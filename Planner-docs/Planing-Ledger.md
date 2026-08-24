@@ -34,7 +34,7 @@ The active snapshot is `SNAP-2026-08-24-SUBPLANS`. Every row in section 4 belong
 
 | Sub-plan Path | Status | Snapshot ID | Run ID | Validation Evidence | Blocker | Next Action | Superseded By | Updated At |
 |---|---|---|---|---|---|---|---|---|
-| Planner-docs/Faz-1-Plans/Faz1.1-version-control-bootstrap.md | planned | SNAP-2026-08-24-SUBPLANS | - | - | - | Measure directory sizes, write ignore rules including the keystore, initialize, commit. | - | 2026-08-24 |
+| Planner-docs/Faz-1-Plans/Faz1.1-version-control-bootstrap.md | complete | SNAP-2026-08-24-SUBPLANS | IMPL-01 | All 7 acceptance criteria pass. Commit `ff6934e`, 86 files, `size-pack` 455.20 KiB, clean tree, 86/86 byte-identical round-trip. | - | None. DEC-01 (remote) stays open and is not this sub-plan's to close. | - | 2026-08-24 |
 | Planner-docs/Faz-1-Plans/Faz1.2-signing-key-containment.md | planned | SNAP-2026-08-24-SUBPLANS | - | - | - | Audit the five release archives by entry name; resolve OQ-09. | - | 2026-08-24 |
 | Planner-docs/Faz-1-Plans/Faz1.3-patch-table-format-contract.md | planned | SNAP-2026-08-24-SUBPLANS | - | - | - | Transcribe the grammar from halpatch.sh and round-trip three records. | - | 2026-08-24 |
 | Planner-docs/Faz-1-Plans/Faz1.4-toolchain-procedure-record.md | planned | SNAP-2026-08-24-SUBPLANS | - | - | - | Write the ordered procedure and run both self-checks. | - | 2026-08-24 |
@@ -69,15 +69,25 @@ The active snapshot is `SNAP-2026-08-24-SUBPLANS`. Every row in section 4 belong
 
 ## 5. Implementation Runs
 
-No implementation run has occurred. Step 4 has not been invoked for this project, and no sub-plan has moved beyond `planned`.
+| Run ID | Date | Sub-plan | Slice performed | Validation evidence | Outcome |
+|---|---|---|---|---|---|
+| IMPL-01 | 2026-08-24 | `Planner-docs/Faz-1-Plans/Faz1.1-version-control-bootstrap.md` | F1.1-01 through F1.1-06: measured per-directory sizes, wrote `.gitignore` and `.gitattributes`, dry-ran the tracked set before any object was written, initialized on branch `main`, committed 86 files, wrote the exclusion rationale. | `git rev-parse --is-inside-work-tree` = `true`; `git status --short` empty; `size-pack` 455.20 KiB after `git gc` (limit 50 MB); 86 tracked files with `.sh` 9, `.py` 4, `.smali` 2, `.patch` 2, `.prop` 2, `.html` 1, `.xml` 9, `.md` 42; zero `.apk`/`.zip`/`.keystore`/`.bin` and zero external-tree paths tracked; 73/73 source files on disk confirmed tracked; 86/86 files round-trip byte-identically from `HEAD`. Commit `ff6934e`. | Complete. All seven acceptance criteria pass. |
 
-When Step 4 runs, each verified slice or stop event appends a row here recording the sub-plan path, the slice performed, the validation evidence produced, and the resulting status change in section 4.
+Each verified slice or stop event appends a row here recording the sub-plan path, the slice performed, the validation evidence produced, and the resulting status change in section 4.
+
+**Confirmed and contradicted claims from IMPL-01.** `EV-01` is inverted and stays `confirmed`: the workspace is now a repository. `CQ-02` moves from `answered (negatively)` to `answered (positively)`. `EV-18` is contradicted as stated and replaced by measurement: the workspace holds approximately 7.3 GiB, not roughly 465 MB — the earlier figure summed root-level files only and counted no directory, and 454.4 MiB of root-level files is what it actually measured. `AUTOPSY-P0-01`, the project's highest-severity finding, is resolved.
+
+**Two scope deviations, recorded rather than applied silently.** `device_ishtar/` was excluded although Faz 1.1 section 4 lists it as tracked content: it is its own clean git clone of AOSPA upstream on branch `vauxite`, with full history and a remote, so it already has the rollback path this sub-phase creates, and nesting it would have stored a gitlink that restores no file content. **Faz 6.1 edits that tree and must commit there, not in the parent repository.** Conversely, `12mpx_agc_config.agc` and `50mpx_agc_config.agc` were tracked although the sub-plan lists them in neither its tracked set nor its exclusion set: 220 KB of hand-tuned UTF-8 XML that no script in the workspace regenerates. Both deviations are argued in `UNTRACKED-BY-DESIGN.md` section 7.
+
+**One hazard found and fixed inside the slice.** This host has `core.autocrlf=true`, which would have checked out every tracked script with CRLF line endings. `ishtar-cam-modes/post-fs-data.sh` and its siblings are executed by the on-device Magisk shell, which does not tolerate that, so a checkout would have restored a broken module — a rollback path that does not roll back. `.gitattributes` now defaults to no conversion, so a checkout returns the committed bytes, and pins `eol=lf` for `.sh`, `.prop`, `.patch`, `mode`, and `lang`. Verified: `git ls-files --eol` reports `i/lf w/lf` for every one of them.
+
+**One local configuration change.** The host had no `user.name` or `user.email`. Both were set **repo-local only** (`git config --local`), not globally, as `ahmet <ahmetozgurc40@gmail.com>`. Change it with `git config --local user.name ...` if that attribution is wrong.
 
 Two recording rules apply and both come from the project's own history rather than from convention. Every located binary address is written into `Planner-docs/Project-Ontology.md` during the session it is found, per Main-Planing risk `R10` and Project-Comprehension `QAS-03`. Every probe that resolves updates the confidence column in `Planner-docs/Project-Comprehension.md` and the corresponding question status in `Planner-docs/Project-Ontology.md` in the same session, per the recording rule stated in that document's section 8.
 
 ## 6. Current State Snapshot
 
-**Repository.** Not under version control. `git status --short` and `git branch --show-current` both fail at the workspace root, re-confirmed during the Step 2 run. This is `AUTOPSY-P0-01` and is the first item in the execution order.
+**Repository.** Under version control as of 2026-08-24. Branch `main`, one commit `ff6934e`, 86 tracked files, `size-pack` 455.20 KiB, clean working tree, no remote. `AUTOPSY-P0-01` is resolved. Excluded paths and their recovery routes are recorded in `UNTRACKED-BY-DESIGN.md` at the workspace root; `device_ishtar/` is excluded because it is its own git clone with its own history.
 
 **Deliverables.** Three module directories exist: `ishtar-cam-modes/` at version v2.1 with versionCode 12, `ishtar-aon-fix/` at v1.1, and `agc-50mp-yama/` holding two smali sources and one experimental HAL patch table. Five release archives sit at the workspace root, none audited for the signing keystore.
 

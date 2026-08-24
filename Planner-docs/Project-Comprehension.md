@@ -11,7 +11,7 @@ The change goal driving this comprehension pass is: **make a 50 MP capture compl
 | ID | Question | Priority | Answer criterion | Status |
 |---|---|---|---|---|
 | CQ-01 | Which layer actually gates 50 MP today? | P0 | A named function or check, measured on device | answered |
-| CQ-02 | Is the workspace recoverable from a mistake? | P0 | Version control or an equivalent snapshot exists | answered (negatively) |
+| CQ-02 | Is the workspace recoverable from a mistake? | P0 | Version control or an equivalent snapshot exists | answered (positively, 2026-08-24 by Faz 1.1) |
 | CQ-03 | What proves a mode switch worked? | P0 | A repeatable command producing a pass/fail signal | answered (nothing does) |
 | CQ-04 | Which invariant does libgcam enforce, exactly? | P0 | The source line and both accepted values | answered |
 | CQ-05 | Where does the HAL write `pixelArraySize`? | P0 | An address that, when patched, changes `dumpsys` output | open |
@@ -29,7 +29,7 @@ The change goal driving this comprehension pass is: **make a 50 MP capture compl
 
 | ID | Claim | Claim Type | Evidence Type | Evidence Source | Confidence |
 |---|---|---|---|---|---|
-| EV-01 | The workspace is not a git repository | structural | source | root `ls -la` shows no `.git` directory | confirmed |
+| EV-01 | The workspace is a git repository as of 2026-08-24 (Faz 1.1); it was not one before | structural | source | `git rev-parse --is-inside-work-tree` returns `true`; commit `ff6934e` tracks 86 files; `git status --short` is empty | confirmed |
 | EV-02 | No tests, CI, or smoke harness exist anywhere in the tree | structural | source | no `tests/` · no `.github/` · no `Makefile` · no `package.json` · no `pyproject.toml` | confirmed |
 | EV-03 | The sensor-mode layer is mature and in daily use | configuration | configuration | `ishtar-cam-modes/module.prop` version=v2.1 versionCode=12 | confirmed |
 | EV-04 | 50 MP works for third-party applications | behavioral | runtime | on-device Open Camera capture measured at 50.3 MP (journal Faz 8) | confirmed |
@@ -46,7 +46,7 @@ The change goal driving this comprehension pass is: **make a 50 MP capture compl
 | EV-15 | A signing keystore sits in the working tree | structural | source | `ishtar-cam-modes/tile-app/debug.keystore` (path only · contents not read) | confirmed |
 | EV-16 | The experimental patch grows the stream array from 508 to 868 int32 | behavioral | runtime | `dumpsys media.camera` entry count before and after the experiment | confirmed |
 | EV-17 | radare2 and rabin2 do not complete on this binary | behavioral | runtime | two runs at 300 s and 60 s in two different shells produced zero output | confirmed |
-| EV-18 | The workspace holds roughly 465 MB at root level | structural | source | root `ls -la` byte sums; `du -sh` timed out before completing | tentative |
+| EV-18 | The workspace holds approximately 7.3 GiB in total; 454.4 MiB of that is root-level files | structural | source | per-directory `find -type f -printf %s` sums, 2026-08-24 (Faz 1.1); table in `UNTRACKED-BY-DESIGN.md` section 1. The earlier 465 MB figure counted root files only and no directory. | confirmed |
 | EV-19 | The device's live mode matches the workspace `mode` file | configuration | configuration | `ishtar-cam-modes/mode` contains `stock`; the device was not queried this run | tentative |
 | EV-20 | WSL2 is not installed and blocks the Android 16 track | user_intent | user-confirmed | user statement recorded in project history | probable |
 | EV-21 | `dcgB` gives about 25% less noise and roughly double the detail versus stock | behavioral | runtime | on-device comparison recorded in `module.prop` and the journal | probable |
@@ -107,7 +107,7 @@ The change goal driving this comprehension pass is: **make a 50 MP capture compl
 
 ## 6. Change History, Hotspots, and Ownership Signals
 
-No git history exists (EV-01), so evolutionary evidence comes from `module.prop`'s version notes and the journal's phase structure. This is a weaker signal than commit history and is used only directionally.
+No git history exists for the work described below (EV-01), so evolutionary evidence comes from `module.prop`'s version notes and the journal's phase structure. This is a weaker signal than commit history and is used only directionally. History begins at commit `ff6934e` (2026-08-24, Faz 1.1); everything before it is unrecorded and this paragraph remains the only account of it.
 
 **Version cadence.** v1.0 → v2.1 across roughly eight days (2026-08-16 to 2026-08-22), with four released zips. Rapid, and the fixes are specific rather than cosmetic.
 
