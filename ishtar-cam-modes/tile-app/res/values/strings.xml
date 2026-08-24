@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Modulun varsayilan dili SISTEM DILINDEN BAGIMSIZ olarak Ingilizcedir.
+  Turkce metinler koda gomulu (BaseTile.Msg) ve $MODDIR/lang dosyasindan
+  secilir; WebUI'deki dil dugmesi ayni dosyayi yazar.
+-->
+<resources>
+    <string name="app_name">IMX989 Camera Modes</string>
+    <string name="tile_50mp">50MP</string>
+    <string name="tile_dcg">DCG</string>
+    <string name="tile_ln4">LN4</string>
+    <string name="tile_ln2">LN2</string>
+    <string name="no_root">no root access</string>
+</resources>

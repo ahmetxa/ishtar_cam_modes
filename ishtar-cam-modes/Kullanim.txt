@@ -1,0 +1,273 @@
+ishtar IMX989 Camera Modes  v1.9
+=================================
+
+NE YAPAR
+--------
+Ana kameranin (Sony IMX989, "wide") sensor surucu dosyasini 12-bit cikisa gecirir
+ve DCG / LN modlarini acar. Yamalar 13U-989-DCG16+LN2+LN4 modundan alindi; o mod
+eski bir HyperOS surucusunu (1.062.110 bayt) temel aliyordu. Bu pakette yamalar
+cihazdaki guncel surucuye (1.062.250 bayt) tasindi, QTI Chromatix CRC32 yeniden
+hesaplandi ve yama TEK bir mod yerine secilebilecek TUM fotograf modlarina
+uygulandi -- boylece overrideForceSensorMode property'sine hic gerek kalmiyor.
+
+
+MODLAR
+------
+  stock  degistirilmemis surucu
+
+  dcgB   >>> ONERILEN <<<  6 fotograf moduna (1,2,7,10,14,15) 12-bit cikis +
+         DCG secici (0x321C=2) + PLL ayari uygular.
+         Cihazda olculdu, 3'e 3 donusumlu, ISO esit (947 / 948):
+             stok  gurultu 2.637   HF detay 5.04   2,73 MB   1/25
+             dcgB  gurultu 1.974   HF detay 11.22  3,82 MB   1/25
+         Yani ~%25 az gurultu, iki katindan fazla korunmus detay ve
+         DEKLANSOR HIZI DEGISMIYOR. 10 ardisik cekimde 0 hata.
+
+  dcgA   dcgB'nin PLL ayari olmayan surumu. Karsilastirma icin duruyor.
+
+  ln4f   14 fotograf moduna LN4 + 12-bit uygular. Kalite dcgB ile ayni
+         (gurultu 1.911, HF 11.35) ama pozu 1/25 yerine 1/20 yapar
+         -> hareketli sahnede daha fazla bulaniklik. dcgB tercih edilmeli.
+  ln2f   Ayni, LN2 ile; poz 1/17'ye uzuyor. En dezavantajlisi.
+
+  ln2s   10-bit LN. Olculdu: kazanc yok, stoktan daha gurultulu. Onerilmez.
+  ln4s   Ayni.
+
+  ln2    ESKI/REFERANS. Yalniz sensor modu 1'i yamalar ve
+  ln4    overrideForceSensorMode=1 gerektirir; o CamX ayari KURESELdir.
+         Ayar olmadan fotograflar pembe bantlanir. Kullanmayin.
+
+
+BILINEN KISITLAR
+----------------
+  * VIDEO calismiyor. dcgB / ln4f / ln2f aktifken video kaydi baslatinca
+    akis oluyor (SHDR 5/6/18/19, 8K 8, yavas cekim 9/22 modlari yamali degil).
+    Video icin once "setmode.sh stock" yapin -- yeniden baslatma GEREKMIYOR.
+  * 50MP (sensor modu 0) yamali degil, ayni sebeple bozulur.
+  * 3360x2520 modlari (12/13/20/21) dcgB'de yamali degil; o modlarin register
+    duzeni farkli (158 kayit, 170 yerine). LN varyantlari onlari da kapsiyor.
+
+
+ARAYUZLER
+---------
+0) HIZLI AYARLAR KUTUCUKLARI -- DCG / LN4 / LN2
+   Modul, tile-app.apk'yi ilk acilista kurar ve uc kutucugu Hizli Ayarlar'a
+   ekler. Kutucuga DOKUNMAK modu acar/kapatir (acik olana tekrar dokunmak
+   stock'a dondurur). Kutucugun alt yazisi o an etkin modu gosterir.
+   Kutucuga UZUN BASMAK asagidaki WebUI sayfasini acar.
+
+   Uygulama cekmecede GORUNUR; simgesine dokununca bu WebUI acilir.
+   v2.0'da kok yetkisi verilince kendiliginden gizleniyordu. Cihazda
+   olculdu: AOSPA baslaticisi, takma ad "pm disable" ile kapatilsa da
+   uygulamayi cekmecede TUTUYOR (taze kurulumdan sonra da). Gizlemenin
+   tek etkisi girdiyi ISLEVSIZ birakmakti: dokununca WebUI yerine
+   Android'in Uygulama Bilgisi sayfasi aciliyordu. Bu yuzden varsayilan
+   artik GORUNUR. Baska bir baslatici kullaniyorsaniz deneyebilirsiniz:
+     su -c 'sh /data/adb/modules/ishtar_cam_modes/action.sh tiles hide'
+   Geri almak icin ayni komut "tiles show" ile.
+
+   Kutucuklarda etkin mod YAZMAZ; hangisinin acik oldugu kutucugun kendi
+   vurgusundan okunur. Alt yazi yalnizca kok erisimi yoksa cikar.
+
+   Gecis sirasinda ekranin alt ortasinda CANLI BILDIRIM cikar:
+     Ingilizce:  Switching to DCG  ->  11s  10s  9s ...  ->  DCG ready
+     Turkce   :  DCG'ye geciliyor  ->  11sn 10sn 9sn ... ->  DCG hazir
+   "ready / hazir" gorunene kadar kamerayi ACMAYIN.
+
+   Bu bildirim gercek bir Toast DEGIL, uygulamanin kendi katmani. Sebep:
+   Android uygulama basina toast kotasi uyguluyor (~5 toast / 20 sn) ve
+   saniyelik geri sayim engelleniyor ("above allowed toast quota"). Gereken
+   izinler modul kurulumda otomatik verilir; elle:
+      su -c "pm grant com.ishtar.cammodes android.permission.POST_NOTIFICATIONS"
+      su -c "cmd appops set com.ishtar.cammodes POST_NOTIFICATION allow"
+      su -c "cmd appops set com.ishtar.cammodes SYSTEM_ALERT_WINDOW allow"
+   Overlay izni yoksa uygulama sessizce Toast'a duser (geri sayim seyrek olur).
+   NOT: screencap ne toast'i ne overlay'i yakalar; ekran goruntusunde
+   gorunmemesi calismadigi anlamina gelmez.
+
+   Kutucuk senkronu (v1.5'te duzeltildi): SystemUI uc kutucuk servisini ayni
+   anda bagli tutmuyor, bu yuzden bir kutucuga dokununca digerleri eski modu
+   gostermeye devam ediyordu. Uc katmanli cozum:
+     * surec onbellegi -- yeni baglanan kutucuk kabuga gitmeden dogru cizer
+     * tahmin -- dokunus aninda beklenen mod butun kutucuklara dagitilir
+                 ("dcgB…" seklinde uc nokta ile gosterilir)
+     * uyandirma -- kardes kutucuklar icin requestListeningState() cagrilir
+                    ve gec baglananlar kendini yeniden yoklar
+   Olculdu: dokunulan kutucuk ~3 ms, digerleri ~1-2 sn icinde senkron.
+
+   TEK SEFERLIK: kutucuklarin calismasi icin uygulamaya kok yetkisi
+   verilmelidir. KernelSU'nun Superuser listesi baslatici etkinligi olmayan
+   uygulamalari gizledigi icin sira sudur:
+     su -c sh /data/adb/modules/ishtar_cam_modes/action.sh tiles show
+     KernelSU > Superuser > "IMX989 Kamera Modlari" > ac
+     su -c sh /data/adb/modules/ishtar_cam_modes/action.sh tiles hide
+   Yetki UID'ye baglidir; bir kez verilince kalicidir.
+   Durum: action.sh tiles status
+
+DIL
+---
+Modulun arayuz dili SISTEM DILINDEN BAGIMSIZDIR; varsayilan INGILIZCE.
+WebUI'nin sag ust kosesindeki EN / TR dugmesiyle degistirilir. Tercih
+$MODDIR/lang dosyasinda tutulur ve kutucuk bildirimleri de ayni dili kullanir.
+Terminalden:  action.sh lang        -> mevcut dil
+              action.sh lang tr     -> Turkce
+              action.sh lang en     -> Ingilizce
+
+
+1) WebUI -- 3 dugme, modulun kendi icinde, APK gerekmez
+   KernelSU-Next > Module > "ishtar IMX989 Camera Modes" karti > WEBUI
+   Uc dugme: DCG (dcgB), LN4 (ln4f), LN2 (ln2f). Her biri ac/kapa calisir;
+   acik olana tekrar basmak stock'a dondurur. Etkin mod ve uyarilar canli.
+   Sag ustte EN / TR dil dugmesi.
+
+2) Action dugmesi -- ayni kartta ACTION; tek dokunusla sirala:
+   stock -> dcgB -> ln4f -> stock
+
+3) Terminal -- action.sh makine dostu arayuz:
+     sh /data/adb/modules/ishtar_cam_modes/action.sh get
+     sh /data/adb/modules/ishtar_cam_modes/action.sh state dcgB     -> on|off
+     sh /data/adb/modules/ishtar_cam_modes/action.sh toggle dcgB
+     sh /data/adb/modules/ishtar_cam_modes/action.sh set stock
+     sh /data/adb/modules/ishtar_cam_modes/action.sh info           -> mod|mount|md5
+
+   QS kutucugu uygulamasina (root shell komutu calistiran turden) yapistirmak
+   icin uc komut:
+     su -c "sh /data/adb/modules/ishtar_cam_modes/action.sh toggle dcgB"
+     su -c "sh /data/adb/modules/ishtar_cam_modes/action.sh toggle ln4f"
+     su -c "sh /data/adb/modules/ishtar_cam_modes/action.sh toggle ln2f"
+   Kutucuk durumu gostermek isterse:
+     su -c "sh /data/adb/modules/ishtar_cam_modes/action.sh state dcgB"
+
+
+KULLANIM
+--------
+Durum gormek:
+  su -c sh /data/adb/modules/ishtar_cam_modes/setmode.sh
+
+Mod degistirmek:
+  su -c sh /data/adb/modules/ishtar_cam_modes/setmode.sh dcgB
+  su -c sh /data/adb/modules/ishtar_cam_modes/setmode.sh stock
+
+Ilk kurulumdan sonra BIR KEZ yeniden baslat. Sonrasinda mod degistirmek icin
+yeniden baslatmaya gerek yok; script kamera servislerini yeniden baslatir.
+Kamera uygulamasi aciksa once kapat.
+
+Baslangic modu "stock" - yani kurulum tek basina hicbir seyi degistirmez.
+
+
+MOD DEGISIMI ~10-12 SANIYE SURER  (v1.7)
+----------------------------------------
+Mod degistirmek kamera yigininin tamamen yeniden baslamasini gerektirir.
+OLCULDU: servisler "running" olduktan sonra bile kamera ~4 saniye daha
+KULLANILAMIYOR (provider butun sensorleri yeniden probe ediyor). Bu arada
+kamerayi acarsaniz cekim SESSIZCE basarisiz olur -- uygulama acilmamis gibi
+gorunur. Ustuste denenirse provider SIGABRT atar ve o cokme cekirdek
+tahsislerini sizdirip kalici kilitlenmeye yol acabilir.
+
+Bu yuzden:
+  * setmode.sh servisleri yeniden baslattiktan sonra kamera listesinin geri
+    geldigini bekler + 5 saniye guvenlik payi birakir.
+  * action.sh isin GERCEKTEN bitmesini bekler (.busy bayragi).
+  * Kutucuklarda gecis surerken BASLIGIN SONUNDA "..." cikar.
+    Uc nokta kaybolana kadar kamerayi ACMAYIN.
+
+Olculdu: dokunustan 4 sn sonra acmak basarisiz, 7 sn sonrasi calisiyor;
+uc nokta kaybolduktan sonra 6/6 basarili.
+
+
+MOD DEGISIMINDE KAMERA KILITLENMESI (v1.6'da duzeltildi)
+---------------------------------------------------------
+Belirti: QS kutucugundan / WebUI'den mod degistirdikten sonra AGC de MiuiCamera
+da hic acilmiyor.
+
+Sebep: setmode.sh kamera yiginini YANLIS sirayla olduruyordu -- once provider,
+sonra cameraserver. Yani HAL, cameraserver hala akan bir oturum tutarken
+oluyordu. QCOM kamera cekirdek surucusu bu durumda CSIPHY/CSID tahsislerini
+birakmiyor; taze baslayan provider bile kaynaklari tukenmis goruyor
+(CSIPHYHw:4 AvailableResource=0, IFE dimension 0 x 0).
+Aralikli olmasinin sebebi: yalnizca o anda gercekten aktif bir oturum varsa
+olusuyordu.
+
+Cozum -- sira istemciden HAL'e dogru cevrildi:
+  1) am force-stop <kamera uygulamalari>   oturumlar duzgun sonlansin
+  2) stop cameraserver                     HAL'in istemcisi kalmasin
+  3) stop/start vendor.camera-provider     init uzerinden, temiz yasam dongusu
+     (+ vendor.camera-provider-2-7-ext)
+  4) start cameraserver
+Ayrica:
+  * action.sh isi setsid ile KOPARILMIS yurutur -- cagiran (kutucuk servisi
+    ya da WebUI) is bitmeden oldurulurse gecis yine de tamamlanir.
+  * .switching kilidi es zamanli iki gecisi engeller (90 sn'de bayatlar).
+Yan fayda: action.sh blob yazilir yazilmaz doner, ~4 sn yerine ~2 sn.
+
+Dogrulandi: kamera akarken 4 ardisik mod gecisi + hizli cift dokunus +
+cagiran surecin ortada oldurulmesi -- hepsinde kamera calismaya devam etti.
+
+
+KAMERA YINE DE KILITLENIRSE
+---------------------------
+Belirti: HER modda (stok dahil) onizleme siyah, cekilen kare bos.
+Logda: CSIPHYHw:4 AvailableResource=0
+Sebep: bir kamera oturumu cokup donanim tahsisini birakmamis.
+       (MiuiCamera -- com.android.camera -- bu ROM'da stok blob ve property
+        bosken bile cokuyor; onu acmayin.)
+COZUM: YENIDEN BASLATMA. Kamera servislerini oldurmek yetmiyor.
+Bu duruma girildiginde suclu blob degildir; once stock'a alip yeniden baslatin.
+
+
+NEDEN TUM MODLARA BIRDEN
+------------------------
+Surucude 23 sensor modu var; kamera hangisini sececegine cozunurluk, en-boy
+orani ve fps'e bakarak kendi karar veriyor ve tek moda zorlamanin guvenli yolu
+yok (overrideForceSensorMode KURESELdir, tum sensorlere uygulanir). Bu yuzden
+yama, fotograf cekiminde secilebilecek modlara birden uygulaniyor.
+AGC (org.codeaurora.snapcam) HAL'den "RAW10 4096x3072" istiyor -> mod 1/3/14/16.
+
+Mod 14-21, mod 1-8'in birebir kopyasidir; tek fark fazladan tasidiklari
+capability 0x23 degeri. Register icerikleri bit bit aynidir.
+
+
+REGISTER KARSILIGI
+------------------
+  0x0112 / 0x0113   cikis formati    0x0A0A=RAW10  0x0C0C=RAW12  0x0E0E=RAW14
+  0x0342 / 0x0343   LINE_LENGTH_PCK  12-bit icin BUYUTULMESI ZORUNLU
+                    (buyutulmezse akis hic gelmiyor; olculdu)
+  0x31A4            LN secici        0=kapali 1=LN2 2=LN4
+  0x321C            DCG secici       0=kapali 2=acik
+  0x0307/0x030D-0F  PLL carpan/bolucu
+
+Orijinal DCG modunun satici zamanlama register'lari (0x3805, 0x389x, 0x38Bx,
+0x3170, 0x3172, 0xB8xx) bu firmware'de GORUNTUYU BOZUYOR -- onizleme parlak
+yesile donuyor. Ikiye bolerek dogrulandi; dcgA/dcgB o grubu icermiyor.
+
+
+NASIL CALISIR
+-------------
+post-fs-data.sh, secili blob'u modulun active/ dizinine kopyalar ve o tek dosyayi
+/odm/lib64/camera/... uzerine bind mount eder. Mod degistirmek ayni inode'un
+icerigini degistirmek demektir; mount'a hic dokunulmaz.
+
+
+GUVENLIK KILIDI
+---------------
+Her acilista /odm'deki stok surucunun md5'i kontrol edilir:
+  beklenen: 9e4d0fe1a8bf2eb4146c9917a0ac2c4c
+Uymuyorsa (ornegin OTA geldiyse) modul HICBIR SEY MOUNT ETMEZ.
+Bloblari yeniden uretmek icin:
+  python tools/ln_multimode.py  <yeni surucu> blobs/
+  python tools/dcg_multimode.py <yeni surucu> blobs/ <mod klasoru>
+  python tools/verify_ln.py
+
+
+SORUN CIKARSA
+-------------
+  su -c sh /data/adb/modules/ishtar_cam_modes/setmode.sh stock
+Duzelmezse KernelSU'dan modulu devre disi birak ve yeniden baslat.
+En kotu ihtimalde /data/adb/modules/ishtar_cam_modes/disable dosyasi olustur.
+
+
+DOGRULAMA
+---------
+  logcat -d | grep ishtar_cam_modes
+  md5sum /odm/lib64/camera/com.qti.sensormodule.ishtar_semco_imx989_wide.bin
+  dumpsys media.camera | grep -A1 "sensor.info.whiteLevel"

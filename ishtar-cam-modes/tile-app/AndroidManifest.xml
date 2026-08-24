@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  IMX989 kamera modu Hizli Ayarlar kutucuklari.
+
+  Bilerek LAUNCHER intent-filter'i YOK  ->  uygulama cekmecesinde gorunmez.
+  Kutucuga uzun basinca WebUiActivity acilir (QS_TILE_PREFERENCES), o da
+  modulun KernelSU WebUI sayfasini baslatip kapanir.
+-->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.ishtar.cammodes"
+    android:versionCode="11"
+    android:versionName="2.1">
+
+    <uses-sdk android:minSdkVersion="26" android:targetSdkVersion="35" />
+
+    <!-- Ekran altindaki bildirim (Toast) icin gerekli: bildirimleri kapali
+         olan uygulamalarin toast'lari Android tarafindan bastiriliyor
+         ("Suppressing toast ... by user request"). Izin, modul kurulumda
+         "pm grant" ile verilir. -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
+    <!-- Geri sayim bildirimi icin kendi katmanimiz: Android uygulama basina
+         toast kotasi uyguluyor (~5 toast / 20 sn), saniyelik guncelleme
+         "above allowed toast quota" ile engelleniyor. Izin verilmezse
+         uygulama sessizce Toast'a duser. -->
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+
+    <application
+        android:label="@string/app_name"
+        android:icon="@mipmap/ic_launcher"
+        android:allowBackup="false"
+        android:hasCode="true">
+
+        <!-- Kutucuga uzun basma hedefi. Kendi arayuzu yok, WebUI'yi acar. -->
+        <activity
+            android:name=".WebUiActivity"
+            android:exported="true"
+            android:excludeFromRecents="true"
+            android:noHistory="true"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar">
+            <intent-filter>
+                <action android:name="android.service.quicksettings.action.QS_TILE_PREFERENCES" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
+        <!--
+          Baslatici takma adi. TEK amaci uygulamanin KernelSU'nun Superuser
+          listesinde gorunmesi: o liste baslatici etkinligi olmayan
+          uygulamalari gizliyor, dolayisiyla kok yetkisi verilemiyor.
+          Yetki bir kez verildikten sonra (UID'ye baglidir, kalicidir)
+          modul bu bileseni KENDILIGINDEN kapatir ("pm disable"), boylece
+          uygulama cekmecede gorunmez. Kural action.sh:launcher_sync'te;
+          hem her acilista (service.sh) hem her mod degisiminde uygulanir.
+          Burada enabled="true" kalmali: ilk kurulumda gorunur olmasi sart.
+        -->
+        <activity-alias
+            android:name=".Launcher"
+            android:targetActivity=".WebUiActivity"
+            android:exported="true"
+            android:enabled="true"
+            android:label="@string/app_name"
+            android:icon="@mipmap/ic_launcher">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity-alias>
+
+        <service
+            android:name=".FullResTile"
+            android:label="@string/tile_50mp"
+            android:icon="@drawable/ic_camera"
+            android:exported="true"
+            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
+            <intent-filter>
+                <action android:name="android.service.quicksettings.action.QS_TILE" />
+            </intent-filter>
+        </service>
+
+        <service
+            android:name=".DcgTile"
+            android:label="@string/tile_dcg"
+            android:icon="@drawable/ic_dcg"
+            android:exported="true"
+            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
+            <intent-filter>
+                <action android:name="android.service.quicksettings.action.QS_TILE" />
+            </intent-filter>
+        </service>
+
+        <service
+            android:name=".Ln4Tile"
+            android:label="@string/tile_ln4"
+            android:icon="@drawable/ic_ln4"
+            android:exported="true"
+            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
+            <intent-filter>
+                <action android:name="android.service.quicksettings.action.QS_TILE" />
+            </intent-filter>
+        </service>
+
+        <service
+            android:name=".Ln2Tile"
+            android:label="@string/tile_ln2"
+            android:icon="@drawable/ic_ln2"
+            android:exported="true"
+            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
+            <intent-filter>
+                <action android:name="android.service.quicksettings.action.QS_TILE" />
+            </intent-filter>
+        </service>
+
+    </application>
+</manifest>

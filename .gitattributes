@@ -1,0 +1,32 @@
+# ---------------------------------------------------------------------------
+# ishtar workspace - line-ending policy
+#
+# Written by Faz 1.1 (Version Control Bootstrap).
+#
+# This host has core.autocrlf=true. Left alone, git would check out every
+# tracked text file with CRLF line endings. That is not merely cosmetic here:
+# ishtar-cam-modes ships shell scripts that are executed by the on-device
+# Magisk shell at post-fs-data, and a CRLF script fails there in ways that are
+# slow and confusing to diagnose. The whole point of this repository is that a
+# checkout restores a working file, so conversion has to be pinned, not left
+# to a per-machine git setting.
+#
+# Policy, in two parts:
+#   1. Default to no conversion at all. The repository is a recovery tool
+#      first; a checkout must return the same bytes that were committed,
+#      whatever they were. The workspace currently holds a mix of LF and CRLF
+#      files and this preserves each one as it stands.
+#   2. Force LF for the artifacts that are consumed by a Linux or Android
+#      shell, or by the patch tooling. All of these are already LF today, so
+#      this pins the current state rather than rewriting anything.
+# ---------------------------------------------------------------------------
+
+# 1. Default: byte-preserving.
+* -text
+
+# 2. Must be LF, because something outside Windows reads them.
+*.sh     text eol=lf
+*.prop   text eol=lf
+*.patch  text eol=lf
+mode     text eol=lf
+lang     text eol=lf

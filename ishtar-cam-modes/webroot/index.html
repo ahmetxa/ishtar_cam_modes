@@ -1,0 +1,344 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>IMX989 Camera Modes</title>
+<style>
+  :root{
+    --bg:#f4f5f7; --card:#ffffff; --fg:#14161a; --dim:#5b6472; --line:#e2e5ea;
+    --on:#1f6f43; --on-bg:#e3f5ea; --warn:#8a5a00; --warn-bg:#fdf1d8;
+    --shadow:0 1px 3px rgba(0,0,0,.08),0 6px 20px rgba(0,0,0,.05);
+  }
+  @media (prefers-color-scheme:dark){
+    :root{
+      --bg:#0e1013; --card:#171a1f; --fg:#e8eaed; --dim:#9aa4b2; --line:#262b33;
+      --on:#7ee0a6; --on-bg:#12291d; --warn:#f0c274; --warn-bg:#2a2113;
+      --shadow:0 1px 3px rgba(0,0,0,.4),0 6px 20px rgba(0,0,0,.3);
+    }
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  body{
+    margin:0;background:var(--bg);color:var(--fg);
+    font:15px/1.5 system-ui,-apple-system,"Roboto",sans-serif;
+    padding:max(16px,env(safe-area-inset-top)) 16px max(24px,env(safe-area-inset-bottom));
+  }
+  header{margin:4px 2px 18px;display:flex;align-items:flex-start;gap:12px}
+  .htxt{flex:1;min-width:0}
+  h1{font-size:19px;margin:0 0 4px;letter-spacing:-.01em}
+  .sub{color:var(--dim);font-size:13px}
+
+  .lang{flex:none;display:flex;border:1px solid var(--line);border-radius:999px;overflow:hidden;background:var(--card)}
+  .lang button{
+    appearance:none;border:0;background:transparent;color:var(--dim);
+    font:600 12px/1 inherit;letter-spacing:.04em;padding:8px 11px;cursor:pointer;
+  }
+  .lang button[aria-pressed="true"]{background:var(--fg);color:var(--bg)}
+
+  .status{
+    background:var(--card);border:1px solid var(--line);border-radius:14px;
+    padding:14px 16px;margin-bottom:16px;box-shadow:var(--shadow);
+    display:flex;align-items:center;gap:12px;
+  }
+  .dot{width:10px;height:10px;border-radius:50%;background:var(--dim);flex:none}
+  .dot.live{background:var(--on)}
+  .status .txt{flex:1;min-width:0}
+  .status .k{font-size:12px;color:var(--dim)}
+  .status .v{font-size:17px;font-weight:600;letter-spacing:-.01em}
+
+  .btn{
+    width:100%;display:flex;align-items:center;gap:14px;text-align:left;
+    background:var(--card);color:var(--fg);border:1px solid var(--line);
+    border-radius:14px;padding:15px 16px;margin-bottom:10px;
+    font:inherit;cursor:pointer;box-shadow:var(--shadow);
+    transition:transform .08s ease,border-color .15s ease,background .15s ease;
+  }
+  .btn:active{transform:scale(.985)}
+  .btn[aria-pressed="true"]{border-color:var(--on);background:var(--on-bg)}
+  .btn .name{font-weight:600;font-size:16px}
+  .btn .desc{color:var(--dim);font-size:12.5px;margin-top:2px}
+  .btn .body{flex:1;min-width:0}
+  .pill{
+    flex:none;font-size:11px;font-weight:700;letter-spacing:.04em;
+    padding:5px 9px;border-radius:999px;border:1px solid var(--line);color:var(--dim);
+  }
+  .btn[aria-pressed="true"] .pill{background:var(--on);color:#fff;border-color:var(--on)}
+
+  .note{
+    background:var(--warn-bg);color:var(--warn);border-radius:12px;
+    padding:11px 14px;font-size:12.5px;margin:14px 0 4px;display:none;
+  }
+  .note.show{display:block}
+  .note b{font-weight:700}
+
+  details{margin-top:20px}
+  summary{color:var(--dim);font-size:13px;cursor:pointer;padding:6px 2px;list-style:none}
+  summary::-webkit-details-marker{display:none}
+  summary::before{content:"▸ ";}
+  details[open] summary::before{content:"▾ ";}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:8px;margin-top:10px}
+  .mini{
+    background:var(--card);border:1px solid var(--line);border-radius:11px;
+    padding:11px 6px;font:600 13px/1.2 inherit;color:var(--fg);cursor:pointer;text-align:center;
+  }
+  .mini[aria-pressed="true"]{border-color:var(--on);background:var(--on-bg);color:var(--on)}
+  .meta{color:var(--dim);font-size:11.5px;margin-top:14px;word-break:break-all;line-height:1.7}
+  .meta code{font-family:ui-monospace,monospace;font-size:11px}
+  .busy{pointer-events:none;opacity:.55}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="htxt">
+    <h1 id="t-title">IMX989 Camera Modes</h1>
+    <div class="sub" id="t-sub">Xiaomi 13 Ultra &middot; main camera sensor driver</div>
+  </div>
+  <div class="lang" role="group" aria-label="Language">
+    <button type="button" data-lang="en">EN</button>
+    <button type="button" data-lang="tr">TR</button>
+  </div>
+</header>
+
+<div class="status">
+  <span class="dot" id="dot"></span>
+  <div class="txt">
+    <div class="k" id="t-active">active mode</div>
+    <div class="v" id="cur">…</div>
+  </div>
+</div>
+
+<div id="main"></div>
+
+<div class="note" id="note"></div>
+
+<details>
+  <summary id="t-more">Other modes (experimental / reference)</summary>
+  <div class="grid" id="extra"></div>
+  <div class="meta" id="meta"></div>
+</details>
+
+<script>
+const MODDIR = '/data/adb/modules/ishtar_cam_modes';
+const ACT = 'sh ' + MODDIR + '/action.sh';
+const SWITCH_SECONDS = 12;
+
+/* Varsayilan dil SISTEM DILINDEN BAGIMSIZ olarak Ingilizce.
+   Tercih modulun lang dosyasinda tutulur; kutucuk uygulamasi da oradan okur. */
+const I18N = {
+  en: {
+    title: 'IMX989 Camera Modes',
+    sub: 'Xiaomi 13 Ultra · main camera sensor driver',
+    active: 'active mode',
+    more: 'Other modes (experimental / reference)',
+    loading: 'loading…',
+    unknown: 'unknown',
+    switching: 'switching…',
+    noRoot: 'no root access',
+    note: '<b>50MP and the 12-bit modes exclude each other.</b> DCG/LN patch photo ' +
+          'modes only — switch back to <b>Stock</b> before recording video. 50MP leaves ' +
+          'video untouched (1080p60 / 4K60 verified) but needs a third-party app: ' +
+          'measured 50.3 MP in OpenCamera, 12.6–15.2 MP in AGC; the GCam 8.4 engine cannot select the 50MP stream.',
+    ready: n => n + ' ready',
+    wait: n => 'Switching to ' + n,
+    remaining: s => s + 's',
+    failed: 'Mode switch failed',
+    mount: 'bind mount',
+    md5: 'active file md5',
+    modes: {
+      '50mp': ['50MP', 'Full resolution 8192×6144 for third-party apps. Video unaffected. Turns DCG/LN off.'],
+      dcgB: ['DCG', '12-bit + dual conversion gain — recommended. Shutter speed unchanged.'],
+      ln4f: ['LN4', '12-bit + low noise 4. Same quality, but 1/20 instead of 1/25.'],
+      ln2f: ['LN2', '12-bit + low noise 2. Lengthens exposure the most.']
+    },
+    stock: 'Stock',
+    on: 'ON', off: 'OFF'
+  },
+  tr: {
+    title: 'IMX989 Kamera Modları',
+    sub: 'Xiaomi 13 Ultra · ana kamera sensör sürücüsü',
+    active: 'etkin mod',
+    more: 'Diğer modlar (deneysel / referans)',
+    loading: 'yükleniyor…',
+    unknown: 'bilinmiyor',
+    switching: 'değiştiriliyor…',
+    noRoot: 'kök erişimi yok',
+    note: '<b>50MP ile 12-bit modları birbirini dışlar.</b> DCG/LN yalnızca fotoğraf ' +
+          'modlarını yamalar — video çekmeden önce <b>Stok</b>\'a dönün. 50MP videoyu ' +
+          'etkilemez (1080p60 / 4K60 doğrulandı) ama üçüncü parti uygulama gerektirir: ' +
+          'OpenCamera\'da 50,3 MP, AGC\'de 12,6–15,2 MP ölçüldü; GCam 8.4 motoru 50MP akışını seçemiyor.',
+    ready: n => n + ' hazır',
+    wait: n => n + dative(n) + ' geçiliyor',
+    remaining: s => s + 'sn',
+    failed: 'Mod değişimi başarısız',
+    mount: 'bind mount',
+    md5: 'etkin dosya md5',
+    modes: {
+      '50mp': ['50MP', 'Üçüncü parti uygulamalar için tam çözünürlük 8192×6144. Videoyu etkilemez. DCG/LN kapanır.'],
+      dcgB: ['DCG', '12-bit + dual conversion gain — önerilen. Deklanşör hızı değişmez.'],
+      ln4f: ['LN4', '12-bit + düşük gürültü 4. Aynı kalite, poz 1/25 yerine 1/20.'],
+      ln2f: ['LN2', '12-bit + düşük gürültü 2. Pozu en çok uzatan seçenek.']
+    },
+    stock: 'Stok',
+    on: 'AÇIK', off: 'KAPALI'
+  }
+};
+
+const MAIN_MODES = ['50mp', 'dcgB', 'ln4f', 'ln2f'];
+const EXTRA = ['stock', 'dcgA', 'ln2s', 'ln4s', 'ln2', 'ln4'];
+
+let lang = 'en', current = null, busy = false;
+const T = () => I18N[lang];
+
+function exec(cmd){
+  return new Promise(resolve=>{
+    if (typeof ksu === 'undefined' || !ksu.exec){
+      resolve({errno:-1, stdout:'', stderr:'not running inside KernelSU WebUI'});
+      return;
+    }
+    const cb = 'cb_' + Date.now().toString(36) + Math.random().toString(36).slice(2);
+    window[cb] = (errno, stdout, stderr)=>{
+      delete window[cb];
+      resolve({errno, stdout:(stdout||'').trim(), stderr:(stderr||'').trim()});
+    };
+    try { ksu.exec(cmd, JSON.stringify({}), cb); }
+    catch(e){ delete window[cb]; resolve({errno:-1, stdout:'', stderr:String(e)}); }
+  });
+}
+
+function toast(m){ try{ ksu.toast(m); }catch(e){} }
+
+/* Turkce yonelme eki: kisaltmalar okundugu gibi ek alir.
+   DCG  "de-ce-ge"   -> unluyle biter -> 'ye | LN4 "...dort" -> 'e
+   LN2  "...iki"     -> unluyle biter -> 'ye | STOK "stok"   -> 'a
+   50MP "elli-em-pe" -> unluyle biter -> 'ye                          */
+function dative(mode){
+  if (mode === 'LN4')  return "'e";
+  if (mode === 'STOK') return "'a";
+  return "'ye";
+}
+
+/* Bildirimlerde mod adi BUYUK HARFLE gosterilir. */
+function prettyName(m){
+  if (m === '50mp') return '50MP';
+  if (m === 'dcgB' || m === 'dcgA') return 'DCG';
+  if (m && m.indexOf('ln4') === 0) return 'LN4';
+  if (m && m.indexOf('ln2') === 0) return 'LN2';
+  return lang === 'tr' ? 'STOK' : 'STOCK';
+}
+
+function applyLanguage(){
+  const t = T();
+  document.documentElement.lang = lang;
+  document.getElementById('t-title').textContent = t.title;
+  document.getElementById('t-sub').textContent = t.sub;
+  document.getElementById('t-active').textContent = t.active;
+  document.getElementById('t-more').textContent = t.more;
+  document.getElementById('note').innerHTML = t.note;
+  document.querySelectorAll('.lang button').forEach(b=>{
+    b.setAttribute('aria-pressed', b.dataset.lang === lang ? 'true' : 'false');
+  });
+  MAIN_MODES.forEach(id=>{
+    const el = document.querySelector('.btn[data-mode="' + id + '"]');
+    if (!el) return;
+    el.querySelector('.name').textContent = t.modes[id][0];
+    el.querySelector('.desc').textContent = t.modes[id][1];
+  });
+  const st = document.querySelector('.mini[data-mode="stock"]');
+  if (st) st.textContent = t.stock;
+  render();
+}
+
+function render(){
+  const t = T();
+  document.getElementById('cur').textContent =
+    current === null ? t.loading : (current === 'unknown' ? t.unknown : current);
+  document.getElementById('dot').className = 'dot' + (current && current !== 'unknown' ? ' live' : '');
+  document.getElementById('note').className =
+    'note' + (current && current !== 'stock' && current !== 'unknown' ? ' show' : '');
+  document.querySelectorAll('[data-mode]').forEach(el=>{
+    const on = el.dataset.mode === current;
+    el.setAttribute('aria-pressed', on ? 'true':'false');
+    const p = el.querySelector('.pill');
+    if (p) p.textContent = on ? t.on : t.off;
+  });
+}
+
+async function refresh(){
+  const r = await exec(ACT + ' info');
+  if (r.errno !== 0){
+    document.getElementById('cur').textContent = r.stderr || '—';
+    return;
+  }
+  const [mode, mount, md5, l] = r.stdout.split('|');
+  current = mode;
+  if (l === 'tr' || l === 'en') { lang = l; }
+  document.getElementById('meta').innerHTML =
+    T().mount + ': <code>' + mount + '</code><br>' + T().md5 + ': <code>' + (md5 || '-') + '</code>';
+  applyLanguage();
+}
+
+async function run(cmd, target){
+  if (busy) return;
+  busy = true;
+  document.body.classList.add('busy');
+
+  // Geri sayim SAYFA ICINDE gosterilir: ksu.toast da Android'in uygulama basina
+  // toast kotasina takiliyor (~5 toast / 20 sn), saniyelik guncelleme
+  // "above allowed toast quota" ile engelleniyor. Toast yalnizca basta ve sonda.
+  const name = prettyName(target);
+  const cur = document.getElementById('cur');
+  cur.textContent = T().wait(name);
+  toast(T().wait(name));
+
+  let left = SWITCH_SECONDS;
+  const tick = setInterval(()=>{
+    left--;
+    if (left > 0) cur.textContent = T().wait(name) + ' · ' + T().remaining(left);
+  }, 1000);
+
+  const r = await exec(cmd);
+  clearInterval(tick);
+  busy = false;
+  document.body.classList.remove('busy');
+  await refresh();
+  toast(r.errno === 0 ? T().ready(prettyName(current)) : T().failed);
+}
+
+function build(){
+  const t = T();
+  const main = document.getElementById('main');
+  MAIN_MODES.forEach(id=>{
+    const b = document.createElement('button');
+    b.className = 'btn'; b.dataset.mode = id; b.type = 'button';
+    b.innerHTML = '<span class="body"><span class="name">' + t.modes[id][0] +
+                  '</span><div class="desc">' + t.modes[id][1] + '</div></span>' +
+                  '<span class="pill">' + t.off + '</span>';
+    b.onclick = ()=> run(ACT + ' toggle ' + id, current === id ? 'stock' : id);
+    main.appendChild(b);
+  });
+  const ex = document.getElementById('extra');
+  EXTRA.forEach(id=>{
+    const b = document.createElement('button');
+    b.className = 'mini'; b.dataset.mode = id; b.type = 'button';
+    b.textContent = id === 'stock' ? t.stock : id;
+    b.onclick = ()=> run(ACT + ' set ' + id, id);
+    ex.appendChild(b);
+  });
+  document.querySelectorAll('.lang button').forEach(b=>{
+    b.onclick = async ()=>{
+      lang = b.dataset.lang;
+      applyLanguage();
+      await exec(ACT + ' lang ' + lang);
+    };
+  });
+}
+
+try { ksu.enableEdgeToEdge(); } catch(e){}
+build();
+applyLanguage();
+refresh();
+document.addEventListener('visibilitychange', ()=>{ if(!document.hidden && !busy) refresh(); });
+</script>
+</body>
+</html>

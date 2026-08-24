@@ -1,0 +1,28 @@
+# ishtar 50MP -- HAL RAW genisletme DENEMESI (2026-08-23)
+# camera.qcom.so / InitializeScalerStaticCaps icindeki bicim araligi testi:
+#   sub wN, wFmt, #0x22 ; cmp wN, #2  -> "bicim 0x22..0x23 ise yayinla"
+# Bu test #5'e cikarilinca aralik 0x22..0x26 olur, yani
+#   0x24 RAW_OPAQUE, 0x25 RAW10, 0x26 RAW12 de yayinlanir.
+#
+# ETKISI OLCULDU: android.scaler.availableStreamConfigurations icine
+#   [37 8192 6144 OUTPUT] [38 8192 6144 OUTPUT] [36 8192 6144 OUTPUT]
+# girdileri geliyor (dizi 508 -> 868 int32). AGC bunu goruyor ve
+# getImageReaderFormat RAW10 8192x6144 seciyor.
+#
+# ANCAK: Gcam motoru reddediyor --
+#   libgcam static_metadata.cc:667
+#   frame_raw_max (8192x6144) matches neither the active area size
+#   (4096x3072) nor pixel array size (4096x3072)
+# Yani bu yama TEK BASINA yeterli degil; pixel array (ya da aktif dizi)
+# ham cozunurluge esitlenmeli. Ayrintilar: 50MP-Entegrasyon-Plani.md Faz 12.
+#
+# UYARI: bu yama ham bicimleri SADECE tam cozunurlukte degil, HER
+# cozunurlukte ekliyor (dizi 360 int32 buyudu). Daraltilmasi gerekiyor.
+#
+# bicim: <4bayt-indeksi> <stok-escape> <yamali-escape>
+# temel: fullres md5 fe0245a4720fb07b01d96deef47f5569
+# sonuc: md5 8d0915ce520fadaf092d31ed675aa98a
+5965367 \177\011\000\161 \177\025\000\161
+5965574 \377\010\000\161 \377\024\000\161
+5965999 \237\012\000\161 \237\026\000\161
+5966028 \237\012\000\161 \237\026\000\161
