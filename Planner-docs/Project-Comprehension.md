@@ -17,7 +17,7 @@ The change goal driving this comprehension pass is: **make a 50 MP capture compl
 | CQ-05 | Where does the HAL write `pixelArraySize`? | P0 | An address that, when patched, changes `dumpsys` output | open |
 | CQ-06 | Are the sensor and HAL layers truly independent? | P1 | Evidence that one can change without the other | answered (they are, but exclusion is enforced in shell) |
 | CQ-07 | What is the smallest correct HAL patch? | P1 | A patch adding RAW only at full resolution, with duration rows | open |
-| CQ-08 | Which artifacts are safe to distribute? | P1 | An enumerated packaging rule | partially answered |
+| CQ-08 | Which artifacts are safe to distribute? | P1 | An enumerated packaging rule | answered (rule enumerated 2026-08-24 by Faz 1.2 as Project-Ontology invariant 9a; enforcement is Faz 9.1) |
 | CQ-09 | Can the module brick the camera, and how is it recovered? | P1 | A written recovery path | open |
 | CQ-10 | Which conclusions in the journal are stale? | P1 | Superseded sections identified | answered |
 | CQ-11 | Does the WebUI expose a shell-injection surface? | P2 | `index.html` read and its `action.sh` calls traced | open |
@@ -146,7 +146,7 @@ No git history exists for the work described below (EV-01), so evolutionary evid
 | H-06 | `customize.sh` normalizes `mode` at install, so shipping developer state is harmless | tentative | Read `customize.sh` (78 lines). Static, cheap — do this in Phase 1. |
 | H-07 | The WebUI passes no unsanitized input to a shell | tentative | Read `webroot/index.html` and trace every `action.sh` invocation. Static, cheap. |
 | H-08 | Patch application is ordered but not atomic against power loss | tentative | Read `halpatch.sh`'s `hal_write`. Static, cheap. |
-| H-09 | No released zip contains `debug.keystore` | tentative | `unzip -l` each of the four release zips. Static, cheap, and it closes a security question. |
+| H-09 | No released zip contains `debug.keystore` | confirmed | Probe run 2026-08-24 (Faz 1.2): `unzip -Z1` name-only listing of all five release zips, plus an entry-size check for the 2,664-byte keystore. Clean on both. |
 | H-10 | The device's live state matches the workspace `mode` file | tentative | The smoke script answers this on its first run. |
 
 **Probe discipline.** Probes H-06 through H-09 are static, cheap, and answer P1/P2 questions — they should be batched into Phase 1 rather than deferred. H-01 and H-02 are the Phase 3 critical path. H-03 and H-04 require the device and the user's hands, and should not be scheduled until the probe ahead of them has passed.
