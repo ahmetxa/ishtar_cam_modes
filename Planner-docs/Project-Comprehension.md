@@ -39,7 +39,7 @@ The change goal driving this comprehension pass is: **make a 50 MP capture compl
 | EV-08 | `Forty8Strip` is an identity stub | structural | source | baksmali output: `LAGC;->Forty8Strip(I)I` body is `return p0` in both builds | confirmed |
 | EV-09 | `Lddl;->P` and `Lddl;->Q` blocklists are empty | structural | source | baksmali output for `Lddl;` | probable |
 | EV-10 | The four-instruction patch makes AGC select RAW10 8192x6144 unaided | behavioral | runtime | AGC log `getImageReaderFormat ... RAW10 8192x6144` with no preferences set | confirmed |
-| EV-11 | The `;SYMLINK=` entry is absent from both device trees | structural | source | `grep -c SYMLINK` returns 0 for `device_ishtar/proprietary-files.txt` · 0 for `refs/a16_ishtar/proprietary-files.txt` | confirmed |
+| EV-11 | The `;SYMLINK=` entry was absent from both device trees; it was added 2026-08-24 by Faz 6.1 and its effect is **not yet verified by any build** | structural | source | `grep -c ";SYMLINK="` now returns 1 for `device_ishtar/proprietary-files.txt` and 1 for `refs/a16_ishtar/proprietary-files.txt`, each exactly one line changed. Entry form copied from `refs/neo_ishtar/proprietary-files.txt:1154`, the same declaration for the same device and file. | confirmed (as an edit) / unverified (as a fix) |
 | EV-12 | Camera restart must run client before HAL | behavioral | runtime | reversing the order reproduced a black preview in every mode including stock | confirmed |
 | EV-13 | `pref_raw_key` and `pref_fix_resolution_key` break Gcam init independently | behavioral | runtime | isolation run: reverting the HAL then the APK did not fix it · deleting the prefs did | confirmed |
 | EV-14 | Released v2.1 has never been flashed | historical | history | zip dated 2026-08-22 with no flash recorded in the journal | probable |
@@ -70,7 +70,7 @@ The change goal driving this comprehension pass is: **make a 50 MP capture compl
 | TRACE-11 | Full-res stream advertisement | `InitializeScalerStaticCaps` `0x16bf4c0` | 16 + 4 patch sites | `dumpsys media.camera` | **none** | Faz 4, Faz 12 |
 | TRACE-12 | Gcam metadata validation | libgcam `static_metadata.cc:667` | vendor, unmodifiable | active/pixel array tags | **none** | Faz 12 |
 | TRACE-13 | AON repair | `ishtar-aon-fix/post-fs-data.sh` | creates `aon_front.pb` path | — | **none** | memory + module description |
-| TRACE-14 | Device-tree defect | `device_ishtar/proprietary-files.txt` | missing `;SYMLINK=` | — | **none** | Faz 10 notes |
+| TRACE-14 | Device-tree defect | `device_ishtar/proprietary-files.txt` line 1031; `refs/a16_ishtar/proprietary-files.txt` line 1037 | `;SYMLINK=` entry **added** 2026-08-24 (Faz 6.1); addressed but unproven until a build runs | — | **none** — verification is registered against Phase 7 by Faz 6.2 | Faz 10 notes; `Planner-docs/Faz-6-Plans/Faz6.1-symlink-entry-in-device-trees.md` |
 
 **Trace gap of note:** every row's Tests column is empty except TRACE-08. The project's entire verification surface is one build-time blob checker.
 
