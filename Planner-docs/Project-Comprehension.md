@@ -20,8 +20,8 @@ The change goal driving this comprehension pass is: **make a 50 MP capture compl
 | CQ-08 | Which artifacts are safe to distribute? | P1 | An enumerated packaging rule | answered (rule enumerated 2026-08-24 by Faz 1.2 as Project-Ontology invariant 9a; enforcement is Faz 9.1) |
 | CQ-09 | Can the module brick the camera, and how is it recovered? | P1 | A written recovery path | open |
 | CQ-10 | Which conclusions in the journal are stale? | P1 | Superseded sections identified | answered |
-| CQ-11 | Does the WebUI expose a shell-injection surface? | P2 | `index.html` read and its `action.sh` calls traced | open |
-| CQ-12 | Is boot-time patch application atomic? | P2 | `halpatch.sh` and `post-fs-data.sh` read | open |
+| CQ-11 | Does the WebUI expose a shell-injection surface? | P2 | `index.html` read and its `action.sh` calls traced | answered (no) — exhaustive: 4 `exec` sites, 2 `run()` callers, every argument from a source literal. See `Project-Ontology.md` OQ-06. One defence-in-depth gap remains at `index.html:276` (FIND-1.5-02), not reachable today. |
+| CQ-12 | Is boot-time patch application atomic? | P2 | `halpatch.sh` and `post-fs-data.sh` read | answered (no, by design) — ordered `dd` writes onto a module-private copy, md5-classified and re-seeded on damage. See `Project-Ontology.md` OQ-05. `post-fs-data.sh:66` is the one copy with no post-write verification (FIND-1.5-03). |
 | CQ-13 | What blocks the Android 16 track? | P2 | A named environment blocker | answered |
 | CQ-14 | Is `Kararlar #4` (mode-0 12-bit) still the right next experiment? | P2 | A human decision, given Phase 3's growth | open — needs user |
 
@@ -143,9 +143,9 @@ No git history exists for the work described below (EV-01), so evolutionary evid
 | H-03 | The HAL delivers remosaiced Bayer, not raw Quad-Bayer, at full resolution | tentative | Capture one DNG once H-02 passes; inspect the CFA pattern. Requires the device and the user. |
 | H-04 | The 10-bit/12-bit mismatch is the only obstacle to 50 MP + LN | tentative | Generate a 12-bit mode-0 blob, verify with `verify_ln.py`, mount temporarily, switch to `ln2`, capture. Reverts cleanly if it fails. |
 | H-05 | The `tiles hide` failure is a framework-visibility issue, not a module bug | tentative | Read `tile-app/` and `service.sh`; compare against the v2.1 "read from framework, not cache" fix which solved an adjacent symptom. |
-| H-06 | `customize.sh` normalizes `mode` at install, so shipping developer state is harmless | tentative | Read `customize.sh` (78 lines). Static, cheap — do this in Phase 1. |
-| H-07 | The WebUI passes no unsanitized input to a shell | tentative | Read `webroot/index.html` and trace every `action.sh` invocation. Static, cheap. |
-| H-08 | Patch application is ordered but not atomic against power loss | tentative | Read `halpatch.sh`'s `hal_write`. Static, cheap. |
+| H-06 | `customize.sh` normalizes `mode` at install, so shipping developer state is harmless | **contradicted in premise, conclusion holds** | `customize.sh` read in full: zero writes to `mode` (sole writer is `setmode.sh:204`), so it does **not** normalize. The conclusion survives for a different reason: `unzip -Z1` shows the archives ship no `mode`/`lang`/`active/` at all, and `post-fs-data.sh:14,23-27` defaults an absent/empty mode to `stock`. Shipping developer state is harmless because the state is not shipped. |
+| H-07 | The WebUI passes no unsanitized input to a shell | **confirmed** | Exhaustive trace, not sampled: 4 `exec()` sites (`index.html:268,300,332` + def `:193/:204`), 2 `run()` callers (`:317,:325`), ids from source literals `MAIN_MODES:187`/`EXTRA:188`, `lang` from the two static buttons `:98-99`. Whitelist backstop at `action.sh:108-114` before the `sh -c` interpolation at `:131`. |
+| H-08 | Patch application is ordered but not atomic against power loss | **confirmed** | `halpatch.sh:66-77` `hal_write` issues one `dd conv=notrunc` per entry — ordered, not atomic. Mitigating mechanism, which the bare hypothesis omits: the target is the private copy `:30`, damage is detected by `hal_state:80-87` and repaired by `hal_seed` via `hal_set:97-99`, and `hal_set:101` verifies md5 after every write. |
 | H-09 | No released zip contains `debug.keystore` | confirmed | Probe run 2026-08-24 (Faz 1.2): `unzip -Z1` name-only listing of all five release zips, plus an entry-size check for the 2,664-byte keystore. Clean on both. |
 | H-10 | The device's live state matches the workspace `mode` file | **contradicted** | Answered on the smoke script's first run, 2026-08-30. Device mode is `dcgB` (live blob md5 matches `dcgB.bin`); the workspace `mode` file says `stock`. They do not match. |
 
