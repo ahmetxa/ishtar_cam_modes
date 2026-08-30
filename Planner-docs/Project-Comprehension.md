@@ -12,7 +12,7 @@ The change goal driving this comprehension pass is: **make a 50 MP capture compl
 |---|---|---|---|---|
 | CQ-01 | Which layer actually gates 50 MP today? | P0 | A named function or check, measured on device | answered |
 | CQ-02 | Is the workspace recoverable from a mistake? | P0 | Version control or an equivalent snapshot exists | answered (positively, 2026-08-24 by Faz 1.1) |
-| CQ-03 | What proves a mode switch worked? | P0 | A repeatable command producing a pass/fail signal | answered (nothing does) |
+| CQ-03 | What proves a mode switch worked? | P0 | A repeatable command producing a pass/fail signal | answered 2026-08-30 (Faz 2.1): `scripts/smoke.sh`. Demonstrated on a real dcgB-to-dcgA switch, where the comparable-region diff was exactly three lines and nothing else moved. |
 | CQ-04 | Which invariant does libgcam enforce, exactly? | P0 | The source line and both accepted values | answered |
 | CQ-05 | Where does the HAL write `pixelArraySize`? | P0 | An address that, when patched, changes `dumpsys` output | open |
 | CQ-06 | Are the sensor and HAL layers truly independent? | P1 | Evidence that one can change without the other | answered (they are, but exclusion is enforced in shell) |
@@ -30,8 +30,8 @@ The change goal driving this comprehension pass is: **make a 50 MP capture compl
 | ID | Claim | Claim Type | Evidence Type | Evidence Source | Confidence |
 |---|---|---|---|---|---|
 | EV-01 | The workspace is a git repository as of 2026-08-24 (Faz 1.1); it was not one before | structural | source | `git rev-parse --is-inside-work-tree` returns `true`; commit `ff6934e` tracks 86 files; `git status --short` is empty | confirmed |
-| EV-02 | No tests, CI, or smoke harness exist anywhere in the tree | structural | source | no `tests/` · no `.github/` · no `Makefile` · no `package.json` · no `pyproject.toml` | confirmed |
-| EV-03 | The sensor-mode layer is mature and in daily use | configuration | configuration | `ishtar-cam-modes/module.prop` version=v2.1 versionCode=12 | confirmed |
+| EV-02 | No tests or CI exist anywhere in the tree; a smoke harness now does | structural | source | Still no `tests/` · no `.github/` · no `Makefile` · no `package.json` · no `pyproject.toml`. Superseded in part 2026-08-30 (Faz 2.1): `scripts/smoke.sh` is the first automatable validation surface the project has ever had. | confirmed |
+| EV-03 | The sensor-mode layer is mature and in daily use | configuration | runtime | Workspace `ishtar-cam-modes/module.prop` reads v2.1/versionCode 12, but the **device runs v2.0/versionCode 11** (Faz 2.1, 2026-08-30), on mode `dcgB`. Mature and in daily use is confirmed; the version is the older one. | confirmed |
 | EV-04 | 50 MP works for third-party applications | behavioral | runtime | on-device Open Camera capture measured at 50.3 MP (journal Faz 8) | confirmed |
 | EV-05 | AGC cannot yet complete a 50 MP capture | behavioral | runtime | logcat `Stuck shot ... HDR_PLUS` plus the `static_metadata.cc:667` rejection | confirmed |
 | EV-06 | libgcam requires `frame_raw_max` to equal the active array or the pixel array | behavioral | runtime | logcat line naming `8192x6144` against `4096x3072` for both arrays | confirmed |
@@ -42,12 +42,12 @@ The change goal driving this comprehension pass is: **make a 50 MP capture compl
 | EV-11 | The `;SYMLINK=` entry was absent from both device trees; it was added 2026-08-24 by Faz 6.1 and its effect is **not yet verified by any build** | structural | source | `grep -c ";SYMLINK="` now returns 1 for `device_ishtar/proprietary-files.txt` and 1 for `refs/a16_ishtar/proprietary-files.txt`, each exactly one line changed. Entry form copied from `refs/neo_ishtar/proprietary-files.txt:1154`, the same declaration for the same device and file. | confirmed (as an edit) / unverified (as a fix) |
 | EV-12 | Camera restart must run client before HAL | behavioral | runtime | reversing the order reproduced a black preview in every mode including stock | confirmed |
 | EV-13 | `pref_raw_key` and `pref_fix_resolution_key` break Gcam init independently | behavioral | runtime | isolation run: reverting the HAL then the APK did not fix it · deleting the prefs did | confirmed |
-| EV-14 | Released v2.1 has never been flashed | historical | history | zip dated 2026-08-22 with no flash recorded in the journal | probable |
+| EV-14 | Released v2.1 has never been flashed | historical | runtime | Confirmed on device 2026-08-30 (Faz 2.1): the installed module reports `version=v2.0`, `versionCode=11`. The v2.1 zip exists in the workspace but is not what is running. | confirmed |
 | EV-15 | A signing keystore sits in the working tree | structural | source | `ishtar-cam-modes/tile-app/debug.keystore` (path only · contents not read) | confirmed |
 | EV-16 | The experimental patch grows the stream array from 508 to 868 int32 | behavioral | runtime | `dumpsys media.camera` entry count before and after the experiment | confirmed |
 | EV-17 | radare2 and rabin2 do not complete on this binary | behavioral | runtime | two runs at 300 s and 60 s in two different shells produced zero output | confirmed |
 | EV-18 | The workspace holds approximately 7.3 GiB in total; 454.4 MiB of that is root-level files | structural | source | per-directory `find -type f -printf %s` sums, 2026-08-24 (Faz 1.1); table in `UNTRACKED-BY-DESIGN.md` section 1. The earlier 465 MB figure counted root files only and no directory. | confirmed |
-| EV-19 | The device's live mode matches the workspace `mode` file | configuration | configuration | `ishtar-cam-modes/mode` contains `stock`; the device was not queried this run | tentative |
+| EV-19 | The device's live mode matches the workspace `mode` file | configuration | runtime | **Contradicted on device 2026-08-30 (Faz 2.1).** The device reports mode `dcgB` with the live sensor blob md5 matching `dcgB.bin`; the workspace `mode` file says `stock`. The workspace file is not a mirror of device state and must never be read as one. | contradicted |
 | EV-20 | WSL2 is not installed and blocks the Android 16 track | user_intent | user-confirmed | user statement recorded in project history | probable |
 | EV-21 | `dcgB` gives about 25% less noise and roughly double the detail versus stock | behavioral | runtime | on-device comparison recorded in `module.prop` and the journal | probable |
 | EV-22 | The `tiles hide` option is ineffective | behavioral | runtime | observed on device; the cause was never diagnosed | probable |
@@ -147,7 +147,7 @@ No git history exists for the work described below (EV-01), so evolutionary evid
 | H-07 | The WebUI passes no unsanitized input to a shell | tentative | Read `webroot/index.html` and trace every `action.sh` invocation. Static, cheap. |
 | H-08 | Patch application is ordered but not atomic against power loss | tentative | Read `halpatch.sh`'s `hal_write`. Static, cheap. |
 | H-09 | No released zip contains `debug.keystore` | confirmed | Probe run 2026-08-24 (Faz 1.2): `unzip -Z1` name-only listing of all five release zips, plus an entry-size check for the 2,664-byte keystore. Clean on both. |
-| H-10 | The device's live state matches the workspace `mode` file | tentative | The smoke script answers this on its first run. |
+| H-10 | The device's live state matches the workspace `mode` file | **contradicted** | Answered on the smoke script's first run, 2026-08-30. Device mode is `dcgB` (live blob md5 matches `dcgB.bin`); the workspace `mode` file says `stock`. They do not match. |
 
 **Probe discipline.** Probes H-06 through H-09 are static, cheap, and answer P1/P2 questions — they should be batched into Phase 1 rather than deferred. H-01 and H-02 are the Phase 3 critical path. H-03 and H-04 require the device and the user's hands, and should not be scheduled until the probe ahead of them has passed.
 

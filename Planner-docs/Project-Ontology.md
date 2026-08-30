@@ -49,7 +49,20 @@ The 27 MB HAL binary is never shipped. The device's own stock blob is patched in
 
 **Sensor blob** — `com.qti.sensormodule.ishtar_semco_imx989_wide.bin`, exactly 1,062,250 bytes. QTI Chromatix format with a `regSetting`/register map and a 23-entry mode table. Ten variants are pre-generated under `blobs/`.
 
-**Stream configuration** — the framework-visible list of `{format, width, height, direction}` tuples. Emitted by `InitializeScalerStaticCaps`. Camera 3 (the framework index AGC opens as the rear camera) is the one that matters.
+**Stream configuration** — the framework-visible list of `{format, width, height, direction}` tuples. Emitted by `InitializeScalerStaticCaps`.
+
+**Which camera is "camera 3" is an open question as of 2026-08-30 (`OQ-17`).** The Faz 2.1 smoke run measured every HAL camera device on the phone, and the shorthand this project has used does not survive contact with the dump. `dumpsys media.camera` maps framework device 3 to HAL id 9, and HAL id 9 is **Front**-facing with a 3264x2448 pixel array — it cannot be the IMX989. The rear IMX989 array (4096x3072 binned, 8192x6144 physical) sits on HAL id 0 and on ids 2 through 7 and 10. Measured on a stock HAL in mode `dcgB`:
+
+| HAL id | Facing | availableStreamConfigurations | pixelArraySize |
+|---|---|---|---|
+| 0 | Back | 440 | 4096x3072 |
+| 1 | Front | 372 | 3264x2448 |
+| 2,3,4,5,6,7 | Back | 500 each | 4096x3072 |
+| 8, 9 | Front | 432 each | 3264x2448 |
+| 10 | Back | 500 | 4096x3072 |
+| 11, 12 | Front | 120 each | 12000x9000 |
+
+None of these is the 508 recorded by `EV-16`, which was measured under a `fullres` HAL, so the comparison is not like-for-like. Until this resolves, `scripts/smoke.sh` reports **all thirteen** devices rather than committing to one, and prints full stream rows for the lowest Back-facing id (HAL 0) under an explicitly stated rule. Faz 3.2 and Faz 4.1 should settle it by measurement rather than inherit the shorthand.
 
 ## 4. Module and Boundary Map
 
@@ -152,10 +165,11 @@ Recorded here deliberately: these values are expensive to re-derive and have bee
 | OQ-07 | Does `customize.sh` normalize `mode` and `active/` at install time? | open | `customize.sh` (78 lines) not read in this pass |
 | OQ-08 | Does `ishtar-cam-modes` ship its own `sepolicy.rule`? | open | present in the reference modules; not verified for this one |
 | OQ-09 | Does any released zip already contain `debug.keystore`? | answered (no) | Faz 1.2 audit, 2026-08-24: all five archives listed by entry name; zero `.keystore`/`.jks`/`.p12`/`.pem`/`.key` entries and zero entries at the 2,664-byte keystore size. Adjacent finding: the keystore password ships in plaintext inside `tile-app/build.sh` in v1.9/v2.0/v2.1 (see invariant 9c, `DEC-10`). |
-| OQ-10 | Does the device's live state match the workspace `mode` file (`stock`)? | open | not verified this run; the smoke script should answer it |
+| OQ-10 | Does the device's live state match the workspace `mode` file (`stock`)? | answered (no) | Faz 2.1 smoke run 2026-08-30: device is on `dcgB`, workspace file says `stock`. The workspace file tracks the last host-side edit, not the device. |
 | OQ-11 | Why is the `tiles hide` option ineffective? | open | observed ineffective; cause never diagnosed |
-| OQ-12 | Which framework camera index maps to which physical sensor across all lenses? | partially_answered | camera 3 = rear main, opened by AGC as port lens index 2; other indices unmapped |
+| OQ-12 | Which framework camera index maps to which physical sensor across all lenses? | partially_answered, and the previous answer is now in doubt | Faz 2.1 measurement 2026-08-30 contradicts the stored shorthand: `dumpsys media.camera` maps framework device 3 to HAL id 9, which is **Front**-facing at 3264x2448 and cannot be the rear main. The rear IMX989 array sits on HAL id 0 and ids 2-7 and 10. Full per-device table in section 3. See `OQ-17`. |
 | OQ-13 | Are `Lddl;->P/Q` blocklists relevant to resolution filtering? | answered | **No** — both empty; hypothesis rejected |
 | OQ-14 | Does the port have a working 48M mechanism? | answered | **No** — `Forty8Strip` is an identity stub; hypothesis rejected |
 | OQ-15 | Why did AGC cap at 12.6 MP? | answered | `getOutputSizes()` high-resolution bucket exclusion (invariant 7), not a blocklist or a flag |
 | OQ-16 | Why did the Faz 4 wide patch break AGC? | answered | same invariant as Faz 12, opposite direction (invariant 6) |
+| OQ-17 | Which HAL camera id is the one the 16-point `fullres` patch actually modifies, and which one does AGC open? | open | Raised by the Faz 2.1 smoke run, 2026-08-30. Eight Back-facing devices share the 4096x3072 array, and none currently reports the 508 entries `EV-16` recorded under a `fullres` HAL. Settle by taking a smoke snapshot with the HAL in `fullres` and diffing against the stock baseline: the device whose `streamcfg` count moves is the one being patched. This is a prerequisite for Faz 4.1 stating its target array count as a number. |
