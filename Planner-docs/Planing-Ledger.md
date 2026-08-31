@@ -218,6 +218,8 @@ Everything the prediction expected to move and did not is itself evidence: `sens
 
 **`F2.2-08` — the flash date is 2026-08-31**, install completing at 19:03 local (16:03 UTC) and the post-flash bracket taken at 16:08 UTC. `EV-14` is closed by measurement.
 
+**A contributing cause of the lost transcript, worth one line.** `.gitignore:48` ignores `*.log`, so `install.log` at the workspace root is invisible to `git status` and would never be committed by any ordinary `git add -A`. The IMPL-11 transcript is therefore preserved as `snapshots/20260831-1603__faz2.2__install-transcript-v2.1.txt` under the smoke-bracket naming convention, which is version controlled. Installer transcripts are device-event records and belong with the brackets rather than at the root under an extension the repository discards.
+
 **`FIND-2.2-01` remains predicted, not measured, and this run could not change that.** The install was performed from `stock` mode precisely so the guard would pass, and it did pass — `customize.sh:23-27` was satisfied with `9e4d0fe1a8bf2eb4146c9917a0ac2c4c` on both sides. That is a positive control for the guard's pass path and confirms the workaround works, but it cannot demonstrate the abort. The original aborted transcript was not retained. The finding stays open at P2 and routed to Phase 9 on the strength of the source reading in IMPL-09.
 
 ## 6. Current State Snapshot

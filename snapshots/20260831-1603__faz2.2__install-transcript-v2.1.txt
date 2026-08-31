@@ -1,0 +1,94 @@
+- Module size: 9.71 MB
+- Installing to /data/adb/modules_update/ishtar_cam_modes
+- Extracting module files
+- Running module installer
+- Using mmrs metainstall
+cp: '/system/vendor/.' and '/vendor/.' are the same file
+cp: '/system/product/.' and '/product/.' are the same file
+cp: '/system/system_ext/.' and '/system_ext/.' are the same file
+- Current boot slot: _a
+- Device is system-as-root
+Archive:  /data/user/0/com.rifsxd.ksunext/cache/module.zip
+  inflating: module.prop
+*****************************************************
+ ishtar IMX989 Camera Modes (50MP / DCG / LN2 / LN4) 
+ by port: Claude / orijinal mod: Eskom_Sa 
+*****************************************************
+**************************
+ Powered by KernelSU-Next 
+**************************
+Archive:  /data/user/0/com.rifsxd.ksunext/cache/module.zip
+  inflating: customize.sh
+- Extracting module files
+Archive:  /data/user/0/com.rifsxd.ksunext/cache/module.zip
+  inflating: Kullanim.txt
+  inflating: action.sh
+  inflating: customize.sh
+  inflating: halpatch.sh
+  inflating: module.prop
+  inflating: post-fs-data.sh
+  inflating: service.sh
+  inflating: setmode.sh
+  inflating: tile-app.apk
+  inflating: blobs/dcgA.bin
+  inflating: blobs/dcgB.bin
+  inflating: blobs/hal-fullres.patch
+  inflating: blobs/ln2.bin
+  inflating: blobs/ln2f.bin
+  inflating: blobs/ln2s.bin
+  inflating: blobs/ln4.bin
+  inflating: blobs/ln4f.bin
+  inflating: blobs/ln4s.bin
+  inflating: blobs/stock.bin
+  inflating: tile-app/AndroidManifest.xml
+  inflating: tile-app/build.sh
+  inflating: tile-app/java/com/ishtar/cammodes/BaseTile.java
+  inflating: tile-app/java/com/ishtar/cammodes/DcgTile.java
+  inflating: tile-app/java/com/ishtar/cammodes/FullResTile.java
+  inflating: tile-app/java/com/ishtar/cammodes/Hud.java
+  inflating: tile-app/java/com/ishtar/cammodes/Ln2Tile.java
+  inflating: tile-app/java/com/ishtar/cammodes/Ln4Tile.java
+  inflating: tile-app/java/com/ishtar/cammodes/Sh.java
+  inflating: tile-app/java/com/ishtar/cammodes/WebUiActivity.java
+  inflating: tile-app/res/drawable/ic_camera.xml
+  inflating: tile-app/res/drawable/ic_dcg.xml
+  inflating: tile-app/res/drawable/ic_launcher_background.xml
+  inflating: tile-app/res/drawable/ic_launcher_foreground.xml
+  inflating: tile-app/res/drawable/ic_ln2.xml
+  inflating: tile-app/res/drawable/ic_ln4.xml
+  inflating: tile-app/res/mipmap-anydpi-v26/ic_launcher.xml
+  inflating: tile-app/res/values/strings.xml
+  inflating: tools/dcg_multimode.py
+  inflating: tools/ln_multimode.py
+  inflating: tools/port_sensor_mod.py
+  inflating: tools/verify_ln.py
+  inflating: webroot/index.html
+
+  ishtar IMX989 Camera Modes  v2.1
+  --------------------------------
+- Cihazdaki surucu : 9e4d0fe1a8bf2eb4146c9917a0ac2c4c
+- Beklenen         : 9e4d0fe1a8bf2eb4146c9917a0ac2c4c
+- Kamera HAL      : stok surum (50MP kullanilabilir)
+
+- Modlar : stock / 50mp / dcgA-B / ln2 / ln4 (+s/f cesitleri)
+- Yontem : sensor surucusu ve kamera HAL'i icin tekil bind mount
+- Baslangic modu: ilk kurulumda stock; guncellemede mevcut mod
+
+  50MP ile DCG/LN birbirini disler: biri acilinca digeri kapanir.
+
+  Mod degistirme:
+    su -c sh /data/adb/modules/ishtar_cam_modes/setmode.sh 50mp
+  Durum:
+    su -c sh /data/adb/modules/ishtar_cam_modes/setmode.sh
+
+  Hizli Ayarlar kutucuklari (50MP DCG LN4 LN2) ilk acilista
+  kendiliginden kurulur. Kutucuklarin calismasi icin KernelSU >
+  Superuser listesinden 'IMX989 Camera Modes' uygulamasina kok
+  yetkisi verin. Uygulama cekmecede gorunur kalir; simgesine
+  dokununca modul arayuzu acilir.
+
+  Ilk kurulumdan sonra bir kez yeniden baslat.
+
+- Done
+- Installation complete
+- Module installed successfully!
