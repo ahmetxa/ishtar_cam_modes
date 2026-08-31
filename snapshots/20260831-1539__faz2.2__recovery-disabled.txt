@@ -1,0 +1,153 @@
+# ishtar device smoke
+# taken   : 2026-08-31T15:39:12Z
+# serial  : dc27e5d0
+# note    : lines above BEGIN COMPARABLE are excluded from diffs
+--- BEGIN COMPARABLE ---
+constants.source                = /data/adb/modules/ishtar_cam_modes (device-installed module)
+module.version                  = v2.0
+module.versionCode              = 11
+mode.file                       = dcgB
+sensor.target                   = /odm/lib64/camera/com.qti.sensormodule.ishtar_semco_imx989_wide.bin
+sensor.live.md5                 = 9e4d0fe1a8bf2eb4146c9917a0ac2c4c
+sensor.live.size                = 1062250 / expected 1062250
+sensor.live.variant             = stock
+sensor.mount.count              = 0
+hal.target                      = /odm/lib64/hw/camera.qcom.so
+hal.live.md5                    = c3fa63a86ee3ecaf9fbf02005d35f6b5
+hal.live.size                   = 27268688 / expected 27268688
+hal.state                       = stock
+hal.mount.count                 = 0
+camera.main.rule                = lowest HAL id with Facing: Back
+camera.main.hal_id              = 0
+camera.hal0   facing=Back  streamcfg=440   pixelArray=[4096 3072] activeArray=[0 0 4096 3072]
+camera.hal1   facing=Front streamcfg=372   pixelArray=[3264 2448] activeArray=[0 0 3264 2448]
+camera.hal10  facing=Back  streamcfg=500   pixelArray=[4096 3072] activeArray=[0 0 4096 3072]
+camera.hal11  facing=Front streamcfg=120   pixelArray=[12000 9000] activeArray=[0 0 12000 9000]
+camera.hal12  facing=Front streamcfg=120   pixelArray=[12000 9000] activeArray=[0 0 12000 9000]
+camera.hal2   facing=Back  streamcfg=500   pixelArray=[4096 3072] activeArray=[0 0 4096 3072]
+camera.hal3   facing=Back  streamcfg=500   pixelArray=[4096 3072] activeArray=[0 0 4096 3072]
+camera.hal4   facing=Back  streamcfg=500   pixelArray=[4096 3072] activeArray=[0 0 4096 3072]
+camera.hal5   facing=Back  streamcfg=500   pixelArray=[4096 3072] activeArray=[0 0 4096 3072]
+camera.hal6   facing=Back  streamcfg=500   pixelArray=[4096 3072] activeArray=[0 0 4096 3072]
+camera.hal7   facing=Back  streamcfg=500   pixelArray=[4096 3072] activeArray=[0 0 4096 3072]
+camera.hal8   facing=Front streamcfg=432   pixelArray=[3264 2448] activeArray=[0 0 3264 2448]
+camera.hal9   facing=Front streamcfg=432   pixelArray=[3264 2448] activeArray=[0 0 3264 2448]
+camera.hal0.stream_config.rows:
+  32 4096 2304 OUTPUT
+  32 4096 3072 OUTPUT
+  33 1920 1080 OUTPUT
+  33 1920 1440 OUTPUT
+  33 2400 1080 OUTPUT
+  33 2448 2448 OUTPUT
+  33 2560 1440 OUTPUT
+  33 2880 2160 OUTPUT
+  33 3072 3072 OUTPUT
+  33 3200 1440 OUTPUT
+  33 3200 1800 OUTPUT
+  33 3840 2160 OUTPUT
+  33 4096 1844 OUTPUT
+  33 4096 2160 OUTPUT
+  33 4096 2304 OUTPUT
+  33 4096 3072 OUTPUT
+  34 1280 720 OUTPUT
+  34 1280 960 OUTPUT
+  34 1440 1080 OUTPUT
+  34 1600 1200 OUTPUT
+  34 1600 720 OUTPUT
+  34 1632 1224 OUTPUT
+  34 176 144 OUTPUT
+  34 1920 1080 OUTPUT
+  34 1920 1440 OUTPUT
+  34 1920 960 OUTPUT
+  34 2400 1080 OUTPUT
+  34 2448 2448 OUTPUT
+  34 2560 1440 OUTPUT
+  34 2880 2160 OUTPUT
+  34 3072 3072 OUTPUT
+  34 320 240 OUTPUT
+  34 3200 1440 OUTPUT
+  34 3200 1800 OUTPUT
+  34 352 288 OUTPUT
+  34 3840 2160 OUTPUT
+  34 4096 1844 OUTPUT
+  34 4096 2160 OUTPUT
+  34 4096 2304 OUTPUT
+  34 4096 3072 INPUT
+  34 4096 3072 OUTPUT
+  34 640 480 OUTPUT
+  34 720 480 OUTPUT
+  34 800 600 OUTPUT
+  34 864 480 OUTPUT
+  34 960 720 OUTPUT
+  35 1280 720 OUTPUT
+  35 1280 960 OUTPUT
+  35 1440 1080 OUTPUT
+  35 1600 1200 OUTPUT
+  35 1600 720 OUTPUT
+  35 1632 1224 OUTPUT
+  35 176 144 OUTPUT
+  35 1920 1080 OUTPUT
+  35 1920 1440 OUTPUT
+  35 1920 960 OUTPUT
+  35 2400 1080 OUTPUT
+  35 2448 2448 OUTPUT
+  35 2560 1440 OUTPUT
+  35 2880 2160 OUTPUT
+  35 3072 3072 OUTPUT
+  35 320 240 OUTPUT
+  35 3200 1440 OUTPUT
+  35 3200 1800 OUTPUT
+  35 352 288 OUTPUT
+  35 3840 2160 OUTPUT
+  35 4096 1844 OUTPUT
+  35 4096 2160 OUTPUT
+  35 4096 2304 OUTPUT
+  35 4096 3072 INPUT
+  35 4096 3072 OUTPUT
+  35 640 480 OUTPUT
+  35 720 480 OUTPUT
+  35 800 600 OUTPUT
+  35 864 480 OUTPUT
+  35 960 720 OUTPUT
+  36 4096 2304 OUTPUT
+  36 4096 3072 OUTPUT
+  37 4096 2304 OUTPUT
+  37 4096 3072 OUTPUT
+  54 1280 720 OUTPUT
+  54 1280 960 OUTPUT
+  54 1440 1080 OUTPUT
+  54 1600 1200 OUTPUT
+  54 1600 720 OUTPUT
+  54 1632 1224 OUTPUT
+  54 176 144 OUTPUT
+  54 1920 1080 OUTPUT
+  54 1920 1440 OUTPUT
+  54 1920 960 OUTPUT
+  54 2400 1080 OUTPUT
+  54 2448 2448 OUTPUT
+  54 2560 1440 OUTPUT
+  54 2880 2160 OUTPUT
+  54 3072 3072 OUTPUT
+  54 320 240 OUTPUT
+  54 3200 1440 OUTPUT
+  54 3200 1800 OUTPUT
+  54 352 288 OUTPUT
+  54 3840 2160 OUTPUT
+  54 4096 1844 OUTPUT
+  54 4096 2160 OUTPUT
+  54 4096 2304 OUTPUT
+  54 4096 3072 INPUT
+  54 4096 3072 OUTPUT
+  54 640 480 OUTPUT
+  54 720 480 OUTPUT
+  54 800 600 OUTPUT
+  54 864 480 OUTPUT
+  54 960 720 OUTPUT
+agc.package                     = org.codeaurora.snapcam
+agc.installed                   = yes
+agc.versionName                 = 8.4.300.414775575.18
+agc.versionCode                 = 64764891
+agc.apk.md5                     = ce65f862c990e2acc02be356f75a7122
+prefs.trap.count                = 2
+prefs.trap.keys                 = pref_fix_resolution_key pref_raw_key 
+--- END COMPARABLE ---
