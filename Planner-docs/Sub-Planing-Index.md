@@ -140,6 +140,27 @@ The master plan's phase order is preserved in the folder structure. The executio
 14. **`Faz-7-Plans/Faz7.1-wsl2-provisioning.md`** and **`Faz-7-Plans/Faz7.2-first-aospa-build.md`** — the second front, opened only after the camera work consolidates, per the main plan's own conclusion.
 15. **`Faz-8-Plans/Faz8.1-beryl-port-sizing.md`** and **`Faz-8-Plans/Faz8.2-kernel-lts-merge-scoping.md`** — scoping only, gated on Phase 7's outcome, with both commit decisions routed to the user.
 
+### 4a. Priority amendment, 2026-08-31 — Phase 5 raised, `DEC-03` answered
+
+**This amendment supersedes positions 9 and 11 above for the near term. The numbered list is left intact as the original reasoning.**
+
+`DEC-03` asked whether Phase 5 retains its priority given how much Phase 3 has grown, and routed the question to the user via `Faz-3-Plans/Faz3.6-fallback-decision-gate.md`. **The user answered it directly on 2026-08-31: Phase 5 has priority.** The stated goal is to run the 50 MP HAL layer and an LN sensor mode at the same time. The decision no longer needs to wait for `Faz 3.6`, which was only the default place it would have been asked.
+
+The revised next-up order is:
+
+1. **`Faz-5-Plans/Faz5.1-twelve-bit-mode-zero-blob.md`** — host-side only, no device, no risk. Generates the candidate mode-0 12-bit blob and verifies it with `ishtar-cam-modes/tools/verify_ln.py`. Nothing downstream can be judged until this artifact exists.
+2. **`Faz-5-Plans/Faz5.2-temporary-mount-composition-test.md`** — the sub-plan that actually answers whether the two layers can coexist. Temporary mount, revertible, bracketed by `scripts/smoke.sh`.
+3. **`Faz-3-Plans/Faz3.1-preference-trap-clearance.md`** — kept close behind because it is cheap and because it owns the per-measurement checklist that `FIND-2.3-01` has now made mandatory for every later measurement.
+4. **`Faz-5-Plans/Faz5.3-exclusion-rule-disposition.md`** — only after `Faz 5.2` produces a result.
+
+**A dependency deviation is being taken deliberately, and is recorded rather than hidden.** `Faz5.1` section 10 states "Depends on Phase 4 being complete, per Main-Planing's *after everything else is stable* condition", and `Faz5.2` section 10 states "Depends on ... Phase 4 for a stable HAL artifact". Neither sub-plan file is edited by this amendment, so both still say that.
+
+The justification for proceeding anyway is that the condition's *purpose* is already met. It exists so the composition test is not run against a moving HAL. The HAL under test is frozen: `ishtar-cam-modes` v2.1 is flashed, its fullres artifact is pinned at md5 `fe0245a4720fb07b01d96deef47f5569`, and `IMPL-13` has now characterised it across all ten modes with per-mode snapshots. Phase 4 reduces and consolidates that patch; it does not make it more stable than a frozen, regression-tested artifact already is. Running `Faz 5.2` against v2.1 measures composition against a known, recorded baseline.
+
+**What this amendment does not claim.** It does not resolve the textual conflict inside the two `Faz-5-Plans` files; doing that properly would require a Step 2 re-plan of both, which the user declined in favour of the cheaper index-level change. A session reading those sub-plans will see the Phase 4 dependency and must read this amendment alongside it. It also does not change any phase number, does not edit `Planner-docs/Main-Planing.md`, and therefore does **not** supersede `SNAP-2026-08-24-SUBPLANS` or require a Step 3 re-audit.
+
+**The AGC video regression is explicitly not the reason for this amendment.** The user's stated link between the video fault and the layer merge is not supported by measurement: `IMPL-13` recorded AGC's video section black in four states including plain `stock`, with sensor and HAL both unmodified, and the `50mp` + LN combination has never been reachable on this device because `post-fs-data.sh:16-18` and `setmode.sh` force the sensor layer to stock whenever `50mp` is selected — verified in `IMPL-13`'s bracketed `dcgB` -> `50mp` transition. `FIND-2.3-03` stays open and routed to Phase 3 on its own merits. Raising Phase 5 will not fix it, and Phase 5 must not be judged by whether it does.
+
 The remaining Phase 1 and Phase 2 items — `Faz-1-Plans/Faz1.6-workspace-readme-and-refs-index.md` and `Faz-2-Plans/Faz2.4-tiles-hide-disposition.md` — are low-priority and may run whenever convenient. The first absorbs outputs from the other Phase 1 sub-plans and benefits from running last within its phase; the second is the only Phase 2 sub-plan that Phase 3 does not depend on.
 
 ## 5. Out-of-Scope or Deferred Topics
