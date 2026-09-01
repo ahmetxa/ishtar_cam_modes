@@ -1,0 +1,31 @@
+# ishtar Faz 3.3 -- pixelArraySize (f0006) DENEY yamasi -- A15 / vauxite
+#
+# TEK SATIR. blobs/hal-fullres.patch ile BIRLESTIRME -- hal_write
+# $HAL_PATCH icindeki HER satiri uygular; bu tablo ayri kalmalidir.
+#
+# Ne yapar:
+#   0x0166645c  ldr x1, [x4, #0x198]   ->   ldr x1, [x4, #0]
+#   x4 = S + 0x3c1c oldugundan 0x198 yer degistirmesi tam olarak
+#   S+0x3db4'e, yani BINNED (2x2) piksel dizisine denk gelir.
+#   Baslatici 0x016f07c0..0x016f07fc soyle yazar:
+#       [S+0x3db4] = [S+0x3c1c] / binning
+#   Yani S+0x3c1c BINNENMEMIS ciftti tutar (8192x6144), S+0x3db4 ise
+#   binnenmis olani (4096x3072). Yer degistirmeyi 0 yapmak, secici==1
+#   yolunun da binnenmemis cifti yayinlamasini saglar.
+#
+#   Ikinci yayin yolu (0x016664b0..0x016664c8) ayni [x19+0x6550] ara
+#   yuvasini yeniden yayinlar, kendi degerini turetmez -- bu yuzden
+#   deger yazimini yamalamak HER IKI yolu da karsilar.
+#
+# bicim: <4bayt-indeksi> <stok-escape> <yamali-escape>
+#   indeks = bayt_ofseti / 4  (dd bs=4 seek=<indeks> icin hazir)
+#   escape dizileri printf '%b' ile YAZILDIGI GIBI kullanilir.
+#
+# temel  stok    md5 c3fa63a86ee3ecaf9fbf02005d35f6b5
+# sonuc  stok+bu md5 77083b7c099d4c68a9213476141c450d
+#
+# temel  fullres md5 fe0245a4720fb07b01d96deef47f5569
+# sonuc  fullres+bu md5 c539f04e6bbaedb907a5c987f16800ea
+#
+# nokta 1
+5871895 \201\314\100\371 \201\000\100\371

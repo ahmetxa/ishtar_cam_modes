@@ -1,0 +1,34 @@
+Faz 3.3 -- VAL-METADATA evidence (IMPL-20)
+Attempt 1 of the Faz 3.1 budget. Candidate: 0x0166645c (Faz 3.2 ranked #2, promoted to #1).
+
+Measured against AGC build ce65f862c990e2acc02be356f75a7122 (PATCHED, per user decision).
+Device dc27e5d0. Camera 3. Source: dumpsys media.camera, section
+"Camera HAL device device@1.1/vendor_qti/3 (v1.1) static information:" (4424 lines in all three runs).
+
+Patch: ldr x1,[x4,#0x198] -> ldr x1,[x4,#0]   4-byte index 5871895
+  stock word 0xF940CC81   patched word 0xF9400081
+  base stock md5 c3fa63a86ee3ecaf9fbf02005d35f6b5
+  expected patched md5 77083b7c099d4c68a9213476141c450d  (PRE-COMMITTED before the run)
+
+                                              BEFORE           AFTER PATCH      AFTER REVERT
+android.sensor.info.pixelArraySize (f0006)    [4096 3072]      [8192 6144]      [4096 3072]
+android.sensor.info.activeArraySize (f0000)   [0 0 4096 3072]  [0 0 4096 3072]  [0 0 4096 3072]
+preCorrectionActiveArraySize (f000a)          [0 0 4096 3072]  [0 0 4096 3072]  [0 0 4096 3072]
+
+hal.live.md5     c3fa63a8...      77083b7c...      c3fa63a8...
+hal.state        stock            unrecognized     stock
+hal.mount.count  1                1                1
+sensor.live.md5  9e4d0fe1... (stock, unchanged in all three runs)
+mode.file        stock (unchanged in all three runs)
+prefs.trap       0/12 by per-key audit AND 0 by smoke.sh -- the two AGREED this run (FIND-5.2-01 cross-check)
+
+VAL-CHECKSUM   PASS  -- both writes matched their pre-committed md5 exactly; mounted target reflected it.
+VAL-METADATA   PASS  -- f0006 moved; f0000 and f000a provably untouched.
+VAL-MANUAL     PASS  -- user confirmed live preview in the stock camera; screencap showed a real scene,
+                        crash buffer empty, no ishtar_cam_modes DURDU: line.
+VAL-REVERT     PASS  -- comparable region of the third smoke snapshot is byte-identical to the first.
+VAL-SMOKE      3 runs: before-stock / after-patch / after-revert.
+VAL-PRECOND    Faz 3.1 per-measurement checklist, all 7 items; exactly one variable moved (hal.live.md5).
+
+SELinux context verified u:object_r:vendor_file:s0 after each write (FIND-9.2-01: chown/chmod/chcon
+were checked EXPLICITLY here, not 2>/dev/null silenced).
