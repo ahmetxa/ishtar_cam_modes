@@ -74,8 +74,8 @@ control; see [Exclusions](#exclusions).
 
 | Archive | md5 | Status |
 |---|---|---|
-| `ishtar-cam-modes-v2.1.zip` | `fea919b67a4693a4591127be4a6e9daa` | **Most recent.** Built, **never flashed** — the device runs v2.0. |
-| `ishtar-cam-modes-v2.0.zip` | `9c115f5d6ab03f5a8a264e3bf3106495` | **Currently installed** on device `dc27e5d0` (versionCode 11). |
+| `ishtar-cam-modes-v2.1.zip` | `fea919b67a4693a4591127be4a6e9daa` | **Most recent, and currently installed** on device `dc27e5d0` as versionCode 12. Flashed 2026-08-31 (`IMPL-11`). |
+| `ishtar-cam-modes-v2.0.zip` | `9c115f5d6ab03f5a8a264e3bf3106495` | Superseded by v2.1 on 2026-08-31. Was versionCode 11. |
 | `ishtar-cam-modes-v1.9.zip` | `d7845bc848b6ea72297c50a821ef260a` | Superseded. |
 | `ishtar-cam-modes-v1.0.zip` | `9cf8facb01d7e87c67cbfa60b0bdb0ff` | Superseded. |
 | `ishtar-aon-fix-v1.1.zip` | `f7a6352db73050f73bd27f62e62dd453` | Current AON fix release. |
@@ -104,12 +104,20 @@ these checksums. No download location appears in this repository.
 | `com.qti.sensormodule.ishtar_semco_imx989_wide.bin` | md5 `9e4d0fe1a8bf2eb4146c9917a0ac2c4c` — the **stock** sensor driver, and the exact value the module's install and boot guards require. An OTA that changes this invalidates every patch offset at once. |
 
 > **⚠ Preference trap.** Both `.agc` files contain the `pref_raw_key` and
-> `pref_fix_resolution_key` families (six occurrences of each, in both files).
+> `pref_fix_resolution_key` families — **all twelve key names in each file**,
+> verified 2026-08-31 (a bare key plus `_0`..`_4`, twice).
 > **Importing either one re-arms the trap.** A pinned resolution or format
 > preference overrides what the HAL advertises, so a measurement taken after an
 > import measures the preference, not the HAL — and the result looks like the
-> patch failed. Clear both key families before any Phase 3 measurement. Both are
-> currently present in the installed AGC's shared preferences.
+> patch failed.
+>
+> **Device state, measured 2026-08-31 (Faz 3.1): all twelve keys are UNSET**, and
+> they stayed unset across an AGC restart — the app does not self-arm the trap.
+> The earlier note that both were "currently present" is superseded. Audit
+> procedure, clearance procedure and the per-measurement checklist are in
+> [`docs/phase3-preconditions.md`](docs/phase3-preconditions.md); run the
+> per-key audit before any Phase 3 measurement rather than trusting a single
+> `smoke.sh` reading (`FIND-5.2-01`).
 
 ### Tooling and working paths
 

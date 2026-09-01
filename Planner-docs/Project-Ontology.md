@@ -47,11 +47,38 @@ Every value below was measured from a device or a binary, not inferred. Where so
 
 The 27 MB HAL binary is never shipped. The device's own stock blob is patched in place, which is why the md5 guard is load-bearing rather than decorative.
 
-**Sensor blob** — `com.qti.sensormodule.ishtar_semco_imx989_wide.bin`, exactly 1,062,250 bytes. QTI Chromatix format with a `regSetting`/register map and a 23-entry mode table. Ten variants are pre-generated under `blobs/`.
+**Sensor blob** — `com.qti.sensormodule.ishtar_semco_imx989_wide.bin`, exactly 1,062,250 bytes. QTI Chromatix format with a `regSetting`/register map and a 23-entry mode table. Nine variants are pre-generated under `blobs/`; the tenth mode, `50mp`, is a HAL layer rather than a sensor blob. Blobs are generated output and are `.gitignore`d — the tools under `ishtar-cam-modes/tools/`, not the binaries, are the tracked artifact.
+
+*Container layout*, re-verified by Faz 5.1 against all nine blobs (`verify_ln.py` asserts the first three on every load):
+
+| Offset | Field |
+|---|---|
+| `0x00` | `QTI Chromatix Header`, 20 bytes |
+| `0x1C` | u32, file size minus 4 |
+| `0xB8` | u32, data-region base offset |
+| `0xBC` | u32, data-region length |
+| `0xD0` | parameter table, 60 B/entry: `name[44]` + `offset` + `size` + `id` + `next`. `offset` is relative to the data base, and 14,455 entries exist. |
+| last 4 B | `zlib.crc32(file[:-4])`, little-endian |
+
+*Mode table.* `resolutionData` holds one 304-byte record per mode, 23 records. Field 5 is the mode's `streamConfiguration` entry index, field 12 is LINE_LENGTH_PCK, field 13 is frame length lines, field 31 is the mode's `regSetting` entry index. Both back-links are asserted on load rather than inferred from entry order — entry ordering is *not* mode order (mode 0 uses `regSetting` #46, mode 1 uses #563). `regSetting` is 40 B/record, with `[1]` the value-entry index and `[2]` the register address. A register's value is changed by **redirecting the table entry's offset field**, never by writing into the data region, so shared values cannot be corrupted; the cost is that the desired value must already exist somewhere in the data region.
+
+*Bit-depth encoding*, read from real blobs on 2026-08-31 rather than from the register specification:
+
+| | 10-bit | 12-bit | 14-bit |
+|---|---|---|---|
+| `0x0112` / `0x0113` | `0x0A` | `0x0C` | `0x0E` |
+| `streamConfiguration` +8 (`dt`) | `0x2B` | `0x2C` | `0x2D` |
+| `streamConfiguration` +28 (`bpp`) | 10 | 12 | 14 |
+
+The 10-bit and 12-bit columns are measured (`stock` mode 0 and `dcgB` modes 1/14). The 14-bit column is read from `dcg_multimode.py`'s constants, not from a blob — no 14-bit variant is present in `blobs/`.
+
+*White and black levels are global, not per-mode.* They live in `sensorDriverData` at +524 (whiteLevel) and +528/532/536/540 (blackLevel): `stock` carries 1023/64, every DCG and `*f` LN variant carries 4095/256. **This is the mechanism behind invariant 4** — a variant raises the global level to 12-bit while `FOTO_MODLARI` (`ln_multimode.py:235`) deliberately excludes mode 0, so mode 0 keeps emitting 10-bit under a 12-bit white level.
+
+*One hazard for any future per-mode work.* `ln_multimode.apply_ln()` clamps frame length to `FLL_MIN = 3200`. Every mode in `FOTO_MODLARI` is at most 3,072 lines, so the clamp is safe there. Mode 0 is **6,144 lines**; applying that path unmodified would set a frame length shorter than the frame itself. Faz 5.1's `tools/mode0_12bit.py` therefore leaves field 13 untouched.
 
 **Stream configuration** — the framework-visible list of `{format, width, height, direction}` tuples. Emitted by `InitializeScalerStaticCaps`.
 
-**Which camera is "camera 3" is an open question as of 2026-08-30 (`OQ-17`).** The Faz 2.1 smoke run measured every HAL camera device on the phone, and the shorthand this project has used does not survive contact with the dump. `dumpsys media.camera` maps framework device 3 to HAL id 9, and HAL id 9 is **Front**-facing with a 3264x2448 pixel array — it cannot be the IMX989. The rear IMX989 array (4096x3072 binned, 8192x6144 physical) sits on HAL id 0 and on ids 2 through 7 and 10. Measured on a stock HAL in mode `dcgB`:
+**"Camera 3" does not mean what this project used it to mean, and `OQ-17` is now answered (IMPL-12, 2026-08-31).** The Faz 2.1 smoke run measured every HAL camera device on the phone, and the shorthand this project has used does not survive contact with the dump. `dumpsys media.camera` maps framework device 3 to HAL id 9, and HAL id 9 is **Front**-facing with a 3264x2448 pixel array — it cannot be the IMX989. The rear IMX989 array (4096x3072 binned, 8192x6144 physical) sits on HAL id 0 and on ids 2 through 7 and 10. Measured on a stock HAL in mode `dcgB`:
 
 | HAL id | Facing | availableStreamConfigurations | pixelArraySize |
 |---|---|---|---|
@@ -62,7 +89,19 @@ The 27 MB HAL binary is never shipped. The device's own stock blob is patched in
 | 10 | Back | 500 | 4096x3072 |
 | 11, 12 | Front | 120 each | 12000x9000 |
 
-None of these is the 508 recorded by `EV-16`, which was measured under a `fullres` HAL, so the comparison is not like-for-like. Until this resolves, `scripts/smoke.sh` reports **all thirteen** devices rather than committing to one, and prints full stream rows for the lowest Back-facing id (HAL 0) under an explicitly stated rule. Faz 3.2 and Faz 4.1 should settle it by measurement rather than inherit the shorthand.
+None of these is the 508 recorded by `EV-16`, which was measured under a `fullres` HAL, so that comparison was not like-for-like. `scripts/smoke.sh` reports **all thirteen** devices rather than committing to one, and prints full stream rows for the lowest Back-facing id (HAL 0) under an explicitly stated rule.
+
+**`OQ-17` asked which HAL id the 16-point `fullres` patch modifies. The answer is: all thirteen.** IMPL-12 diffed a `fullres` smoke snapshot against the stock baseline. The per-id `availableStreamConfigurations` deltas are:
+
+| HAL id | stock | fullres | delta |
+|---|---|---|---|
+| 0 | 440 | 456 | +16 |
+| 1 (Front) | 372 | 452 | +80 |
+| 2–7, 10 | 500 | 508 | +8 each |
+| 8, 9 (Front) | 432 | 508 | +76 each |
+| 11, 12 (Front) | 120 | 124 | +4 each |
+
+**Front-facing ids move too**, which no document before IMPL-12 anticipated. The patch is not single-id; it edits a shared code path in `InitializeScalerStaticCaps` that every camera id runs. **Faz 4.1 must size its dimension guard for device-wide reach**, not for one id, and cannot state a single target array count as a number. Which id AGC actually opens remains separate and unmeasured — `FIND-2.3-03` records `logicalCameraId 0, cameraId 2` from a failing `configure_streams`, which is a hint, not a determination.
 
 ## 4. Module and Boundary Map
 
@@ -137,9 +176,9 @@ Recorded here deliberately: these values are expensive to re-derive and have bee
 
 1. **Reversibility.** Every modification is a bind-mount or an md5-guarded offset patch. A module that cannot be disabled is a bricked phone.
 2. **Fail closed.** Size check, then md5 check, then write. Never write on a mismatch.
-3. **Restart ordering.** Client before HAL. Violating this leaks CSIPHY/CSID allocations and blackens preview in every mode. (Section 5.)
-4. **Layer exclusion.** `50mp` and DCG/LN are mutually exclusive until `Kararlar #4` is executed and proven.
-5. **Video integrity.** 1080p60 and 4K60 must remain functional in every mode. A standing acceptance criterion, user-validated.
+3. **Restart ordering.** Client before HAL. Violating this leaks CSIPHY/CSID allocations and blackens preview in every mode. (Section 5.) **Holds under direct test (IMPL-13, 2026-08-31):** ~17 mode transitions and 2 reboots across all ten modes left the bind-mount count at exactly 1 on each path every time, with no leak symptom. Note that `CSIPHYHw:4 AvailableResource=0` — which `Kullanim.txt` presents as the leak signature — also reads 0 on a clean boot and is therefore **not diagnostic** (`FIND-2.3-04`).
+4. **Layer exclusion.** `50mp` and DCG/LN are mutually exclusive **as the module ships, and this is now a deliberate retention rather than an untested assumption.** `Kararlar #4` was **executed and proven for DCG** (IMPL-15, 2026-08-31): composing the `fullres` HAL with `dcgB`+mode-0-12-bit produced a clean 50.3 MP capture with no corruption, so the constraint is **removable, not physical**. **Faz 5.3 decided to retain it anyway (IMPL-17, user decision).** Three reasons, all measured: the composed capture is **visually indistinguishable** from `50mp` alone, so there is no demonstrated benefit to ship; only **DCG** was proven, and the two combinations the roadmap names (`50mp`+`ln2`, `50mp`+`ln4`) cannot be validated because those modes crash AGC independently (`FIND-2.3-02`); and removal is a **state-model change**, not a dispatch edit — see `ARC-03` for the six-surface inventory. Enforcement as logic lives at `post-fs-data.sh:15-27` and `setmode.sh:177-192` only. The verified candidate `candidates/dcgB-m0-12bit.bin` (md5 `80b53215…`) is **kept and deliberately not in `blobs/`**, so adoption stays cheap if a benefit is ever demonstrated. Re-open this invariant only with new evidence of benefit, not of mechanism — mechanism is settled. **Holds under direct test (IMPL-13, 2026-08-31)**, in both directions and bracketed: selecting `50mp` reverted the sensor layer to stock (`9e4d0fe1…`) while the HAL went `fullres`. The enforcement sites are `post-fs-data.sh:16-18` and `setmode.sh`. **A consequence worth stating plainly: `50mp` combined with `ln2`/`ln4` has never been reachable on this device**, so no observed behaviour can be attributed to that combination. The mechanism is the global white level — see the sensor blob entry in section 3. Faz 5.1 generated the candidate that targets this invariant (`docs/mode0-12bit-candidate.md`); Faz 5.2 is what tests it, and until it does, this invariant stands unmodified.
+5. **Video integrity.** 1080p60 and 4K60 must remain functional in every mode. A standing acceptance criterion, user-validated. **Unassessable on this build as of IMPL-13 (2026-08-31) — neither confirmed nor refuted.** AGC fails `configure_streams()` before any 60 fps profile can be selected, so the invariant's own precondition is unreachable through AGC. The failure is **not module-caused**: the video section is black in plain `stock` with sensor and HAL both unmodified, in four states before and after a reboot (`FIND-2.3-03`, routed to Phase 3). OpenCamera records plain 1080p cleanly in `dcgB`, so the camera path itself is not broken. Do not record this invariant as passing on the strength of that — OpenCamera at 1080p30 does not exercise it.
 6. **Gcam static-metadata consistency.** `libgcam static_metadata.cc:667` requires `frame_raw_max` to equal the active array size **or** the pixel array size. Violation → `gcam.cc:274 Create … failed` → `NullPointerException: Gcam.f()`. **This single invariant explains two failures from opposite directions:** the Faz 4 wide patch raised the active array without raising raw; the Faz 12 RAW patch raised raw without raising the array. Both sides must move together.
 7. **Android high-resolution bucket.** `getOutputSizes(fmt)` excludes any size whose minimum frame duration exceeds 1/20 s; those appear only via `getHighResolutionOutputSizes(fmt)`. On camera 3: 8192x6144 = 66,666,666 ns (15 fps) → excluded; 4096x3072 = 33,333,333 ns (30 fps) → kept. This was the original root cause of AGC's 12.6 MP ceiling, and it is why Open Camera — which reads both lists — reached 50.3 MP unaided.
 8. **The preference trap.** `pref_raw_key_N` and `pref_fix_resolution_key_N` independently break Gcam initialization by triggering the port's `getFixResolutionList` width-cap, which can shrink a sensor's RAW list to an odd size. This already caused one misattributed failure. **Check for and clear these before diagnosing anything else.**
@@ -159,7 +198,7 @@ Recorded here deliberately: these values are expensive to re-derive and have bee
 | OQ-01 | Where does `camera.qcom.so` write `android.sensor.info.pixelArraySize` (tag `f0006`)? | open | 9 movz/movk sites and 6 rodata dwords located; write site not found |
 | OQ-02 | Does the HAL deliver remosaiced Bayer or raw Quad-Bayer at 8192x6144? | open | never captured — no successful full-res RAW frame yet |
 | OQ-03 | Can `pixelArraySize` be raised without breaking other consumers? | open | untested; the opposite direction (active array) is known to break AGC (Faz 4) |
-| OQ-04 | Is the 10-bit/12-bit mismatch the *only* obstacle to 50 MP + LN composition? | open | assumed by `Kararlar #4`; no measurement confirms exclusivity of the cause |
+| OQ-04 | Is the 10-bit/12-bit mismatch the *only* obstacle to 50 MP + LN composition? | answered | **Measured by IMPL-15 on 2026-08-31, and the answer is yes for DCG.** With `dcgB` + mode 0 moved to 12-bit mounted under the `fullres` HAL, the camera opened without a Gcam NPE, preview was live in both AGC and OpenCamera, and OpenCamera captured a valid **8192x6144 / 50.3 MP** frame with no corruption. Nothing beyond the bit-depth mismatch had to move. Two limits on the claim: the tested sensor layer is **DCG (`dcgB`), not LN** — `ln2`/`ln4` were not composed, and they independently crash AGC (`FIND-2.3-02`); and the composed frame is **visually indistinguishable** from the same shot at `50mp` alone, so the composition is *reachable* but showed no measured quality gain in a dark, flat scene. |
 | OQ-05 | Is patch application atomic against power loss mid-write? | answered | No, and it does not need to be. `halpatch.sh:66-77` `hal_write` applies each entry with a separate `dd conv=notrunc`, so writes are **ordered, not atomic**. The target is `$MODDIR/active_hal/camera.qcom.so` (`halpatch.sh:30`), a module-private copy — never the live `/odm/lib64/hw/camera.qcom.so`. A partial write is **detected**: `hal_state` (`:80-87`) md5-classifies the copy and returns `unknown` when it matches neither known value. It is **recovered**: `hal_set` (`:97-99`) calls `hal_seed` on `unknown`/`none`, which re-copies the device's stock binary and verifies it (`:106-116`). `hal_set:101` re-verifies md5 after every write, so a failed `dd` cannot be reported as success. `hal_write` has exactly one caller (`:100`), which verifies. |
 | OQ-06 | Does the WebUI pass any user input into a shell invocation? | answered | No. Exhaustive trace of `webroot/index.html`: exactly **four** `exec()` call sites — `:268` (`ACT + ' info'`), `:300` (`exec(cmd)` inside `run()`), `:332` (`ACT + ' lang ' + lang`), plus the definition at `:193`/`:204`. `run()` has exactly **two** callers: `:317` (`ACT + ' toggle ' + id`) and `:325` (`ACT + ' set ' + id`), where `id` iterates the source-literal arrays `MAIN_MODES` (`:187`) and `EXTRA` (`:188`). `lang` at `:330` reads `dataset.lang` from the two static buttons at `:98-99` (`en`/`tr`). `ACT`/`MODDIR` are string literals (`:122-123`). No `exec` argument has a user-controllable component. Backstop: `action.sh:108-114` `valid()` whitelists the mode against a fixed ten-element list before `:131` interpolates it into `sh -c`. |
 | OQ-07 | Does `customize.sh` normalize `mode` and `active/` at install time? | answered | No — and the shipped archive makes it moot. `customize.sh` (78 lines, read in full) contains **zero** writes to `mode`; the only writer in the module is `setmode.sh:204`. But `unzip -Z1` on `ishtar-cam-modes-v2.1.zip` and `v2.0.zip` shows neither ships `mode`, `lang`, `active/`, or `active_hal/` — packaging already excludes runtime state. On first boot `post-fs-data.sh:14` reads an absent file, `MODE` is empty, and the `*)` arm at `:23-27` defaults to `stock`. **`AUTOPSY-P3-03` is contradicted for the shipped artifact.** The residual defect is the claim at `customize.sh:62` ("guncellemede mevcut mod"), which nothing implements — see FIND-1.5-01. |
@@ -172,4 +211,4 @@ Recorded here deliberately: these values are expensive to re-derive and have bee
 | OQ-14 | Does the port have a working 48M mechanism? | answered | **No** — `Forty8Strip` is an identity stub; hypothesis rejected |
 | OQ-15 | Why did AGC cap at 12.6 MP? | answered | `getOutputSizes()` high-resolution bucket exclusion (invariant 7), not a blocklist or a flag |
 | OQ-16 | Why did the Faz 4 wide patch break AGC? | answered | same invariant as Faz 12, opposite direction (invariant 6) |
-| OQ-17 | Which HAL camera id is the one the 16-point `fullres` patch actually modifies, and which one does AGC open? | open | Raised by the Faz 2.1 smoke run, 2026-08-30. Eight Back-facing devices share the 4096x3072 array, and none currently reports the 508 entries `EV-16` recorded under a `fullres` HAL. Settle by taking a smoke snapshot with the HAL in `fullres` and diffing against the stock baseline: the device whose `streamcfg` count moves is the one being patched. This is a prerequisite for Faz 4.1 stating its target array count as a number. |
+| OQ-17 | Which HAL camera id is the one the 16-point `fullres` patch actually modifies, and which one does AGC open? | partially_answered | Raised by the Faz 2.1 smoke run 2026-08-30; **answered by IMPL-12 on 2026-08-31** by the `fullres`-vs-baseline smoke diff it proposed. The patch modifies **all thirteen** camera ids, Front-facing included, not one — per-id deltas in section 3. Faz 4.1 must therefore size its guard for device-wide reach and cannot name a single target array count. **Which id AGC opens is still unmeasured** and stays open. Row updated by Faz 5.1, the first sub-plan since IMPL-12 whose boundary covers this file. |
