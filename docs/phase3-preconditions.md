@@ -199,6 +199,27 @@ name as "the Faz 3.1 per-measurement checklist".
    truncation before.
 7. **Attribution stated.** The result names the AGC build it was measured
    against — currently the **patched** `ce65f862…`, not stock.
+8. **Crash contamination cleared.** After **any** camera-provider abort, reboot
+   before the next reading. A reading taken after an abort without an
+   intervening reboot is void — it is retaken, not interpreted. This is
+   `FIND-3.4-03`. **And the abort must be real:** `logcat | grep <pattern>`
+   matches `adbd`'s own echo of your command, because `adbd` logs each incoming
+   shell request verbatim and the request line contains the search string. That
+   produced a **false provider abort** and a **false libgcam gate failure** in
+   the `IMPL-28` / `IMPL-30` session, either of which a trusting reader would
+   have recorded as real. Always `logcat -d | grep -v adbd | grep <pattern>`,
+   or redirect to a file on the device and read that file back. Confirm any
+   abort by a second method before treating a reboot as required.
+
+Item 8 was added by `IMPL-31` under `Faz-4-Plans/Faz4.6-raw-payload-geometry-diagnosis.md`
+work item `F4.6-09`, which is the first sub-plan to hold write authority for this
+file. It had been restated inline by `Faz4.5` and `Faz4.6` because no owner
+existed for it; those inline restatements are now redundant and this file is the
+single source. `AUDIT-FIX-08` is thereby **permanently discharged**.
+
+Although the checklist is named for Phase 3, items 3 and 8 in particular bind any
+later phase that takes a device measurement; Phase 4 sub-plans reference it by
+this name rather than restating it.
 
 ### Caveat on the smoke script's preference field
 

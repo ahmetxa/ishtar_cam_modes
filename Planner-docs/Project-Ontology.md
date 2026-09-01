@@ -263,6 +263,26 @@ This confirms, by measurement rather than inference, that **`S+0x3c1c` holds `81
 
 **Toolchain negative findings** (each cost real time): apktool's bundled smali `Main` classes are stripped stubs and cannot be invoked; `com.android.tools.smali` Maven paths return 404; the Bitbucket mirror returns 403; google/smali publishes no release binaries; **radare2 and rabin2 5.9.8 do not complete on this 27 MB binary** (no output in 300 s, from either shell).
 
+### The corrupt-frame geometry model (IMPL-31 / Faz 4.6, 2026-09-01)
+
+**The artifact is a half-width payload written linearly into a full-width raster.** Confirmed on three captures across two HAL states and two raster sizes, with an inverse control that round-trips byte-identically. Full record: `docs/raw-geometry-diagnosis.md`. Tool: `agc-50mp-yama/tools/frame_geometry.py`.
+
+**Axis rule, which every future shape claim must apply first.** The AGC JPEG is stored **rotated 90 degrees** from the sensor raster: SOF0 says 6144x8192, EXIF `ImageWidth`/`ImageLength` say 8192x6144, `Orientation`=1. JPEG height is the raster row direction; JPEG width is the raster row count. `EV-38` was recorded in JPEG axes and reads differently once transposed — the two colour strips are side by side in raster axes, not stacked.
+
+| State | Raster | Payload | W ratio | H ratio | Black |
+|---|---|---|---|---|---|
+| three-layer (`IMPL-23` era) | 8192x6144 | 4096x**6144** | 1/2 | 1/1 | 50% |
+| five-word (`IMPL-30`) | 8192x6144 | 4096x**3072** | 1/2 | 1/2 | 75% |
+| five-word, smaller request | 4096x3072 | 2048x**1536** | 1/2 | 1/2 | 75% |
+
+**Three consequences worth carrying forward rather than re-deriving.**
+
+1. **The reconstruction is a re-read, not a permutation.** Splitting each raster row at its midpoint and emitting the halves as consecutive rows leaves the linear byte stream untouched, so un-folding is `Image.frombytes` at half the width — one call, no per-row loop over 50 megapixels. This is why the decisive probe cost nothing.
+2. **`80340003` is removed as a candidate on evidence, not on cost.** The fault is *proportional* to the request; the vendor tag holds a *fixed* `[0 0 4096 3072]` and never moves (`EV-40`). A fixed rect cannot yield a 2048x1536 payload at a 4096x3072 raster, nor a height ratio that changes while the tag does not. `DEC-13` is vindicated by measurement.
+3. **The `IMPL-23` / `IMPL-30` "50% vs 75%" discrepancy is reconciled.** Both figures were correct for their own state. The record was right to refuse to reconcile them from description alone. **Attribution of the height change to the active-array raise is NOT claimed** — the two states differ in session, scene and `pref_48m_key`, so the one-variable rule is unmet. That attribution is `F4.6-05`/`F4.6-06` work.
+
+**The open question this leaves, stated so it is not confused with a settled one:** *why* the payload is half-width. Candidates are a 2x2-binned sensor delivery into a full-size buffer, a remosaic path configured at half extent, or a stride negotiated from a stale rect. Not answerable from an image; it needs the negotiated buffer stride and binning state from a filtered logcat during capture (`F4.6-06`).
+
 ## 7. Invariants and Constraints
 
 1. **Reversibility.** Every modification is a bind-mount or an md5-guarded offset patch. A module that cannot be disabled is a bricked phone.
@@ -275,6 +295,8 @@ This confirms, by measurement rather than inference, that **`S+0x3c1c` holds `81
    **Outcome recorded 2026-09-01 (IMPL-23 / Faz 3.5). The invariant is CONFIRMED exactly as stated, and it is now known to be NECESSARY BUT NOT SUFFICIENT.** Satisfying it through the *pixel array* branch works: with `pixelArraySize=[8192 6144]` and RAW10 8192x6144 both live, `static_metadata.cc:667` stopped occurring entirely, `Gcam` initialised, and AGC completed three reproducible 50.3 MP captures. That is the first time this gate has ever been passed on this device.
    **The refinement:** passing the gate does not produce a correct image. Every full-resolution AGC frame is geometrically corrupt — content fills only the active-array extent of a full-size buffer, leaving exactly half the frame black, with a magenta cast over the rest. The gate compares `frame_raw_max` against *either* array, but the imaging pipeline downstream still lays out geometry from the **active** array. So satisfying invariant 6 via `f0006` alone leaves `f0000`, `f000a` and the QTI vendor tag `org.codeaurora.qcamera3.quadra_cfa.activeArraySize (80340003)` — all three still `[0 0 4096 3072]` — inconsistent with the buffer. Open Camera is unaffected, because its frames come from the HAL's own ISP path rather than from Gcam's RAW consumption.
    **Consequence for Phase 4:** whatever narrowing Phase 4 performs must preserve the raised `f0006` *and* must additionally raise the three active-array tags together, or the corruption stands. Raising `f0006` on its own is a metadata fix, not an imaging fix.
+
+   **Superseded in its diagnosis 2026-09-01 (IMPL-30, then IMPL-31 / Faz 4.6). The invariant itself stands; the account of the corruption above does not.** Both patchable active-array tags were raised to `[0 0 8192 6144]` and **the frame stayed corrupt** (`EV-37`), which refutes "content fills only the active-array extent" as the mechanism. The measured mechanism is a **half-width payload written linearly into a full-width raster** (`EV-42`), and it is *proportional to the request* rather than pegged to any array value (`EV-45`) — so no tag value explains it and the vendor tag `80340003` is excluded on evidence. Two corrections follow for anyone reading the paragraph above: "exactly half the frame black" was the **three-layer** state and 75% is the five-word state, both correct (`EV-44`); and the magenta cast is **alternate payload rows** carrying opposite CFA phase, not a single flip (`H-03`). The preservation requirement in the previous paragraph is unaffected and still binds Phase 4.
 7. **Android high-resolution bucket.** `getOutputSizes(fmt)` excludes any size whose minimum frame duration exceeds 1/20 s; those appear only via `getHighResolutionOutputSizes(fmt)`. On camera 3: 8192x6144 = 66,666,666 ns (15 fps) → excluded; 4096x3072 = 33,333,333 ns (30 fps) → kept. This was the original root cause of AGC's 12.6 MP ceiling, and it is why Open Camera — which reads both lists — reached 50.3 MP unaided.
 8. **The preference trap.** `pref_raw_key_N` and `pref_fix_resolution_key_N` independently break Gcam initialization by triggering the port's `getFixResolutionList` width-cap, which can shrink a sensor's RAW list to an odd size. This already caused one misattributed failure. **Check for and clear these before diagnosing anything else.**
 9. **Signing.** No signing key ships in any distributed artifact. **Verified empirically 2026-08-24 by Faz 1.2**, not merely asserted: all five released archives (`ishtar-cam-modes-v1.0/v1.9/v2.0/v2.1`, `ishtar-aon-fix-v1.1`) were listed by entry name and contain no `.keystore`, `.jks`, `.p12`, `.pem`, or `.key` entry, and no entry at the 2,664-byte size of the local `debug.keystore`. Three sub-rules now carry this invariant forward:
