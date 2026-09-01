@@ -156,7 +156,30 @@ Recorded here deliberately: these values are expensive to re-derive and have bee
 - Changing those four to `cmp wN,#5` admits 0x22–0x26, which adds RAW10 (37), RAW12 (38), and RAW_OPAQUE (36) at 8192x6144. Array grows 508 → 868 int32.
 - All 16 `hal-fullres.patch` sites are inside this function; the binary has 55 accesses to `+0x3d84` in total.
 
-**`android.sensor.info.pixelArraySize`, tag `f0006`** — the current Phase C target. Nine movz/movk references at `0x004fe984`, `0x004fee94`, `0x004ffa5c`, `0x00d9ae24`, `0x00d9ae80`, `0x013b192c`, `0x013b1994`, `0x013b1a08`, `0x013b1a7c`. Six rodata dwords at `0x0002c6ac`, `0x0038964c`, `0x003969b4`, `0x00396adc`, `0x00397fcc`, `0x0039c1f0`. **The write site has not been located.**
+**`android.sensor.info.pixelArraySize`, tag `f0006`** — **the write site is LOCATED** (IMPL-18 / Faz 3.2; static analysis against stock HAL `c3fa63a86ee3ecaf9fbf02005d35f6b5`, 27,268,688 B).
+
+*Address convention.* File offset **equals** virtual address for `.text` (`0x004f7000`, size `0x146a538`) and `.rodata` (`0x000280e0`, size `0x3d5d68`); only `.data`/`.bss` carry a `0x1000` delta. Every address below is therefore both.
+
+- **Publisher routine** — `0x1755430`, the CamX static-metadata update call; 668 direct `bl` callers. As used here the arguments are `x0` = metadata context, `w1` = tag, `x2` = value pointer, `w3` = element count, `x4` = the string `camxContext` at `0x001d0090`, `w5` = 0, `w6` = -1.
+- **Publishing function** — begins `0x01661f40` (`paciasp`), prologue `stp x29, x30, [sp, #-0x60]!` at `0x01661f44`. Stripped: no symbol covers it, and the nearest preceding `STT_FUNC` (`ChiEntry`, `0x01655750` + `0x144`) does **not** contain it. It publishes the entire `android.sensor.info.*` family — `f0001` through `f000a` — in one sequence.
+- **The `f0006` publication** — `bl` at `0x0166648c` with `w3 = 2` (two int32: width, height). Value pointer `[x19+0x6550]`, built by `add x2, x19, #6, lsl #12` then `add x2, x2, #0x550`. Tag built by `movz w1, #6` at `0x01666468` and `movk w1, #0xf, lsl #16` at `0x01666478`.
+- **The value write itself** — `0x0166643c` … `0x01666460`: `ldr x12, [x24, #0x60]` (sensor-data base, call it `S`) ; `mov w5, #0x3c1c` at **`0x01666440`** ; `add x4, x12, x5` ; `ldr w27, [x12, #0x3d84]` (selector) ; `ldr x17, [x4]` ; `str x17, [x19, #0x6550]` at `0x01666454` ; `b.ne` ; `ldr x1, [x4, #0x198]` ; `str x1, [x19, #0x6550]` at `0x01666460`. The published pair is **copied from `S+0x3c1c`, or from `S+0x3db4` when `[S+0x3d84] == 1`**. That selector field `+0x3d84` is the same one recorded above with 55 accesses binary-wide.
+- **Second publication path** — `movz` `0x016664b4` / `movk` `0x016664c0`, tail-branching at `0x016664c8` to `0x1662098`; reached when `[[x19+0x68]+0x148] == 5`. Same tag, same count, same `[x19+0x6550]` slot.
+- **Third genuine site is a lookup, not a write** — `movz` `0x01668ebc` / `movk` `0x01668ec0` feeding `bl 0x7d12b0` (tag-to-index resolution, 421 callers) inside a per-tag dispatch chain (`f0005` at `0x01668e8c`, `f0008` at `0x01668eec`).
+- **Sibling offsets in `S`, same function** — `f0005` (count 2) from `S+0x3dac` (`bl` at `0x016663f8`); `f000a` (count 4) from `S+0x3d88` loaded via `q7` (`bl` at `0x01666588`). `[x19+0x6550]` is a staging slot reused across tags.
+- **Origin of the value: RUNTIME-DERIVED from the sensor data structure, not a constant in the binary.** This answers F3.2-04 and is the decisive input to Faz 3.3's patch strategy.
+
+**Two corrections to the earlier `f0006` address book, both established exhaustively (IMPL-18).**
+
+- The **nine recorded `movz`/`movk` addresses are false positives** — not one of them builds `0xf0006`. `0x004fe984` and `0x004fee94` load the division magic constant `0xffe56cb1`; `0x013b192c`, `0x013b1994`, `0x013b1a08`, `0x013b1a7c` load the division magic constant `0xf83f630a`; `0x004ffa5c` builds a 64-bit literal consumed by a `stp`; `0x00d9ae24` and `0x00d9ae80` load hashed keys `0xf18e69c5` and `0xf18f69c5`. Do not spend budget on them again.
+- The **six rodata dwords are genuine but are not value sources.** All six do hold `0x000f0006`, and they are the only six 4-byte-aligned dwords in the entire file with that value. But `0x0038964c` and `0x0039c1f0` sit inside strictly sequential tag-list runs (`000f0001` … `000f000a`), `0x0002c6ac` inside a shorter tag run, and `0x003969b4`, `0x00396adc`, `0x00397fcc` inside packed 16-bit tuning data. **No exact `adrp`+`add` pair computes the address of any of the six** — they are table interiors reached by indexing, holding the tag identifier rather than any dimension.
+- Genuine register-built `f0006` sites in `.text` number **three**, not nine: the two publication sites and the one lookup site listed above.
+
+**Ranked patch candidates handed to Faz 3.3** (none applied; Faz 3.2 is static by scope):
+
+1. **`0x01666440`, `mov w5, #0x3c1c`** — one word whose `imm16` selects which 8-byte `(width, height)` pair in `S` is published as `pixelArraySize`. If any offset in `S` already holds `8192x6144`, redirecting this immediate publishes it with a genuine single-word change. Requires confirming the layout of `S` on device.
+2. **`0x0166645c`, `ldr x1, [x4, #0x198]`** — one word; changes the alternate source offset. Only reachable when `[S+0x3d84] == 1`, so its effect is conditional.
+3. **Overwrite the load/store block `0x0166644c` … `0x01666460`** with immediate construction of `0x0000180000002000` (8192, 6144). Multi-word and alters control flow; ranked last.
 
 **Related metadata tags** — `android.scaler.availableStreamConfigurations` `d000a`; `availableMinFrameDurations` `d000b`; `availableStallDurations` `d000c`; `android.sensor.info.activeArraySize` `f0000`; `preCorrectionActiveArraySize` `f000a`.
 
@@ -195,7 +218,7 @@ Recorded here deliberately: these values are expensive to re-derive and have bee
 
 | ID | Question | Status | Evidence |
 |---|---|---|---|
-| OQ-01 | Where does `camera.qcom.so` write `android.sensor.info.pixelArraySize` (tag `f0006`)? | open | 9 movz/movk sites and 6 rodata dwords located; write site not found |
+| OQ-01 | Where does `camera.qcom.so` write `android.sensor.info.pixelArraySize` (tag `f0006`)? | answered | **Located statically by IMPL-18 (Faz 3.2)** against stock HAL `c3fa63a8…`. The value is staged at `[x19+0x6550]` by `str` at `0x01666454` (or `0x01666460` on the `[S+0x3d84] == 1` path), copied from sensor-data offset `S+0x3c1c` (alt `S+0x3db4`) where `S = [x24+0x60]`, then published as tag `f0006` with count 2 by `bl 0x0166648c` into the CamX metadata publisher `0x1755430`. Containing function starts `0x01661f40`. **The value is runtime-derived, not a binary constant.** The nine previously recorded `movz`/`movk` sites are false positives and the six rodata dwords are tag-list interiors, not value sources; full detail and the ranked patch candidates are in the address book above. Faz 3.3 owns the confirming single-word patch and the `dumpsys` read. |
 | OQ-02 | Does the HAL deliver remosaiced Bayer or raw Quad-Bayer at 8192x6144? | open | never captured — no successful full-res RAW frame yet |
 | OQ-03 | Can `pixelArraySize` be raised without breaking other consumers? | open | untested; the opposite direction (active array) is known to break AGC (Faz 4) |
 | OQ-04 | Is the 10-bit/12-bit mismatch the *only* obstacle to 50 MP + LN composition? | answered | **Measured by IMPL-15 on 2026-08-31, and the answer is yes for DCG.** With `dcgB` + mode 0 moved to 12-bit mounted under the `fullres` HAL, the camera opened without a Gcam NPE, preview was live in both AGC and OpenCamera, and OpenCamera captured a valid **8192x6144 / 50.3 MP** frame with no corruption. Nothing beyond the bit-depth mismatch had to move. Two limits on the claim: the tested sensor layer is **DCG (`dcgB`), not LN** — `ln2`/`ln4` were not composed, and they independently crash AGC (`FIND-2.3-02`); and the composed frame is **visually indistinguishable** from the same shot at `50mp` alone, so the composition is *reachable* but showed no measured quality gain in a dark, flat scene. |

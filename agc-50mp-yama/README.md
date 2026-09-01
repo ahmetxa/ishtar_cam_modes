@@ -83,3 +83,30 @@ işleyemiyor. Yani APK tarafındaki tıkanıklık açıldı, sıra HAL tarafınd
 
 `pref_48m_key` yokken APK stok gibi çalışıyor (RAW10 4096x3072, çekim
 sorunsuz) — doğrulandı.
+
+## HAL tarafi: pixelArraySize yazim yeri (Faz 3.2 / IMPL-18)
+
+`find_tag_write_site.py` — `camera.qcom.so` icinde bir metadata tag'inin
+yazim yerini bulan salt-okunur analiz betigi. Hicbir yama uygulamaz.
+
+    python find_tag_write_site.py <camera.qcom.so> f0006
+
+Stock HAL `c3fa63a86ee3ecaf9fbf02005d35f6b5` (27.268.688 B) uzerinde
+`android.sensor.info.pixelArraySize` (tag `f0006`) icin bulunan sonuc:
+
+- Ontolojide kayitli **dokuz `movz`/`movk` adresi yanlis pozitif** — hicbiri
+  `0xf0006` kurmuyor; bolme sabitleri, 64-bit literal ve hash anahtarlari.
+- **Alti rodata dword'u gercek ve tam** (dosyadaki tek alti hizali
+  `0x000f0006`), ama **deger kaynagi degil**: tag listesi tablolarinin ici,
+  hicbirine tam `adrp`+`add` ile erisilmiyor.
+- Gercek yazim, `0x01661f40`'ta baslayan fonksiyonda:
+  `S = [x24+0x60]`, deger `S+0x3c1c`'ten (veya `[S+0x3d84] == 1` ise
+  `S+0x3db4`'ten) `[x19+0x6550]` yuvasina kopyalanir, sonra
+  `bl 0x0166648c` ile publisher `0x1755430` uzerinden `count=2` yayinlanir.
+- **Deger calisma aninda turetilir; ikilide sabit degildir.** Yamalanacak bir
+  sabit yok; en iyi tek-kelime adayi `0x01666440` (`mov w5, #0x3c1c`), yani
+  hangi `(genislik, yukseklik)` ciftinin yayinlandigini secen immediate.
+
+Tam kayit ve siralanmis aday listesi: `Planner-docs/Project-Ontology.md`
+adres defteri, `EV-24`/`EV-25`/`EV-26`, ve `Planing-Ledger.md` IMPL-18.
+Yamayi Faz 3.3 uygular; bu betik olcmez, yalnizca bulur.
