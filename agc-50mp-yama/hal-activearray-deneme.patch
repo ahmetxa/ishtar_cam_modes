@@ -1,0 +1,62 @@
+# ishtar Faz 4.5 -- aktif dizi (f0000 / f000a) DENEY yamasi -- A15 / vauxite
+#
+# IKI SATIR. blobs/hal-fullres.patch ile BIRLESTIRME -- hal_write
+# $HAL_PATCH icindeki HER satiri uygular; bu tablo ayri kalmalidir.
+# hal-pixelarray-deneme.patch ile ayni indeksi PAYLASMAZ; uc tablo
+# sirasiz birlesir (IMPL-23 ile ayni ozellik).
+#
+# Ne yapar:
+#   0x016622ac  mov w9,  #0x3d98   ->   mov w9,  #0x3c54     (f0000)
+#   0x01666554  mov w12, #0x3d88   ->   mov w12, #0x3c24     (f000a)
+#
+# Neden: yayin islevi (0x01661f40) her iki dikdortgeni de once
+# BINNENMEMIS kaynaktan q yazmacina okur, sonra secici [S+0x3d84]==1
+# ise BINNENMIS kaynaktan UZERINE yazar:
+#   f0000: varsayilan S+0x3c54 , uzerine S+0x3d98
+#   f000a: varsayilan S+0x3c24 , uzerine S+0x3d88
+# Baslatici bu ciftleri isaretli bolme ile turetir:
+#   [S+0x3d98] = [S+0x3c54] / binning     (0x016f077c .. 0x016f07a0)
+#   [S+0x3d88] = [S+0x3c24] / binning     (0x016f0888 .. 0x016f08ac)
+# yani 0x3c serisi BINNENMEMIS (tam cozunurluk) degerleri tutar.
+# Bu, f0006 icin dogrulanmis olan modelin AYNISIDIR
+#   ([S+0x3db4] = [S+0x3c1c] / binning , 0x016f07c0 .. 0x016f07e4).
+#
+# GUVENLIK: her satir kosullu q yukunu, AYNI temel blokta kosulsuz q
+# yukunun ZATEN okudugu 16 bayta yonlendirir. Yani sinir disi okuma
+# uretmez -- ikilinin kendi kodu o adresi zaten okuyor.
+#
+# 80340003 (org.codeaurora.qcamera3.quadra_cfa.activeArraySize) bu
+# tabloda YOKTUR ve olamaz: sabit 27 MB ikilide 4-bayt hizali dword
+# olarak SIFIR kez gecer ve .text icinde movz/movk ile hic kurulmaz.
+# Yalnizca ISIM dizgisi vardir (0x002265af). Saticinin etiket numarasi
+# calisma aninda saglayici tarafindan atanir -- yamanacak sozcuk yok.
+# Bu, bir eksiklik degil, F4.5-05'in acik NEGATIF sonucudur.
+#
+# bicim: <4bayt-indeksi> <stok-escape> <yamali-escape>
+#   indeks = bayt_ofseti / 4  (dd bs=4 seek=<indeks> icin hazir)
+#   escape dizileri printf '%b' ile YAZILDIGI GIBI kullanilir.
+#
+# ONCEDEN TAAHHUT EDILEN md5 (herhangi bir cihaz yazimindan ONCE,
+# konak tarafinda hesaplandi; besteleyici once alti bilinen md5'i
+# birebir yeniden uretti -- IMPL-23 disiplini):
+#
+# temel  stok    md5 c3fa63a86ee3ecaf9fbf02005d35f6b5
+#   + yalniz f0000            md5 c8ed89e8fed41e3928396e7f65c8f6ff
+#   + yalniz f000a            md5 bdfbe1fb68750a9cc75a5b06c2c05172
+#   + ikisi birden (bu tablo) md5 90c012152454488f135a730f77f3e4d5
+#
+# temel  uc-katman md5 c3db54b0b154dd19211f221e3d5046e7
+#   + yalniz f0000            md5 8371521de8e9fd69697f4eec5285455d
+#   + yalniz f000a            md5 2c71565d919919bf0cbc75a83e6189d9
+#   + ikisi birden (bu tablo) md5 c094101de0184e9216a57020873bac0b
+#
+# OLCUM KURALI: F4.5-07/F4.5-08 TEK etiketi tek seferde uygular.
+# Bu tablo IKI satir tasidigi ve hal_write her satiri uyguladigi icin,
+# tek-etiket olcumu tabloyla DEGIL, dogrudan dd ile yapilir (IMPL-23
+# bes sozcugu boyle yazdi). Yukaridaki tek-etiket md5'leri tam da bu
+# yuzden ayrica listelenmistir.
+#
+# nokta 1 -- f0000  android.sensor.info.activeArraySize
+5867691 \011\263\207\122 \211\212\207\122
+# nokta 2 -- f000a  android.sensor.info.preCorrectionActiveArraySize
+5871957 \014\261\207\122 \214\204\207\122

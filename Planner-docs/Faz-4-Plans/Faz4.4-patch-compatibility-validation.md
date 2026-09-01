@@ -6,6 +6,10 @@ Main-Planing Phase 4's acceptance signals define exactly what this sub-phase mea
 
 Autopsy adds the quantitative requirement. Section 12 under Phase 4: "Require the array-size delta (currently 508 → 868 int32) as a measured acceptance number, not a qualitative claim."
 
+**Amended 2026-09-01 (`AUDIT-FIX-09`). That quoted pair of numbers may not be used as a baseline without being qualified first, and this sub-plan is the worst place in the project for the ambiguity to survive, because reporting the count as a number is its entire job.** A bare "508" names neither a camera id nor a metric. `IMPL-25` identified it as **`camera.hal3` in the fullres state, on the `streamcfg` int32 element count**, against hal0's fullres figure of 456 — and `scripts/smoke.sh` prints hal0 **first**, because its output is sorted by id, so a reading taken from the top line does not compare against 508 at all. **The recorded figures also disagree with each other and this sub-plan must not paper over it:** `EV-16` and the `hal-raw50-deneme.patch` header record 508 → 868, while `IMPL-30`'s bracket recorded `camera.hal0` 440 → 800 and `camera.hal3` 500 → 868 under the seven-word stack built on the fullres base. Whether the 8-entry difference is a base-state difference, a transcription slip, or a real change is not settled by the record. **Therefore this sub-plan does not quote a baseline. It reads the baseline from a bracketed snapshot in the state it is comparing against, names the camera id and the metric with the number, and inherits its target from what `Faz-4-Plans/Faz4.1-fullres-dimension-guard.md` actually stated rather than re-deriving it from Autopsy's figure.**
+
+**Amended 2026-09-01: this sub-plan also carries `FIND-4.5-01` (P2, open), routed here by `IMPL-28`.** The active-array raise is **global, not per-sensor**. Because the patched word sits in the shared `android.sensor.info.*` publishing routine rather than in a per-sensor path, the front cameras moved too — `hal1`, `hal8` and `hal9` went `[0 0 3264 2448]` -> `[0 0 6528 4896]`, exactly 2x — while `hal11` and `hal12` were unaffected, consistent with their selector not taking the binned branch. **The consequence is an internally inconsistent metadata pair on cameras this project never intended to touch:** the front cameras now advertise an `activeArray` *larger than their own `pixelArray`*. The wide camera does not have this problem, because `f0006` is raised alongside on it. Whether the raise needs scoping to the wide sensor, or is harmless because nothing consumes the front active array at full extent, is **not answered by any measurement taken so far** — and a patch intended for other people's devices cannot ship with that question open. This sub-plan is where it is answered.
+
 This is the phase's closing validation and it differs from Faz 3.4's consumer survey in an important way. Faz 3.4 asked whether a single-word metadata change broke anything. This asks whether the complete, consolidated, shippable patch — narrowed emission, duration rows, and pixel array change together — is safe to distribute. The patch is intended for other people's devices, which is the argument Project-Comprehension `QAS-04` makes for narrowing in the first place: "the patch is intended for distribution."
 
 The full ten-mode surface matters here too. Project-Ontology invariant 4 records that `50mp` and the DCG and LN modes are mutually exclusive, and Autopsy section 6 notes the rule is enforced by shell control flow rather than by a checked invariant. A consolidated patch that redefines the HAL state — which Faz 4.3's structural decision may do — touches exactly that control flow.
@@ -29,7 +33,8 @@ The comparison baselines are already established and should be used rather than 
 ## 4. Scope
 
 - The stream configuration surface: RAW10 and RAW_SENSOR present at 8192x6144, duration rows matching, and no spurious entries at other resolutions.
-- The array entry count as a measured number compared against the Faz 4.1 target and the 508 baseline.
+- The array entry count as a measured number, **stated with its camera id and its metric**, compared against the two targets `Faz 4.1` stated and against a baseline read from a bracketed snapshot rather than quoted from Autopsy.
+- The front-camera consequence of the global active-array raise (`FIND-4.5-01`): whether `hal1`, `hal8` and `hal9` advertising `activeArray` larger than their own `pixelArray` is tolerable in a distributed patch, and what the disposition is.
 - Open Camera at full resolution, with the result measured numerically against the documented 50.3 MP.
 - The AGC path, per whatever state Faz 3.6 established as the phase 3 outcome.
 - The stock camera application and the video path at 1080p60 and 4K60.
@@ -50,7 +55,9 @@ The comparison baselines are already established and should be used rather than 
 
 ## 6. Current Repository Evidence
 
-`agc-50mp-yama/hal-raw50-deneme.patch` records the pre-narrowing measurement this validation is compared against: the array grows from 508 to 868 int32 entries under the broad experimental patch. The 508 figure is the unpatched-for-RAW baseline and Faz 4.1's target is derived from it.
+`agc-50mp-yama/hal-raw50-deneme.patch` records a pre-narrowing measurement of 508 to 868 int32 entries under the broad experimental patch. **That figure is used here only as provenance, never as the comparison baseline** — see the `AUDIT-FIX-09` amendment in section 1. It names no camera id and no metric, and it disagrees with `IMPL-30`'s bracketed reading of `camera.hal3` 500 -> 868 in an adjacent state. The comparison baseline is read fresh, per camera id, from a bracketed `scripts/smoke.sh` snapshot.
+
+`Planner-docs/Project-Ontology.md` section 6 records the `FIND-4.5-01` measurement this sub-plan must dispose of: under the single `f0000` word alone, `hal1`, `hal8` and `hal9` moved `[0 0 3264 2448]` -> `[0 0 6528 4896]` while `hal11` and `hal12` did not, and `hal0` and `hal2`…`hal7` and `hal10` moved to `[0 0 8192 6144]`. Every `streamcfg` count and every `pixelArray` value was unchanged by that word, and the bracketed comparable-region diff was exactly thirteen lines. The front cameras' `pixelArray` did **not** move, which is what leaves them internally inconsistent.
 
 The same file records the three entries that should be present at full resolution: `[37 8192 6144 OUTPUT]`, `[38 8192 6144 OUTPUT]`, and `[36 8192 6144 OUTPUT]`, subject to whatever format set Faz 4.2 settled.
 
@@ -72,8 +79,11 @@ Project-Comprehension `CQ-07` remains open at Phase 4's start: "What is the smal
   - Description: Extract the RAW format rows and the matching duration rows for camera 3, and confirm full resolution is present with nothing spurious elsewhere.
   - Output: A stream configuration verdict with the extracted rows.
 - F4.4-02 — Measure the array entry count
-  - Description: Report the count as a number and compare against the Faz 4.1 target and the 508 baseline. Autopsy requires this to be a measured number rather than a qualitative claim.
-  - Output: A numeric array count comparison.
+  - Description: Report the count as a number **with its camera id and its metric named** — the `streamcfg` int32 element count for a stated `camera.hal<id>` — and compare it against the two targets `Faz 4.1` stated and against a baseline read from a bracketed snapshot in the same state. Autopsy requires a measured number rather than a qualitative claim; `AUDIT-FIX-09` requires that the number be attributable. Do not quote 508 as a baseline, and note that `scripts/smoke.sh` sorts by id, so hal0 is the first line and is not hal3.
+  - Output: A numeric array count comparison, per camera id, against a freshly read baseline and against `Faz 4.1`'s stated targets.
+- F4.4-02b — Dispose of the global active-array raise (`FIND-4.5-01`)
+  - Description: Measure `activeArray` and `pixelArray` for **every** camera id under the consolidated patch, not only the wide camera, and identify each id where `activeArray` now exceeds its own `pixelArray`. Then establish whether anything consumes the front cameras' active array at full extent — the stock camera's front path, the front video profiles, and any application in the Faz 3.4 consumer set that uses a front camera — and state a disposition: tolerable as-is, or requiring the raise to be scoped to the wide sensor. A scoping requirement is a **decision raised to the user with the evidence attached**, not a repair made here, per this sub-plan's out-of-scope rule — scoping the raise to one sensor is a fresh write-site question of the kind `Faz4.5` was created to hold, and it would need its own owner.
+  - Output: A per-camera-id array consistency table, a front-camera behavioural verdict, and a stated disposition for `FIND-4.5-01`.
 - F4.4-03 — Validate the third-party consumer
   - Description: Capture with Open Camera at full resolution and measure the result numerically against the documented 50.3 MP.
   - Output: An Open Camera verdict with a measured resolution.
@@ -100,7 +110,8 @@ Project-Comprehension `CQ-07` remains open at Phase 4's start: "What is the smal
 
 - RAW10 and RAW_SENSOR are present at 8192x6144 with matching duration rows in both duration tables.
 - No RAW format entries exist at resolutions other than full resolution.
-- The array entry count is reported as a number and matches the Faz 4.1 target within an explained margin.
+- The array entry count is reported as a number **carrying its camera id and its metric**, matches the corresponding `Faz 4.1` target within an explained margin, and is compared against a baseline read from a bracketed snapshot rather than against a quoted figure. No unqualified "508" appears in the result.
+- Every camera id has an `activeArray` and `pixelArray` reading under the consolidated patch, every id where the first exceeds the second is named, and `FIND-4.5-01` carries a stated disposition backed by a front-camera behavioural check rather than by assumption.
 - Open Camera's full-resolution result is measured numerically and matches the documented value.
 - The AGC path matches the expectation the Faz 3.6 outcome established.
 - The stock camera opens, previews, and completes a shutter; video records and plays at both profiles.
@@ -115,7 +126,8 @@ Project-Comprehension `CQ-07` remains open at Phase 4's start: "What is the smal
 This is the phase's validation sub-phase, so its approach is the validation. The design principle is comparison against recorded references rather than fresh judgment.
 
 - `VAL-SMOKE` (from Faz 2.1) — the state reporter, used per mode and around each check.
-- `VAL-ARRAYCOUNT` (from Faz 4.1) — the numeric array count, the sub-phase's headline metric.
+- `VAL-ARRAYCOUNT` (from Faz 4.1) — the numeric array count, the sub-phase's headline metric, reported per camera id with the `streamcfg` int32 metric named.
+- `VAL-ARRAYCONSIST` (proposed) — `activeArray` against `pixelArray` for **every** camera id under the consolidated patch, which is what `FIND-4.5-01` needs and what no prior measurement has covered across the full id set.
 - `VAL-TABLES` (from Faz 4.2) — three-table consistency for the surviving entries.
 - `VAL-MANUAL` (proposed) — the user checklist: Open Camera capture with a measured result, stock camera shutter, video at both profiles, ten-mode camera opens, and the AGC check. Autopsy's Gate 3 in full.
 - `VAL-COMPARE` (proposed) — comparison of every verdict against the Faz 2.2 baseline, the Faz 2.3 regression record, and the Faz 3.4 consumer survey.
@@ -126,7 +138,8 @@ Local versus live: entirely live. Security validation is not applicable at this 
 
 | Path | State | Purpose | Validation Command IDs |
 |---|---|---|---|
-| scripts/smoke.sh | existing | Per-mode and per-check state reporting. | VAL-SMOKE, VAL-ARRAYCOUNT, VAL-PERSIST |
+| scripts/smoke.sh | existing | Per-mode and per-check state reporting, and the per-camera-id `activeArray` / `pixelArray` readings. | VAL-SMOKE, VAL-ARRAYCOUNT, VAL-ARRAYCONSIST, VAL-PERSIST |
+| Planner-docs/Project-Ontology.md | modified | Record the `FIND-4.5-01` disposition and the per-camera-id consistency result against the address book's existing raise entry. | VAL-ARRAYCONSIST |
 | ishtar-cam-modes/blobs/hal-fullres.patch | existing | The consolidated artifact under validation; read, not modified. | VAL-TABLES |
 | docs/regression-v2.1.md | existing | The ten-mode reference for comparison. | VAL-COMPARE |
 | docs/consumer-survey.md | existing | The post-pixel-array consumer reference. | VAL-COMPARE |
@@ -154,6 +167,8 @@ Subagents are not recommended.
 
 - Risk: Open Camera is checked without measuring and a silent resolution drop goes unnoticed. Impact: the exact failure `halpatch.sh` documents as happening without the patch, now happening with a defective one. Mitigation: F4.4-03 and the acceptance criteria both require a numeric measurement.
 - Risk: the array count is reported qualitatively as reduced. Impact: Autopsy's explicit requirement is unmet and the narrowing's success is unfalsifiable. Mitigation: F4.4-02 requires a number compared against a pre-stated target.
+- Risk (`AUDIT-FIX-09`): the count is compared against the unqualified 508 figure. Impact: a comparison against the wrong camera — 508 is hal3 in fullres, hal0's figure is 456, and smoke prints hal0 first — producing a confident wrong verdict on the sub-plan's headline metric. Mitigation: section 1's amendment forbids quoting the figure, F4.4-02 requires the camera id and the metric alongside the number, and the baseline is read from a bracketed snapshot in the comparison state.
+- Risk (`FIND-4.5-01`): the front cameras' inconsistent array pair is checked only by reading metadata, and a consumer that actually breaks on it is not exercised. Impact: a patch ships that is internally inconsistent on three camera ids nobody tested, on other people's devices. Mitigation: F4.4-02b requires a behavioural check on the front path, not only a metadata table, and F4.4-05's stock-camera and video checks are run on the front camera as well as the rear.
 - Risk (invariant 4): Faz 4.3's structural change broke the exclusion enforcement and it is not noticed because individual modes work. Impact: a state where both layers are active, which produced corrupted output historically. Mitigation: F4.4-07 exercises both transitions as a distinct work item.
 - Risk: reboot persistence fails because `post-fs-data.sh` was not updated for a renamed HAL state. Impact: 50 MP works interactively and vanishes after every reboot. Mitigation: F4.4-08 tests the boot path specifically, which is separate from the interactive path.
 - Risk: a failure is repaired inline because it looks small. Impact: the validation record describes a configuration that no longer exists, and the repair skips its owning sub-phase's checks. Mitigation: the out-of-scope section and the acceptance criteria both require routing.
@@ -164,14 +179,17 @@ Subagents are not recommended.
 
 The consolidated patch is validated as a shippable artifact: the stream configuration surface carries exactly the intended entries with matching duration rows, the array count matches a pre-stated target as a measured number, every consumer the project has documented behaves as expected, all ten modes work, the exclusion rule holds in both directions, and the state survives a reboot. `CQ-07` is answered by the artifact.
 
-The evidence an implementer should produce is the extracted stream and duration rows, the numeric array count, the measured Open Camera resolution, the ten-mode comparison, the two transition verdicts, and the persistence verdict.
+`FIND-4.5-01` is disposed of rather than carried into a release: every camera id's `activeArray` and `pixelArray` are recorded, the ids where the pair is inconsistent are named, and the front-camera behaviour under that inconsistency is measured rather than assumed harmless.
+
+The evidence an implementer should produce is the extracted stream and duration rows, the numeric array count with its camera id and metric, the per-camera-id array consistency table, the measured Open Camera resolution, the ten-mode comparison, the two transition verdicts, and the persistence verdict.
 
 The ledger summary Step 4 should append records: the measured array count against target, the consumer results, the ten-mode outcome, the invariants exercised, the `CQ-07` resolution, and any routed finding.
 
 ## 13. Next Sub-Phase Transition Criteria
 
 - The stream configuration surface matches the intent with no spurious entries.
-- The array count is a number matching the pre-stated target.
+- The array count is a number carrying its camera id and metric, matching the pre-stated target.
+- `FIND-4.5-01` has a stated disposition backed by a per-camera-id table and a front-camera behavioural check, and any scoping requirement is raised to the user rather than repaired here.
 - Open Camera's resolution is measured and correct.
 - All ten modes pass against the regression reference.
 - Both exclusion transitions and reboot persistence are confirmed.

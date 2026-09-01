@@ -110,3 +110,48 @@ Stock HAL `c3fa63a86ee3ecaf9fbf02005d35f6b5` (27.268.688 B) uzerinde
 Tam kayit ve siralanmis aday listesi: `Planner-docs/Project-Ontology.md`
 adres defteri, `EV-24`/`EV-25`/`EV-26`, ve `Planing-Ledger.md` IMPL-18.
 Yamayi Faz 3.3 uygular; bu betik olcmez, yalnizca bulur.
+
+## HAL tarafi: aktif dizi yazim yerleri (Faz 4.5 / IMPL-27)
+
+`hal-activearray-deneme.patch` bu klasordeki **ucuncu** tablodur. Faz 3.5,
+`f0006`'yi tek basina yukseltmenin AGC'de 50.3 MP yakalamayi actigini ama
+goruntunun geometrik olarak bozuk kaldigini olctu (`FIND-3.5-01`): kare
+tam boy tamponun yalnizca aktif-dizi kadarini doldurdugu icin yarisi siyah,
+kalani macenta tonlu. Sebep, aktif dizi etiketlerinin `[0 0 4096 3072]`'te
+kalmasidir. Bu tablo onlari yukseltir.
+
+- **`f0000`** `android.sensor.info.activeArraySize` — yayin `bl 0x0166234c`,
+  `count=4`. Etiket TEK bir `movz w1, #0xf, lsl #16` (`0x01662338`) ile
+  kurulur; her etiketin kullandigi `movz`+`movk` ciftini arayan bir tarama
+  bu yuzden onu **gormez** — daha once "aile `f0001`..`f000a`" denmesinin
+  sebebi budur ve duzeltilmistir.
+- **`f000a`** `android.sensor.info.preCorrectionActiveArraySize` — yayin
+  `bl 0x01666588`, `count=4`.
+- Her ikisi de once BINNENMEMIS kaynaktan okunur, sonra secici
+  `[S+0x3d84] == 1` ise BINNENMIS kaynaktan uzerine yazilir:
+  `f0000` varsayilan `S+0x3c54` / uzerine `S+0x3d98`,
+  `f000a` varsayilan `S+0x3c24` / uzerine `S+0x3d88`.
+- Baslatici ciftleri **isaretli bolme** ile turetir —
+  `[S+0x3d98] = [S+0x3c54] / binning` (`0x016f077c`..`0x016f07a0`) ve
+  `[S+0x3d88] = [S+0x3c24] / binning` (`0x016f0888`..`0x016f08ac`) — yani
+  **tam cozunurluklu dikdortgen `S` icinde ZATEN vardir** (F4.5-04: EVET).
+  `f0006` cifti (`0x016f07c0`..`0x016f07e4`) ayni sekilde cozulur ve
+  kontrol gorevi gorur.
+- Yama bu yuzden `f0006`'nin dogrulanmis yamasiyla **ayni sinifta**: tek
+  kelimelik bir `movz` immediate yonlendirmesi. Sinir disi okuma uretmez,
+  cunku kosullu `q` yukunu ayni temel blokta kosulsuz `q` yukunun zaten
+  okudugu 16 bayta yoneltir.
+
+**`80340003`** (`org.codeaurora.qcamera3.quadra_cfa.activeArraySize`) bu
+tabloda **yoktur ve olamaz**. Sabit, 27 MB ikilide 4-bayt hizali dword
+olarak **sifir** kez gecer ve `.text` icinde `movz`/`movk` ile **hic**
+kurulmaz; yalnizca isim dizgisi vardir (`0x002265af`, `org.codeaurora
+.qcamera3.bfw` ve `com.xiaomi.camera.supportedfeatures` ile ayni satici
+bolum-adi tablosunda). Satici etiket numarasi calisma aninda saglayici
+tarafindan `0x80000000` tabanindan atanir. Bu, **acik bir negatif
+sonuctur** (F4.5-05), eksik birakilmis bir madde degil.
+
+Tam kayit: `Planner-docs/Project-Ontology.md` adres defteri ve
+`Planing-Ledger.md` IMPL-27. Onceden taahhut edilen md5'ler yama
+dosyasinin basligindadir; besteleyici bunlari uretmeden once alti bilinen
+md5'i birebir yeniden uretmistir.

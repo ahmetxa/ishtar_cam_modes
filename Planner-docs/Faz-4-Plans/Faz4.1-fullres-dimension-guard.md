@@ -33,20 +33,24 @@ The preservation requirement from Faz 3.6 governs this sub-phase. If Phase 3 pro
 - Identification of where in `InitializeScalerStaticCaps` a resolution guard can be applied, given that the current gate tests format rather than size.
 - A single-site guard applied first, with the array delta measured before the remaining sites are touched.
 - Extension to the remaining sites once the approach is validated.
-- A target array entry count stated numerically before the work, so success is measurable rather than qualitative.
-- Verification that RAW10 and RAW_SENSOR remain advertised at 8192x6144 after narrowing, since removing the goal along with the excess is the obvious failure mode.
-- Verification that the AGC path still behaves as Faz 3.5 established, per the Faz 3.6 preservation requirement.
+- A target array entry count stated numerically before the work, naming the camera id and the metric it is counted on, so success is measurable rather than qualitative.
+- **Extending RAW emission to format 32 (`RAW_SENSOR`) at 8192x6144, per `DEC-11`.** The `0x22..0x26` gate cannot reach format 32 = `0x20`, which sits below its subtract base, so `RAW_SENSOR` was never emitted there and no narrowing can make it appear. Extending emission is what makes section 8's `RAW_SENSOR` criterion satisfiable, and it is the same change `OQ-02` and `FIND-3.5-02` need, since a full-resolution DNG is unobtainable without it.
+- Verification that RAW10 remains advertised at 8192x6144 after narrowing and that `RAW_SENSOR` is newly advertised there after the format-32 extension, since removing the goal along with the excess is the obvious failure mode.
+- Verification that the AGC path still behaves as Faz 3.5 established, per the Faz 3.6 preservation requirement — measured against the corrected geometry `Faz-4-Plans/Faz4.5-active-array-raise.md` produces, not against the corrupt frame.
 - Recording of any newly located address into Project-Ontology section 6 during the session.
+
+**The accepted tension, stated rather than glossed.** The format-32 extension **widens** a gate inside a sub-plan whose entire purpose is narrowing what that gate emits. `DEC-11` put this to the user and it was accepted on the condition that the two effects never be reported as one figure: **the narrowing delta and the format-32 addition are separate numbers.** A single net array count would let one movement mask the other, and a narrowing that overshot could be hidden by an addition that overshot the other way.
 
 ## 5. Out of Scope
 
 - Adding `availableMinFrameDurations` or `availableStallDurations` rows. Faz 4.2 owns those.
 - Consolidating or relocating patch tables. Faz 4.3 owns that.
 - The full consumer compatibility survey, which is Faz 4.4.
-- Any change to `pixelArraySize` or to the active array. Those were settled in Phase 3 and must be preserved, not revisited.
+- Any change to `pixelArraySize`. The `f0006` write site at `0x0166645c` was settled in Phase 3, is confirmed by measurement, and must be preserved exactly — this sub-plan verifies it still reads `[8192 6144]` and does not touch it.
+- **The active-array raise, which is a dependency rather than an exclusion.** `f0000`, `f000a` and `org.codeaurora.qcamera3.quadra_cfa.activeArraySize (80340003)` are raised from `[0 0 4096 3072]` by `Faz-4-Plans/Faz4.5-active-array-raise.md`, sequenced **before** this sub-plan by `DEC-12`. This sub-plan neither performs that work nor excludes it from Phase 4: it runs after it and inherits its result. The earlier text here read "settled in Phase 3 and must be preserved, not revisited", which contradicted `IMPL-24`'s preservation requirement and was the defect `IMPL-25` stopped on.
 - Any change to the sensor layer, the blobs, or the ten-mode dispatch.
 - Composing 50 MP with LN modes, which is Phase 5.
-- Reopening the format range decision. Which formats are admitted was decided by the experiment; this sub-phase constrains where they are emitted.
+- Reopening the format range decision beyond the one addition `DEC-11` authorises. Formats 34 through 38 stay as the experiment decided them; format 32 is added because section 8 requires it and nothing else can supply it. No further format is admitted here.
 
 ## 6. Current Repository Evidence
 
@@ -66,9 +70,12 @@ Project-Ontology section 6 also records the vendor table evidence explaining why
 
 ## 7. Planned Work Breakdown
 
-- F4.1-01 — State the target array count before starting
-  - Description: Compute and record the expected post-narrowing entry count from the 508 baseline plus the three wanted entries. This makes the acceptance criterion a number rather than a direction.
-  - Output: A stated numeric target.
+- F4.1-01 — State the target array count before starting, against a named camera id and metric
+  - Description: Compute and record the expected post-narrowing entry count. **The baseline must name a camera id and a metric, because 508 alone names neither and `IMPL-25` stopped on that ambiguity.** The metric is `scripts/smoke.sh`'s `streamcfg` field, which is the **int32** element count read from `android.scaler.availableStreamConfigurations (d000a)` — not an entry count, and each entry is four int32. **508 is hal3 in the fullres state, not hal0.** The recorded values are hal0: stock 440, fullres 456, three-layer 800; hal3: stock 500, fullres 508, three-layer 868. The patch header's "508 -> 868" is therefore hal3's row, and smoke prints hal0's row **first** because its output is sorted by id — so a reading taken from the top line is hal0's and does not compare against 508. State the target for hal0 and for hal3 explicitly, and state which one the acceptance criterion is judged on.
+  - Output: A stated numeric target per camera id, on the named metric.
+- F4.1-01b — State the format-32 addition as its own number
+  - Description: Separately from the narrowing target, state how many int32 the format-32 extension is expected to add at 8192x6144, and on which camera ids. This is the `DEC-11` separation requirement expressed as a work item: two predictions before the work, so two deltas can be checked against them afterwards.
+  - Output: A stated numeric addition, distinct from the narrowing target.
 - F4.1-02 — Locate the resolution context at each emission site
   - Description: Determine what width and height values are available in registers or memory at each of the four gate sites, since a resolution guard requires the dimension to be reachable there.
   - Output: A per-site resolution availability assessment.
@@ -81,24 +88,30 @@ Project-Ontology section 6 also records the vendor table evidence explaining why
 - F4.1-05 — Extend to the remaining sites
   - Description: Once the one-site result matches prediction, apply at the remaining three and measure again.
   - Output: A full-patch delta measurement against the stated target.
+- F4.1-05b — Extend emission to format 32 and measure it separately
+  - Description: Apply the `DEC-11` change that admits `RAW_SENSOR` (32 = `0x20`) at 8192x6144, in its own bracketed step after the narrowing has been measured and accepted. Read the resulting delta on its own. **The narrowing delta and this addition are reported as two numbers and are never summed into one net array count** — that condition is what the user accepted the widening under.
+  - Output: A format-32 delta, stated separately from the narrowing delta.
 - F4.1-06 — Verify the goal survived
-  - Description: Confirm RAW10 and RAW_SENSOR are still advertised at 8192x6144 and that no spurious entries remain at other resolutions.
-  - Output: A stream configuration verdict.
+  - Description: Confirm RAW10 is still advertised at 8192x6144, confirm `RAW_SENSOR` is now advertised there, and confirm no spurious entries remain at other resolutions — including that the format-32 extension did not reintroduce entries at the resolutions the narrowing removed.
+  - Output: A stream configuration verdict, with the RAW10 and `RAW_SENSOR` rows quoted per resolution rather than collapsed.
 - F4.1-07 — Verify the Phase 3 preservation requirement
-  - Description: Confirm the AGC path still behaves as Faz 3.5 established, per the requirement Faz 3.6 handed forward.
-  - Output: A preservation verdict.
+  - Description: Confirm the AGC path still behaves as Faz 3.5 established, per the requirement Faz 3.6 handed forward, and confirm `f0006` still reads `[8192 6144]`. Because `Faz-4-Plans/Faz4.5-active-array-raise.md` runs first, the frame this check preserves is the corrected one; a capture that is geometrically correct before this sub-plan and corrupt after it is a failure of this sub-plan, which is precisely the discrimination `DEC-12` sequenced the two in this order to obtain.
+  - Output: A preservation verdict naming the image state before and after.
 - F4.1-08 — Record addresses during the session
   - Description: Write any newly located address or instruction detail into Project-Ontology section 6 as it is found.
   - Output: An updated address book.
 
 ## 8. Acceptance Criteria
 
-- The target array entry count is stated numerically before any patch is applied.
+- The target array count is stated numerically before any patch is applied, and it **names a camera id and the metric it is counted on**. A bare number is not acceptable: 508 is hal3-in-fullres on the `streamcfg` int32 count, hal0's fullres figure is 456, and smoke prints hal0 first.
+- The format-32 addition is stated as its own predicted number, before any patch is applied, distinct from the narrowing target.
 - The single-site measurement is taken and compared against prediction before the remaining sites are touched.
-- The final array entry count matches the stated target, within an explained margin.
-- RAW10 and RAW_SENSOR remain advertised at 8192x6144 after narrowing.
-- No RAW format entries remain at resolutions other than the full-resolution dimension.
-- The Phase 3 preservation requirement is verified, not assumed.
+- The final array count matches the stated target, within an explained margin, **reported as two separate deltas — the narrowing and the format-32 addition — and never as one net array count.** A result stated as a single net figure fails this criterion regardless of the figure's value.
+- RAW10 remains advertised at 8192x6144 after narrowing.
+- **`RAW_SENSOR` (format 32) is advertised at 8192x6144.** This criterion is satisfiable only through the `DEC-11` format-32 extension and **depends on that extension rather than on the narrowing**: the `0x22..0x26` gate admits formats 34–38, format 32 = `0x20` lies below its subtract base, and no narrowing of that gate can ever emit it. `IMPL-25` confirmed this from the patch header's own arithmetic. If the extension is not made, this criterion is unmet and must be reported as unmet rather than reinterpreted.
+- No RAW format entries remain at resolutions other than the full-resolution dimension, the format-32 addition included.
+- The Phase 3 preservation requirement is verified, not assumed, and `f0006` still reads `[8192 6144]`.
+- The capture verified in F4.1-07 is compared against the geometry `Faz-4-Plans/Faz4.5-active-array-raise.md` established, not against the corrupt frame `FIND-3.5-01` described.
 - Every measurement has a smoke snapshot bracket and confirms the preference precondition, per the Faz 3.1 checklist.
 - Any newly located address is in Project-Ontology section 6 by the end of the session.
 - The patch remains expressible as offset entries within the four-byte alignment constraint.
@@ -124,6 +137,8 @@ Local versus live: the guard design is local; every measurement is live. Securit
 | docs/patch-table-format.md | existing | The alignment and extension constraints the guard must satisfy. | VAL-DISASM |
 
 ## 10. Dependencies and Sequencing
+
+**Blocked by `Faz-4-Plans/Faz4.5-active-array-raise.md`, by `DEC-12`.** That sub-plan raises `f0000`, `f000a` and `80340003`, and it runs first so that F4.1-07 preserves a good capture rather than certifying that a half-black frame is still half-black. Do not execute this sub-plan before it lands.
 
 Depends on Faz 3.6 for the preservation requirement and for the decision that Phase 4 should proceed at all. Depends on Faz 1.3 for the format contract's alignment and extension rules, and on Faz 1.4 for the disassembler.
 
@@ -151,7 +166,7 @@ Subagents are not recommended.
 
 ## 12. Desired End State
 
-The RAW format emission is restricted to the full-resolution dimension only. The stream configuration array carries the three wanted entries and none of the excess, at a count matching a target stated before the work began. RAW10 and RAW_SENSOR remain advertised at 8192x6144, the Phase 3 result is preserved and verified, and every located address is in the ontology.
+The RAW format emission is restricted to the full-resolution dimension only. The stream configuration array carries the wanted entries and none of the excess, at counts matching the two targets stated before the work began — the narrowing target and the format-32 addition, reported separately. RAW10 remains advertised at 8192x6144 and `RAW_SENSOR` is now advertised there for the first time, the Phase 3 result is preserved and verified, and every located address is in the ontology.
 
 The evidence an implementer should produce is the stated target, the single-site delta, the final delta, the stream configuration rows, and the preservation verdict.
 
@@ -160,7 +175,8 @@ The ledger summary Step 4 should append records: the target count, the measured 
 ## 13. Next Sub-Phase Transition Criteria
 
 - The final array entry count matches the pre-stated target within an explained margin.
-- RAW10 and RAW_SENSOR are confirmed at 8192x6144 with no spurious entries elsewhere.
+- RAW10 is confirmed still at 8192x6144 and `RAW_SENSOR` is confirmed newly at 8192x6144, with no spurious entries elsewhere.
+- The narrowing delta and the format-32 addition are on record as two numbers.
 - The Phase 3 preservation requirement is verified by measurement.
 - The narrowed patch is expressible within the four-byte alignment constraint.
 - Newly located addresses are recorded in the ontology.
