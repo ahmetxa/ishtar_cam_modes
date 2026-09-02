@@ -1298,3 +1298,193 @@ problem entirely. Also present and unexamined: `PropertyIDUsecaseSensorModes`
 `persist.vendor.camera.logstate=3` and `vendor.camera.sensor.logsystem=3`.
 
 `EV-44` is unchanged. `FIND-3.5-01` and `FIND-4.5-02` remain **OPEN**.
+
+## 21. `EV-44` performed: the stream reaches full resolution, the sensor readout does not (`IMPL-43`, 2026-09-02)
+
+`EV-44` had never been attempted. It has now been performed, and it **passes its
+first half and fails its second**. The result relocates the fault a layer below
+where section 18 put it, and it corrects section 18's model on a point the model
+itself predicted.
+
+### The instrument section 17 said did not exist
+
+Section 17 concluded that "the RAW10 stream's configured dimensions are never
+logged anywhere". **That is true of logcat and false of `dumpsys`.** With a
+camera open, `dumpsys media.camera` prints, per stream:
+
+```
+Stream[2]: Output
+  Consumer name: ImageReader-8192x6144f25m37-18510-2
+  Dims: 8192 x 6144, format 0x25, dataspace 0x1
+  Frames produced: 2104
+```
+
+The consumer name carries the **app-side `ImageReader` geometry and format**, and
+`Dims:` carries the **configured stream geometry**. Both halves of `EV-44` are
+therefore readable directly, without a log mask, without a patch, and without the
+`[ DUMP] SensorMode` line that section 20 established is unreachable. The same
+dump also prints the latest result metadata with values.
+
+### Baseline: RAW10 at full resolution was never published
+
+On the live fullres base (`fe0245a4720fb07b01d96deef47f5569`, no stack), for
+camera 2 — the device AGC opens — `android.scaler.availableStreamConfigurations`
+contains **127 rows**, and its only RAW10 (format 37) entries are:
+
+```
+[37 4096 3072 OUTPUT ]   [37 4096 2304 OUTPUT ]
+```
+
+At `8192x6144` it publishes formats 33, 34, 35 and 54 — **no RAW10**. The vendor's
+own `xiaomi.scaler.availableStreamConfigurations` (`81850000`) *does* carry
+`[37 8192 6144 0]`, so the HAL knows about RAW10 at 50 MP internally; it simply is
+not published in the AOSP table the framework validates client streams against.
+
+**That is why the stack delivered a binned buffer.** It is not a sensor-binning
+decision and never was: a RAW10 reader opened at `8192x6144` had no matching
+published configuration, and the session ended up on the `4096x3072` RAW10 stream.
+
+### With the seven-word stack the stream reaches full resolution
+
+Applying the pre-committed stack — `md5 c094101de0184e9216a57020873bac0b`, 7
+words, in `applyfull.sh`'s documented safe window — changes the published table:
+
+| | rows in `availableStreamConfigurations` | RAW10 entries | `[37 8192 6144 OUTPUT]` |
+|---|---|---|---|
+| fullres base | 127 | 2 | absent |
+| **+ seven-word stack** | **217** | **32** | **present** |
+
+With `pref_48m_key=1`, the trap cleared to 0/12, and
+`pref_camera_picturesize_back_key=8192x6144`, AGC then configures:
+
+```
+Stream[1]  ImageReader-8192x6144f23m22   Dims: 8192 x 6144  format 0x23 (YUV)
+Stream[2]  ImageReader-8192x6144f25m37   Dims: 8192 x 6144  format 0x25 (RAW10)
+```
+
+**Request and configuration agree at full resolution.** `EV-44`'s first half —
+never previously achieved — is satisfied.
+
+A correction to the carried claim while we are here: `pref_48m_key` is
+**necessary but not sufficient, and it is not the selector**. It only makes the
+50 MP size appear in AGC's list. The proximate selector is
+`pref_camera_picturesize_back_key`; with `pref_48m_key=1` but that key still
+reading `4096x3072`, AGC opened a `4096x3072` RAW10 reader and the session matched
+cleanly at half resolution.
+
+### The capture: 50 MP for the first time, and still exactly three quarters black
+
+Shutter fired at `22:42` (`input keyevent 27`), producing
+`AGC_20260902_224207399.jpg`.
+
+| capture | JPEG | MP | black fraction |
+|---|---|---|---|
+| `21:26` clean reference | 3072x4096 | 12.58 | **0.0024** |
+| `19:31` folded reference | 3072x4096 | 12.58 | 0.7498 |
+| **`22:42` full-res stream** | **6144x8192** | **50.33** | **0.7497** |
+
+This is **the first 50.33 MP image the project has produced**. It is also still
+folded, and `PrepShot` still rejected **15 of 15** frames with `all-zero green`.
+
+Quadrant measurement on the 22:42 artifact (stored rotated, so 6144x8192):
+
+```
+top-left     black 1.0000      top-right     black 0.4994
+bottom-left  black 1.0000      bottom-right  black 0.4994
+```
+
+The left half is entirely black and the right half is half black: **content
+occupies exactly one quadrant**, `(1.0+0.4994+1.0+0.4994)/4 = 0.7497`. A
+`4096x3072` content region inside an `8192x6144` raster, which is the same
+arithmetic section 18 closed — but now with the stream itself at `8192x6144`.
+
+### What this corrects in section 18
+
+Section 18 concluded that `all_black` tracks a **request/delivery mismatch**, and
+predicted that making the requested reader size match the delivered buffer would
+yield a clean image. **The prediction is now falsified in the direction that
+matters.** Here the app request, the configured stream, and the saved image are
+all `8192x6144`, and the fold is unchanged at `0.7497`.
+
+The mismatch is real but was mislocated. It is not *app request vs stream
+configuration* — that now agrees. It is **buffer geometry vs sensor readout
+geometry**. The stream is `8192x6144`; the sensor is still reading out binned
+`4096x3072` and its content lands in one quarter of the buffer.
+
+Section 18's clean `21:26` capture is still explained: there the buffer was
+`4096x3072` *and* the readout was `4096x3072`, so they agreed. Agreement, not
+resolution, was the operative variable — the refinement is only that the second
+term is the **readout**, not the configuration.
+
+### The located cause: the camera does not advertise ultra-high-resolution
+
+Read live from the capture's own result metadata:
+
+```
+android.sensor.pixelMode (e0020):            [DEFAULT ]
+android.sensor.rawBinningFactorUsed (e0021): [FALSE ]
+```
+
+And from camera 2's static characteristics:
+
+```
+android.request.availableCapabilities (c000c): byte[11]
+  [BACKWARD_COMPATIBLE CONSTRAINED_HIGH_SPEED_VIDEO RAW YUV_REPROCESSING
+   PRIVATE_REPROCESSING READ_SENSOR_SETTINGS MANUAL_SENSOR BURST_CAPTURE
+   MANUAL_POST_PROCESSING STREAM_USE_CASE DYNAMIC_RANGE_TEN_BIT ]
+```
+
+**`ULTRA_HIGH_RESOLUTION_SENSOR` is absent**, and the
+`activeArraySizeMaximumResolution`, `pixelArraySizeMaximumResolution`,
+`preCorrectionActiveArraySizeMaximumResolution` and `binningFactor` static tags
+appear only in key *lists*, carrying no values.
+
+Without that capability a client cannot legally request
+`android.sensor.pixelMode = MAXIMUM_RESOLUTION`, CamX stays in `DEFAULT` pixel
+mode, and `DEFAULT` on this quad-Bayer part is the 2x2 binned readout. That is
+exactly what the metadata reports and exactly what the quadrant measurement
+shows.
+
+This also reconciles the stock camera, which does reach 50 MP: `IMPL-39` recorded
+that MiuiCamera gets there through the vendor quad-CFA remosaic **YUV** usecase,
+not through RAW and not through `pixelMode`. The two paths are independent, and
+only the RAW path needs the capability.
+
+### What this establishes, and what it does not
+
+**Established.** `dumpsys media.camera` reads both halves of `EV-44` directly and
+is the instrument section 20 went looking for. On the base HAL, RAW10 at
+`8192x6144` is not published in the AOSP stream-configuration table, which is the
+mechanical reason a full-resolution RAW request was served a binned buffer. The
+seven-word stack publishes it (127 -> 217 rows, 2 -> 32 RAW10 entries) and AGC
+then configures a genuine `8192x6144` RAW10 stream. A capture on that stream
+produces a 50.33 MP image — a first — that is still folded into one quadrant,
+with 15/15 `all_black`. The cause is that the sensor readout stays binned because
+camera 2 does not advertise `ULTRA_HIGH_RESOLUTION_SENSOR`, so
+`pixelMode` cannot leave `DEFAULT`.
+
+**Not established.** Whether adding the capability and populating the four
+`*MaximumResolution` tags is sufficient to make CamX switch the sensor to mode 0,
+or whether the sensor-mode selection needs separate work. Whether the vendor's
+remosaic path can be reached from a RAW request at all. Nothing was patched
+toward either — the stack applied here is the project's own pre-committed one and
+nothing new was written.
+
+**`EV-44` verdict: first half PASS, second half FAIL.** `FIND-3.5-01` and
+`FIND-4.5-02` remain **OPEN**, and `FIND-4.5-02` now has a *located* mechanism
+rather than an inferred one.
+
+### Device state left by this run
+
+The stack is **still applied** (`c094101d…`) and the preferences are still set to
+50 MP, because that is the state in which the next experiment runs. To restore
+the pre-session state:
+
+```
+sh /data/local/tmp/revertstack.sh        # -> fe0245a4720fb07b01d96deef47f5569
+tar -xf /data/local/tmp/agc-shared_prefs.bak-20260902-2240.tar \
+    -C /data/data/org.codeaurora.snapcam
+```
+
+Brackets: `20260902-2228__Faz4.6__IMPL42-post-revert` (before) and
+`20260902-2245__Faz4.6__IMPL43-post-EV44-stack-applied` (after).

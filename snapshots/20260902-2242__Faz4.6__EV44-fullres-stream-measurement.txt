@@ -1,0 +1,15 @@
+EV-44 measurement, 2026-09-02 22:41-22:42, IMPL-43
+HAL: c094101de0184e9216a57020873bac0b (fullres base + seven-word stack)
+prefs: trap 0/12, pref_48m_key=1, pref_camera_picturesize_back_key=8192x6144
+AGC camera device: 2   pipeline cam_0   package org.codeaurora.snapcam
+
+--- AGC configured streams (dumpsys media.camera, camera open) ---
+    Operation mode: NORMAL (0)
+      Consumer name: ImageReader-1440x1080f22m11-18510-0
+      Dims: 1440 x 1080, format 0x7fa30c06, dataspace 0x0
+      Consumer name: ImageReader-8192x6144f23m22-18510-1
+      Dims: 8192 x 6144, format 0x23, dataspace 0x8c20000
+      Consumer name: ImageReader-8192x6144f25m37-18510-2
+      Dims: 8192 x 6144, format 0x25, dataspace 0x1
+      Consumer name: ImageReader-640x480f23m52-18510-3
+      Dims: 640 x 480, format 0x23, dataspace 0x8c20000
