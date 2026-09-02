@@ -1,0 +1,31 @@
+# Faz 4.6 / IMPL-36 -- green verdict vs SABRE mapping, ordering probe
+# Source: /data/local/tmp/f46-agc.log (44246 lines, IMPL-35 capture, 2026-09-02 19:30-19:32)
+# Read-only extraction on device; no capture, no patch, no prefs touched.
+# Counts at foot: 15 green / 15 SABRE, matching IMPL-35's excerpt.
+
+== first 3 and last 3 all-zero green ==
+6027:09-02 19:31:01.122  2814  2946 E libgcam : [shot_process.cc:392]: PrepShot: Bad frame with all-zero green pixels (timestamp 89216793041725)
+6028:09-02 19:31:01.122  2814  2946 E libgcam : [shot_process.cc:392]: PrepShot: Bad frame with all-zero green pixels (timestamp 89216853149642)
+6029:09-02 19:31:01.122  2814  2946 E libgcam : [shot_process.cc:392]: PrepShot: Bad frame with all-zero green pixels (timestamp 89216913257506)
+6039:09-02 19:31:01.122  2814  2946 E libgcam : [shot_process.cc:392]: PrepShot: Bad frame with all-zero green pixels (timestamp 89217514336412)
+6040:09-02 19:31:01.122  2814  2946 E libgcam : [shot_process.cc:392]: PrepShot: Bad frame with all-zero green pixels (timestamp 89217574444329)
+6041:09-02 19:31:01.122  2814  2946 E libgcam : [shot_process.cc:392]: PrepShot: Bad frame with all-zero green pixels (timestamp 89217634552194)
+== ALL SABRE MapFrameToTexture lines ==
+6173:09-02 19:31:01.341  2814  2949 E libgcam : [hardware_buffer_map.cc:66]: MapFrameToTexture: SABRE: Cannot get file descriptor from opaque_handle
+6253:09-02 19:31:01.494  2814  2949 E libgcam : [hardware_buffer_map.cc:66]: MapFrameToTexture: SABRE: Cannot get file descriptor from opaque_handle
+6311:09-02 19:31:01.586  2814  2949 E libgcam : [hardware_buffer_map.cc:66]: MapFrameToTexture: SABRE: Cannot get file descriptor from opaque_handle
+6327:09-02 19:31:01.623  2814  2949 E libgcam : [hardware_buffer_map.cc:66]: MapFrameToTexture: SABRE: Cannot get file descriptor from opaque_handle
+6393:09-02 19:31:01.725  2814  2949 E libgcam : [hardware_buffer_map.cc:66]: MapFrameToTexture: SABRE: Cannot get file descriptor from opaque_handle
+6426:09-02 19:31:01.793  2814  2949 E libgcam : [hardware_buffer_map.cc:66]: MapFrameToTexture: SABRE: Cannot get file descriptor from opaque_handle
+6443:09-02 19:31:01.818  2814  2949 E libgcam : [hardware_buffer_map.cc:66]: MapFrameToTexture: SABRE: Cannot get file descriptor from opaque_handle
+6554:09-02 19:31:01.968  2814  2949 E libgcam : [hardware_buffer_map.cc:66]: MapFrameToTexture: SABRE: Cannot get file descriptor from opaque_handle
+6572:09-02 19:31:02.001  2814  2949 E libgcam : [hardware_buffer_map.cc:66]: MapFrameToTexture: SABRE: Cannot get file descriptor from opaque_handle
+6637:09-02 19:31:02.115  2814  2949 E libgcam : [hardware_buffer_map.cc:66]: MapFrameToTexture: SABRE: Cannot get file descriptor from opaque_handle
+6645:09-02 19:31:02.137  2814  2949 E libgcam : [hardware_buffer_map.cc:66]: MapFrameToTexture: SABRE: Cannot get file descriptor from opaque_handle
+6710:09-02 19:31:02.258  2814  2949 E libgcam : [hardware_buffer_map.cc:66]: MapFrameToTexture: SABRE: Cannot get file descriptor from opaque_handle
+6731:09-02 19:31:02.282  2814  2949 E libgcam : [hardware_buffer_map.cc:66]: MapFrameToTexture: SABRE: Cannot get file descriptor from opaque_handle
+6794:09-02 19:31:02.399  2814  2949 E libgcam : [hardware_buffer_map.cc:66]: MapFrameToTexture: SABRE: Cannot get file descriptor from opaque_handle
+6799:09-02 19:31:02.415  2814  2949 E libgcam : [hardware_buffer_map.cc:66]: MapFrameToTexture: SABRE: Cannot get file descriptor from opaque_handle
+== counts ==
+15
+15

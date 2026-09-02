@@ -466,3 +466,98 @@ measurement rather than trusted from an earlier reading. `pref_48m_key` itself
 
 `FIND-3.5-01` and `FIND-4.5-02` both remain **OPEN**. Nothing in this run is an
 image fix.
+
+## 14. The all-zero-green verdict is not caused by the SABRE mapping failure (`IMPL-36`, 2026-09-02)
+
+Section 13 left one question explicitly undecided: whether the fifteen
+`all-zero green` rejections were caused by the payload layout or by frames that
+were never successfully mapped, `lib_aion_buffer.so` having failed to load. It
+recorded that the two were "not separable from the log surface alone." **They
+are separable, and they are now separated.** No new capture was required.
+
+### `lib_aion_buffer.so` is absent from the port by construction
+
+`libgcastartup.so` carries the literal dlopen name `lib_aion_buffer.so` next to
+`wireless/android/camera/common/lib_aion/aion.cc`, `aion_context.cc` and
+`scoped_power_boost.cc`, plus the two GPU consumers
+`googlex/gcam/gpu/gles/aion_mapped_hardware_buffer.cc` and
+`googlex/gcam/gpu/opencl/android/aion_mapped_image.cc`. The library itself ships
+in **none** of the three APKs on hand — `AGC8.4.300_V9.6_50MP_patched`,
+`V9.6_snap` and `V14_snap` carry 20, 20 and 21 `.so` files respectively for
+`arm64-v8a`, and zero of them are an aion buffer library.
+
+So `aion.cc:791` is a **standing deficiency of the port**, not a consequence of
+any HAL patch, not something `IMPL-35` introduced, and not repairable from the
+HAL side. This confirms the `IMPL-35` reading that `SABRE` is a standing port
+condition, and supplies the reason.
+
+### The verdict is a stored statistic, merely reported at `shot_process.cc:392`
+
+Static reading of `libgcastartup.so` places the log site inside a reporter, not
+inside a test. At `0x1ed882c` the emitting block is entered only by:
+
+    ldr  w8, [x26, #0x708]
+    cmp  w8, #3
+    b.ne <skip>
+
+`[x26+0x708]` is a small enum, bounded to `0..3` by the jump table at
+`0x1ed81b8` (`cmp w13,#3 / b.hi`), read together with siblings at `+0x70c`,
+`+0x710`, `+0x714` and `+0x718` behind a validity flag at `+0x71c`. The same
+function reports, from the same block and all attributed to `PrepShot` in
+`shot_process.cc`, this family of verdicts:
+
+- `Non-empty frame with unknown sharpness score`
+- `Non-empty frame with unknown sharpness measurement`
+- `Non-empty frame with invalid sharpness measurement`
+- `Overexposed frame with all green pixels saturated`
+- `Bad frame with all-zero green pixels`
+
+with the jump table's own case labels being `all_white`, `all_black` and
+`invalid`. Every sibling is a **CPU-side statistic over the raw payload** —
+sharpness, black level, white level, green level. The verdict is computed
+upstream and stored; `PrepShot` only prints it.
+
+### The ordering settles it
+
+`IMPL-35`'s full 44,246-line log was still present on the device at
+`/data/local/tmp/f46-agc.log`. Read-only extraction — no capture, no patch, no
+preference touched — gives all fifteen of each line rather than the excerpt's
+three and one:
+
+| | count | log lines | timestamps | thread |
+|---|---|---|---|---|
+| `all-zero green` | 15 | 6027..6041 | **all** at `19:31:01.122` | **2946** |
+| `MapFrameToTexture: SABRE` | 15 | 6173..6799 | `19:31:01.341` .. `19:31:02.415` | **2949** |
+
+**Every green verdict precedes every mapping failure**, the smallest gap being
+219 ms, and the two run on different threads. The green verdicts further share a
+single millisecond — a batch evaluation over the whole payload burst — while the
+SABRE failures are spread across 1.07 s, one per frame, as the merge stage walks
+the burst. `aion.cc:791` itself is at `19:30:55.118`, six seconds earlier, at
+library-load time.
+
+A verdict rendered before any frame has been mapped cannot have been caused by
+the mapping failing. **`SABRE` is excluded as the cause of the rejection.**
+
+### What this establishes, and what it does not
+
+Established: the fifteen frames are rejected by a CPU-side read of the raw
+payload that finds the green channel zero. The rejection is about **frame
+content**, which is where `IMPL-35` located the wall, and it is not an artifact
+of the missing aion library. `EV-44` remains owed; this does not obtain it.
+
+Not established: *where* in the raster the green statistic samples. The fold
+measured in section 13 leaves roughly three quarters of the raster black —
+content confined to rows `0..769` of 3072 — so a statistic sampling anywhere
+outside that band would read zero green from a frame whose payload is merely
+mis-strided rather than empty. That is the natural next question and it is
+answerable statically, by locating the producer of `[x26+0x708]`. It is **not**
+answered here, and the causal link from the fold to the green verdict is
+therefore a **hypothesis, not a measurement**.
+
+`SABRE` remains a real port deficiency and is still expected to matter to the
+merge stage downstream of selection. It is simply not the reason the frames are
+rejected.
+
+`FIND-3.5-01` and `FIND-4.5-02` both remain **OPEN**. Nothing in this run is an
+image fix.
