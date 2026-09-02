@@ -749,3 +749,110 @@ sound yet and no claim is made from it here.
 
 `FIND-3.5-01` and `FIND-4.5-02` remain **OPEN**. Nothing in this run is an image
 fix.
+
+## 17. The AGC stream is not restricted — no capture was ever taken on the full one (`IMPL-39`, 2026-09-02)
+
+The question this section was opened to answer was why cameraserver gives the
+stock camera an 8192x6144 stream but clamps AGC to 4096x3072. **The premise is
+false. AGC obtained an 8192x6144 stream in three separate sessions.** What never
+happened is a shutter press in one of them.
+
+### First, a precision correction to section 16
+
+Section 16 read the cameraserver line
+
+    Bypass roundBufferDimensionNearest for privilegedClient YUV streams
+    width W height H for format 35
+
+as reporting the capture stream. **`format 35` is `YUV_420_888`.** AGC requests
+`RAW10` (`getImageReaderFormat ... ImageFormat=RAW10`, and `setShasta rawFormat =
+RAW10(37)` at shot time). So this line reports a **YUV** stream and is silent
+about the RAW10 stream.
+
+That cuts both ways, and against `IMPL-35` more sharply than against section 16:
+
+- `IMPL-35` cited an 8192x6144 line as proof the *RAW* stream was configured at
+  full resolution. It is not proof: wrong format, and 50 s after the capture.
+- Section 16's *conclusion* — the capture's session carried a 4096x3072 stream
+  and no 8192x6144 stream of any kind — is correct and is strengthened below.
+  Its *wording* was imprecise in not saying which stream, and is corrected here.
+
+**The RAW10 stream's configured dimensions are never logged.** `CamX` emits only
+`configure_streams()` errors (`initAperture`, `customeEnable`, `FPS`), and
+`Camera3-Device` only `configureStreamsLocked: Unable to get tag`. No stream
+inventory is printed by either. So no log on hand can say what size AGC's RAW
+stream was.
+
+### The correlation across the whole day is exact
+
+`f46.log` (534,971 lines, `16:55`–`20:18`) is a superset of both other logs and
+contains **exactly two** `startShotCaptureInternal` events.
+
+| session | start | YUV streams configured | capture? | outcome |
+|---|---|---|---|---|
+| AGC (pid 7223) | `17:00:18` | **4096x3072** + 640x480 | **yes**, `17:00:31` | 15/15 `all_black` |
+| AGC (pid 7664) | `17:00:37` | **4096x3072** + 640x480 | no | — |
+| AGC (pid 2814) | `19:30:54` | **4096x3072** + 640x480 | **yes**, `19:30:59` | 15/15 `all_black` |
+| AGC (pid 2814) | `19:31:51` | **8192x6144** + 640x480 | no | — |
+| AGC (pid 2814) | `19:32:02` | **8192x6144** + 640x480 | no | — |
+| AGC (pid 6203) | `19:32:04` | **8192x6144** + 640x480 | no | — |
+| MiuiCamera (pid 2350) | `16:56:10` | **8192x6144** x2 | **yes**, `16:56:10` | `IMG_20260902_165610.jpg`, 8192x6144 |
+
+Both AGC captures on record were taken in a session configured at 4096x3072.
+Every AGC session configured at 8192x6144 ended without a shutter press. The one
+capture on an 8192x6144 session in the whole log is the stock camera's, and it
+succeeded.
+
+**AGC is therefore not clamped by cameraserver.** It reached the same 8192x6144
+figure the stock camera did, three times, on the same device state.
+
+### What differs between AGC's own sessions
+
+Within a single process (pid 2814) the first session was 4096x3072 and the next
+two were 8192x6144, so this is not a per-process or per-client property. At
+`17:00`, before `pref_48m_key` was set, both sessions were 4096x3072; from
+`19:30` onward, with the key set, sessions after the first were 8192x6144.
+
+The consistent reading is that AGC's full-resolution output size **is not in
+force on the session that exists at launch** and takes hold on a later session —
+either after AGC re-reads its preferences or after the user touches the
+resolution control. The log cannot distinguish those two, and the user's UI
+actions are not recorded, so **the trigger is not established**. What is
+established is that the first session after launch was 4096x3072 in all three
+launches on record, and that both captures were taken in exactly that session.
+
+### The stock camera's 8192x6144 is a different mechanism
+
+MiuiCamera does not take a full-resolution RAW path. It runs the vendor
+quad-CFA usecase — `chxextensionmodule.cpp GetNumOfPixelsPerColor() [XCFA]` —
+and receives `createCaptureSession: imageFormat: 35, width: 8192, height: 6144`,
+a **YUV** session, then reprocesses through
+`VirtualCameraReprocessor: createReprocessSession >> input[8192x6144]
+output[8192x6144@256]`. Its buffer queue is literally named `BQ_8192x6144_35`.
+
+So the stock camera's 50 MP is a vendor remosaic delivering YUV, while AGC wants
+RAW10 at the same dimensions and runs its own HDR+ merge. They are not the same
+request, and the stock camera's success does not by itself prove the RAW path
+works. It does prove the sensor and vendor stack deliver 8192x6144 frames on this
+device state.
+
+### Consequence
+
+**`EV-44` may be obtainable with no further HAL work.** The experiment it names
+has never been attempted: get AGC into a session in which the 8192x6144 stream is
+configured — which the log shows happens from the second session after launch —
+and *then* press the shutter. Both existing captures pre-empted that by firing in
+the first session.
+
+This does not predict success. The `all_black` verdict of sections 14–16 was
+measured only on 4096x3072-configured sessions, so whether it persists at full
+resolution is untested in either direction. It does mean the cheapest remaining
+experiment is a capture, not a patch.
+
+Not established: the RAW10 stream size in any session; what triggers AGC's switch
+to the 8192x6144 output size; and whether `pref_48m_key` is that trigger — the
+17:00 sessions requested 8192x6144 through `getImageReaderFormat` while
+configuring 4096x3072, so the request and the configuration move independently.
+
+`FIND-3.5-01` and `FIND-4.5-02` remain **OPEN**. Nothing in this run is an image
+fix.
