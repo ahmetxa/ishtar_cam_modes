@@ -1142,3 +1142,159 @@ has produced a better object than the one it went looking for.** The question is
 no longer "is the sensor forced to bin" — it is not — but "what in CamX picks the
 mode, and is the vendor's own 228-byte switch the answer". `EV-44` is unchanged
 as the acceptance test. `FIND-3.5-01` and `FIND-4.5-02` remain **OPEN**.
+
+## 20. The `SensorMode` dump line cannot be enabled on this build; what the attempt established instead (`IMPL-42`, 2026-09-02)
+
+Section 19 named the CamX dump line
+
+```
+[ DUMP] SensorMode: numPixelsPerLine:%d numLinesPerFrame:%d maxFps:%f
+        Binning_H:%d Binning_V:%d WxH:%d X %d
+```
+
+as a free instrument that would say which sensor mode CamX selects. The user
+chose to spend the device on it. **It could not be enabled.** The negative is
+reported first because it is the result; the positives below are things the
+attempt turned up on the way, and two of them are worth more than the line was.
+
+The device was returned to its exact prior state: the bracket pair
+`20260902-2216__Faz4.6__IMPL42-pre-logmask` and
+`20260902-2228__Faz4.6__IMPL42-post-revert` compare **byte-identical** in their
+comparable regions, the live HAL is still `fe0245a4720fb07b01d96deef47f5569`,
+and the AGC preference trap is unchanged at 2/12. Nothing was written to any
+partition — `/vendor` and `/odm` are read-only erofs and stayed that way.
+
+### The negative: CamX log masks are inert on this build
+
+`camxoverridesettings.txt` is read and applied — that was proven, see below —
+but the three logging masks are not. At every attempt CamX printed:
+
+```
+camxoverridesettingsfile.cpp:805 Initialize() logInfoMask    = 0
+camxoverridesettingsfile.cpp:805 Initialize() logVerboseMask = 0
+camxoverridesettingsfile.cpp:805 Initialize() logCoreCfgMask = 0
+```
+
+Five variations were tried, each with a full camera-stack restart:
+
+1. `logInfoMask` / `logCoreCfgMask` appended at the end of the file, `0xFFFFFFFF`.
+2. The same settings placed at the **top** of the file, `0x7FFFFFFF`.
+3. Decimal `2147483647`.
+4. **In-place replacement of the vendor's own line** rather than a second one.
+5. A clean 32-bit literal `0xFFFFFFF`, testing whether the vendor's value was
+   the problem.
+
+The fourth and fifth deserve emphasis. **The vendor's own file already sets
+`logInfoMask=0x1000000006010098`** — a 64-bit literal — alongside
+`overrideLogLevels=0x1F` and `enableTxtLogging=1`, and CamX reports that setting
+as `0` too. So this is not a rejection of *our* value; the mask reads zero no
+matter who writes it, including Xiaomi. The natural reading is that logging is
+compiled down in this production build and `Initialize()` prints the effective
+zero. `SENSOR`-group line counts in logcat stayed flat across every attempt
+(674, 677, 682, 687), and `/data/vendor/camera/offlinelog` is empty, so
+`enableTxtLogging=1` is not routing them to a file either.
+
+**Do not spend another session on CamX log masks on this build.** The
+`[ DUMP] SensorMode` line, the `[ VERB] currentSensorMode=%d for Node name` line,
+and the `[CORE_CFG] ModeSwitch: ... SensorMode %d settings applied successfully`
+line are all unreachable by this route.
+
+### Positive 1: the settings file CamX reads is the ODM copy, not the vendor one
+
+There are two `camxoverridesettings.txt` on the device and **they are
+byte-identical** (`md5 0fbd24739df68bf8837176c1d0e1aa3d`):
+
+- `/vendor/etc/camera/camxoverridesettings.txt`
+- `/odm/etc/camera/camxoverridesettings.txt`
+
+Being identical, no static inspection can say which one is read. A marker
+discriminates: change `maxDigitalZoom=120.0` to `119.0` in one copy at a time and
+read the value back out of CamX's own `DumpData()` output.
+
+| modified copy | CamX reported `maxDigitalZoom` | conclusion |
+|---|---|---|
+| `/vendor/etc/camera/…` | **120.0** | not read |
+| `/odm/etc/camera/…` | **119.0** | **this is the one** |
+
+**A future session that edits the `/vendor` copy will change nothing and get no
+error.** That is a silent-failure trap of exactly the kind this project has been
+bitten by before, and it is now closed.
+
+### Positive 2: override settings are live-editable, reversibly, without a reboot
+
+Both partitions are read-only erofs, but the file can be replaced by a bind
+mount from a writable path:
+
+```
+cp /odm/etc/camera/camxoverridesettings.txt /data/local/tmp/cxo-odm.txt
+# edit /data/local/tmp/cxo-odm.txt
+chown 0:0 …; chmod 644 …; chcon u:object_r:vendor_configs_file:s0 …
+mount -o bind /data/local/tmp/cxo-odm.txt /odm/etc/camera/camxoverridesettings.txt
+# restart the camera stack: cameraserver first, then the providers
+```
+
+Reverted with `umount`. No partition remount, no module edit, no reboot. The
+`chcon` matters — without the `vendor_configs_file` context the provider cannot
+read it. Verified end to end by the `119.0` marker above, and verified clean on
+revert by md5 against the backups and by the identical bracket pair.
+
+This is a general capability the project did not have: **any CamX override
+setting can now be changed for one measurement and taken back.** The masks
+happen to be inert, but the mechanism is not.
+
+### Positive 3: CamX independently confirms the full-resolution mode, and names AGC's camera
+
+`dumpsys media.camera` prints vendor static metadata **with values**, and carries
+
+```
+org.quic.camera2.sensormode.info.SensorModeTable (803a0000): int32[71]
+  [23 3 8192 6144 ] [30 4096 3072 30 ] [4096 2304 30 4096 ] …
+```
+
+`71 = 2 + 23 x 3`: a count of **23 modes**, three fields each, and the **first
+entry is 8192x6144**. This is section 19's mode-0 finding reproduced through a
+completely independent channel — framework metadata rather than a hand-parse of
+`com.qti.sensormodule.ishtar_semco_imx989_wide.bin` — and it shows the mode is
+not merely present in driver data but **advertised upward by CamX**.
+
+Five camera ids carry the `int32[71]` table — **0, 2, 6, 7, 10** — which matches
+the earlier finding that one IMX989 feeds five logical camera ids. The others
+carry shorter tables (`int32[20]`, `[29]`, `[38]`).
+
+And CamX's `dumpState` retains a configure-streams ring that names the pipeline:
+
+```
+09-02 21:26:52  Pipeline[RealTimeFeatureZSLPreviewRawForThirdPartyApp_0_cam_0]
+09-02 21:27:11  Pipeline[RealTimeFeatureZSLPreviewRawForThirdPartyApp_0_cam_0]
+```
+
+**AGC runs on `cam_0`**, and `cam_0` is one of the five ids whose table contains
+`8192x6144`. Those two timestamps are the successful `21:26` capture from section
+18. The ring gives pipeline names and timings only — no stream dimensions and no
+sensor mode — so it does not answer the delivery question, but it does fix which
+camera the question is about.
+
+### What this establishes, and what it does not
+
+**Established.** The CamX log-mask route is closed on this build, for anyone,
+including the vendor. The settings file that matters is the ODM copy. Override
+settings can be changed live and reverted without touching a partition. CamX
+advertises a 23-mode table whose first entry is `8192x6144`, on the five camera
+ids the IMX989 feeds, and AGC uses `cam_0`, one of them.
+
+**Not established — unchanged from section 19.** Whether CamX *selects* mode 0
+for a still capture. The instrument chosen for that question turned out to be
+unavailable, and no substitute was run.
+
+**Better instrument for the next attempt, found while failing at this one.** The
+metadata table at `/data/vendor/camera/metadata/metadatatable.txt` lists
+`TagID e0021  SensorRawBinningFactorUsed` — the standard
+`android.sensor.rawBinningFactorUsed` **result** key. It states the binning
+factor of a delivered frame, per capture, and it is read from a `CaptureResult`
+by an ordinary camera client rather than from a HAL log. That sidesteps the mask
+problem entirely. Also present and unexamined: `PropertyIDUsecaseSensorModes`
+(`50000000`, 83,600 bytes), `PropertyIDSensorModeSwitched` (`30000045`),
+`com.xiaomi.SensorMode.sensorModeMask` (`81150000`), and the untested properties
+`persist.vendor.camera.logstate=3` and `vendor.camera.sensor.logsystem=3`.
+
+`EV-44` is unchanged. `FIND-3.5-01` and `FIND-4.5-02` remain **OPEN**.
