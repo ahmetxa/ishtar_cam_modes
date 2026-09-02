@@ -1,0 +1,37 @@
+09-02 16:55:55.281 31764 31855 D CAM_Camera2Module: [QCFA]startPreview: set qcfa enable false
+09-02 16:55:55.294 31244 31249 I cameraserver: Bypass roundBufferDimensionNearest for privilegedClient YUV streams width 1440 height 1080 for format 35
+09-02 16:56:01.720 31764 31855 D CAM_Camera2Module: [QCFA]startPreview: set qcfa enable false
+09-02 16:56:01.724 31244 31244 I cameraserver: Bypass roundBufferDimensionNearest for privilegedClient YUV streams width 1440 height 1080 for format 35
+09-02 16:56:09.193  2350  2439 D CAM_Camera2Module: [QCFA]startPreview: set qcfa enable false
+09-02 16:56:09.200 31244 31325 I cameraserver: Bypass roundBufferDimensionNearest for privilegedClient YUV streams width 1440 height 1080 for format 35
+09-02 16:56:10.884  2350  2350 D CAM_Camera2Module: prepareNormalCapture: qcfa = false
+09-02 16:56:11.002 31244 31326 I cameraserver: Bypass roundBufferDimensionNearest for privilegedClient YUV streams width 8192 height 6144 for format 35
+09-02 16:56:11.524 31244 31249 I cameraserver: Bypass roundBufferDimensionNearest for privilegedClient YUV streams width 8192 height 6144 for format 35
+09-02 16:56:19.447  2350  2439 D CAM_Camera2Module: [QCFA]startPreview: set qcfa enable false
+09-02 16:56:19.450 31244 31325 I cameraserver: Bypass roundBufferDimensionNearest for privilegedClient YUV streams width 1440 height 1080 for format 35
+09-02 17:00:18.542 31244 31248 I cameraserver: Bypass roundBufferDimensionNearest for privilegedClient YUV streams width 4096 height 3072 for format 35
+09-02 17:00:18.542 31244 31248 I cameraserver: Bypass roundBufferDimensionNearest for privilegedClient YUV streams width 640 height 480 for format 35
+09-02 17:00:18.589  7223  7271 D AGC     : HdrPlusSession Created
+09-02 17:00:31.218  7223  7564 D AGC     : sabre
+09-02 17:00:31.229  7223  7564 D AGC     : DevSettings -> (merge 1) -> sabreAllowed true
+09-02 17:00:31.235  7223  7564 D AGC     : Allow Sabre true
+09-02 17:00:32.873  7223  7365 E libgcam : [hardware_buffer_map.cc:66]: MapFrameToTexture: SABRE: Cannot get file descriptor from opaque_handle
+09-02 17:00:33.058  7223  7365 E libgcam : [hardware_buffer_map.cc:66]: MapFrameToTexture: SABRE: Cannot get file descriptor from opaque_handle
+09-02 17:00:33.146  7223  7365 E libgcam : [hardware_buffer_map.cc:66]: MapFrameToTexture: SABRE: Cannot get file descriptor from opaque_handle
+09-02 17:00:33.175  7223  7365 E libgcam : [hardware_buffer_map.cc:66]: MapFrameToTexture: SABRE: Cannot get file descriptor from opaque_handle
+09-02 17:00:33.309  7223  7365 E libgcam : [hardware_buffer_map.cc:66]: MapFrameToTexture: SABRE: Cannot get file descriptor from opaque_handle
+09-02 17:00:33.327  7223  7365 E libgcam : [hardware_buffer_map.cc:66]: MapFrameToTexture: SABRE: Cannot get file descriptor from opaque_handle
+09-02 17:00:33.355  7223  7365 E libgcam : [hardware_buffer_map.cc:66]: MapFrameToTexture: SABRE: Cannot get file descriptor from opaque_handle
+09-02 17:00:33.406  7223  7365 E libgcam : [hardware_buffer_map.cc:66]: MapFrameToTexture: SABRE: Cannot get file descriptor from opaque_handle
+09-02 17:00:33.540  7223  7365 E libgcam : [hardware_buffer_map.cc:66]: MapFrameToTexture: SABRE: Cannot get file descriptor from opaque_handle
+09-02 17:00:33.670  7223  7365 E libgcam : [hardware_buffer_map.cc:66]: MapFrameToTexture: SABRE: Cannot get file descriptor from opaque_handle
+09-02 17:00:33.688  7223  7365 E libgcam : [hardware_buffer_map.cc:66]: MapFrameToTexture: SABRE: Cannot get file descriptor from opaque_handle
+09-02 17:00:33.819  7223  7365 E libgcam : [hardware_buffer_map.cc:66]: MapFrameToTexture: SABRE: Cannot get file descriptor from opaque_handle
+09-02 17:00:33.841  7223  7365 E libgcam : [hardware_buffer_map.cc:66]: MapFrameToTexture: SABRE: Cannot get file descriptor from opaque_handle
+09-02 17:00:33.958  7223  7365 E libgcam : [hardware_buffer_map.cc:66]: MapFrameToTexture: SABRE: Cannot get file descriptor from opaque_handle
+09-02 17:00:33.979  7223  7365 E libgcam : [hardware_buffer_map.cc:66]: MapFrameToTexture: SABRE: Cannot get file descriptor from opaque_handle
+09-02 17:00:35.340  7223  7363 E native  : E0902 17:00:35.340733    7363 mesh_warper_utils.cc:86] Invalid mesh: [4096,3072]
+09-02 17:00:35.340  7223  7241 E GoLog   : E0902 17:00:35.340733    7363 mesh_warper_utils.cc:86] Invalid mesh: [4096,3072]
+09-02 17:00:37.459 31244 31244 I cameraserver: Bypass roundBufferDimensionNearest for privilegedClient YUV streams width 640 height 480 for format 35
+09-02 17:00:37.463 31244 31244 I cameraserver: Bypass roundBufferDimensionNearest for privilegedClient YUV streams width 4096 height 3072 for format 35
+09-02 17:00:37.525  7664  7700 D AGC     : HdrPlusSession Created

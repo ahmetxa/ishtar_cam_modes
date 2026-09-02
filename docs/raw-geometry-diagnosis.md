@@ -53,7 +53,7 @@ Two further captures were recovered and analysed as corroboration:
 
 | File | SOF | State at capture |
 |---|---|---|
-| `AGC_20260901_211031502.jpg` | **3072x4096** | five-word stack, 37 s before the primary |
+| `AGC_20260901_211031502.jpg` | **3072x4096** | seven-word stack, 37 s before the primary (see the correction note below) |
 | `AGC_20260901_153736507.jpg` | **6144x8192** | three-layer stack, `IMPL-23` era |
 
 Both are retained: the first as
@@ -133,8 +133,8 @@ permutation of them.
 
 | Capture | Raster | Content band | Reconstructed | Coherent |
 |---|---|---|---|---|
-| `AGC_..._211108200` (five-word) | 8192x6144 | 1539 rows | **4096x3078** | **yes** |
-| `AGC_..._211031502` (five-word) | 4096x3072 | 770 rows | **2048x1540** | **yes** |
+| `AGC_..._211108200` (seven-word) | 8192x6144 | 1539 rows | **4096x3078** | **yes** |
+| `AGC_..._211031502` (seven-word) | 4096x3072 | 770 rows | **2048x1540** | **yes** |
 | `AGC_..._153736507` (three-layer) | 8192x6144 | 3081 rows | **4096x6162** | **yes** |
 
 Evidence retained:
@@ -202,8 +202,8 @@ width. The payload **height** is not constant:
 | Capture | State | Raster | Payload | W ratio | H ratio | Black |
 |---|---|---|---|---|---|---|
 | `..._153736507` | three-layer | 8192x6144 | **4096x6144** | 1/2 | **1/1** | 50% |
-| `..._211108200` | five-word | 8192x6144 | **4096x3072** | 1/2 | **1/2** | 75% |
-| `..._211031502` | five-word | 4096x3072 | **2048x1536** | 1/2 | **1/2** | 75% |
+| `..._211108200` | seven-word | 8192x6144 | **4096x3072** | 1/2 | **1/2** | 75% |
+| `..._211031502` | seven-word | 4096x3072 | **2048x1536** | 1/2 | **1/2** | 75% |
 
 Two consequences, both load-bearing.
 
@@ -223,7 +223,7 @@ scope expansion on the vendor-tag provider is therefore **vindicated by
 measurement**, which is a stronger position than the one it was taken from.
 
 **The height change is an observation, not an attribution.** The three-layer and
-five-word captures differ in more than the two active-array words: different
+seven-word captures differ in more than the two active-array words: different
 session, different scene, and `IMPL-30` set `pref_48m_key=1`. The one-variable rule
 in `docs/phase3-preconditions.md` section 5 item 3 is not satisfied, so this
 document does **not** claim the raise halved the payload height. It records that
@@ -253,8 +253,8 @@ decision, per `Faz4.6` section 5.
 
 | Item | Why | Gate |
 |---|---|---|
-| `F4.6-05` consumer control | Live. Needs the five-word stack re-applied, a camera restart, and shutter presses. | User approval and device |
-| `F4.6-06` HAL configuration read | Live. Needs filtered logcat during a capture in the five-word stack. | User approval and device |
+| `F4.6-05` consumer control | Live. Needs the seven-word stack re-applied, a camera restart, and shutter presses. | User approval and device |
+| `F4.6-06` HAL configuration read | Live. Needs filtered logcat during a capture in the seven-word stack. | User approval and device |
 | `F4.6-07` DNG probe | Gated. `EV-35`: no full-resolution DNG exists before `Faz4.1` lands format-32 emission. | `Faz4.1` |
 
 `F4.6-05` and `F4.6-06` are now **better specified** than when they were written:
@@ -265,7 +265,7 @@ buffer width, and that is a number the log either carries or does not.
 Pre-existing captures were checked as free corroboration and are **not** the
 `F4.6-05` control: the stock camera's 18:46 captures are 4896x6528, a different
 mode, and the Open Camera 15:42 capture is the three-layer `EV-33` reference, not
-the five-word stack.
+the seven-word stack.
 
 ---
 
@@ -281,3 +281,96 @@ was restarted, and no reboot occurred. The device remains at
 `BASELINE-2026-08-31-V21`. No `scripts/smoke.sh` bracket was required, because
 `docs/phase3-preconditions.md` section 5 item 2 brackets device **changes**, and
 there was none.
+
+
+---
+
+## 11. Correction: the artifact state is the SEVEN-word stack (`IMPL-32`, 2026-09-02)
+
+This document originally labelled the `21:10` and `21:11` captures as the
+*five-word* stack. That label is **wrong**, and it is corrected above.
+
+The evidence is the bracket ordering, not a recollection. `IMPL-30`'s reverts
+after `f0000` and after `f000a` are bracketed at `1756` and `1759`; the **full**
+stack is bracketed at `1803__Faz4.5__full-stack.txt` carrying
+`hal.live.md5 = c094101de0184e9216a57020873bac0b`; the teardown is at `1816`.
+Both captures fall inside `[18:03, 18:16]` with **no intervening revert bracket**,
+and the measurement contract requires a bracket around every device change. So
+both were taken in the full stack.
+
+The arithmetic agrees: raw50 (4 words) + pixelarray (1) + activearray (2) = **7**,
+which is what `IMPL-30` recorded and what `IMPL-32` reproduced to the same md5. A
+genuine five-word state (raw50 + pixelarray, no active-array raise) is coherent
+and may have existed earlier in that session, but **no capture in hand belongs to
+it**.
+
+**Nothing in sections 1-10 changes.** Section 7(a)'s reconciliation still holds,
+because the 50%/full-height reading comes from the *three-layer* capture, which is
+genuinely pre-raise. Only the name on the two post-raise captures was wrong. The
+correction matters because a reader reproducing "the five-word stack" would build
+the wrong HAL and measure the wrong thing.
+
+---
+
+## 12. Live results (`F4.6-05`, `F4.6-06`) -- `IMPL-32`, 2026-09-02
+
+State under test reproduced bit-for-bit: `fe0245a4...` (fullres) + 7 words ->
+`c094101de0184e9216a57020873bac0b`, the md5 `IMPL-30` pre-committed. Trap cleared
+to 0/12 before the captures. AGC build `ce65f862...`.
+
+### `F4.6-05` -- the consumer control
+
+| Consumer | Result | Black fraction | Extent |
+|---|---|---|---|
+| **Stock camera** | **CLEAN** | **0.0000** | rows 0..6143, cols 0..8191 of 8192x6144 |
+| **AGC** | folded, as modelled | **0.7490** (0.7500 predicted) | content rows 0..770 of 4096x3072 |
+| Open Camera | **not run** | -- | `pm` keeps no record of the package after three `Success` installs |
+
+**The stock camera is clean at full 8192x6144 in the exact stack that folds AGC's
+frame.** This is the result the sub-plan was written to obtain, and it is stronger
+than `EV-33`: that reference only ever tested the three-layer stack, whereas this
+tests the seven-word one. **The active-array raise did not break the HAL's own
+still path, and the fault is confined to AGC's Gcam path.**
+
+The AGC capture reproduces the fold **proportionally at a half-size raster**:
+0.7490 black against 0.7500 predicted, content rows 0..770 against 768 predicted --
+the same 3-row DCT overshoot section 5 characterises -- and unfolding at column
+2048 gives a coherent **2048x1542** against 2048x1536 predicted. It came out at
+4096x3072 rather than 8192x6144 because `pref_48m_key` was not set; `IMPL-23`
+established AGC will not emit full resolution without it.
+
+### `F4.6-06` -- what the HAL configured
+
+**The stride is not on the log surface.** `stride` occurs **0** times in a
+213,466-line all-buffer capture. Per this sub-plan's own instruction that is
+recorded as a determination, and a scripted trace of the buffer-negotiation path
+is **proposed, not assumed**.
+
+What the log does carry:
+
+| Reading | Value |
+|---|---|
+| Negotiated YUV (format 35) buffers | **8192x6144** (clean stock capture), **4096x3072** (folded AGC capture), 1440x1080 and 640x480 preview |
+| QCFA / remosaic | `prepareNormalCapture: qcfa = false` on the clean 50MP stock capture |
+| `static_metadata.cc:667` | 0 |
+| `Stuck shot` | 0 |
+| `libgcam` / `HdrPlusSession` | 32 / 2 |
+
+**New, unrecorded, and the strongest lead this session produced:**
+
+```
+E native : mesh_warper_utils.cc:86] Invalid mesh: [4096,3072]
+```
+
+Twice, at 17:00:35.340 -- seconds after the AGC capture, **at exactly the buffer
+dimensions that capture negotiated**. Gcam builds a warp mesh at the buffer size
+and rejects it as invalid. This is a Gcam-internal rejection at the same
+dimensions the fold is measured against, and it is the first evidence pointing at
+*why* the payload is half-width rather than merely confirming *that* it is.
+
+### What this does not settle
+
+`EV-44` remains open. Attributing the payload-height halving to the active-array
+raise still needs a **full-resolution** AGC capture in the seven-word stack, which
+requires `pref_48m_key=1`. The one-variable rule forbids the attribution without
+it.
