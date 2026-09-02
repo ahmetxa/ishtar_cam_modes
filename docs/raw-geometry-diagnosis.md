@@ -944,3 +944,192 @@ logged (section 17), so this needs the HAL side rather than another capture.
 
 `FIND-3.5-01` and `FIND-4.5-02` remain **OPEN** — but `FIND-4.5-02`, the image
 corruption, now has a mechanism rather than a description.
+
+## 19. Direction A settled host-side: `tempBinning` is temporal, and a full-resolution sensor mode exists (`IMPL-41`, 2026-09-02)
+
+Section 18 moved the target to the delivery side and left one lead attached to
+it: AGC's `tempBinning: true`, logged once per capture and true in both the
+folded `19:30` shot and the clean `21:26` one. The handoff recorded it honestly
+as a lead rather than a finding — it did not discriminate the two captures, and
+whether it was thermal, causal, or merely AGC reporting sensor state was open.
+
+This section closes it. **No device was used, no preference touched, no capture
+taken.** Everything below is static analysis of files already in the repository.
+
+### `tempBinning` is `ShotParams.allow_temporal_binning`, not a sensor readout mode
+
+The string `tempBinning:` is emitted from exactly one place in
+`AGC8.4.300_V9.6_50MP_patched.apk`, `classes2.dex`, in
+`LHdrPlusSessionImpl;->startShotCaptureInternal`. Its immediate neighbourhood
+settles what it is:
+
+```
+012a: invoke  LAGC;->getTemporalBinning
+012e: const-string "tempBinning:"
+0130: invoke  Lcom/agc/Log;->d                          <- the logged line
+0135: invoke  GcamModuleJNI;->ShotParams_allow_temporal_binning_set
+```
+
+The value that is logged is the value that is then written into gcam's
+`ShotParams.allow_temporal_binning`. Its source is a menu preference:
+
+```
+LAGC;->getTemporalBinning:
+  const-string "pref_temporal_binning_key"
+  const/4 v1, 0                                         <- default
+  invoke  Lcom/Utils/Pref;->MenuValue
+```
+
+**Temporal binning is frame stacking — a burst/merge parameter inside gcam.** It
+is a different mechanism from spatial sensor binning, which has its own separate
+vocabulary in the same APK (`com.google.internal.SensorBinningMode`,
+`ApplySensorBinning__SWIG_0/1`). `tempBinning: true` therefore means the port's
+temporal binning preference is on. **It has no path to the sensor readout mode
+and cannot cause the stack to deliver `4096x3072`.** The lead is refuted, not
+merely undischarged.
+
+### AGC's only sensor-binning control is a Pixel tag it cannot use here
+
+The genuine sensor-binning surface does exist in the APK, and it is inert on this
+device. `Lghy;-><clinit>` builds two `CaptureRequest$Key` objects, the second
+being `com.google.internal.SensorBinningMode`. The only consumer of that field is
+`Lgwh;->get`, and it is guarded:
+
+```
+017c: Set->iterator                    <- the device's available request keys
+018c: CaptureRequest$Key->getName
+0190: sfield Lghy;->b                  (com.google.internal.SensorBinningMode)
+0196: String->equals                   <- capability guard
+019c: sfield Lghy;->b
+019e: Integer->valueOf
+01a2: invoke Lfcy;->i                  <- the write, reached only on a match
+```
+
+AGC enumerates the keys the device advertises and writes `SensorBinningMode`
+**only if the device advertises it.** That tag is Google-internal; ishtar runs
+Qualcomm CamX and does not publish it, so the branch is never taken.
+
+**Consequence: AGC does not and cannot select the sensor readout mode.** The
+binned delivery is decided entirely below the application. This is the app-side
+half of section 18's open question, and it closes in the same direction section
+17 pointed: nothing further is to be gained by opening the app.
+
+### The sensor has exactly one full-resolution mode, and it is mode 0
+
+Parsed from `com.qti.sensormodule.ishtar_semco_imx989_wide.bin` using the format
+recovered in the 2026-08-16 session: parameter table at `0xD0`, 60 bytes per
+entry, offsets relative to the data base at `0xB8`. The file holds 14,454
+entries, one `resolutionData` of 6,992 bytes (23 records of 304), and 23
+`streamConfiguration` entries. Within a 60-byte stream configuration, `u32[5]`,
+`u32[6]` and `u32[7]` are width, height and bit depth.
+
+| mode | stream configurations | line_length_pck | frame_length_lines | cfg count |
+|---|---|---|---|---|
+| **0** | **8192x6144/10** | 13824 | 8728 | **1** |
+| 1 | 4096x3072/10, 4096x768/10 | 11168 | 12680 | 2 |
+| 2 | 4096x2304/10, 4096x576/10 | 11168 | 12672 | 2 |
+| 3 | 4096x3072/10, 2048x768/10 | 21536 | 6576 | 2 |
+| 4 | 4096x2304/10, 2048x576/10 | 21536 | 6567 | 2 |
+| 5 | 4096x3072/10 x3, 4096x768/10 | 11168 | 4224 | 4 |
+| 6 | 4096x2304/10 x3, 4096x576/10 | 11168 | 4224 | 4 |
+| 7 | 4096x2304/10, 4096x576/10 | 11168 | 6336 | 2 |
+| 8 | 7680x4320/10, 3840x1080/10 | 21536 | 6792 | 2 |
+| 9 | 1920x1080/10, 1920x270/10 | 5440 | 1392 | 2 |
+| 10 | 4096x2304/10, 4096x576/10 | 11168 | 12672 | 2 |
+| 11 | 4096x2304/10 x2, 4096x576/10 | 11168 | 6336 | 3 |
+| 12 | 3360x2520/10, 3360x630/10 | 11168 | 13104 | 2 |
+| 13 | 3360x2520/10, 1680x630/10 | 21536 | 6792 | 2 |
+| 14-19 | replicate modes 1-6 on these fields | | | |
+| 20, 21 | replicate modes 12, 13 on these fields | | | |
+| 22 | 1280x720/10, 1280x180/10 | 5440 | 1680 | 2 |
+
+**Mode 0 is the only `8192x6144` entry in the table**, and it is structurally
+unlike every other mode: it is the sole record carrying a *single* stream
+configuration, and the sole record whose `u32[8]` field reads `1` where every
+other mode reads 2, 3 or 4.
+
+A note on the replication rows, because it refines an earlier session's claim
+rather than confirming it. Measured on the resolution and timing fields, modes
+14-19 replicate modes 1-6 and modes 20-21 replicate modes 12-13 — not 14-21
+replicating 1-8. No two of the 23 records are byte-identical, because each
+carries its own `streamConfiguration` and `regSetting` entry indices; the earlier
+"bit-identical" observation was about the register blocks those indices point to,
+which this measurement does not test either way.
+
+So the full-resolution mode is present in the sensor configuration. **The part is
+not pinned to a binned mode by its own driver data**; a `50.33` MP `RAW10`
+readout exists and is described. What remains unproven is whether CamX ever
+*selects* mode 0 for a still capture — the delivery question restated one layer
+lower, and now with a concrete object to look at.
+
+One instrument found while reading the HAL, never used by this project and free:
+CamX carries the format string
+
+```
+[ DUMP] SensorMode: numPixelsPerLine:%d numLinesPerFrame:%d maxFps:%f
+        Binning_H:%d Binning_V:%d WxH:%d X %d
+```
+
+That line names the selected mode's binning factors and dimensions directly.
+Section 17 established that the RAW *stream's* configured dimensions are never
+logged; this is a different statement, from the sensor layer rather than the
+stream layer, and it would answer which mode was chosen without any patch.
+
+### The vendor's own high-resolution switch is a 228-byte HAL diff
+
+`Module_Highres_13U_Switcher_A14/mod/` ships two complete HAL binaries of
+identical size (31,004,560 bytes, both dated 2024-03-08):
+
+- `enable/camera.qcom.so` — md5 `f6b4fbd0d5e7403292070c2dad3c4df6`
+- `disable/camera.qcom.so` — md5 `35194d60e7e8a246b05de64a11b9ff7c`, byte-identical
+  to the module's own `root/odm/lib64/hw/camera.qcom.so`
+
+They differ in **228 bytes across 66 regions**, and the differences are a small
+set of repeated, legible patterns:
+
+1. **About 45 sites of `ldr wN, [xM, #0x3d84]` becoming `mov wN, #0`.** One fixed
+   structure field, read through many different base registers, forced to zero in
+   the high-resolution variant.
+2. **A second cluster forcing `ldr wN, [x16, #0x0 / #0x4 / #0x8]` to `mov wN, #0`**,
+   around file offsets `0x019caa70`–`0x019cad04`.
+3. **Four bounds raised by exactly one:** `cmp wN, #4` becomes `cmp wN, #5`
+   (registers `w7`, `w9`, `w13`, `w16`).
+4. **One guard neutralised:** `cmp w0, #2` / `b.eq` becomes `cmp w0, w0` / `b.ne`
+   at file offset `0x019ca490`, a branch that can now never be taken.
+5. **One 64-bit constant halved**, via a `movk` into bits 63:48: `0x41cd` becomes
+   `0x41bd`, which as the high half of a double is `9.73e8` becoming `4.87e8`.
+
+Symbol attribution is not available for these sites: the nearest preceding
+exported symbol is hundreds of kilobytes away, so the containing functions are
+local and stripped. Do not quote a function name for them.
+
+**These offsets are not transferable.** Both binaries are from the A14 Highres
+switcher module and are a different build from the device's current
+`/odm/lib64/hw/camera.qcom.so` (`fe0245a4720fb07b01d96deef47f5569`, the
+full-resolution base). The *patterns* carry; the addresses do not, and would have
+to be re-derived against the live build before anything is written.
+
+### What this establishes, and what it does not
+
+**Established.** `tempBinning` is temporal binning driven by an AGC preference and
+is unrelated to sensor readout. AGC's sensor-binning control is a Pixel vendor
+tag guarded by an availability check the device fails, so the app cannot select
+the readout mode. The IMX989 driver data contains exactly one full-resolution
+mode, mode 0 at `8192x6144` `RAW10`, structurally distinct from all 22 others. A
+vendor-built high-resolution HAL for this exact device exists in the repository
+and differs from its own disabled counterpart by 228 bytes in five recognisable
+patterns.
+
+**Not established.** Whether CamX selects mode 0 for a still capture, and what
+chooses it. What the field at `[xM, #0x3d84]` is. Whether the `cmp #4` to `cmp #5`
+bound concerns stream counts, mode indices or something else. Whether the halved
+constant is a rate limit. Whether any one of the five patterns is what makes the
+stack **deliver** `8192x6144`, or whether they are five parts of a single switch.
+Nothing here has been tested on the device, and the vendor binaries are a
+different build.
+
+**Direction A is answered in the negative for the app and the sensor data, and it
+has produced a better object than the one it went looking for.** The question is
+no longer "is the sensor forced to bin" — it is not — but "what in CamX picks the
+mode, and is the vendor's own 228-byte switch the answer". `EV-44` is unchanged
+as the acceptance test. `FIND-3.5-01` and `FIND-4.5-02` remain **OPEN**.
