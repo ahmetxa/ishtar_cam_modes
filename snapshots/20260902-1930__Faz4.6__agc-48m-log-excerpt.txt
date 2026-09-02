@@ -1,0 +1,45 @@
+# Faz 4.6 / EV-44 -- AGC capture with pref_48m_key=1, seven-word stack c094101d
+# Source: /data/local/tmp/f46-agc.log, 44246 lines, 2026-09-02 19:30-19:32
+# Filtered to the decisive lines. Full log not committed (5.1 MB).
+
+## Counts over the whole log
+getImageReaderFormat   4
+all-zero green         15
+Invalid mesh           2
+SABRE                  15
+lib_aion_buffer        34
+static_metadata        0
+frame_raw_max          0
+matches neither        0
+Stuck shot             0
+
+## AGC stream selection
+09-02 19:30:54.631  2814  2870 W AGC     : getImageReaderFormat ImageReaderFormat{ImageFormat=RAW10, Size=8192x6144}
+09-02 19:31:51.552  2814  2870 W AGC     : getImageReaderFormat ImageReaderFormat{ImageFormat=RAW10, Size=8192x6144}
+09-02 19:32:02.763  2814  2870 W AGC     : getImageReaderFormat ImageReaderFormat{ImageFormat=RAW10, Size=8192x6144}
+09-02 19:32:04.158  6203  6300 W AGC     : getImageReaderFormat ImageReaderFormat{ImageFormat=RAW10, Size=8192x6144}
+
+## cameraserver stream configuration
+09-02 19:30:54.686 32410 32450 I cameraserver: Bypass roundBufferDimensionNearest for privilegedClient YUV streams width 640 height 480 for format 35
+09-02 19:30:54.689 32410 32450 I cameraserver: Bypass roundBufferDimensionNearest for privilegedClient YUV streams width 4096 height 3072 for format 35
+09-02 19:31:51.573 32410 32450 I cameraserver: Bypass roundBufferDimensionNearest for privilegedClient YUV streams width 8192 height 6144 for format 35
+09-02 19:31:51.574 32410 32450 I cameraserver: Bypass roundBufferDimensionNearest for privilegedClient YUV streams width 640 height 480 for format 35
+09-02 19:32:02.794 32410  3601 I cameraserver: Bypass roundBufferDimensionNearest for privilegedClient YUV streams width 8192 height 6144 for format 35
+09-02 19:32:02.795 32410  3601 I cameraserver: Bypass roundBufferDimensionNearest for privilegedClient YUV streams width 640 height 480 for format 35
+09-02 19:32:04.198 32410  3991 I cameraserver: Bypass roundBufferDimensionNearest for privilegedClient YUV streams width 8192 height 6144 for format 35
+09-02 19:32:04.199 32410  3991 I cameraserver: Bypass roundBufferDimensionNearest for privilegedClient YUV streams width 640 height 480 for format 35
+
+## libgcam frame verdict (15 frames, all rejected)
+09-02 19:31:01.122  2814  2946 E libgcam : [shot_process.cc:392]: PrepShot: Bad frame with all-zero green pixels (timestamp 89216793041725)
+09-02 19:31:01.122  2814  2946 E libgcam : [shot_process.cc:392]: PrepShot: Bad frame with all-zero green pixels (timestamp 89216853149642)
+09-02 19:31:01.122  2814  2946 E libgcam : [shot_process.cc:392]: PrepShot: Bad frame with all-zero green pixels (timestamp 89216913257506)
+   ... 15 total, one per candidate frame
+
+## mesh warper
+09-02 19:31:03.810  2814  2947 E native  : E0902 19:31:03.810112    2947 mesh_warper_utils.cc:86] Invalid mesh: [4096,3072]
+09-02 19:31:03.810  2814  2842 E GoLog   : E0902 19:31:03.810112    2947 mesh_warper_utils.cc:86] Invalid mesh: [4096,3072]
+
+## buffer mapping failures
+09-02 19:30:55.118  2814  3285 E native  : E0902 19:30:55.118810    3285 aion.cc:791] Error loading lib_aion_buffer.so dlopen failed: library "lib_aion_buffer.so" not fou
+09-02 19:30:55.118  2814  2847 E GoLog   : E0902 19:30:55.118810    3285 aion.cc:791] Error loading lib_aion_buffer.so dlopen failed: library "lib_aion_buffer.so" not fou
+09-02 19:31:01.341  2814  2949 E libgcam : [hardware_buffer_map.cc:66]: MapFrameToTexture: SABRE: Cannot get file descriptor from opaque_handle

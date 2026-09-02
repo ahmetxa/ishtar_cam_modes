@@ -374,3 +374,95 @@ dimensions the fold is measured against, and it is the first evidence pointing a
 raise still needs a **full-resolution** AGC capture in the seven-word stack, which
 requires `pref_48m_key=1`. The one-variable rule forbids the attribution without
 it.
+
+---
+
+## 13. `pref_48m_key` is necessary but not sufficient (`IMPL-35`, 2026-09-02)
+
+`IMPL-33` left `EV-44` owed a full-resolution AGC capture in the seven-word
+stack, because its AGC frame came out at 4096x3072 with `pref_48m_key` unset.
+This run set the key and repeated the capture. **`EV-44` is still not
+satisfied, and the reason is now measured rather than suspected.**
+
+State under test, reproduced bit-for-bit again: `fe0245a4...` (fullres) + 7
+words -> `c094101de0184e9216a57020873bac0b`. Trap cleared to **0/12** by per-key
+audit immediately before the capture. `pref_48m_key=1` added as
+`<string name="pref_48m_key">1</string>`, matching how the sibling keys
+(`pref_raw_key`, `pref_fix_resolution_key`) are stored; `AGC;->
+getSupportedOutputSizes` reads it through `AdvancedSettings.get48m()I` and
+branches on `if-eqz`, so any non-zero value opens the patched path.
+
+### The request reached full resolution. The output did not.
+
+| Stage | Evidence | Result |
+|---|---|---|
+| AGC stream selection | `getImageReaderFormat ImageReaderFormat{ImageFormat=RAW10, Size=8192x6144}`, x4 | **8192x6144** |
+| cameraserver configuration | `Bypass roundBufferDimensionNearest for privilegedClient YUV streams width 8192 height 6144 for format 35` | **8192x6144** |
+| Photo size preference | `pref_camera_picturesize_back_key` = `8192x6144`, and it **held** across the session | **8192x6144** |
+| libgcam frame acceptance | `shot_process.cc:392  PrepShot: Bad frame with all-zero green pixels` | **15 of 15 rejected** |
+| Saved JPEG | SOF0, measured | **3072x4096 = 12.6 MP** |
+
+**This is a real advance over `IMPL-33` and a real wall.** The application-side
+blockage `IMPL-23` described is open: with the key set, AGC asks for RAW10 at
+8192x6144 and cameraserver configures that stream without clamping it. The
+metadata gate is also still clear — `static_metadata.cc:667`, `frame_raw_max`,
+`matches neither` and `Stuck shot` all occur **0** times in 44,246 lines. What
+fails is neither the request nor the metadata but the **frame content**: every
+one of the fifteen candidate frames is rejected as all-zero green.
+
+### The fallback output carries the same fold
+
+Measured with `frame_geometry.py`, raster axes:
+
+- pure-black rows **2302 of 3072**, fraction **0.7493** against 0.7500 predicted
+- content confined to rows **0..769**, column extent full
+- unfolding at column 2048 gives a coherent **2048x1540**
+
+That is `IMPL-33`'s artifact reproduced, not escaped. The fallback path does not
+recover a clean image; it produces the same half-width-payload fold at the
+smaller raster. The user's description of the result was "blurry, about 12 MP",
+which is what a 4096x3072 frame whose content occupies one quarter of the raster
+looks like when viewed whole.
+
+### `Invalid mesh: [4096,3072]` is reframed, not confirmed
+
+The `IMPL-33` handoff flagged this as the first evidence for *why* the payload
+is half-width. It is not. The message appears **twice in this capture and twice
+in `IMPL-33`'s** — in the full-resolution-request run and in the half-resolution
+run alike — and `[4096,3072]` is exactly
+`org.codeaurora.qcamera3.quadra_cfa.activeArraySize (80340003)`, read live during
+this session as `[0 0 4096 3072]`. That vendor tag is the one array the
+seven-word stack does **not** raise: the stack raises `f0000`, `f0006` and
+`f000a`, and `IMPL-30` recorded `80340003` staying at half. **The mesh error
+tracks the un-raised vendor tag, and is a standing consequence of it rather than
+a symptom of the payload halving.** It belongs to `FIND-4.5-01` and `F4.4-02b`,
+not to the geometry diagnosis.
+
+### What is not yet discriminated
+
+`lib_aion_buffer.so` fails to load (`aion.cc:791`), which makes
+`GetFileDescriptors not loaded` and then
+`MapFrameToTexture: SABRE: Cannot get file descriptor from opaque_handle`, 15
+times — once per frame. **`SABRE` appears in `IMPL-33`'s log excerpt too**, so it
+is a standing condition of this AGC port and not something this run introduced.
+Whether the all-zero-green verdict is caused by the payload layout or by frames
+that were never successfully mapped is **not settled by this evidence**, and the
+two are not separable from the log surface alone.
+
+Honesty about the comparison: `IMPL-33`'s log survives only as a 37-line targeted
+excerpt, which contains no `all-zero green` line. That is **not** evidence the
+condition was absent then — the excerpt was filtered for other patterns. The
+claim "all-zero green is new at full resolution" is **not** supported and is not
+made here.
+
+### Trap re-arm, observed a second time
+
+`2/12` before -> `0/12` cleared -> **`2/12` after the capture session**
+(`pref_raw_key`, `pref_fix_resolution_key`). This independently reproduces the
+`IMPL-33` finding that the trap re-arms across an AGC session, and confirms the
+sub-plan's rule that the per-key audit must be re-run immediately before every
+measurement rather than trusted from an earlier reading. `pref_48m_key` itself
+**survived** AGC's rewrite of the preference file.
+
+`FIND-3.5-01` and `FIND-4.5-02` both remain **OPEN**. Nothing in this run is an
+image fix.
