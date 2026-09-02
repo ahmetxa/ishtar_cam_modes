@@ -561,3 +561,92 @@ rejected.
 
 `FIND-3.5-01` and `FIND-4.5-02` both remain **OPEN**. Nothing in this run is an
 image fix.
+
+## 15. The producer is `MeasureSharpnessRaw`, and the verdict is literally `all_black` (`IMPL-37`, 2026-09-02)
+
+Section 14 excluded `SABRE` and left one question open: *where* the statistic
+samples. That is not answered here either, but the producer is now identified,
+the enum is decoded, and the sampling mechanism is located — which narrows the
+open question from "what computes this" to a single remaining hop.
+
+### The enum is a frame classification, and value 3 is `all_black`
+
+The jump table at `0x889908` holds `[0x00, 0x19, 0x08, 0x0f]`, indexing from
+`0x1ed81e4`. Each case builds a libc++ short string whose leading byte is the
+SSO size field (`size << 1`):
+
+| value | case target | size byte | label |
+|---|---|---|---|
+| 0 | `0x1ed81e4` | `0x0e` -> 7 | `invalid` |
+| 1 | `0x1ed8248` | `0x0a` -> 5 | `valid` |
+| 2 | `0x1ed8204` | `0x12` -> 9 | `all_white` |
+| 3 | `0x1ed8220` | `0x12` -> 9 | **`all_black`** |
+
+So `[frame+0x708] == 3` is not a bespoke "green" verdict at all. It is the
+frame-content classification **`all_black`**, and `shot_process.cc:392` phrases
+it as "all-zero green pixels" because green is the channel the classifier reads.
+The sibling report at `0x1ed86e8` fires on value 2, `all_white`, and is phrased
+"all green pixels saturated" for the same reason.
+
+**gcam is not reporting a green-specific anomaly. It is reporting that the frame
+is black.** Section 13 measured the raster as **74.93 % pure black**. Those two
+statements are consistent, and their connection is the open question.
+
+### The writer, and the producer
+
+`PrepShot`'s reporting loop (section 14) walks a vector of frame pointers,
+`x26 = [x8 + x23*8]`. The field is written earlier, at `0x1ed3d24`:
+
+    add  x4, x3, #0x708      ; prior stats passed in
+    bl   #0x1f63148          ; <- producer, sret in x8 = sp+0x20
+    ldr  q0, [sp, #0x20]     ; 16 bytes back
+    ldr  w11, [sp, #0x30]    ; 5th int32
+    add  x9, x8, #0x708
+    str  q0, [x9]            ; +0x708 .. +0x714
+    str  w11, [x9, #0x10]    ; +0x718
+    strb w9, [x8, #0x71c]    ; validity := 1
+
+The five int32s at `+0x708..+0x718` are written as one block from the returned
+struct, then the validity flag is set — exactly the layout the reader consumes.
+
+`0x1f63148` is **`MeasureSharpnessRaw`**, in
+`googlex/gcam/hdrplus/base_frame/sharpness.cc`. It carries the guard string
+*"MeasureSharpnessRaw called with non-Bayer image, which is not supported"* and
+tests the image layout at entry (`bl 0x2c8aa0c; cmp w0,#1; b.ne <error>`).
+
+This closes section 14's inference with a name: the classification is produced by
+a **Bayer-aware CPU measurement over the raw image**. It is not a GPU path, not a
+texture read, and cannot involve the missing aion library.
+
+### The sampling region is an explicit rectangle, and it is not per-frame
+
+`MeasureSharpnessRaw` takes a region of interest as argument `x1` — four int32 —
+and intersects it with the full image rect built from the image's own width and
+height (`0x2c8a954`, `0x2c8a9b0`), rejecting an empty intersection:
+
+    ldp  w8, w10, [x25]      ; ROI x0, y0
+    ldp  w11, w12, [x25, #8] ; ROI x1, y1
+    cmp  w8, w0  / csel ...  ; clamp against image bounds
+
+At the call site the ROI is `ldr q0, [x27]` with `x27 = x19 + 0x16d8` — a
+**persistent field of the shot context**, not recomputed per frame. No direct
+store to `+0x16d8` exists anywhere in `.text` on a non-`SP` base, so it is
+populated by a bulk struct initialisation or through a pointer to an inner
+parameter block. Resolving that is one further hop and was not taken here.
+
+### What this establishes, and what it does not
+
+Established: the verdict is `all_black`, produced by `MeasureSharpnessRaw` from
+the Bayer raw image on the CPU, over an explicit ROI held in the shot context and
+clamped to the image bounds.
+
+Not established: the ROI's actual value, and therefore whether the fold explains
+the verdict. The mechanism is now plausible in a specific way rather than a
+general one — a frame whose content is confined to rows `0..769` of 3072 is black
+across the remaining 74.93 % of its raster, so any ROI not concentrated in that
+top band reads black. The centre row of a 3072-row frame is 1536, which the
+measured fold leaves black. **That remains a hypothesis.** Confirming it requires
+the ROI value, which is the next slice and is still host-side.
+
+`EV-44` still owed. `FIND-3.5-01` and `FIND-4.5-02` remain **OPEN**. Nothing in
+this run is an image fix.
