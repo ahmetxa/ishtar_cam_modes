@@ -1006,8 +1006,17 @@ being `com.google.internal.SensorBinningMode`. The only consumer of that field i
 ```
 
 AGC enumerates the keys the device advertises and writes `SensorBinningMode`
-**only if the device advertises it.** That tag is Google-internal; ishtar runs
-Qualcomm CamX and does not publish it, so the branch is never taken.
+**only if the device advertises it.** Supporting measurement: a string scan of
+both vendor HAL binaries (`enable` and `disable`, and the module's `root/odm`
+copy) returns **zero** occurrences of `com.google.internal` — the tag namespace
+is absent from CamX entirely, not merely this one key.
+
+That scan covers `camera.qcom.so` only. A vendor tag could in principle be
+published by a separate tag-provider library, so this is strong evidence rather
+than proof; confirming it costs one `dumpsys media.camera` grep on the device and
+has not been spent. Either way the write is conditional, so **the worst case is
+that AGC sets a binning mode it was already able to set** — it is not a silent
+forced-binning path.
 
 **Consequence: AGC does not and cannot select the sensor readout mode.** The
 binned delivery is decided entirely below the application. This is the app-side
