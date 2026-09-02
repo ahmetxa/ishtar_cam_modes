@@ -285,7 +285,7 @@ there was none.
 
 ---
 
-## 11. Correction: the artifact state is the SEVEN-word stack (`IMPL-32`, 2026-09-02)
+## 11. Correction: the artifact state is the SEVEN-word stack (`IMPL-33`, 2026-09-02)
 
 This document originally labelled the `21:10` and `21:11` captures as the
 *five-word* stack. That label is **wrong**, and it is corrected above.
@@ -299,7 +299,7 @@ and the measurement contract requires a bracket around every device change. So
 both were taken in the full stack.
 
 The arithmetic agrees: raw50 (4 words) + pixelarray (1) + activearray (2) = **7**,
-which is what `IMPL-30` recorded and what `IMPL-32` reproduced to the same md5. A
+which is what `IMPL-30` recorded and what `IMPL-33` reproduced to the same md5. A
 genuine five-word state (raw50 + pixelarray, no active-array raise) is coherent
 and may have existed earlier in that session, but **no capture in hand belongs to
 it**.
@@ -312,7 +312,7 @@ the wrong HAL and measure the wrong thing.
 
 ---
 
-## 12. Live results (`F4.6-05`, `F4.6-06`) -- `IMPL-32`, 2026-09-02
+## 12. Live results (`F4.6-05`, `F4.6-06`) -- `IMPL-33`, 2026-09-02
 
 State under test reproduced bit-for-bit: `fe0245a4...` (fullres) + 7 words ->
 `c094101de0184e9216a57020873bac0b`, the md5 `IMPL-30` pre-committed. Trap cleared

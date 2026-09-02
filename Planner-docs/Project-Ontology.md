@@ -263,6 +263,44 @@ This confirms, by measurement rather than inference, that **`S+0x3c1c` holds `81
 
 **Toolchain negative findings** (each cost real time): apktool's bundled smali `Main` classes are stripped stubs and cannot be invoked; `com.android.tools.smali` Maven paths return 404; the Bitbucket mirror returns 403; google/smali publishes no release binaries; **radare2 and rabin2 5.9.8 do not complete on this 27 MB binary** (no output in 300 s, from either shell).
 
+### The emission sites inside `InitializeScalerStaticCaps` (IMPL-33 / Faz 4.1, 2026-09-02)
+
+**Static analysis on the `fullres` base** `fe0245a4720fb07b01d96deef47f5569`, pulled read-only from `/odm/lib64/hw/camera.qcom.so`. The function disassembles to **6,516 instructions** over `0x16bf4c0` … `0x16c5a90`, which reproduces the recorded count exactly and confirms the bounds independently. All four patch-table indices decode to the recorded stock bytes at the recorded addresses, so the table and the binary confirm each other.
+
+**The four `cmp wN,#2` sites are not four copies of one thing. They are two different arrays.**
+
+| Site | Address | Writes to | Entry | Metric it moves |
+|---|---|---|---|---|
+| 1 | `0x16c18dc` | `[x?+0xb10]`, stride **16** | `{format, w27, w22, 0}` | `android.scaler.availableStreamConfigurations` |
+| 2 | `0x16c1c18` | `[x?+0xb10]`, stride **16** | `{format, w27, w22, 0}` | same |
+| 3 | `0x16c22bc` | `[x?+0x6f30]`, stride **32** | four 8-byte fields, one of them `1000000000 / x10` | a **duration** table |
+| 4 | `0x16c2330` | `[x?+0x6f48…0x6f60]`, stride **32** | same shape | a **duration** table |
+
+`0x3b9aca00` = 1e9 appears at `0x16c229c`/`0x16c22a0` and is divided by a per-mode value at `0x16c22a4` — a frame duration in nanoseconds. **Only sites 1 and 2 can move the `streamcfg` metric; sites 3 and 4 belong to `availableMinFrameDurations` / `availableStallDurations`, which is Faz 4.2's subject.** This is a live-testable prediction, not yet measured.
+
+**F4.1-02 — the resolution IS reachable at the gate sites.** The emit block at `0x16c1a8c` writes the entry as `stp w0, w27, [x2]` ; `stp w22, wzr, [x2, #8]`, so **`w0` = format, `w27` = width, `w22` = height, `w0`…`w22` all live in registers at the gate**. Site 2's emit block at `0x16c1c30` is identical (`stp w12, w27` ; `stp w22, wzr`). The risk that "the resolution is not reachable at the gate sites, so a guard cannot be placed there" is **retired by measurement**. `w27`/`w22` are also read as divisors at `0x16c1908` and `0x16c1920`, confirming they carry the loop's current resolution rather than a scratch value.
+
+**The gate has TWO predecessors, and a guard must sit where they converge.** Path A falls through `0x16c18d4`; path B is a logging call (`bl 0x19615a8` at `0x16c19e4`, with `w27`, `w22` pushed as varargs) that rejoins by `tbnz w14,#0, #0x16c18d8` at `0x16c1a00`. Path B is taken when `[x3+0x2a]` bit 0 is set **or** `[x25] == 0` — data-dependent, so it is not a cold path and cannot be ignored.
+
+**Four instruction slots before each gate are dead — but only on the `fullres` base.** At site 1, `0x16c18c0` `mov w10,#0` is `hal-fullres.patch` index `5965360`; the next four instructions are `cmp w10,#1` ; `cset w25,ne` ; `orr w14,w25,w19` ; `tbz w14,#0`. With `w10` forced to 0 the `cset` is constant 1, so `w14` bit 0 is always 1 and the `tbz` is never taken. `w25` is redefined at `0x16c1904` and `w14` at `0x16c19fc` before any later read, so both are dead. Site 2 has the same shape at `0x16c1bfc` (index `5965567`), and path B has it at `0x16c19ec` (index `5965435`). **These slots exist because of the fullres patch. A guard built on them is valid on the `fullres` base only and must never be replayed onto stock.**
+
+**F4.1-03 — the guard design, verified by encoding.** `ccmp` takes only a 5-bit immediate, so the 8192 test cannot be a `ccmp`; it must be a real `cmp`, which does reach 8192 as `#2, lsl #12`. That fixes the order: compute the format offset, `cmp` the width, `ccmp` the format range, branch.
+
+| Slot | Instruction | Word | Escape |
+|---|---|---|---|
+| `0x16c18c8` | `sub  w11, w0, #0x22` | `5100880B` | `\013\210\000\121` |
+| `0x16c18cc` | `cmp  w27, #2, lsl #12` | `71400B7F` | `\177\013\100\161` |
+| `0x16c18d0` | `ccmp w11, #5, #2, eq` | `7A450962` | `\142\011\105\172` |
+| `0x16c18d4` | `b.lo #0x16c1a8c` | `54000DC3` | `\303\015\000\124` |
+
+Every word was round-tripped through capstone at its intended address; the branch offsets resolve to the intended targets. On the `eq` side (width 8192) the `ccmp` compares the format offset against 5, so `b.lo` admits `0x22`…`0x26`. On the `ne` side it forces `nzcv = 2`, i.e. `C = 1`, so `b.lo` is **not** taken and control falls into the untouched stock gate at `0x16c18d8` (`cmp w11,#2`), which keeps `0x22`…`0x23` at every resolution. **The stock `cmp` at `0x16c18dc` is therefore reverted to `#2`; the widening moves into the guarded block.** Path B needs the same four words plus `b #0x16c18d8` (`17FFFFB6`, `\266\377\377\027`) replacing its `tbnz`, and its `b.lo` is `54000483` (`\203\004\000\124`) from `0x16c19fc`.
+
+**The design fits the patch-table format.** Every entry is a single 4-byte-aligned word replacement at a stated index, which is exactly what `docs/patch-table-format.md` allows; no instruction is inserted and no control flow is relocated. The table grows from 4 entries to roughly 10 per streamcfg site.
+
+**One consequence to state rather than discover.** The guard compares against the literal 8192, so it narrows **every** camera id to RAW-at-8192x6144. The front cameras (`hal1`, `hal8`, `hal9`, pixel array `[3264 2448]`) have a different full-resolution dimension and would gain no RAW rows at all. That matches Phase 4's stated goal — the QCFA full-resolution dimension only — but it is a behavioural change on ids the project has never targeted, and Faz 4.4's per-camera-id consistency table is where it should be checked.
+
+**Toolchain correction.** The address book records `capstone`/`pyelftools` as "not yet installed". Measured 2026-09-02: **capstone 5.0.7 and pyelftools are both installed** and the disassembly path runs. Also: do not name a disassembly helper script `dis.py` — it shadows the stdlib `dis` module that `capstone` imports through `inspect`, and the failure surfaces as a confusing circular-import `AttributeError` on `capstone.Cs`.
+
 ### The corrupt-frame geometry model (IMPL-31 / Faz 4.6, 2026-09-01)
 
 **The artifact is a half-width payload written linearly into a full-width raster.** Confirmed on three captures across two HAL states and two raster sizes, with an inverse control that round-trips byte-identically. Full record: `docs/raw-geometry-diagnosis.md`. Tool: `agc-50mp-yama/tools/frame_geometry.py`.
