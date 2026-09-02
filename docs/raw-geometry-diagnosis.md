@@ -650,3 +650,102 @@ the ROI value, which is the next slice and is still host-side.
 
 `EV-44` still owed. `FIND-3.5-01` and `FIND-4.5-02` remain **OPEN**. Nothing in
 this run is an image fix.
+
+## 16. Correction: the rejected frames were half-resolution frames (`IMPL-38`, 2026-09-02)
+
+Sections 13 to 15 all rest on a premise taken from `IMPL-35`: that the capture
+which libgcam rejected 15/15 was running on a stream configured at 8192x6144.
+**That premise is wrong, and `IMPL-35`'s own log disproves it.** No new capture
+was needed to establish this — only reading the whole log in order rather than
+by pattern.
+
+### The configure line `IMPL-35` cited postdates the capture
+
+`IMPL-35` paired its `getImageReaderFormat RAW10 8192x6144` with a cameraserver
+line reading `width 8192 height 6144` and concluded the stream was configured at
+full resolution without clamping. In chronological order the log reads:
+
+| log line | time | event |
+|---|---|---|
+| 1033 | `19:30:54.631` | AGC `getImageReaderFormat RAW10 8192x6144` |
+| 1084 | `19:30:54.689` | cameraserver configures **4096x3072** |
+| 5368 | `19:30:59.731` | AGC `startShotCaptureInternal` — **the only shot in the log** |
+| 5421 | `19:30:59.788` | libgcam `BuildPayloadBurstSpec` |
+| 6027..6041 | `19:31:01.122` | 15x `all-zero green` |
+| 6173..6799 | `19:31:01.341`..`19:31:02.415` | 15x `MapFrameToTexture: SABRE` |
+| 11219 | `19:31:51.552` | AGC restarts, requests 8192x6144 again |
+| 11250 | `19:31:51.573` | cameraserver configures **8192x6144** — *first time* |
+| 15176 | `19:32:02.794` | cameraserver configures 8192x6144 |
+| 17660 | `19:32:04.198` | cameraserver configures 8192x6144 |
+
+The stream in force for the capture was the one configured at `19:30:54.689`:
+**4096x3072**. The earliest 8192x6144 configuration is at `19:31:51.573`, **fifty
+seconds after** the frames were already rejected, and belongs to a later AGC
+session.
+
+### No shot was ever taken on the full-resolution stream
+
+`startShotCaptureInternal` occurs **exactly once** in 44,246 lines, at
+`19:30:59.731`. `BuildPayloadBurstSpec` likewise occurs once. After each of the
+three 8192x6144 configurations the log shows only `setCameraCaptureSession`
+lines — session setup and preview. There is no shot marker, no payload burst and
+no verdict of any kind after `19:31:02`.
+
+**So the run never captured a photo on an 8192x6144-configured stream.** The one
+capture it did take ran at 4096x3072 and was rejected.
+
+### The same shape occurs in an earlier, undocumented session
+
+`/data/local/tmp/f46c.log` covers `16:55`–`17:05`, a session with no snapshot in
+the repository, sitting between `IMPL-33`'s 14:20 revert and the 17:40 bracket.
+It contains the identical sequence:
+
+- `17:00:18.499` — AGC `getImageReaderFormat RAW10 8192x6144`
+- `17:00:18.542` — cameraserver configures **4096x3072**
+- `17:00:32.616` — 15x `all-zero green`
+- `17:00:32.873`..`17:00:33.979` — 15x `MapFrameToTexture: SABRE`
+
+Two independent sessions, two and a half hours apart, produce the same request,
+the same clamp to 4096x3072, and the same 15/15 `all_black` rejection.
+
+This discharges the first caveat carried into this run. The concern was that
+`IMPL-33`'s surviving 37-line excerpt contained no `all-zero green` line and so
+could not show whether the condition predated full resolution. It did predate it:
+the condition is present in a half-resolution-configured session, and in fact
+**every** rejection on record was measured on a 4096x3072 stream. The claim
+"all-zero green is new at full resolution" is not merely unsupported — the
+evidence runs the other way.
+
+### What this corrects, and what it leaves standing
+
+Corrected: `IMPL-35`'s statement that "cameraserver configures that stream
+without clamping" is not supported by its own log. The clamp to 4096x3072 did
+occur, for the only capture taken. The saved **3072x4096 = 12.6 MP** JPEG is
+therefore not a *fallback* from a full-resolution attempt — it is the ordinary
+output of a capture configured at 4096x3072, and needs no fallback to explain it.
+
+Left standing: sections 14 and 15 are unaffected in their mechanics. `SABRE` is
+still excluded by ordering and by thread; the verdict is still `all_black`
+produced by `MeasureSharpnessRaw` from the Bayer raw on the CPU. What changes is
+only *which frames* were classified — half-resolution ones.
+
+Also left standing, and now sharper: the fold. Section 13 measured the artifact's
+content as confined to rows `0..769` of 3072 with the raster **74.93 %** black.
+That measurement was made on a 4096x3072 frame, which is exactly the geometry the
+capture actually ran at, so the fold and the `all_black` verdict describe the same
+frames rather than two different populations.
+
+**`EV-44` is not merely still owed. The experiment it names — an AGC capture on a
+stream actually configured at 8192x6144 — has never been performed.** The request
+side reaches full resolution; the configuration side has not, on any capture on
+record.
+
+Not established: why cameraserver clamps to 4096x3072 at configure time despite
+the request, and whether `pref_48m_key` bears on it. The 17:00 session already
+requested 8192x6144, which is evidence against `pref_48m_key` being what opens
+the request — but the preference state at 17:00 is **not recorded** in the
+repository (the brackets track only the trap keys), so that comparison is not
+sound yet and no claim is made from it here.
+
+`FIND-3.5-01` and `FIND-4.5-02` remain **OPEN**. Nothing in this run is an image
+fix.
