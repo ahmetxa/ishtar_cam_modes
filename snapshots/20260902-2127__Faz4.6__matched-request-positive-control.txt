@@ -1,0 +1,128 @@
+# Faz 4.6 / IMPL-40 -- POSITIVE CONTROL: matched request produces a clean image
+# Source: logcat ring buffer dumped on device immediately after the user's 21:26 capture.
+#   /data/local/tmp/f46-ev44.log -- 332,202 lines, 19:30:10 - 21:27:50 (spans IMPL-35 too).
+# Measured JPEGs (PIL, grayscale, threshold <4):
+#   19:31 MISMATCH  3072x4096  12.6 MP  black_px = 0.7498
+#   21:27 MATCHED   3072x4096  12.6 MP  black_px = 0.0024
+# NOTE: black_rows reads 0 in both because the JPEG is stored rotated 90 deg;
+#       the fold lies along columns in that orientation. black_px is orientation-free.
+
+== log span ==
+--------- beginning
+09-02 19:30:10.901 
+09-02 21:27:50.822 
+
+== counts ==
+  [startShotCaptureInternal] 2
+  [getImageReaderFormat] 6
+  [all-zero green] 15
+  [MapFrameToTexture] 30
+  [roundBufferDimensionNearest] 12
+  [Invalid mesh] 4
+  [BuildPayloadBurstSpec] 2
+
+== startShotCaptureInternal ==
+5368:09-02 19:30:59.731  2814  3498 W AGC     : startShotCaptureInternal
+302123:09-02 21:26:59.923 15022 15481 W AGC     : startShotCaptureInternal
+
+== getImageReaderFormat ==
+1033:09-02 19:30:54.631  2814  2870 W AGC     : getImageReaderFormat ImageReaderFormat{ImageFormat=RAW10, Size=8192x6144}
+11219:09-02 19:31:51.552  2814  2870 W AGC     : getImageReaderFormat ImageReaderFormat{ImageFormat=RAW10, Size=8192x6144}
+15077:09-02 19:32:02.763  2814  2870 W AGC     : getImageReaderFormat ImageReaderFormat{ImageFormat=RAW10, Size=8192x6144}
+17572:09-02 19:32:04.158  6203  6300 W AGC     : getImageReaderFormat ImageReaderFormat{ImageFormat=RAW10, Size=8192x6144}
+296401:09-02 21:26:52.612 15022 15084 W AGC     : getImageReaderFormat ImageReaderFormat{ImageFormat=RAW10, Size=4096x3072}
+306391:09-02 21:27:11.172 15022 15084 W AGC     : getImageReaderFormat ImageReaderFormat{ImageFormat=RAW10, Size=4096x3072}
+
+== roundBufferDimensionNearest (YUV, format 35) ==
+1075:09-02 19:30:54.686 32410 32450 I cameraserver: Bypass roundBufferDimensionNearest width 640 height 480 for format 35
+1084:09-02 19:30:54.689 32410 32450 I cameraserver: Bypass roundBufferDimensionNearest width 4096 height 3072 for format 35
+11250:09-02 19:31:51.573 32410 32450 I cameraserver: Bypass roundBufferDimensionNearest width 8192 height 6144 for format 35
+11255:09-02 19:31:51.574 32410 32450 I cameraserver: Bypass roundBufferDimensionNearest width 640 height 480 for format 35
+15176:09-02 19:32:02.794 32410  3601 I cameraserver: Bypass roundBufferDimensionNearest width 8192 height 6144 for format 35
+15182:09-02 19:32:02.795 32410  3601 I cameraserver: Bypass roundBufferDimensionNearest width 640 height 480 for format 35
+17660:09-02 19:32:04.198 32410  3991 I cameraserver: Bypass roundBufferDimensionNearest width 8192 height 6144 for format 35
+17665:09-02 19:32:04.199 32410  3991 I cameraserver: Bypass roundBufferDimensionNearest width 640 height 480 for format 35
+296465:09-02 21:26:52.658  7625  7672 I cameraserver: Bypass roundBufferDimensionNearest width 640 height 480 for format 35
+296472:09-02 21:26:52.660  7625  7672 I cameraserver: Bypass roundBufferDimensionNearest width 4096 height 3072 for format 35
+306447:09-02 21:27:11.196  7625 14860 I cameraserver: Bypass roundBufferDimensionNearest width 640 height 480 for format 35
+306459:09-02 21:27:11.198  7625 14860 I cameraserver: Bypass roundBufferDimensionNearest width 4096 height 3072 for format 35
+
+== all-zero green: first 3 and last 1 ==
+6027:09-02 19:31:01.122  2814  2946 E libgcam : [shot_process.cc:392]: PrepShot: Bad frame with all-zero green pixels (timestamp 89216793041725)
+6028:09-02 19:31:01.122  2814  2946 E libgcam : [shot_process.cc:392]: PrepShot: Bad frame with all-zero green pixels (timestamp 89216853149642)
+6029:09-02 19:31:01.122  2814  2946 E libgcam : [shot_process.cc:392]: PrepShot: Bad frame with all-zero green pixels (timestamp 89216913257506)
+6041:09-02 19:31:01.122  2814  2946 E libgcam : [shot_process.cc:392]: PrepShot: Bad frame with all-zero green pixels (timestamp 89217634552194)
+
+== other gcam verdicts / shot outcome ==
+6027:09-02 19:31:01.122  2814  2946 E libgcam : [shot_process.cc:392]: PrepShot: Bad frame with all-zero green pixels (timestamp 89216793041725)
+6028:09-02 19:31:01.122  2814  2946 E libgcam : [shot_process.cc:392]: PrepShot: Bad frame with all-zero green pixels (timestamp 89216853149642)
+6029:09-02 19:31:01.122  2814  2946 E libgcam : [shot_process.cc:392]: PrepShot: Bad frame with all-zero green pixels (timestamp 89216913257506)
+6030:09-02 19:31:01.122  2814  2946 E libgcam : [shot_process.cc:392]: PrepShot: Bad frame with all-zero green pixels (timestamp 89216973365423)
+6031:09-02 19:31:01.122  2814  2946 E libgcam : [shot_process.cc:392]: PrepShot: Bad frame with all-zero green pixels (timestamp 89217033473287)
+6032:09-02 19:31:01.122  2814  2946 E libgcam : [shot_process.cc:392]: PrepShot: Bad frame with all-zero green pixels (timestamp 89217093581204)
+6033:09-02 19:31:01.122  2814  2946 E libgcam : [shot_process.cc:392]: PrepShot: Bad frame with all-zero green pixels (timestamp 89217153689069)
+6034:09-02 19:31:01.122  2814  2946 E libgcam : [shot_process.cc:392]: PrepShot: Bad frame with all-zero green pixels (timestamp 89217213796985)
+6035:09-02 19:31:01.122  2814  2946 E libgcam : [shot_process.cc:392]: PrepShot: Bad frame with all-zero green pixels (timestamp 89217273904850)
+6036:09-02 19:31:01.122  2814  2946 E libgcam : [shot_process.cc:392]: PrepShot: Bad frame with all-zero green pixels (timestamp 89217334012767)
+6037:09-02 19:31:01.122  2814  2946 E libgcam : [shot_process.cc:392]: PrepShot: Bad frame with all-zero green pixels (timestamp 89217394120631)
+6038:09-02 19:31:01.122  2814  2946 E libgcam : [shot_process.cc:392]: PrepShot: Bad frame with all-zero green pixels (timestamp 89217454228548)
+6039:09-02 19:31:01.122  2814  2946 E libgcam : [shot_process.cc:392]: PrepShot: Bad frame with all-zero green pixels (timestamp 89217514336412)
+6040:09-02 19:31:01.122  2814  2946 E libgcam : [shot_process.cc:392]: PrepShot: Bad frame with all-zero green pixels (timestamp 89217574444329)
+6041:09-02 19:31:01.122  2814  2946 E libgcam : [shot_process.cc:392]: PrepShot: Bad frame with all-zero green pixels (timestamp 89217634552194)
+10376:09-02 19:31:09.012  2814  3166 W CAM_A   : BufferFlinger is not available. Aborting display.
+14475:09-02 19:31:56.272  2814  3166 W CAM_A   : BufferFlinger is not available. Aborting display.
+165907:09-02 19:36:40.797  6203  6505 W CAM_A   : BufferFlinger is not available. Aborting display.
+165908:09-02 19:36:40.797  6203  6505 W CAM_A   : BufferFlinger is not available. Aborting display.
+305947:09-02 21:27:07.144 15022 15252 W CAM_A   : BufferFlinger is not available. Aborting display.
+
+
+### SESSION DETAIL ###
+
+== MapFrameToTexture: first and last of each cluster ==
+6173:09-02 19:31:01.341  2814  2949 E libgcam : [hardware_buffer_map.cc:66]: MapFrameToTexture: SABRE: Cannot get file descriptor from opaque_handle
+6799:09-02 19:31:02.415  2814  2949 E libgcam : [hardware_buffer_map.cc:66]: MapFrameToTexture: SABRE: Cannot get file descriptor from opaque_handle
+302799:09-02 21:27:01.315 15022 15150 E libgcam : [hardware_buffer_map.cc:66]: MapFrameToTexture: SABRE: Cannot get file descriptor from opaque_handle
+303009:09-02 21:27:01.610 15022 15150 E libgcam : [hardware_buffer_map.cc:66]: MapFrameToTexture: SABRE: Cannot get file descriptor from opaque_handle
+
+== ALL libgcam ERROR/WARN lines in 21:26-21:28 window ==
+09-02 21:26:52.546 15022 15081 W AGC     : load gcam library gcastartup
+09-02 21:26:59.990 15022 15481 W libgcam : [pipeline_manager.cc:539]: BuildPayloadBurstSpec: BuildPayloadBurstSpecOptions requested driver AE be used, but it is invalid. Falling back to computing AE from raw frame.
+09-02 21:27:01.199 15022 15144 W libgcam : [shot_helper.cc:352]: LogViewfinderAeWarnings: viewfinder_short_tet (0.000ms) is further than expected from the capture TET (2055.600ms). Relative error: 100%.
+
+== AGC lines around the 21:26 shot (setShasta, sizes, save) ==
+09-02 21:26:52.460 15022 15022 D AGC     : initDevice MANUFACTURER:Xiaomi DEVICE:ishtar MODEL:2304FPN6DC BRAND:Xiaomi BOARD:kalama HARDWARE:qcom SDK_INT:35
+09-02 21:26:52.612 15022 15084 W AGC     : getImageReaderFormat ImageReaderFormat{ImageFormat=RAW10, Size=4096x3072}
+09-02 21:26:52.630 15022 15084 D AGC     : getStreamMode 0
+09-02 21:26:52.647 15022 15022 D AGC     : SENSOR_INFO_PHYSICAL_SIZE >= width:13.1072 height:9.8304
+09-02 21:26:52.653 15022 15022 I AGC     : HDR+ Model CameraID:2 raven => raven
+09-02 21:26:52.665 15022 15022 D AGC     : SENSOR_INFO_PHYSICAL_SIZE >= width:4.582656 height:3.436992
+09-02 21:26:52.668 15022 15022 I AGC     : HDR+ Model CameraID:2 raven => raven
+09-02 21:26:52.688 15022 15084 D AGC     : HdrPlusSession Created
+09-02 21:26:52.695 15022 15084 W AGC     : Focus-Tracking in Photo/Video mode false false
+09-02 21:26:52.697 15022 15084 W AGC     : Focus-Tracking in Photo/Video mode false false
+09-02 21:26:59.923 15022 15481 W AGC     : startShotCaptureInternal
+09-02 21:26:59.926 15022 15481 D AGC     : new ShotParams
+09-02 21:26:59.933 15022 15481 D AGC     : createAeShotParams
+09-02 21:26:59.974 15022 15481 D AGC     : ShotParams_shasta_force_set false
+09-02 21:26:59.975 15022 15481 D AGC     : setShasta rawFormat = RAW10(37)
+09-02 21:27:02.027 15022 15546 D AGC     : JPGQuality JpegUtilNative->a() 97
+09-02 21:27:11.172 15022 15084 W AGC     : getImageReaderFormat ImageReaderFormat{ImageFormat=RAW10, Size=4096x3072}
+09-02 21:27:11.180 15022 15084 D AGC     : getStreamMode 0
+09-02 21:27:11.188 15022 15084 D AGC     : HdrPlusSession Created
+09-02 21:27:11.190 15022 15084 W AGC     : Focus-Tracking in Photo/Video mode false false
+
+== Invalid mesh occurrences ==
+7595:09-02 19:31:03.810  2814  2947 E native  : E0902 19:31:03.810112    2947 mesh_warper_utils.cc:86] Invalid mesh: [4096,3072]
+7596:09-02 19:31:03.810  2814  2842 E GoLog   : E0902 19:31:03.810112    2947 mesh_warper_utils.cc:86] Invalid mesh: [4096,3072]
+303223:09-02 21:27:01.993 15022 15148 E native  : E0902 21:27:01.993580   15148 mesh_warper_utils.cc:86] Invalid mesh: [4096,3072]
+303224:09-02 21:27:01.993 15022 15057 E GoLog   : E0902 21:27:01.993580   15148 mesh_warper_utils.cc:86] Invalid mesh: [4096,3072]
+
+== newest photos on device ==
+-rwxrwx--- 1 u0_a297 media_rw  8163101 2026-09-02 16:56 IMG_20260902_165610.jpg
+drwxrws--- 2 u0_a297 media_rw     3452 2026-08-12 13:02 Raw
+-rwxrwx--- 2 u0_a297 media_rw  8987209 2026-08-20 16:34 VID_20260820_163425.mp4
+-rwxrwx--- 2 u0_a297 media_rw 36024175 2026-08-20 16:34 VID_20260820_163436.mp4
+-rwxrwx--- 2 u0_a297 media_rw 16285391 2026-09-01 14:50 VID_20260901_145047.mp4
+-rwxrwx--- 2 u0_a297 media_rw  7046952 2026-09-01 14:50 VID_20260901_145054.mp4
+-rwxrwx--- 2 u0_a297 media_rw  7125774 2026-09-01 14:53 VID_20260901_145337.mp4
+-rwxrwx--- 2 u0_a297 media_rw 19969975 2026-09-01 14:53 VID_20260901_145343.mp4

@@ -856,3 +856,91 @@ configuring 4096x3072, so the request and the configuration move independently.
 
 `FIND-3.5-01` and `FIND-4.5-02` remain **OPEN**. Nothing in this run is an image
 fix.
+
+## 18. The positive control: the fault is a request/delivery mismatch (`IMPL-40`, 2026-09-02)
+
+The user took a photo at `21:26:59`. It was **not** `EV-44` — AGC was in
+half-resolution mode and requested `RAW10 4096x3072`, not `8192x6144`. It is
+something the project had never obtained and needed more: **a successful AGC
+capture through the same stack, logged the same way.** It closes the diagnosis.
+
+### The comparison
+
+The logcat ring buffer was dumped immediately after the shot and still contained
+`IMPL-35`'s session, so both captures are measured from one log, one device
+state, one instrumentation.
+
+| capture | AGC `getImageReaderFormat` | cameraserver YUV | match | `all_black` | saved JPEG |
+|---|---|---|---|---|---|
+| `17:00:31` | RAW10 **8192x6144** | 4096x3072 | **no** | **15/15** | folded |
+| `19:30:59` | RAW10 **8192x6144** | 4096x3072 | **no** | **15/15** | folded |
+| **`21:26:59`** | RAW10 **4096x3072** | 4096x3072 | **yes** | **0** | **clean** |
+
+Measured on the JPEGs themselves (PIL, grayscale, threshold < 4):
+
+- `19:31` artifact — 3072x4096, 12.6 MP, black pixels **0.7498**
+- `21:27` artifact — 3072x4096, 12.6 MP, black pixels **0.0024**
+
+Identical dimensions and identical megapixels. The only variable that moved is
+whether the requested reader size matched the delivered buffer.
+
+### The mechanism, now closed
+
+`1 - 1/4 = 0.75`. A `4096x3072` payload placed into a raster the consumer
+believes is `8192x6144` fills exactly one quarter of it — `12.58` MP of `50.33`
+MP — leaving **three quarters black**. The measured `0.7498` is that number.
+
+So the chain runs:
+
+1. AGC opens a `RAW10` `ImageReader` at `8192x6144`.
+2. The stack delivers `4096x3072` buffers regardless.
+3. gcam reads the payload at the `8192`-wide stride it was promised, so the
+   content lands in one quarter of the raster and the rest is zero.
+4. `MeasureSharpnessRaw` (section 15) reads the Bayer green channel on the CPU,
+   finds it zero, and returns **`all_black`**.
+5. `PrepShot` rejects 15 of 15 candidate frames (section 14).
+6. The saved image carries the fold.
+
+**The fault is not full resolution. It is the mismatch.** Ask for what the stack
+actually delivers and the same pipeline, on the same device state, produces a
+clean 12.6 MP photograph.
+
+### Two earlier findings confirmed by positive control
+
+Both had rested on ordering or on absence of evidence. The successful capture
+converts them into direct observations:
+
+- **`SABRE` is irrelevant to the verdict.** The `21:26` session logged **15**
+  `MapFrameToTexture: SABRE: Cannot get file descriptor from opaque_handle`
+  (`21:27:01.315`–`21:27:01.610`) — the full complement — and produced **zero**
+  rejections and a clean image. Section 14 excluded `SABRE` by timestamp and
+  thread; this settles it by outcome. `lib_aion_buffer.so` remains missing and
+  remains harmless to frame acceptance.
+- **`Invalid mesh: [4096,3072]` is a standing condition, not a symptom.** It
+  appears twice in the successful capture (`21:27:01.993`), exactly as it does in
+  the failed ones. `IMPL-35` reframed it as tracking the un-raised
+  `quadra_cfa.activeArraySize`; a clean photo carrying the same message confirms
+  that reading.
+
+### What this means for the work
+
+**The target moves from the request side to the delivery side.** AGC can already
+ask for `8192x6144` — it did so in six sessions across three launches. Nothing in
+the app or its preferences needs further opening. What has never happened is the
+stack **delivering** an `8192x6144` RAW buffer. Until it does, every
+full-resolution attempt will fold and be rejected in exactly this way, and the
+rejection is a faithful report rather than a bug in gcam.
+
+That is precisely what the HAL stream-configuration work targets, so `Faz4.1` and
+its successors are aimed at the right layer. `EV-44` remains the acceptance test,
+and it is now sharply defined: **a capture in which `getImageReaderFormat` reads
+`8192x6144` and the delivered payload is also `8192x6144`.** Neither of the two
+folded captures met the second half, and the clean one did not attempt the first.
+
+Not established: why the stack delivers `4096x3072` for a `RAW10` reader opened
+at `8192x6144` rather than failing configuration outright, and at which layer
+that substitution happens. The RAW stream's configured dimensions are still never
+logged (section 17), so this needs the HAL side rather than another capture.
+
+`FIND-3.5-01` and `FIND-4.5-02` remain **OPEN** — but `FIND-4.5-02`, the image
+corruption, now has a mechanism rather than a description.
