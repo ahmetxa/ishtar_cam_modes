@@ -1,0 +1,43 @@
+# ishtar device smoke
+# taken   : 2026-09-03T05:59:10Z
+# serial  : dc27e5d0
+# note    : lines above BEGIN COMPARABLE are excluded from diffs
+--- BEGIN COMPARABLE ---
+constants.source                = /data/adb/modules/ishtar_cam_modes (device-installed module)
+module.version                  = v2.1
+module.versionCode              = 12
+mode.file                       = 50mp
+sensor.target                   = /odm/lib64/camera/com.qti.sensormodule.ishtar_semco_imx989_wide.bin
+sensor.live.md5                 = 9e4d0fe1a8bf2eb4146c9917a0ac2c4c
+sensor.live.size                = 1062250 / expected 1062250
+sensor.live.variant             = stock
+sensor.mount.count              = 1
+hal.target                      = /odm/lib64/hw/camera.qcom.so
+hal.live.md5                    = ce419bc901bea61945d166aee11e1ab0
+hal.live.size                   = 27268688 / expected 27268688
+hal.state                       = unrecognized
+hal.mount.count                 = 1
+camera.main.rule                = lowest HAL id with Facing: Back
+camera.main.hal_id              = 0
+camera.hal0   facing=Back  streamcfg=800   pixelArray=[8192 6144] activeArray=[0 0 8192 6144]
+camera.hal1   facing=Front streamcfg=800   pixelArray=[6528 4896] activeArray=[0 0 6528 4896]
+camera.hal10  facing=Back  streamcfg=852   pixelArray=[8192 6144] activeArray=[0 0 8192 6144]
+camera.hal11  facing=Front streamcfg=124   pixelArray=[12000 9000] activeArray=[0 0 12000 9000]
+camera.hal12  facing=Front streamcfg=124   pixelArray=[12000 9000] activeArray=[0 0 12000 9000]
+camera.hal2   facing=Back  streamcfg=868   pixelArray=[8192 6144] activeArray=[0 0 8192 6144]
+camera.hal3   facing=Back  streamcfg=868   pixelArray=[8192 6144] activeArray=[0 0 8192 6144]
+camera.hal4   facing=Back  streamcfg=868   pixelArray=[8192 6144] activeArray=[0 0 8192 6144]
+camera.hal5   facing=Back  streamcfg=868   pixelArray=[8192 6144] activeArray=[0 0 8192 6144]
+camera.hal6   facing=Back  streamcfg=852   pixelArray=[8192 6144] activeArray=[0 0 8192 6144]
+camera.hal7   facing=Back  streamcfg=852   pixelArray=[8192 6144] activeArray=[0 0 8192 6144]
+camera.hal8   facing=Front streamcfg=856   pixelArray=[6528 4896] activeArray=[0 0 6528 4896]
+camera.hal9   facing=Front streamcfg=856   pixelArray=[6528 4896] activeArray=[0 0 6528 4896]
+camera.hal0.stream_config.rows:
+agc.package                     = org.codeaurora.snapcam
+agc.installed                   = yes
+agc.versionName                 = 8.4.300.414775575.18
+agc.versionCode                 = 64764891
+agc.apk.md5                     = ce65f862c990e2acc02be356f75a7122
+prefs.trap.count                = 0
+prefs.trap.keys                 = 
+--- END COMPARABLE ---

@@ -1,0 +1,52 @@
+# ishtar Faz 4.6 -- ULTRA-HIGH-RESOLUTION statik etiket kapisi -- A15 / vauxite
+#
+# DORT SATIR. Ayri tablo; raw50 / pixelarray / activearray tablolarinin
+# USTUNE, yedi-kelime yiginina uygulanir. binsel tablosuyla AYNI ANDA
+# KULLANILAMAZ -- gerekcesi asagida.
+#
+# Ne yapar: her dort noktada
+#     tbz wK, #0x1c, <atla>      ->      nop
+#
+# Neden: dort *MaximumResolution etiketinin yayin kodu ikilide ZATEN
+# VARDIR; calismiyor cunku iki kapiya bagli:
+#     1)  ldr wN,[xM,#0x3d84] ; cmp wN,#1 ; b.ne atla     (binning secici)
+#     2)  tbz wK,#0x1c, atla                              (ozellik biti 28)
+# Kapi 1 su an SAGLANIYOR (sensor binned okuyor, secici=1). Kapi 2
+# saglanmiyor. Bu tablo yalnizca kapi 2'yi kaldirir.
+#
+# Yayinlanacak degerler ZATEN DOGRU -- kod binnenmemis kaynaklardan
+# okuyor, ki "maximum resolution" etiketlerinin tam olarak anlami budur:
+#   0x0166603c -> f000e binningFactor      : sabit mov x13,#0x200000002 = [2,2]
+#   0x0166608c -> f000b activeArraySizeMR  : ldr q5,[x27,x28], x28=0x3c54
+#   0x01666398 -> f000c pixelArraySizeMR   : ldr x5,[x5,x26],  x26=0x3c1c
+# 0x3c54 ve 0x3c1c, projenin kendi hal-activearray / hal-pixelarray
+# yamalarinin BINNENMEMIS (8192x6144) kaynaklar olarak belirledigi
+# ofsetlerin ta kendisidir.
+#
+# DORDUNCU ETIKET (f000d) kapisi 0x016665f0'dadir; yayin kodu 12 KB
+# uzakta, 0x1669acc'de, ve oraya TEK bir oncul dallanir: 0x0166662c
+# b.le. Ayni blok, dikdortgeni binnenmemis piksel dizisine (S+0x3c1c /
+# S+0x3c20) karsi DOGRULAR; yedi-kelime yigini bu ikisini zaten
+# 8192x6144'e cikardigi icin dogrulama gecer.
+#
+# binsel TABLOSUYLA CAKISMA (onemli): hal-binsel-deneme.patch 39 adet
+# [S+0x3d84] okumasini sifirlar; bunlarin ucu (0x0166601c, 0x0166606c,
+# 0x01666378) tam olarak yukaridaki uc noktanin KAPI 1'idir. Secici
+# sifirlanirsa `cmp wN,#1` basarisiz olur ve bu etiketler yayinlanmaz.
+# Yani iki tablo ALTERNATIF stratejilerdir, tamamlayici degil.
+#
+# bicim: <4bayt-indeksi> <stok-escape> <yamali-escape>
+#
+# ONCEDEN TAAHHUT EDILEN md5 (cihaza yazim yapilmadan ONCE, konak
+# tarafinda hesaplandi -- IMPL-23 disiplini):
+#   temel  (fullres + yedi-kelime yigini) md5 c094101de0184e9216a57020873bac0b
+#   sonuc  (+ bu dort satir)                md5 7c4d9117bda6a28274cf246ba4f3fd1e
+#
+# 0x0166603c  tbz -> nop  |  f000e binningFactor            (deger [2,2] sabit)
+5871631 \251\003\346\066 \037\040\003\325
+# 0x0166608c  tbz -> nop  |  f000b activeArraySizeMaxRes    (kaynak S+0x3c54, binnenmemis)
+5871651 \074\001\346\066 \037\040\003\325
+# 0x01666398  tbz -> nop  |  f000c pixelArraySizeMaxRes     (kaynak S+0x3c1c, binnenmemis)
+5871846 \303\350\345\066 \037\040\003\325
+# 0x016665f0  tbz -> nop  |  f000d preCorrActiveArraySizeMR (kaynak S+0x3c24; yayin 0x1669acc, b.le ile)
+5871996 \025\326\345\066 \037\040\003\325

@@ -1488,3 +1488,185 @@ tar -xf /data/local/tmp/agc-shared_prefs.bak-20260902-2240.tar \
 
 Brackets: `20260902-2228__Faz4.6__IMPL42-post-revert` (before) and
 `20260902-2245__Faz4.6__IMPL43-post-EV44-stack-applied` (after).
+
+## 22. `ULTRA_HIGH_RESOLUTION_SENSOR` and the four `*MaximumResolution` tags are enabled (`IMPL-44`, 2026-09-03)
+
+The user asked for the capability and the four tags. **Both are now published.** Two
+claims made in this project's own section-21 follow-up were wrong and are corrected
+first, because the correct reading is what made the work small.
+
+### Two corrections
+
+**"The four tags are never emitted at all, so there is no write site."** Wrong. That
+was inferred from the tags having no values in `dumpsys`. Searching for the tag ids
+as `movz`/`movk` pairs finds emission code for every one of them:
+
+| tag | id | emission site |
+|---|---|---|
+| `binningFactor` | `0xF000E` | `0x1666048` |
+| `activeArraySizeMaximumResolution` | `0xF000B` | `0x1666098` |
+| `pixelArraySizeMaximumResolution` | `0xF000C` | `0x16663A4` |
+| `preCorrectionActiveArraySizeMaximumResolution` | `0xF000D` | `0x1669ACC` |
+
+The code was always there. It was not running.
+
+**"`ULTRA_HIGH_RESOLUTION_SENSOR` does not exist in the binary."** Wrong test. The
+capability enum *names* are resolved by the framework, not the HAL —
+`BACKWARD_COMPATIBLE`, `DYNAMIC_RANGE_TEN_BIT` and `CONSTRAINED_HIGH_SPEED` all
+return **zero** string hits in `camera.qcom.so` while the device advertises all
+three. The capability is a byte value, and value `16` is present in the code.
+
+### One feature bit gates the whole thing
+
+Every piece is guarded by the same test — bit 28 of a feature word reached through
+a four-deep pointer chain — at **18 sites** in the metadata emission region
+`0x1660000`–`0x16b0000`. Three distinct groups sit behind it.
+
+**1. The capability filter itself**, at `0x1669c14`, `0x1669d24`, `0x1669e58`:
+
+```
+cmp  w24, #0x10          ; 16 = ULTRA_HIGH_RESOLUTION_SENSOR
+b.ne <append anyway>     ; any other candidate is appended unconditionally
+tbz  wK, #0x1c, <drop>   ; candidate 16 additionally requires feature bit 28
+ldr  w9, [x6, #0x3d84]   ; ...and a non-zero binning selector
+cbz  w9, <drop>
+```
+
+Value 16 was already in the candidate list. It was only ever being filtered out.
+
+**2. The scaler `MaximumResolution` tables** the framework requires alongside the
+capability — `d0014` streamConfigurations, `d0015` minFrameDurations, `d0016`
+stallDurations, `d0017` inputOutputFormatsMap.
+
+**3. The sensor and sensorInfo `MaximumResolution` tags** — the four requested,
+plus `e001f`/`e000c`/`e000f` opaque-raw, and the lens and HEIC variants.
+
+That grouping is why the patch is all 18 sites rather than the four that were
+asked for: **publishing the capability without the tables is precisely what breaks
+`getStreamConfigurationMap(MAXIMUM_RESOLUTION)` and can drop the camera list.** A
+consistent feature set is safer than a partial one.
+
+### The patch
+
+`agc-50mp-yama/hal-uhrfull-deneme.patch` — 18 rows, each
+
+```
+tbz wK, #0x1c, <skip>      ->      nop
+```
+
+Applied on the seven-word stack. Pre-committed host-side before any device write:
+base `c094101de0184e9216a57020873bac0b` → **`ce419bc901bea61945d166aee11e1ab0`**,
+matched exactly on the device. The binning-selector precondition
+(`[S+0x3d84] == 1`) is **not** touched and is currently satisfied.
+
+### What it produced
+
+`android.request.availableCapabilities` grows from `byte[11]` to `byte[12]` on
+**11 cameras**:
+
+```
+[BACKWARD_COMPATIBLE CONSTRAINED_HIGH_SPEED_VIDEO RAW YUV_REPROCESSING
+ PRIVATE_REPROCESSING READ_SENSOR_SETTINGS MANUAL_SENSOR BURST_CAPTURE
+ MANUAL_POST_PROCESSING ULTRA_HIGH_RESOLUTION_SENSOR STREAM_USE_CASE
+ DYNAMIC_RANGE_TEN_BIT ]
+```
+
+The four requested tags, on 7 cameras, with correct values taken from the
+**unbinned** sources:
+
+```
+android.sensor.info.activeArraySizeMaximumResolution           (f000b) [0 0 8192 6144]
+android.sensor.info.pixelArraySizeMaximumResolution            (f000c) [8192 6144]
+android.sensor.info.preCorrectionActiveArraySizeMaximumResolution (f000d) present
+android.sensor.info.binningFactor                              (f000e) [2 2]
+```
+
+Also now published: `d0014` (`int32[28]`), `d0017` (`int32[12]`),
+`opaqueRawSizeMaximumResolution`, `lens.distortionMaximumResolution`,
+`lens.intrinsicCalibrationMaximumResolution`, and the HEIC `MaximumResolution`
+tables. `availableRequestKeys` grows `135 -> 136`, the new key being
+**`sensor.pixelMode`** — so a client may now legally request
+`MAXIMUM_RESOLUTION`. **Camera enumeration is intact at 13 devices.**
+
+### One real gap, and it is not a gate
+
+`d0015` (`availableMinFrameDurationsMaximumResolution`) and `d0016`
+(`availableStallDurationsMaximumResolution`) are **still absent**. Their gate was
+opened; a third condition stops them:
+
+```
+tbz  w4, #0x1c, skip     ; <- NOPed by this patch
+ldr  x23, [x6, #0x68]
+mov  w2, #0xd444
+ldr  w4, [x23, x2]       ; entry count
+lsl  w3, w4, #2
+cbz  w3, skip            ; <- count is ZERO, so it skips
+```
+
+Their source arrays are **empty data**, not a disabled branch. Filling them means
+generating duration rows, which is `Faz4.2`'s subject, not a one-word patch.
+
+**This leaves a real inconsistency that must stay visible:** the characteristics
+key list advertises `851989` and `851990` while `get()` on them returns null. An
+app that builds a `MAXIMUM_RESOLUTION` stream map may fault on that. The camera
+service itself enumerates fine and ordinary apps are unaffected, but this is a
+known sharp edge until `Faz4.2` lands.
+
+### The image is unchanged, and that is the expected result
+
+A capture in this state (`pref_48m_key=1`, trap 0/12, picture size `8192x6144`):
+
+| capture | JPEG | MP | black |
+|---|---|---|---|
+| `22:42` before this patch | 6144x8192 | 50.33 | 0.7497 |
+| **`08:57` with the capability enabled** | 6144x8192 | 50.33 | **0.7502** |
+
+Identical. `PrepShot` still rejects 15 of 15, and the result metadata still reads
+
+```
+android.sensor.pixelMode            [DEFAULT]
+android.sensor.rawBinningFactorUsed [FALSE]
+```
+
+**Nothing requests the new mode.** AGC is not ultra-high-resolution aware: it opens
+a RAW10 reader and never sets `SENSOR_PIXEL_MODE`. The capability is a
+*precondition*, and it is now satisfied; it is not by itself a fix, and it was
+never going to be one. What changed is that requesting
+`pixelMode = MAXIMUM_RESOLUTION` is now legal on this device, which it was not
+before.
+
+### What this establishes, and what it does not
+
+**Established.** The entire ultra-high-resolution feature exists in CamX behind a
+single bit-28 gate. Opening it at 18 sites publishes the capability on 11 cameras,
+the four requested tags with correct unbinned values, four scaler/sensor
+`MaximumResolution` groups, and `pixelMode` as a request key, without breaking
+enumeration.
+
+**Not established.** Whether a client that actually sets
+`pixelMode = MAXIMUM_RESOLUTION` gets an unbinned sensor readout — nothing has
+tested that, because no installed app requests it. Whether the empty `d0015`/`d0016`
+arrays cause a fault in an app that queries the maximum-resolution stream map.
+Whether the 42 further bit-28 sites outside the metadata region (regions
+`0x17`/`0x18`/`0x19`) are part of the runtime path that would honour the request.
+
+**Next step, sharply defined:** a capture in which `android.sensor.pixelMode` reads
+`MAXIMUM_RESOLUTION` in the result. That needs a client that sets it — AGC will not.
+
+`FIND-3.5-01` and `FIND-4.5-02` remain **OPEN**.
+
+### Device state and conflict note
+
+Live HAL is `ce419bc901bea61945d166aee11e1ab0`. Revert with the table's stock
+column:
+
+```
+sh /data/local/tmp/haltbl.sh /data/local/tmp/hal-uhrfull-deneme.patch 2 \
+   ce419bc901bea61945d166aee11e1ab0 c094101de0184e9216a57020873bac0b
+```
+
+**`hal-binsel-deneme.patch` must not be applied together with this table.** It
+zeroes `[S+0x3d84]` at 39 sites, three of which (`0x0166601c`, `0x0166606c`,
+`0x01666378`) are the binning-selector precondition of these very emissions, and
+the capability filter tests the same selector with `cbz`. Zeroing it removes both
+the tags and the capability. The two tables are alternative strategies.

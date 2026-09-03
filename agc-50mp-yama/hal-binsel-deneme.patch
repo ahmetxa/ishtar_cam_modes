@@ -1,0 +1,118 @@
+# ishtar Faz 4.6 -- binning selector [S+0x3d84] DENEY yamasi -- A15 / vauxite
+#
+# 39 SATIR. Bu tablo AYRI kalir; raw50 / pixelarray / activearray
+# tablolariyla indeks PAYLASMAZ ve onlarin USTUNE uygulanir.
+#
+# Ne yapar: her
+#     ldr wN, [xM, #0x3d84]      ->      mov wN, #0
+#
+# Neden: [S+0x3d84] BINNING SECICISIDIR. Model zaten projenin kendi
+# hal-activearray-deneme.patch basliginda yazili:
+#     f0000: varsayilan S+0x3c54 (binnenmemis); secici==1 ise
+#            S+0x3d98 (binnenmis) UZERINE yazilir
+#     f000a: varsayilan S+0x3c24 ; uzerine S+0x3d88
+# Yani secici sifirlanirsa hicbir tuketici binnenmis dala girmez.
+#
+# SATICI DOGRULAMASI (IMPL-41): Module_Highres_13U_Switcher_A14 ayni
+# mekanizmayi kullanir. O modulun iki ikilisi arasindaki 228 baytlik
+# farkin buyuk bolumu tam olarak budur:
+#     disable/camera.qcom.so : 53 adet  ldr wN,[xM,#0x3d84]
+#     enable /camera.qcom.so :  5 adet  -> 48 tanesi mov wN,#0
+# Yani bu, saticinin BU CIHAZ icin sevk ettigi calisan yuksek-cozunurluk
+# anahtarinin ta kendisidir. Ofsetler TASINMAZ (farkli derleme);
+# buradaki 39 site canli ikili uzerinde yeniden turetilmistir.
+#
+# KAPSAM: 0x007xxxxx: 2 site, 0x012xxxxx: 2 site, 0x016xxxxx: 35 site
+# (bunlarin 24'u metadata yayin bolgesi 0x0166xxxx icinde). Site
+# 0x01662298, projenin kendi activearray yazma yeri 0x016622ac'ye
+# 20 bayt uzakliktadir -- ayni islev bolgesi.
+#
+# GERI ALMA: ayni tablonun stok sutunu geri yazilir (revertbinsel.sh).
+#
+# bicim: <4bayt-indeksi> <stok-escape> <yamali-escape>
+#   indeks = bayt_ofseti / 4  (dd bs=4 seek=<indeks> icin hazir)
+#   escape dizileri printf '%b' ile YAZILDIGI GIBI kullanilir.
+#
+# ONCEDEN TAAHHUT EDILEN md5 (cihaza HICBIR yazim yapilmadan ONCE,
+# konak tarafinda hesaplandi -- IMPL-23 disiplini):
+#   temel  (fullres + yedi-kelime yigini) md5 c094101de0184e9216a57020873bac0b
+#   sonuc  (+ bu 39 satir)                md5 f95397b2954704c221b6fbb0e7efeed4
+#
+# 0x007cb5c4  ldr w12,[x11,#0x3d84] -> mov w12,#0
+2043249 \154\205\175\271 \014\000\200\122
+# 0x007cc094  ldr w12,[x10,#0x3d84] -> mov w12,#0
+2043941 \114\205\175\271 \014\000\200\122
+# 0x012434fc  ldr w12,[x25,#0x3d84] -> mov w12,#0
+4787519 \054\207\175\271 \014\000\200\122
+# 0x01263d00  ldr w3,[x6,#0x3d84] -> mov w3,#0
+4820800 \303\204\175\271 \003\000\200\122
+# 0x0161f098  ldr w8,[x22,#0x3d84] -> mov w8,#0
+5798950 \310\206\175\271 \010\000\200\122
+# 0x0161f0d0  ldr w9,[x22,#0x3d84] -> mov w9,#0
+5798964 \311\206\175\271 \011\000\200\122
+# 0x01662298  ldr w0,[x24,#0x3d84] -> mov w0,#0
+5867686 \000\207\175\271 \000\000\200\122
+# 0x01663778  ldr w24,[x13,#0x3d84] -> mov w24,#0
+5869022 \270\205\175\271 \030\000\200\122
+# 0x016637e0  ldr w8,[x14,#0x3d84] -> mov w8,#0
+5869048 \310\205\175\271 \010\000\200\122
+# 0x01663948  ldr w13,[x15,#0x3d84] -> mov w13,#0
+5869138 \355\205\175\271 \015\000\200\122
+# 0x01664740  ldr w21,[x7,#0x3d84] -> mov w21,#0
+5870032 \365\204\175\271 \025\000\200\122
+# 0x01664b48  ldr w12,[x11,#0x3d84] -> mov w12,#0
+5870290 \154\205\175\271 \014\000\200\122
+# 0x01664bb0  ldr w7,[x22,#0x3d84] -> mov w7,#0
+5870316 \307\206\175\271 \007\000\200\122
+# 0x01665084  ldr w14,[x12,#0x3d84] -> mov w14,#0
+5870625 \216\205\175\271 \016\000\200\122
+# 0x01665328  ldr w10,[x27,#0x3d84] -> mov w10,#0
+5870794 \152\207\175\271 \012\000\200\122
+# 0x01665388  ldr w0,[x0,#0x3d84] -> mov w0,#0
+5870818 \000\204\175\271 \000\000\200\122
+# 0x01665e80  ldr w16,[x1,#0x3d84] -> mov w16,#0
+5871520 \060\204\175\271 \020\000\200\122
+# 0x0166601c  ldr w27,[x4,#0x3d84] -> mov w27,#0
+5871623 \233\204\175\271 \033\000\200\122
+# 0x0166606c  ldr w23,[x27,#0x3d84] -> mov w23,#0
+5871643 \167\207\175\271 \027\000\200\122
+# 0x01666378  ldr w1,[x5,#0x3d84] -> mov w1,#0
+5871838 \241\204\175\271 \001\000\200\122
+# 0x01666448  ldr w27,[x12,#0x3d84] -> mov w27,#0
+5871890 \233\205\175\271 \033\000\200\122
+# 0x01666540  ldr w10,[x26,#0x3d84] -> mov w10,#0
+5871952 \112\207\175\271 \012\000\200\122
+# 0x016665d0  ldr w9,[x28,#0x3d84] -> mov w9,#0
+5871988 \211\207\175\271 \011\000\200\122
+# 0x016679fc  ldr w13,[x7,#0x3d84] -> mov w13,#0
+5873279 \355\204\175\271 \015\000\200\122
+# 0x01667ae0  ldr w10,[x0,#0x3d84] -> mov w10,#0
+5873336 \012\204\175\271 \012\000\200\122
+# 0x01669c18  ldr w9,[x6,#0x3d84] -> mov w9,#0
+5875462 \311\204\175\271 \011\000\200\122
+# 0x01669d28  ldr w7,[x7,#0x3d84] -> mov w7,#0
+5875530 \347\204\175\271 \007\000\200\122
+# 0x01669e5c  ldr w4,[x1,#0x3d84] -> mov w4,#0
+5875607 \044\204\175\271 \004\000\200\122
+# 0x0166c4a8  ldr w1,[x13,#0x3d84] -> mov w1,#0
+5878058 \241\205\175\271 \001\000\200\122
+# 0x0166cb40  ldr w9,[x22,#0x3d84] -> mov w9,#0
+5878480 \311\206\175\271 \011\000\200\122
+# 0x01670b80  ldr w6,[x21,#0x3d84] -> mov w6,#0
+5882592 \246\206\175\271 \006\000\200\122
+# 0x01670c88  ldr w4,[x21,#0x3d84] -> mov w4,#0
+5882658 \244\206\175\271 \004\000\200\122
+# 0x01670e88  ldr w1,[x21,#0x3d84] -> mov w1,#0
+5882786 \241\206\175\271 \001\000\200\122
+# 0x016717f0  ldr w4,[x23,#0x3d84] -> mov w4,#0
+5883388 \344\206\175\271 \004\000\200\122
+# 0x016f00e4  ldr w19,[x20,#0x3d84] -> mov w19,#0
+6012985 \223\206\175\271 \023\000\200\122
+# 0x016f0358  ldr w19,[x20,#0x3d84] -> mov w19,#0
+6013142 \223\206\175\271 \023\000\200\122
+# 0x016f0964  ldr w19,[x20,#0x3d84] -> mov w19,#0
+6013529 \223\206\175\271 \023\000\200\122
+# 0x016f09b0  ldr w14,[x12,#0x3d84] -> mov w14,#0
+6013548 \216\205\175\271 \016\000\200\122
+# 0x016f13e0  ldr w25,[x26,#0x3d84] -> mov w25,#0
+6014200 \131\207\175\271 \031\000\200\122

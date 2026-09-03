@@ -1,0 +1,86 @@
+# ishtar Faz 4.6 -- ULTRA_HIGH_RESOLUTION_SENSOR tam ozellik kapisi
+#                    -- A15 / vauxite
+#
+# 18 SATIR. Ayri tablo; yedi-kelime yiginin USTUNE uygulanir.
+# hal-uhrtags-deneme.patch'in USTKUMESIDIR (o dort satir burada da var).
+# hal-binsel-deneme.patch ile AYNI ANDA KULLANILAMAZ -- gerekce asagida.
+#
+# Ne yapar: metadata yayin bolgesindeki (0x1660000-0x16b0000) HER
+#     tbz wK, #0x1c, <atla>      ->      nop
+#
+# Neden: CamX'te ultra-yuksek-cozunurluk ozelliginin TAMAMI ikilide
+# ZATEN VARDIR ve tek bir ozellik bitine (bit 28) bagli olarak kapalidir.
+# Kapinin ardinda su UC parca bulunur:
+#
+#   1) YETENEK: 0x01669c14 / 0x01669d24 / 0x01669e58
+#        cmp w24, #0x10        <- 16 = ULTRA_HIGH_RESOLUTION_SENSOR
+#        b.ne <kosulsuz ekle>
+#        tbz wK, #0x1c, <dusur> <- ADAY 16 ISE bit 28 sart
+#        ldr w9, [x6, #0x3d84]  <- ve binning secici sifir olmamali
+#        cbz w9, <dusur>
+#      Yani 16 zaten aday listesindedir; yalnizca eleniyordu.
+#
+#   2) SCALER MaximumResolution TABLOLARI (cerceve bunlari ZORUNLU kilar):
+#        d0014 availableStreamConfigurationsMaximumResolution
+#        d0015 availableMinFrameDurationsMaximumResolution
+#        d0016 availableStallDurationsMaximumResolution
+#        d0017 availableInputOutputFormatsMapMaximumResolution
+#
+#   3) SENSOR/SENSORINFO MaximumResolution ETIKETLERI:
+#        f000b activeArraySizeMR, f000c pixelArraySizeMR,
+#        f000d preCorrectionActiveArraySizeMR, f000e binningFactor,
+#        e001f/e000c/e000f opaque-raw MR
+#
+# ONEMLI: yetenegi (1) TABLOLAR (2) OLMADAN yayinlamak, cercevenin
+# MAXIMUM_RESOLUTION StreamConfigurationMap kurulumunu bozar ve kamera
+# sayimini dusurebilir. Bu yuzden tablo KISMI DEGIL, 18 noktanin
+# tamami olarak uygulanir -- tutarli bir ozellik kumesi budur.
+#
+# Kapi 1 (binning secici [S+0x3d84]==1) DOKUNULMAZ ve su an saglaniyor.
+#
+# binsel TABLOSUYLA CAKISMA: hal-binsel-deneme.patch o seciciyi
+# sifirlar; sifirlanirsa hem bu etiketler hem de yetenek DUSER.
+# Iki tablo ALTERNATIF stratejilerdir.
+#
+# bicim: <4bayt-indeksi> <stok-escape> <yamali-escape>
+#
+# ONCEDEN TAAHHUT EDILEN md5 (konak tarafinda, IMPL-23 disiplini):
+#   temel  (fullres + yedi-kelime yigini) md5 c094101de0184e9216a57020873bac0b
+#   sonuc  (+ bu 18 satir)                md5 ce419bc901bea61945d166aee11e1ab0
+#
+# 0x01663798  tbz -> nop  |  MR tablo grubu 1
+5869030 \332\110\347\066 \037\040\003\325
+# 0x01663800  tbz -> nop  |  MR tablo grubu 1
+5869056 \227\105\347\066 \037\040\003\325
+# 0x01663968  tbz -> nop  |  MR tablo grubu 1
+5869146 \104\072\347\066 \037\040\003\325
+# 0x01664754  tbz -> nop  |  MR tablo grubu 2
+5870037 \132\374\347\066 \037\040\003\325
+# 0x01664b68  tbz -> nop  |  d0015 minFrameDurationsMR + d0016 stallDurationsMR
+5870298 \104\252\346\066 \037\040\003\325
+# 0x01664bd0  tbz -> nop  |  d0016 stallDurationsMR
+5870324 \011\247\346\066 \037\040\003\325
+# 0x01665354  tbz -> nop  |  d0014 streamConfigurationsMR + d0017 ioFormatsMapMR
+5870805 \345\152\346\066 \037\040\003\325
+# 0x016653a8  tbz -> nop  |  d0017 ioFormatsMapMR + d001a multiResStreamSupported
+5870826 \101\150\346\066 \037\040\003\325
+# 0x01665ea0  tbz -> nop  |  e001f/e000c/e000f sensor opaque-raw MR
+5871528 \232\020\346\066 \037\040\003\325
+# 0x0166603c  tbz -> nop  |  f000e binningFactor [2,2] + f000b activeArraySizeMR
+5871631 \251\003\346\066 \037\040\003\325
+# 0x0166608c  tbz -> nop  |  f000b activeArraySizeMR (kaynak S+0x3c54)
+5871651 \074\001\346\066 \037\040\003\325
+# 0x01666398  tbz -> nop  |  f000c pixelArraySizeMR (kaynak S+0x3c1c)
+5871846 \303\350\345\066 \037\040\003\325
+# 0x016665f0  tbz -> nop  |  f000d preCorrActiveArraySizeMR (yayin 0x1669acc, b.le)
+5871996 \025\326\345\066 \037\040\003\325
+# 0x01667a1c  tbz -> nop  |  MR tablo grubu 3 (depth/heic)
+5873287 \273\064\345\066 \037\040\003\325
+# 0x01667b00  tbz -> nop  |  MR tablo grubu 3 (depth/heic)
+5873344 \212\055\345\066 \037\040\003\325
+# 0x01669c14  tbz -> nop  |  ULTRA_HIGH_RESOLUTION_SENSOR yetenek filtresi (cmp w24,#0x10)
+5875461 \256\005\340\066 \037\040\003\325
+# 0x01669d24  tbz -> nop  |  ULTRA_HIGH_RESOLUTION_SENSOR yetenek filtresi (cmp w24,#0x10)
+5875529 \214\006\340\066 \037\040\003\325
+# 0x01669e58  tbz -> nop  |  ULTRA_HIGH_RESOLUTION_SENSOR yetenek filtresi (cmp w24,#0x10)
+5875606 \155\352\347\066 \037\040\003\325
