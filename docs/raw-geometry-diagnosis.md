@@ -2129,3 +2129,158 @@ one.
 `ce419bc901bea61945d166aee11e1ab0`, matching the live HAL. No capture, no patch,
 no preference touched, no device write. `FIND-3.5-01` and `FIND-4.5-02` remain
 **OPEN**.
+
+## 26. `Faz4.1` narrowed live, and the `d0014` collision is measured rather than argued (`IMPL-48`, 2026-09-03)
+
+`IMPL-47` ended by routing a sequencing decision: `InitializeScalerStaticCaps`
+populates the default stream-configuration count and all three
+`MaximumResolution` counts in one store run, so `Faz4.7` section 10's claimed
+independence from `Faz4.1` was void, and two sub-plans wanted to patch one
+function. The user chose the option that turns the collision into evidence —
+**run `Faz4.1` and bracket `d0014` around it.**
+
+That is what this run did. It settles, by measurement, the question `IMPL-47`
+deliberately refused to guess.
+
+### The prediction, stated before the patch
+
+`d0014` on every ultra-high-resolution camera carried **7 records, all at
+1920x1080**, formats `{33, 34, 35, 36, 37, 38, 54}`. Formats 36, 37 and 38 are
+`0x24`, `0x25`, `0x26` — **exactly** the three admitted by the raw50 widening
+(`sub wN,#0x22` ; `cmp wN,#5` in place of `#2`). The rest reach the array through
+other tests.
+
+So the two hypotheses separate cleanly:
+
+- **Same loop** — Faz4.1's gate reaches the max-res rows — then reverting the
+  gate must drop 36, 37 and 38: `d0014` **28 → 16**.
+- **Same function only** — `d0014` is untouched: **28 stays 28**.
+
+Both were written down, with the full baseline table, before any device write.
+
+### What was run
+
+Three composed states, each with its md5 computed host-side **before** any device
+contact and each matched on apply (`VAL-CHECKSUM`), on the base the device was
+found in (`ce419bc9…` = fullres + seven-word stack + the 18-site UHR gate):
+
+| stage | change | md5 | pre-committed |
+|---|---|---|---|
+| A | baseline, gates `#5` | `ce419bc901bea61945d166aee11e1ab0` | found |
+| B | all four gates → `#2` | `fc7481c1d852ee489d4543a6308e07dc` | matched |
+| C | site 1 guarded, sites 2–4 back to `#5` | `6619ad47a67571ff596b909cd43cf48e` | matched |
+| D | site 2 guarded as well | `87f92dd49afea0a0652640923d72f3a6` | matched |
+
+**One error was caught host-side before it reached the device.** The first
+composer wrote `cmp w11,#2` to all four gate sites; sites 2, 3 and 4 use `w7`,
+`w20` and `w20`, so that would have corrupted the register operand. The stock
+word is the live word minus `3 << 10` (the `cmp` immediate field is bits
+[21:10]), and the words derived that way reproduce the committed
+`hal-raw50-deneme.patch` stock column **exactly, in both columns, for all four
+rows** — the table cross-validates the derivation and the derivation
+cross-validates the table.
+
+### The answer: same loop
+
+| stage | site 1 | site 2 | `d0014` | rows | formats |
+|---|---|---|---|---|---|
+| A | broad | broad | **28** | 7 | 33 34 35 36 37 38 54 |
+| B | stock `#2` | stock `#2` | **16** | 4 | 33 34 35 54 |
+| C | guarded | broad | **24** | 6 | 33 34 35 36 38 54 |
+| D | guarded | guarded | **16** | 4 | 33 34 35 54 |
+
+**`Faz4.1`'s format gate moves `d0014`.** Three gate configurations, three
+distinct `d0014` values, on all eleven ultra-high-resolution cameras
+simultaneously. The max-res rows are built in the **same loop** as the default
+rows, not merely in the same function — which is the stronger of the two claims
+`IMPL-47` separated and refused to assert on static evidence alone.
+
+The row accounting closes exactly: site 1 broad contributes **one** row to
+`d0014` (format 37, RAW10) and site 2 broad contributes **two** (formats 36 and
+38); `4 + 1 + 2 = 7`, and stage C's `4 + 2 = 6`. Under the guard, site 1
+contributes **zero** to `d0014`, because the guard tests width == 8192 and
+`d0014`'s rows are at 1920x1080 — the guard narrows the max-res table as a
+side effect, in the same direction and for the same reason.
+
+Sites 3 and 4 were broad at stage D and narrow at stage B, and `d0014` is 16 in
+both. **They do not feed it**, confirming live the static prediction that they
+are duration tables and Faz 4.2's subject.
+
+### `Faz4.1`'s own result: every pre-stated target matched
+
+`IMPL-34` stated the targets host-side before any patch existed: hal0 **468**,
+hal3 **520**, front ids and hal11/hal12 unchanged. Measured at stage D, on
+`scripts/smoke.sh`'s `streamcfg` metric — the `int32` element count of
+`android.scaler.availableStreamConfigurations (d000a)`:
+
+| cam | broad (A) | stock gate (B) | **guarded (D)** | target |
+|---|---|---|---|---|
+| 0 | 800 | 456 | **468** | 468 ✔ |
+| 1 | 800 | 452 | **452** | unchanged ✔ |
+| 2 / 3 | 868 | 508 | **520** | 520 ✔ |
+| 4–7, 10 | 868 / 852 | 508 | **520** | – |
+| 8 / 9 | 856 | 508 | **508** | unchanged ✔ |
+| 11 / 12 | 124 | 124 | **124** | unchanged ✔ |
+
+The stage-B figures reproduce `IMPL-34`'s recorded fullres baseline (hal0 456,
+hal1 452, hal2–hal10 508, hal11/12 124) to the integer, which independently
+confirms both that reading and that the revert is clean.
+
+**The two numbers, kept separate as `DEC-11` requires and never summed:**
+
+- **Narrowing delta:** camera 3, `868 → 520` = **−348 int32**. Against the
+  unwidened gate the guard adds `508 → 520` = **+12 int32**, three rows.
+- **Format-32 addition:** **not measured.** `F4.1-05b` was not attempted in this
+  run, so it has no number. It is reported as absent, not folded in.
+
+`F4.1-04`'s single-site requirement was honoured and its arithmetic is exact:
+site 1's broad excess is 128 int32, of which the guard deliberately keeps 12,
+so guarding site 1 alone must cost 116 — and `868 − 752 = 116`.
+
+### `F4.1-06`: what survived, and what did not
+
+Diffing stage B against stage D on camera 2, the guard adds **exactly three
+rows and nothing else**: `[36 8192 6144 OUTPUT]`, `[37 8192 6144 OUTPUT]`,
+`[38 8192 6144 OUTPUT]`.
+
+- **RAW10 (37) is advertised at 8192x6144.** The primary preservation criterion
+  holds.
+- Formats 36, 37 and **32** also appear at 4096x3072 and 4096x2304 — **but they
+  are already there at stage B, with the gate at stock `#2`.** They come from a
+  different emission path and are not this patch's residue. The criterion "no
+  spurious entries at other resolutions" is met with respect to this patch.
+- **`RAW_SENSOR` (32) is NOT advertised at 8192x6144 — this criterion is UNMET**,
+  and is reported unmet rather than reinterpreted, exactly as section 8 requires.
+  It is unreachable by any narrowing of this gate (`0x20` sits below the `0x22`
+  subtract base) and needs the `DEC-11` format-32 extension, `F4.1-05b`.
+- Front cameras (hal8/hal9) gained no RAW rows, staying at 508 — the guard
+  compares against the literal 8192 and their full-resolution dimension differs.
+  This is the behavioural consequence `IMPL-34` predicted and routed to Faz 4.4.
+
+**`F4.1-07` was not performed.** The Phase 3 preservation check needs the AGC
+stack and a human shutter press.
+
+### Device state
+
+**Restored to exactly the state it was found in.** A single-step 20-word revert
+returned `ce419bc901bea61945d166aee11e1ab0`, and `VAL-REVERT` is byte-exact: the
+comparable region of `20260903-1530__Faz4.1__post-revert` differs from
+`20260903-1500__Faz4.1__pre-stageB` by **0 lines** across 240. Mode `50mp`,
+13 camera devices, camera list back within the poll on every one of the four
+restarts. No preference was touched, no capture was taken.
+
+The narrowed state is reproducible in one command from
+`agc-50mp-yama/hal-fullres-guard-deneme.patch` (18 rows), whose precondition is
+that the four raw50 gates are at stock `#2`.
+
+### What this does to the sequencing question
+
+The collision `IMPL-47` predicted is **real, measured, and larger than a
+footnote**: `Faz4.1` changes `d0014` every time it changes `d000a`, and
+`Faz4.1`'s acceptance criteria count only the default array, so a run following
+them literally would have moved the max-res table by −12 int32 and never
+recorded it. That is precisely the failure mode flagged before the run, and it
+did not happen only because the bracket was added.
+
+`FIND-3.5-01` and `FIND-4.5-02` remain **OPEN**. Nothing in this run touched the
+image.

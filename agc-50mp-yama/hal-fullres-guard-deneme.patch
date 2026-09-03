@@ -1,0 +1,52 @@
+# ishtar Faz 4.1 -- tam-cozunurluk BOYUT KORUMASI (dimension guard), 2026-09-03
+#
+# 18 SATIR. hal-raw50-deneme.patch'in DARALTILMIS halidir; onun YERINE gecer.
+# ON KOSUL: dort raw50 kapisi STOK #2 durumunda olmali (raw50 col 2 ile geri al).
+# Bu tablo yalnizca `fullres` tabani uzerinde gecerlidir -- kullandigi dort bos
+# yuva hal-fullres.patch'in kendisinin urettigi olu komutlardir. STOK uzerine
+# ASLA uygulanmaz.
+#
+# Ne yapar: raw50'nin "her cozunurlukte 0x22..0x26" genislemesini,
+#   cmp w27, #2, lsl #12   ; genislik 8192 mi?
+#   ccmp wN, #5, #2, eq    ; oyleyse araligi #5'e ac, degilse C=1 birak
+#   b.lo <emit>            ; C=0 ise yayinla
+# seklinde KOSULLU hale getirir. 8192 disinda stok `cmp wN,#2` gecerli kalir.
+#
+# Iki yayin bolgesi (site 1 = 0x16c18dc, site 2 = 0x16c1c18), her birinin IKI
+# oncelinden (dusme yolu + gunluk yolu) girilir; dordu de yamalanir.
+# Site 3-4 (0x16c22bc, 0x16c2330) SURE tablolaridir -- Faz 4.2'nin konusu,
+# burada dokunulmaz.
+#
+# OLCULDU 2026-09-03 (IMPL-48), canli HAL uzerinde, kamera kimligi basina
+# `android.scaler.availableStreamConfigurations (d000a)` int32 sayisi:
+#   genis raw50 : hal0 800  hal2/3 868  hal8/9 856  hal11/12 124
+#   stok kapi   : hal0 456  hal2/3 508  hal8/9 508  hal11/12 124
+#   BU TABLO    : hal0 468  hal2/3 520  hal8/9 508  hal11/12 124
+# Faz 4.1'in onceden ilan edilen hedefleri hal0 468 / hal3 520 idi -- TUTTU.
+# Eklenen tek fark, 8192x6144'te uc satir: [36 ...] [37 ...] [38 ...] (+12 int32).
+#
+# YAN ETKI, olculdu ve kucumsenmemeli: bu kapi d0014
+# (availableStreamConfigurationsMaximumResolution) tablosunu DA daraltir --
+# int32[28] -> int32[16]. Max-res satirlari ayni dongude uretiliyor.
+# Ayrinti: docs/raw-geometry-diagnosis.md bolum 26.
+#
+# bicim: <4bayt-indeksi> <stok-escape> <yamali-escape>
+# temel: fullres md5 fe0245a4720fb07b01d96deef47f5569 (kapilar #2 iken)
+5965362 \137\005\000\161 \013\210\000\121
+5965363 \371\007\237\032 \177\013\100\161
+5965364 \056\003\023\052 \142\011\105\172
+5965365 \216\011\000\066 \303\015\000\124
+5965435 \012\000\200\122 \177\013\100\161
+5965437 \137\005\000\161 \013\210\000\121
+5965438 \371\007\237\032 \142\011\105\172
+5965439 \056\003\023\052 \203\004\000\124
+5965440 \316\366\007\067 \266\377\377\027
+5965569 \137\004\000\161 \207\211\000\121
+5965570 \360\007\237\032 \177\013\100\161
+5965571 \017\002\023\052 \342\010\105\172
+5965572 \357\013\000\066 \003\001\000\124
+5965661 \002\000\200\122 \177\013\100\161
+5965663 \137\004\000\161 \207\211\000\121
+5965664 \360\007\237\032 \342\010\105\172
+5965665 \017\002\023\052 \143\365\377\124
+5965666 \157\364\007\067 \243\377\377\027

@@ -295,6 +295,34 @@ This confirms, by measurement rather than inference, that **`S+0x3c1c` holds `81
 
 Every word was round-tripped through capstone at its intended address; the branch offsets resolve to the intended targets. On the `eq` side (width 8192) the `ccmp` compares the format offset against 5, so `b.lo` admits `0x22`…`0x26`. On the `ne` side it forces `nzcv = 2`, i.e. `C = 1`, so `b.lo` is **not** taken and control falls into the untouched stock gate at `0x16c18d8` (`cmp w11,#2`), which keeps `0x22`…`0x23` at every resolution. **The stock `cmp` at `0x16c18dc` is therefore reverted to `#2`; the widening moves into the guarded block.** Path B needs the same four words plus `b #0x16c18d8` (`17FFFFB6`, `\266\377\377\027`) replacing its `tbnz`, and its `b.lo` is `54000483` (`\203\004\000\124`) from `0x16c19fc`.
 
+**Site 2, located and patched live (`IMPL-48`, 2026-09-03).** Site 2 has the same
+two-predecessor shape as site 1, which was not previously recorded. Path A falls
+through `0x16c1c10`; path B is the logging call at `0x16c1d6c`, rejoining by
+`tbnz w15,#0, #0x16c1c14` at `0x16c1d88`. The format register here is `w12`
+(`ldr w12,[x21]`), not `w0`, and the range register is `w7`, not `w11` — the
+reason a single `cmp w11,#2` word cannot be replayed across all four gate sites.
+Dead slots: `0x16c1c04`…`0x16c1c10` on path A, `0x16c1d74`/`0x16c1d7c`…`0x16c1d88`
+on path B. **`cset w16, ne` at `0x16c1c08` is dead** because `ldr x16,[sp,#0x1b0]`
+at `0x16c1cac` redefines the register four instructions before its only read at
+`0x16c1cb0` — this needed checking, since site 2's `cset` target is read later in
+the function where site 1's is not.
+
+| Slot | Instruction | Word | Escape |
+|---|---|---|---|
+| `0x16c1c04` | `sub  w7, w12, #0x22` | `51008987` | ` Q` |
+| `0x16c1c08` | `cmp  w27, #2, lsl #12` | `71400B7F` | `@q` |
+| `0x16c1c0c` | `ccmp w7, #5, #2, eq` | `7A4508E2` | `âEz` |
+| `0x16c1c10` | `b.lo #0x16c1c30` | `54000103` | ` T` |
+| `0x16c1d84` | `b.lo #0x16c1c30` | `54FFF563` | `cõÿT` |
+| `0x16c1d88` | `b    #0x16c1c14` | `17FFFFA3` | `£ÿÿ` |
+
+**Measured consequence, and it is not confined to `d000a`.** Applying the guard at
+both sites moves `android.scaler.availableStreamConfigurationsMaximumResolution`
+(`d0014`) from `int32[28]` to `int32[16]`, because the max-res rows are emitted by
+the **same loop** through the **same format gate**. Site 1 broad contributes format
+37 to `d0014`; site 2 broad contributes 36 and 38. Sites 3 and 4 do not feed it.
+See `docs/raw-geometry-diagnosis.md` section 26.
+
 **The design fits the patch-table format.** Every entry is a single 4-byte-aligned word replacement at a stated index, which is exactly what `docs/patch-table-format.md` allows; no instruction is inserted and no control flow is relocated. The table grows from 4 entries to roughly 10 per streamcfg site.
 
 **One consequence to state rather than discover.** The guard compares against the literal 8192, so it narrows **every** camera id to RAW-at-8192x6144. The front cameras (`hal1`, `hal8`, `hal9`, pixel array `[3264 2448]`) have a different full-resolution dimension and would gain no RAW rows at all. That matches Phase 4's stated goal — the QCFA full-resolution dimension only — but it is a behavioural change on ids the project has never targeted, and Faz 4.4's per-camera-id consistency table is where it should be checked.
