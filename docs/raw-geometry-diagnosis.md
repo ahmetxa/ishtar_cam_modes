@@ -1863,3 +1863,136 @@ Unchanged by this run, and verified by a before/after `smoke.sh` bracket whose
 comparable regions are byte-identical. Live HAL remains
 `ce419bc901bea61945d166aee11e1ab0`; trap 0/12; 13 camera devices. The probe is a
 read-only measurement client and writes only to `/data/local/tmp/`.
+
+## 24. `F4.6-04` performed: the un-fold holds, and no data was ever missing (`IMPL-46`, 2026-09-03)
+
+`IMPL-45` measured the payload's *shape* — exactly `4096 x 3072` pixels written
+contiguously into an `8192`-wide raster — but stopped short of the test `Faz4.6`
+actually budgets for. `F4.6-04` is that test: *"un-folding the content region on
+the hypothesis that a 4096-wide payload was written into an 8192-wide raster, and
+judging whether a coherent scene results."* It is now performed, host-side, on the
+RAW10 buffer `IMPL-45` captured. **The hypothesis holds, and decisively.**
+
+### The first metric failed, and why that matters
+
+The obvious test — whichever reading is *smoother* vertically is the true
+geometry — **cannot discriminate here**, and reporting it as inconclusive would
+have been the wrong conclusion rather than a null result. The frame is dark (mean
+absolute gradient ≈ `1.4` of 255), so sensor noise dominates scene structure and
+both readings score alike: `1.420` at 8192 wide against `1.396` at 4096 wide, a
+ratio of `1.02x`. Nothing is learnable from that.
+
+The discriminating structure was already in the same numbers, under a different
+question.
+
+### The discriminator is the Bayer signature
+
+`android.sensor.info.colorFilterArrangement` on camera 2 reads **`BGGR`** — a 2x2
+CFA. In any *valid* raster, adjacent rows therefore carry different colour
+channels and must differ strongly, while rows two apart share phase and must be
+smooth. That gives a physical test statistic rather than a heuristic one:
+
+```
+bayer_ratio = mean|I(y) - I(y+1)|  /  mean|I(y) - I(y+2)|
+```
+
+A true Bayer raster gives `bayer_ratio >> 1`. Reading at double width destroys
+the alternation — two true rows sit side by side inside one raster row, so
+consecutive raster rows end up sharing phase — giving `bayer_ratio ~ 1`.
+
+| reading | geometry | adj `(y,y+1)` | same-phase `(y,y+2)` | **bayer_ratio** | horiz control |
+|---|---|---|---|---|---|
+| **A** as the buffer declares | `8192 x 1536` | 1.396 | 1.420 | **0.98x** | 1.428 |
+| **B** un-folded | `4096 x 3072` | **21.860** | 1.396 | **15.66x** | 1.424 |
+
+**A shows no row alternation at all.** For a BGGR sensor that is not a
+near-miss — it is impossible. **B shows the alternation cleanly, at `15.66x`.**
+The horizontal control is `1.00x` between the two readings, exactly as a
+row-stride error predicts: horizontal structure is untouched.
+
+### No data was ever missing
+
+The un-folded `4096 x 3072` frame, measured the same way as every prior capture
+(PIL, grayscale, threshold `< 4`, on the original):
+
+| frame | geometry | black fraction | min / max | mean |
+|---|---|---|---|---|
+| the capture as delivered | `8192 x 6144` | **0.7500** | 0 / 141 | 11.05 |
+| **the same bytes, un-folded** | `4096 x 3072` | **0.0000** | **15 / 141** | 44.189 |
+| `IMPL-40` clean reference (`21:26`) | `3072 x 4096` | 0.0024 | — | — |
+
+**Zero black pixels, and a floor of 15 rather than 0.** Every one of the
+12,582,912 pixels is real, exposed scene content. The "three quarters black"
+that has defined this investigation since section 15 is **entirely a
+presentation artifact**: the same bytes, read at the width they were written
+for, are a complete and correctly exposed frame.
+
+### What this settles
+
+`FIND-4.5-02`'s mechanism is now fully characterised, and it is **not data
+loss, not a sensor fault, and not a corrupt payload**. The producer emits a
+correct, complete `4096 x 3072` BGGR frame and writes it contiguously into a
+buffer that declares `rowStride = 10240` (an 8192-wide row). No stride
+adaptation happens at that boundary. The consumer then reads it as an
+`8192`-wide raster, which spreads each true row-pair across one raster row and
+leaves the bottom three quarters untouched.
+
+This also explains, without any further assumption, why `MeasureSharpnessRaw`
+returned `all_black` on 15 of 15 frames: its ROI samples a region that, under
+the wrong stride, is genuinely zero — while the data it was looking for sits
+elsewhere in the same buffer.
+
+**Two faults, now cleanly separated.** (1) The sensor reads out binned
+`4096 x 3072` when `8192 x 6144` was requested — still open, and still blocked
+by `d0014` as section 23 established. (2) The binned payload is then written
+without stride adaptation into the full-size buffer. **These are independent.**
+Section 23 left open whether they were one fault or two; they are two, and (2)
+is now measured end to end.
+
+### A correction to sections 22 and 23 — the ownership claim was wrong
+
+Both section 22 and section 23 state that filling `d0015`/`d0016` is
+"`Faz4.2`'s duration-row work". **That is incorrect**, and it was repeated
+twice, so it is corrected here rather than left to be inherited a third time.
+
+`Faz4.2`'s scope names **`d000b` and `d000c`** — the *default-mode*
+`availableMinFrameDurations` and `availableStallDurations` — and its Out of
+Scope explicitly excludes "changing which formats or resolutions are emitted."
+It does not mention the `MaximumResolution` variants.
+
+A scan of **all 34 sub-plans** for
+`MaximumResolution|d0014|d0015|d0016|ULTRA_HIGH_RESOLUTION|pixelMode` returns
+**zero hits**. The entire ultra-high-resolution line — the capability, the four
+tags, the `d0014`/`d0015`/`d0016` tables and `pixelMode` itself — has **no
+owning sub-plan**. `IMPL-44` ran as an `F4.6-08` routed consequence at the
+user's direction, and `IMPL-45` followed it. This is the same structural class
+as `AUDIT-FIX-08`: work proceeding with no sub-plan holding write authority
+for it.
+
+**This is recorded, not acted on.** Whether that line gets a new sub-plan or
+continues as user-directed work is a planning decision and is routed to the
+user, not taken here.
+
+### What this establishes, and what it does not
+
+**Established.** The un-fold hypothesis of `F4.6-04` holds, on a physical
+discriminator rather than an aesthetic judgement. The delivered payload is a
+complete `4096 x 3072` BGGR frame with **zero** black pixels. The black fraction
+is a stride artifact, and the stride fault is independent of the binning fault.
+
+**Not established.** Where in the pipeline the stride adaptation is missing —
+this run measured the *output* of that boundary, not its code. Whether fixing
+the stride alone would yield a correct (if half-resolution) 50 MP-container
+image, since the binning fault is untouched. Nothing about the sensor readout
+question, which remains blocked by `d0014`.
+
+`FIND-3.5-01` remains **OPEN**. `FIND-4.5-02` remains **OPEN**, but its
+mechanism is now measured rather than inferred, and one of its two faults is
+fully characterised.
+
+### Device state
+
+**Not contacted.** This slice is host-side arithmetic on a buffer captured in
+`IMPL-45`. No capture, no patch, no preference touched, no device write. The
+one device read was `colorFilterArrangement` from a `dumpsys` file already on
+the device from `IMPL-45`.
