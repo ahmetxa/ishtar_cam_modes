@@ -2284,3 +2284,146 @@ did not happen only because the bracket was added.
 
 `FIND-3.5-01` and `FIND-4.5-02` remain **OPEN**. Nothing in this run touched the
 image.
+
+## 27. `F4.1-07` performed: the narrowing passes every count and breaks AGC (`IMPL-49`, 2026-09-03)
+
+`IMPL-48` narrowed `Faz4.1` live, hit every pre-stated array-count target, and
+closed by naming `F4.1-07` as the one work item left — the Phase 3 preservation
+check, deferred because it needs the AGC stack and a shutter press. The user
+asked for it to be driven over `adb` rather than deferred further. It is now
+performed, and **it fails.**
+
+This is the outcome `F4.1-07` exists to produce. `IMPL-48` measured counts and
+found them correct; counts were never the question this item asks.
+
+### What `F4.1-07` could and could not answer in this run
+
+Section 10 blocks `Faz4.1` on `Faz4.5` so that this check "preserves a good
+capture rather than certifying that a half-black frame is still half-black."
+`Faz4.5`'s metadata half landed but `FIND-4.5-02` is **OPEN** — the image was
+never corrected. The strong form was therefore unavailable, and this was
+recorded before the run in `docs/faz41-predictions-impl49.md`:
+
+- **answerable** — does the guard make things worse than without it;
+- **not answerable** — does the guard preserve a geometrically correct frame.
+
+The run answered the first, in the negative, and never needed the second.
+
+### The measurement
+
+Four HAL states, each applied with the committed tables through `haltbl.sh`,
+each md5 matched against the value `IMPL-48` pre-committed:
+
+| stage | md5 | `d000a` cam 2 | `d0014` | AGC |
+|---|---|---|---|---|
+| **A** broad raw50 | `ce419bc9…` | 868 | 28 | **launches, 4/4** |
+| **B** stock gates | `fc7481c1…` | 508 | 16 | **crashes** |
+| **D** guard | `87f92dd4…` | 520 | 16 | **crashes, 3/3** |
+| **A** restored | `ce419bc9…` | 868 | 28 | **launches** |
+
+Same application, same preferences, same device, same session procedure. **Only
+the HAL differs.** The failure is `com.agc.DefaultErrorActivity` in place of
+`com.android.camera.CameraLauncher`, with this in the crash buffer:
+
+```
+FATAL EXCEPTION: main
+Process: org.codeaurora.snapcam
+java.lang.RuntimeException: java.lang.NullPointerException: Attempt to invoke
+virtual method 'boolean com.google.googlex.gcam.Gcam.f()' on a null object
+reference
+```
+
+gcam's engine object is null — the HDR+ engine never initialised. No camera
+stream is configured at all, so this is upstream of any capture.
+
+The stage-A runs were not assumed to work; they were measured, and they
+configure both full-resolution streams every time:
+
+```
+Consumer name: ImageReader-8192x6144f25m37   Dims: 8192 x 6144  format 0x25 (RAW10)
+Consumer name: ImageReader-8192x6144f23m22   Dims: 8192 x 6144  format 0x23 (YUV)
+```
+
+### The cause is the narrowing, not the guard
+
+The obvious reading — that the guard's three added rows confuse the consumer —
+**is wrong, and the discriminating stage was run rather than reasoned about.**
+Stage B carries no guard at all: all four gates at stock `#2`, the table
+`Faz4.1` treats as the clean baseline. **It crashes identically.**
+
+So the fault is not in anything `Faz4.1` adds. It is in what the narrowing
+**removes**: `868 → 520` on camera 2 is **348 int32 = 87 stream-configuration
+rows**, and AGC needs some of them. The guard's three `8192x6144` rows are
+necessary but nowhere near sufficient.
+
+This inverts the sub-plan's premise. `Faz4.1` treats the broad raw50 rows as
+spurious entries to be cleaned up, and its acceptance criteria are written to
+confirm they are gone. **They are load-bearing for the only consumer the project
+cares about.**
+
+### What this does to `Faz4.1`
+
+`F4.1-07`'s verdict is **FAIL**, and it is the criterion that decides the
+sub-plan, not one of nine that can be traded off:
+
+- `F4.1-04`, `F4.1-05` — **pass**, and were independently re-measured here.
+  Stage D reproduced `IMPL-48` to the integer: hal0 **468**, **520** on seven
+  cameras, hal1 452, front 508, hal11/12 124, `d0014` **16**.
+- `f0006` still reads **`[8192 6144]`** at stage D, and `f0000`
+  **`[0 0 8192 6144]`** — the metadata half of `F4.1-07` is **met**.
+- The Phase 3 preservation requirement is **not** met. A patch that passes every
+  count and prevents the camera application from starting has not preserved the
+  Phase 3 path.
+
+`agc-50mp-yama/hal-fullres-guard-deneme.patch` should **not** be promoted beyond
+an experiment on this evidence. It is not withdrawn — its arithmetic is correct
+and `IMPL-48`'s measurements stand — but its acceptance criteria are now known
+to be insufficient, which is a finding about the sub-plan, not about the table.
+
+### The image comparison is void, and is reported as void
+
+The stage-A capture was taken and measured the same way as
+`IMPL-40`/`43`/`44` — PIL, grayscale, threshold `< 4`, on the original:
+
+```
+AGC_20260903_170630550.jpg   8192 x 6144 = 50.33 MP   BLACK FRACTION 1.0000
+```
+
+Every pixel is exactly zero (`extrema (0, 0)` on all four quadrants), and the log
+carries the familiar `PrepShot: Bad frame with all-zero green pixels`. **This is
+the scene, not the code:** the same binary `ce419bc9…` measured **0.7502** in
+`IMPL-44`, and the device was unattended in the dark for this run. A fully black
+frame cannot discriminate a preserved geometry from a destroyed one, so **no
+black-fraction comparison is drawn between stages**, and none is needed — stage D
+never reached a capture.
+
+Obtaining the content half requires the phone pointed at a lit scene. That is
+the one part of `F4.1-07` still owed, and it is owed only if `Faz4.1` is revived.
+
+### Established, and not
+
+**Established.** The narrowing breaks AGC, reproducibly, with a clean control in
+both directions. The cause lies in the removed rows, not the guard, because the
+guard-free stage B fails identically. `f0006` and `f0000` survive the guard.
+`IMPL-48`'s counts reproduce exactly in an independent session.
+
+**Not established.** *Which* of the 87 removed rows AGC requires — no bisection
+was run, and the 868 → 520 delta was not decomposed. Whether a wider guard could
+satisfy both the full-resolution goal and gcam's initialisation. Whether the
+`d0014` narrowing contributes to the crash independently of `d000a`; both move
+together at stages B and D and were not separated.
+
+**Not attempted.** `F4.1-05b`, the `DEC-11` format-32 extension, remains
+unattempted and its criterion **UNMET**, unchanged from `IMPL-48`.
+
+### Device state
+
+Restored to the state it was found in — `ce419bc901bea61945d166aee11e1ab0`, mode
+`50mp`, 13 camera devices — and AGC verified working after the restore. Every one
+of the six transitions matched its pre-committed md5. `VAL-REVERT` is byte-exact:
+the comparable region of `20260903-1730__Faz4.1__F4107-post-revert` differs from
+`20260903-1700__Faz4.1__F4107-pre-stageA` by **0 lines across 239**. One capture
+was taken, at stage A; no preference was touched; no mode was switched.
+
+`FIND-3.5-01` and `FIND-4.5-02` remain **OPEN**. Nothing in this run is an image
+fix.
