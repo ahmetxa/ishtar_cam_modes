@@ -321,6 +321,24 @@ Every word was round-tripped through capstone at its intended address; the branc
 
 **The open question this leaves, stated so it is not confused with a settled one:** *why* the payload is half-width. Candidates are a 2x2-binned sensor delivery into a full-size buffer, a remosaic path configured at half extent, or a stride negotiated from a stale rect. Not answerable from an image; it needs the negotiated buffer stride and binning state from a filtered logcat during capture (`F4.6-06`).
 
+**The `MaximumResolution` scaler tables, `d0014` / `d0015` / `d0016`** — located 2026-09-03 (`IMPL-47` / `Faz4.7`, `F4.7-02`) against the live HAL `ce419bc901bea61945d166aee11e1ab0`.
+
+All four scaler stream/duration emissions read from one shared base object, `[x19 + 0xa6560 + 0x68]`:
+
+| tag | name | count field | data | emission address |
+|---|---|---|---|---|
+| `d000a` | `availableStreamConfigurations` (default) | `base+0x6f28` | `ldr [base+0xb10]` — a **pointer** | `0x01665178` |
+| `d0014` | `availableStreamConfigurationsMaximumResolution` | `base+0x6f2c` | `add base+0xb28` — **inline** | `0x0166536c` |
+| `d0015` | `availableMinFrameDurationsMaximumResolution` | `base+0xd444` | `base+0x6f48` | `0x01664b84` |
+| `d0016` | `availableStallDurationsMaximumResolution` | `base+0xe850` | `base+0xde50` | `0x01664bec` |
+
+- Each emission does `lsl w3, count, #2`, so the published element count is `count * 4` int32 — one 16-byte `{format, width, height, direction}` record per count unit. Camera 2's `d0014` count is **7**, giving the observed `int32[28]`.
+- `d0014`'s emission additionally requires `[S+0x3d84] == 1` (the binning selector, untouched) and `[S+0x4968] == 0`, and its bit-28 gate at `0x01665354` is one of `hal-uhrfull-deneme.patch`'s eighteen NOPs.
+- **The rows are not static data.** A whole-binary scan for `int32 1920` followed by `int32 1080` returns 20 aligned hits, none of them a stream-configuration record. The table is assembled at runtime.
+- **The populator is `InitializeScalerStaticCaps`** — the same function recorded above for the default array and targeted by `Faz4.1`. At `0x016c5350`…`0x016c5368` it writes the default count and all three `MaximumResolution` counts in one consecutive store run, from values computed off a shared loop variable (`w24*2+2`, `w24+1`, `4`). A second writer touching the same fields is at `0x016bf7d4`.
+- **Open:** whether the max-res rows are built in the same *loop* or merely the same *function*; where the `1920x1080` values originate; and whether `Faz4.1`'s `cmp #2` → `cmp #5` change reaches the max-res rows. The `0x016c5360` store writes `w24*2+2`, which cannot equal 7 for any integer `w24`, so that is **not** the path that produced camera 2's count and at least one other writer is involved.
+- Tooling: `agc-50mp-yama/tools/region_dis.py` (disassemble a vaddr range) and `agc-50mp-yama/tools/immscan.py` (find `movz`/`movk` carrying a given 16-bit immediate). Both read-only.
+
 ## 7. Invariants and Constraints
 
 1. **Reversibility.** Every modification is a bind-mount or an md5-guarded offset patch. A module that cannot be disabled is a bricked phone.

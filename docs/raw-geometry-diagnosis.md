@@ -1996,3 +1996,136 @@ fully characterised.
 `IMPL-45`. No capture, no patch, no preference touched, no device write. The
 one device read was `colorFilterArrangement` from a `dumpsys` file already on
 the device from `IMPL-45`.
+
+## 25. `F4.7-02` located: the max-res tables share `InitializeScalerStaticCaps` with the default one (`IMPL-47`, 2026-09-03)
+
+`Faz4.7`'s host-side half. No device write; the binary was pulled read-only and
+its md5 matched `ce419bc901bea61945d166aee11e1ab0` before any analysis. **The
+sub-plan's own pause condition fired**, which is why this section ends in a
+routed decision rather than a patch design.
+
+### `F4.7-03`, first half: the rows are not static data
+
+If `d0014`'s seven `[format, 1920, 1080, OUTPUT]` records existed as static data,
+the fix would be a row edit. They do not. Scanning the whole 27,268,688-byte
+binary for `int32 1920` immediately followed by `int32 1080` finds **20 aligned
+occurrences and not one of them is a stream-configuration record** — every hit
+sits inside an ordinary resolution or framerate list (the `0x39c4xx` cluster is a
+video-profile table of `width, height, fps, …`). There is no run of seven
+`[fmt, 1920, 1080, 0]` quadruples anywhere.
+
+**The table is assembled at runtime.** A row edit was never available.
+
+### `F4.7-02`: the three emission sites, and a fourth for comparison
+
+All four read from **one shared base object**, `[x19 + 0xa6560 + 0x68]`:
+
+| tag | name | count | data | emission |
+|---|---|---|---|---|
+| `d000a` | `availableStreamConfigurations` (default) | `base+0x6f28` | `ldr [base+0xb10]` — a **pointer** | `0x01665178` |
+| `d0014` | `…MaximumResolution` | `base+0x6f2c` | `add base+0xb28` — **inline** | `0x0166536c` |
+| `d0015` | `availableMinFrameDurationsMaximumResolution` | `base+0xd444` | `base+0x6f48` | `0x01664b84` |
+| `d0016` | `availableStallDurationsMaximumResolution` | `base+0xe850` | `base+0xde50` | `0x01664bec` |
+
+The `d0014` emission in full, with `IMPL-44`'s NOP visible in place:
+
+```
+0x0166531c  ldr  x27, [x24, #0x60]        ; S
+0x01665320  add  x17, x19, #0xa6, lsl #12
+0x01665324  add  x17, x17, #0x560         ; x17 = x19 + 0xa6560
+0x01665328  ldr  w10, [x27, #0x3d84]      ; binning selector
+0x0166532c  cmp  w10, #1
+0x01665330  b.ne <skip>                   ; requires selector == 1
+0x01665334  mov  w1, #0x4968
+0x01665338  ldr  w8, [x27, x1]
+0x0166533c  cbnz w8, <skip>               ; requires [S+0x4968] == 0
+0x01665354  nop                           ; <- IMPL-44 NOPed the bit-28 gate here
+0x01665358  ldr  x21, [x17, #0x68]        ; the shared base
+0x0166535c  mov  w16, #0x6f2c
+0x01665360  ldr  w11, [x21, x16]          ; count
+0x01665364  lsl  w3, w11, #2              ; count * 4 int32
+0x01665368  cbz  w3, <skip>
+0x0166536c  mov  w1, #0x14
+0x01665370  add  x2, x21, #0xb28          ; data, inline
+0x01665378  movk w1, #0xd, lsl #16        ; 0xd0014
+0x0166537c  b    #0x1667da0               ; publish
+```
+
+`lsl w3, count, #2` confirms the arithmetic independently: `count = 7`, `7 x 4 =
+28` int32, which is exactly the `int32[28]` `dumpsys` reports. Nothing here is
+inferred from the dump alone.
+
+**A structural detail worth carrying forward:** the default table's data is a
+**pointer** stored at `base+0xb10`, while the max-res table's data is an **inline
+array** at `base+0xb28`. Different storage classes in the same struct, eighteen
+bytes apart. The counts are adjacent int32 fields, `0x6f28` and `0x6f2c`.
+
+### The finding that stops the sub-plan
+
+The populator is **`InitializeScalerStaticCaps`** (`0x16bf4c0`…`0x16c5a90`) —
+the function the ontology already records, and the function **`Faz4.1` targets**
+with its four `cmp wN,#2` sites at `0x16c18dc`, `0x16c1c18`, `0x16c22bc`,
+`0x16c2330`.
+
+At `0x016c5350`…`0x016c5368`, in one consecutive run of stores:
+
+```
+0x016c531c  lsl  w26, w24, #1
+0x016c5320  add  w7,  w26, #2             ; w7  = w24*2 + 2
+0x016c5324  add  w20, w24, #1             ; w20 = w24 + 1
+0x016c5334  mov  w17, #0x6f28             ; default count offset
+0x016c5344  mov  w26, #0x6f2c             ; d0014 count offset
+0x016c5348  mov  w21, #0xd444             ; d0015 count offset
+0x016c534c  mov  w3,  #0xe850             ; d0016 count offset
+0x016c5350  str  w12, [x22, x17]          ; default count
+0x016c5360  str  w7,  [x22, x26]          ; d0014 count
+0x016c5364  str  w20, [x22, x21]          ; d0015 count
+0x016c5368  str  w14, [x22, x3]           ; d0016 count  = 4
+```
+
+**The default count and all three MaximumResolution counts are written by one
+function, in one instruction run, from values computed off the same loop
+variable.** A second writer touching the same fields exists at `0x016bf7d4`.
+
+`Faz4.7` section 10 claimed independence from `Faz4.1` and `Faz4.2` on the
+grounds that the `MaximumResolution` tables have their own emission sites — which
+is true of the *emissions* and false of the *population*. Section 10 named this
+exact contingency and section 13 made it a pause condition. **It has fired.**
+
+Three consequences follow, and none of them is a patch:
+
+1. **`Faz4.1` may already move `d0014`.** Its `cmp #2` → `cmp #5` change widens
+   the admitted format set inside this function. If the max-res rows are built in
+   the same loop, `Faz4.1` changes `d0014` as a side effect — and `Faz4.1`'s
+   acceptance criteria count only the default array's int32s, so it would not
+   notice.
+2. **The `Faz4.7` / `Faz4.2` boundary may not hold either.** It was drawn at the
+   `MaximumResolution` suffix, which is a naming boundary, not a code one.
+3. **Ordering is now a real decision.** Two sub-plans want to patch one function.
+
+### What is established, and what is not
+
+**Established.** `d0014`'s content is not static data. The four emission sites,
+their shared base, and their count and data offsets are located and cross-checked
+against the published `int32[28]`. The default table's data is a pointer and the
+max-res table's is inline. `InitializeScalerStaticCaps` writes all four counts in
+one store run, from computed values.
+
+**Not established, and deliberately not guessed.** Whether the max-res rows are
+built in the *same loop* as the default rows or merely in the same function — a
+shared function and an adjacent store run are strong evidence and are not the
+same claim. Where the `1920x1080` values themselves come from; the store run at
+`0x016c5360` writes `w24*2 + 2`, which cannot equal 7 for any integer `w24`, so
+**this is not the path that produced camera 2's count of 7** and at least one
+other writer is involved. Whether `Faz4.1`'s format gate actually reaches the
+max-res rows. Those three are what `F4.7-03` still owes, and they are cheap
+host-side work — but they should be done under a sequencing decision, not before
+one.
+
+### Device state
+
+**Not contacted for analysis.** The binary was pulled read-only from
+`/data/adb/modules/ishtar_cam_modes/active_hal/camera.qcom.so` and verified at
+`ce419bc901bea61945d166aee11e1ab0`, matching the live HAL. No capture, no patch,
+no preference touched, no device write. `FIND-3.5-01` and `FIND-4.5-02` remain
+**OPEN**.
