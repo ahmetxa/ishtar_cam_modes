@@ -1670,3 +1670,196 @@ zeroes `[S+0x3d84]` at 39 sites, three of which (`0x0166601c`, `0x0166606c`,
 `0x01666378`) are the binning-selector precondition of these very emissions, and
 the capability filter tests the same selector with `cbz`. Zeroing it removes both
 the tags and the capability. The two tables are alternative strategies.
+
+## 23. A client requested `MAXIMUM_RESOLUTION` and got it; the sensor still binned, and the fold is a stride error (`IMPL-45`, 2026-09-03)
+
+Section 22 ended with a sharply defined next step: *a capture in which
+`android.sensor.pixelMode` reads `MAXIMUM_RESOLUTION` in the result.* That
+capture now exists. It required building an instrument, and the instrument found
+two things the record did not have: **the mode is honoured, partially**, and
+**the payload fold is not a quadrant fold at all**.
+
+### The instrument
+
+`tools/pixelmode-probe/` — a minimal Camera2 client. It is **not an APK**. It is
+a bare `classes.dex` run through `app_process`, the standard Android shell-tool
+mechanism, so it needs no `aapt2`, `apksigner`, `zipalign` or `gradle`. It runs
+as the shell user, which holds `android.permission.CAMERA`
+(`granted=true, SYSTEM_FIXED`).
+
+Host toolchain, two direct downloads (no `sdkmanager`):
+
+| file | purpose | size |
+|---|---|---|
+| `platform-35_r02.zip` → `android-35/android.jar` | compile target, API 35 = device | 64.3 MB |
+| `r8-8.13.23.jar` (provides `d8`) | classes → dex | 18.3 MB |
+
+`bash tools/pixelmode-probe/build.sh` compiles, dexes and pushes.
+`PixelModeProbe [width] [height] [max|default|both] [format]`.
+
+`ActivityThread.systemMain()` / `getSystemContext()` are hidden API and are
+reached by reflection; everything else is public Camera2.
+
+### Two request-path facts that had to be discovered
+
+**The framework's max-res stream map is `null`.** `get()` on
+`SCALER_STREAM_CONFIGURATION_MAP_MAXIMUM_RESOLUTION` returns **null** — it does
+not throw. This is the predicted `d0015`/`d0016` gap, and the prediction that a
+client "may fault" on it is now **measured: it returns null quietly.** A client
+must handle null, not an exception.
+
+**A stream must *declare* the pixel mode it will be used in.** Setting
+`CaptureRequest.SENSOR_PIXEL_MODE` alone is rejected by the camera **service**,
+not the HAL:
+
+```
+IllegalArgumentException: submitRequestList:479: Request settings
+CONTROL_SENSOR_PIXEL_MODE are not consistent with streams configured
+```
+
+The service infers `{DEFAULT}` for a stream whose size it found in the default
+map. The fix is `OutputConfiguration.addSensorPixelModeUsed(...)` plus
+`SessionConfiguration` — the deprecated `createCaptureSession(List<Surface>,…)`
+cannot express this at all.
+
+### The blocker: `d0014` describes a 1920x1080 sensor
+
+With the mode declared, configuring `8192x6144` in `MAXIMUM_RESOLUTION` fails at
+session setup — `isSessionConfigurationSupported` throws *Invalid session
+configuration*. The reason is in the table IMPL-44 published. For **camera 2**:
+
+```
+android.scaler.availableStreamConfigurationsMaximumResolution (d0014): int32[28]
+  [34 1920 1080 OUTPUT ]   [35 1920 1080 OUTPUT ]   [33 1920 1080 OUTPUT ]
+  [54 1920 1080 OUTPUT ]   [37 1920 1080 OUTPUT ]   [38 1920 1080 OUTPUT ]
+  [36 1920 1080 OUTPUT ]
+```
+
+**Seven formats, one size, and that size is 1920x1080.** Meanwhile the sensor
+tags on the same camera read `activeArraySizeMaximumResolution [0 0 8192 6144]`,
+`pixelArraySizeMaximumResolution [8192 6144]`, `binningFactor [2 2]`.
+
+This is a contradiction *inside the published metadata*, and the service enforces
+the stream table. **No client can configure an 8192x6144 maximum-resolution
+stream on this build**, however correct its code. Opening the bit-28 gate
+published the table; it did not populate it with the unbinned geometry.
+
+That reframes the next step. It is not the 42 further bit-28 sites. It is
+`d0014`'s *contents* — and `d0015`/`d0016` alongside it, which are empty for the
+same reason. All three are one body of work, and it is `Faz4.2`'s.
+
+### The mode is honoured, and the honouring is partial
+
+At `1920x1080` — a geometry `d0014` does permit — the request succeeds. Both
+captures use `YUV_420_888` (format 35), same session shape, one run:
+
+| | `MAXIMUM_RESOLUTION` | `DEFAULT` (control) |
+|---|---|---|
+| `isSessionConfigurationSupported` | true | true |
+| result `SENSOR_PIXEL_MODE` | **1 (MAXIMUM_RESOLUTION)** | 0 (DEFAULT) |
+| result `SENSOR_RAW_BINNING_FACTOR_USED` | **true** | true |
+| result `SCALER_CROP_REGION` | **Rect(0, 0 - 8192, 6144)** | Rect(0, 0 - 4096, 3072) |
+| frame | real image, black 0.0000, mean 168.88 | real image, black 0.0000, mean 168.22 |
+
+**This is the first capture in this project whose result metadata reads
+`MAXIMUM_RESOLUTION`.** `FIND-4.5-02`'s central unknown is now answered in part:
+**CamX does respond to `pixelMode`.** It switches the crop domain from the binned
+`4096x3072` to the full unbinned `8192x6144`.
+
+**But `rawBinningFactorUsed` stays `true` in both.** The coordinate system moved;
+the sensor did not come out of binning. Two readings remain open, and the
+evidence does not separate them: either CamX honours the mode only in the crop
+domain and never reprograms the sensor, or a 1920x1080 output legitimately keeps
+a binned readout and the question can only be asked at full size — which
+`d0014` currently forbids. **Do not record this as "the sensor refuses to
+unbin."** It is not yet that.
+
+RAW10 at `1920x1080` was tried first and times out waiting for a result in
+**both** modes, so that timeout is a property of the geometry, not of `pixelMode`.
+The comparison above uses YUV precisely because it is unaffected.
+
+### The fold is a stride error, not a quadrant fold
+
+The control capture at `8192x6144` RAW10 delivered a full buffer, and it is the
+first time the payload has been measured as raw sensor data rather than as a
+processed JPEG:
+
+```
+width x height : 8192 x 6144      rowStride    : 10240      planes : 1
+format         : RAW10 (0x25)     buffer bytes : 62914560   pixelStride : 0
+```
+
+`rowStride = 10240` is **correct** for a full 8192-wide RAW10 row
+(`8192 x 10 / 8`), and `10240 x 6144 = 62914560` is the whole buffer. The
+geometry is genuinely full size.
+
+Measured with PIL, grayscale, threshold `< 4`, on the original — the same method
+as `IMPL-40`/`43`/`44`:
+
+```
+BLACK FRACTION : 0.7500      (37748736 / 50331648 px)
+```
+
+which matches the AGC JPEG's `0.7497` / `0.7502`. But the *structure* is not what
+was assumed:
+
+```
+QUADRANT OCCUPANCY (each 4096x3072)
+  top-left      black=0.5000  min=0 max=140 mean=21.261
+  top-right     black=0.5000  min=0 max=141 mean=22.927
+  bottom-left   black=1.0000  min=0 max=  0 mean= 0.000
+  bottom-right  black=1.0000  min=0 max=  0 mean= 0.000
+```
+
+Content is in the **top half at half density**, not in one quadrant. Reading
+individual rows settles it — rows 100 and 1000 are populated across **all 8192
+columns**, and row 1536 onward is entirely black:
+
+```
+last populated row index : 1535
+populated row count      : 1536
+populated pixels         : 1536 x 8192 = 12582912
+4096 x 3072              =              12582912   <- exact match
+```
+
+**The payload is exactly the binned pixel count, written contiguously.** The
+producer emits `4096 x 3072` pixels and lays them down as a flat stream into a
+buffer that is 8192 wide, so they wrap at twice the intended rate and fill
+exactly the first quarter of the rows. Three quarters black is the *arithmetic
+consequence* of that, not an independent symptom.
+
+This corrects the framing carried since section 18 and repeated in section 22.
+The image was never "content in one quadrant" — that was an artifact of reading a
+rotated 6144x8192 JPEG. **It is a row-stride mismatch: right pixel count, wrong
+row width.** The sensor is delivering binned data and something downstream is
+writing it with the destination buffer's stride instead of the source's.
+
+### What this establishes, and what it does not
+
+**Established.** A Camera2 client can now legally request and *receive*
+`pixelMode = MAXIMUM_RESOLUTION` on this build; CamX responds by moving
+`SCALER_CROP_REGION` to the full `8192x6144`. The max-res stream map is `null`,
+not throwing. `OutputConfiguration.addSensorPixelModeUsed` is mandatory. `d0014`
+contains only `1920x1080`, which blocks any full-size max-res stream. The
+`8192x6144` RAW payload is exactly `4096x3072` pixels in a contiguous
+top-of-buffer band — a stride error with an exact pixel-count match.
+
+**Not established.** Whether the sensor will leave binning when a *full-size*
+max-res stream is requested — `d0014` forbids asking. Whether the stride error
+and the binning are one fault or two. Whether the 42 bit-28 sites in regions
+`0x17`/`0x18`/`0x19` matter; they remain untouched and unexamined, and this run
+gives no reason to touch them.
+
+**Next step, sharply defined:** populate `d0014` with the unbinned sizes, and
+`d0015`/`d0016` with matching duration rows. That is `Faz4.2`, and it is now on
+the critical path rather than beside it — it is the only thing standing between
+this instrument and the measurement that settles the sensor question.
+
+`FIND-3.5-01` and `FIND-4.5-02` remain **OPEN**.
+
+### Device state
+
+Unchanged by this run, and verified by a before/after `smoke.sh` bracket whose
+comparable regions are byte-identical. Live HAL remains
+`ce419bc901bea61945d166aee11e1ab0`; trap 0/12; 13 camera devices. The probe is a
+read-only measurement client and writes only to `/data/local/tmp/`.

@@ -1,0 +1,194 @@
+########## probe2.log ##########
+
+=== CONTEXT ===
+context: android.app.ContextImpl@36c553a
+cameraManager: android.hardware.camera2.CameraManager@bf425eb
+cameraIdList: [0, 1]
+
+=== CHARACTERISTICS (camera 2) ===
+availableCapabilities: [0, 9, 3, 7, 4, 5, 1, 6, 2, 16, 19, 18]
+ULTRA_HIGH_RESOLUTION_SENSOR present: true
+SENSOR_INFO_ACTIVE_ARRAY_SIZE            : Rect(0, 0 - 8192, 6144)
+SENSOR_INFO_PIXEL_ARRAY_SIZE             : 8192x6144
+..ACTIVE_ARRAY_SIZE_MAXIMUM_RESOLUTION   : Rect(0, 0 - 8192, 6144)
+..PIXEL_ARRAY_SIZE_MAXIMUM_RESOLUTION    : 8192x6144
+SENSOR_INFO_BINNING_FACTOR               : 2x2
+
+=== DEFAULT STREAM MAP ===
+default output formats: [32, 256, 34, 35, 36, 37, 38, 54, 1212500294, 4101]
+  RAW_SENSOR (0x20): [4096x3072, 4096x2304]
+  RAW_PRIVATE (0x24): [8192x6144, 4096x3072, 4096x2304, 3072x3072, 4096x2160, 3840x2160, 4096x1844, 2880x2160, 2448x2448, 3200x1800, 3200x1440, 2560x1440, 1920x1440, 2400x1080, 1920x1080, 1632x1224, 1600x1200, 1920x960, 1440x1080, 1280x960, 1600x720, 1280x720, 960x720, 800x600, 864x480, 720x480, 640x480, 352x288, 320x240, 176x144, 4096x3072, 4096x2304]
+  RAW10 (0x25): [8192x6144, 4096x3072, 4096x2304, 3072x3072, 4096x2160, 3840x2160, 4096x1844, 2880x2160, 2448x2448, 3200x1800, 3200x1440, 2560x1440, 1920x1440, 2400x1080, 1920x1080, 1632x1224, 1600x1200, 1920x960, 1440x1080, 1280x960, 1600x720, 1280x720, 960x720, 800x600, 864x480, 720x480, 640x480, 352x288, 320x240, 176x144, 4096x3072, 4096x2304]
+  RAW12 (0x26): [8192x6144, 4096x3072, 4096x2304, 3072x3072, 4096x2160, 3840x2160, 4096x1844, 2880x2160, 2448x2448, 3200x1800, 3200x1440, 2560x1440, 1920x1440, 2400x1080, 1920x1080, 1632x1224, 1600x1200, 1920x960, 1440x1080, 1280x960, 1600x720, 1280x720, 960x720, 800x600, 864x480, 720x480, 640x480, 352x288, 320x240, 176x144]
+
+=== MAXIMUM_RESOLUTION STREAM MAP ===
+NOTE: d0015/d0016 (min frame durations / stall durations MaximumResolution) are known ABSENT on this build -- their source arrays are empty. The key list advertises 851989/851990 while get() may return null. A throw HERE is that known gap, not a bug in this client.
+RESULT: max-res stream map is NULL (no throw). This is the d0015/d0016 gap.
+format RAW10 found at 8192x6144 in the DEFAULT map
+
+chosen format: RAW10 (0x25) at 8192x6144
+
+=== CAPTURE 1 of 2 -- pixelMode = MAXIMUM_RESOLUTION ===
+camera opened: 2
+OutputConfiguration: addSensorPixelModeUsed(MAXIMUM_RESOLUTION)
+isSessionConfigurationSupported threw: java.lang.IllegalArgumentException: Invalid session configuration
+SESSION FAILED: java.lang.IllegalStateException: session CONFIGURE FAILED at 8192x6144
+  (a configuration failure at max-res is itself a result: it means the framework will not accept this geometry, most likely because the d0015/d0016 duration tables are empty)
+
+=== CAPTURE 2 of 2 -- CONTROL, pixelMode = DEFAULT ===
+camera opened: 2
+OutputConfiguration: addSensorPixelModeUsed(DEFAULT)
+isSessionConfigurationSupported: true
+session configured
+request: SENSOR_PIXEL_MODE left DEFAULT (key not set)
+request readback SENSOR_PIXEL_MODE: null
+--- IMAGE GEOMETRY ---
+  width x height : 8192 x 6144
+  format         : RAW10 (0x25)
+  rowStride      : 10240
+  pixelStride    : 0
+  planes         : 1
+  buffer bytes   : 62914560
+  implied rows   : 6144
+  wrote          : /data/local/tmp/probe_default_8192x6144_stride10240_ps0_RAW10.raw (62914560 bytes)
+--- RESULT METADATA ---
+  SENSOR_PIXEL_MODE            : 0 (DEFAULT)
+  SENSOR_RAW_BINNING_FACTOR_USED: true
+  SCALER_CROP_REGION            : Rect(0, 0 - 4096, 3072)
+  SENSOR_TIMESTAMP              : 139611907826464
+saved: /data/local/tmp/probe_default_8192x6144_stride10240_ps0_RAW10.raw
+
+=== DONE ===
+
+########## probe3.log ##########
+probe geometry: 1920x1080  modes=both
+
+=== CONTEXT ===
+context: android.app.ContextImpl@8c52e2d
+cameraManager: android.hardware.camera2.CameraManager@3d48f62
+cameraIdList: [0, 1]
+
+=== CHARACTERISTICS (camera 2) ===
+availableCapabilities: [0, 9, 3, 7, 4, 5, 1, 6, 2, 16, 19, 18]
+ULTRA_HIGH_RESOLUTION_SENSOR present: true
+SENSOR_INFO_ACTIVE_ARRAY_SIZE            : Rect(0, 0 - 8192, 6144)
+SENSOR_INFO_PIXEL_ARRAY_SIZE             : 8192x6144
+..ACTIVE_ARRAY_SIZE_MAXIMUM_RESOLUTION   : Rect(0, 0 - 8192, 6144)
+..PIXEL_ARRAY_SIZE_MAXIMUM_RESOLUTION    : 8192x6144
+SENSOR_INFO_BINNING_FACTOR               : 2x2
+
+=== DEFAULT STREAM MAP ===
+default output formats: [32, 256, 34, 35, 36, 37, 38, 54, 1212500294, 4101]
+  RAW_SENSOR (0x20): [4096x3072, 4096x2304]
+  RAW_PRIVATE (0x24): [8192x6144, 4096x3072, 4096x2304, 3072x3072, 4096x2160, 3840x2160, 4096x1844, 2880x2160, 2448x2448, 3200x1800, 3200x1440, 2560x1440, 1920x1440, 2400x1080, 1920x1080, 1632x1224, 1600x1200, 1920x960, 1440x1080, 1280x960, 1600x720, 1280x720, 960x720, 800x600, 864x480, 720x480, 640x480, 352x288, 320x240, 176x144, 4096x3072, 4096x2304]
+  RAW10 (0x25): [8192x6144, 4096x3072, 4096x2304, 3072x3072, 4096x2160, 3840x2160, 4096x1844, 2880x2160, 2448x2448, 3200x1800, 3200x1440, 2560x1440, 1920x1440, 2400x1080, 1920x1080, 1632x1224, 1600x1200, 1920x960, 1440x1080, 1280x960, 1600x720, 1280x720, 960x720, 800x600, 864x480, 720x480, 640x480, 352x288, 320x240, 176x144, 4096x3072, 4096x2304]
+  RAW12 (0x26): [8192x6144, 4096x3072, 4096x2304, 3072x3072, 4096x2160, 3840x2160, 4096x1844, 2880x2160, 2448x2448, 3200x1800, 3200x1440, 2560x1440, 1920x1440, 2400x1080, 1920x1080, 1632x1224, 1600x1200, 1920x960, 1440x1080, 1280x960, 1600x720, 1280x720, 960x720, 800x600, 864x480, 720x480, 640x480, 352x288, 320x240, 176x144]
+
+=== MAXIMUM_RESOLUTION STREAM MAP ===
+NOTE: d0015/d0016 (min frame durations / stall durations MaximumResolution) are known ABSENT on this build -- their source arrays are empty. The key list advertises 851989/851990 while get() may return null. A throw HERE is that known gap, not a bug in this client.
+RESULT: max-res stream map is NULL (no throw). This is the d0015/d0016 gap.
+format RAW10 found at 1920x1080 in the DEFAULT map
+
+chosen format: RAW10 (0x25) at 1920x1080
+
+=== CAPTURE -- pixelMode = MAXIMUM_RESOLUTION ===
+camera opened: 2
+OutputConfiguration: addSensorPixelModeUsed(MAXIMUM_RESOLUTION)
+isSessionConfigurationSupported: true
+session configured
+request: SENSOR_PIXEL_MODE = MAXIMUM_RESOLUTION (1)
+request readback SENSOR_PIXEL_MODE: 1
+TIMEOUT waiting for capture result
+TIMEOUT waiting for image
+
+=== CAPTURE -- CONTROL, pixelMode = DEFAULT ===
+camera opened: 2
+OutputConfiguration: addSensorPixelModeUsed(DEFAULT)
+isSessionConfigurationSupported: true
+session configured
+request: SENSOR_PIXEL_MODE left DEFAULT (key not set)
+request readback SENSOR_PIXEL_MODE: null
+TIMEOUT waiting for capture result
+TIMEOUT waiting for image
+
+=== DONE ===
+
+########## probe4.log ##########
+probe geometry: 1920x1080  modes=both
+
+=== CONTEXT ===
+context: android.app.ContextImpl@c520bd7
+cameraManager: android.hardware.camera2.CameraManager@dd4bcc4
+cameraIdList: [0, 1]
+
+=== CHARACTERISTICS (camera 2) ===
+availableCapabilities: [0, 9, 3, 7, 4, 5, 1, 6, 2, 16, 19, 18]
+ULTRA_HIGH_RESOLUTION_SENSOR present: true
+SENSOR_INFO_ACTIVE_ARRAY_SIZE            : Rect(0, 0 - 8192, 6144)
+SENSOR_INFO_PIXEL_ARRAY_SIZE             : 8192x6144
+..ACTIVE_ARRAY_SIZE_MAXIMUM_RESOLUTION   : Rect(0, 0 - 8192, 6144)
+..PIXEL_ARRAY_SIZE_MAXIMUM_RESOLUTION    : 8192x6144
+SENSOR_INFO_BINNING_FACTOR               : 2x2
+
+=== DEFAULT STREAM MAP ===
+default output formats: [32, 256, 34, 35, 36, 37, 38, 54, 1212500294, 4101]
+  RAW_SENSOR (0x20): [4096x3072, 4096x2304]
+  RAW_PRIVATE (0x24): [8192x6144, 4096x3072, 4096x2304, 3072x3072, 4096x2160, 3840x2160, 4096x1844, 2880x2160, 2448x2448, 3200x1800, 3200x1440, 2560x1440, 1920x1440, 2400x1080, 1920x1080, 1632x1224, 1600x1200, 1920x960, 1440x1080, 1280x960, 1600x720, 1280x720, 960x720, 800x600, 864x480, 720x480, 640x480, 352x288, 320x240, 176x144, 4096x3072, 4096x2304]
+  RAW10 (0x25): [8192x6144, 4096x3072, 4096x2304, 3072x3072, 4096x2160, 3840x2160, 4096x1844, 2880x2160, 2448x2448, 3200x1800, 3200x1440, 2560x1440, 1920x1440, 2400x1080, 1920x1080, 1632x1224, 1600x1200, 1920x960, 1440x1080, 1280x960, 1600x720, 1280x720, 960x720, 800x600, 864x480, 720x480, 640x480, 352x288, 320x240, 176x144, 4096x3072, 4096x2304]
+  RAW12 (0x26): [8192x6144, 4096x3072, 4096x2304, 3072x3072, 4096x2160, 3840x2160, 4096x1844, 2880x2160, 2448x2448, 3200x1800, 3200x1440, 2560x1440, 1920x1440, 2400x1080, 1920x1080, 1632x1224, 1600x1200, 1920x960, 1440x1080, 1280x960, 1600x720, 1280x720, 960x720, 800x600, 864x480, 720x480, 640x480, 352x288, 320x240, 176x144]
+
+=== MAXIMUM_RESOLUTION STREAM MAP ===
+NOTE: d0015/d0016 (min frame durations / stall durations MaximumResolution) are known ABSENT on this build -- their source arrays are empty. The key list advertises 851989/851990 while get() may return null. A throw HERE is that known gap, not a bug in this client.
+RESULT: max-res stream map is NULL (no throw). This is the d0015/d0016 gap.
+format FORCED by argv: fmt35
+
+chosen format: fmt35 (0x23) at 1920x1080
+
+=== CAPTURE -- pixelMode = MAXIMUM_RESOLUTION ===
+camera opened: 2
+OutputConfiguration: addSensorPixelModeUsed(MAXIMUM_RESOLUTION)
+isSessionConfigurationSupported: true
+session configured
+request: SENSOR_PIXEL_MODE = MAXIMUM_RESOLUTION (1)
+request readback SENSOR_PIXEL_MODE: 1
+--- IMAGE GEOMETRY ---
+  width x height : 1920 x 1080
+  format         : fmt35 (0x23)
+  rowStride      : 1920
+  pixelStride    : 1
+  planes         : 3
+  buffer bytes   : 2073600
+  implied rows   : 1080
+  wrote          : /data/local/tmp/probe_max_1920x1080_1920x1080_stride1920_ps1_fmt35.raw (2073600 bytes)
+--- RESULT METADATA ---
+  SENSOR_PIXEL_MODE            : 1 (MAXIMUM_RESOLUTION)
+  SENSOR_RAW_BINNING_FACTOR_USED: true
+  SCALER_CROP_REGION            : Rect(0, 0 - 8192, 6144)
+  SENSOR_TIMESTAMP              : 139947054768963
+saved: /data/local/tmp/probe_max_1920x1080_1920x1080_stride1920_ps1_fmt35.raw
+
+=== CAPTURE -- CONTROL, pixelMode = DEFAULT ===
+camera opened: 2
+OutputConfiguration: addSensorPixelModeUsed(DEFAULT)
+isSessionConfigurationSupported: true
+session configured
+request: SENSOR_PIXEL_MODE left DEFAULT (key not set)
+request readback SENSOR_PIXEL_MODE: null
+--- IMAGE GEOMETRY ---
+  width x height : 1920 x 1080
+  format         : fmt35 (0x23)
+  rowStride      : 1920
+  pixelStride    : 1
+  planes         : 3
+  buffer bytes   : 2073600
+  implied rows   : 1080
+  wrote          : /data/local/tmp/probe_default_1920x1080_1920x1080_stride1920_ps1_fmt35.raw (2073600 bytes)
+--- RESULT METADATA ---
+  SENSOR_PIXEL_MODE            : 0 (DEFAULT)
+  SENSOR_RAW_BINNING_FACTOR_USED: true
+  SCALER_CROP_REGION            : Rect(0, 0 - 4096, 3072)
+  SENSOR_TIMESTAMP              : 139949228660995
+saved: /data/local/tmp/probe_default_1920x1080_1920x1080_stride1920_ps1_fmt35.raw
+
+=== DONE ===
+

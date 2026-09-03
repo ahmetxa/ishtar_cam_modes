@@ -1,0 +1,4 @@
+# Build outputs. Regenerate with build.sh; the toolchain lives outside the
+# repo at C:/Users/ahmet/android-tools (android.jar + r8.jar, ~82 MB).
+classes/
+dex/
