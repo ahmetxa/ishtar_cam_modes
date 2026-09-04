@@ -8,7 +8,14 @@ Autopsy raises three related findings that belong together. `AUTOPSY-P3-01` reco
 
 Project-Comprehension `EV-23` records the stale claim as `contradicted` — the only row in that register with that confidence value — and `ARC-10` records "History lives in the journal — Duplicated into `module.prop` `description`" as `divergent`.
 
-By this point Phase 3 has acted on the very conclusion the stale text denies, which makes the correction more than tidiness: the shipped module describes a limitation the project has spent a phase removing.
+By this point Phase 3 has acted on the very conclusion the stale text denies, which makes the correction more than tidiness.
+
+**Amended 2026-09-04 by planning run 10 (`AUDIT-FIX-18`, `DEC-14`). The premise of this correction inverted, and its shape changed with it.** This paragraph previously read "the shipped module describes a limitation the project has spent a phase removing". `DEC-14` retired the objective of removing that limitation and **adopted 12.6 MP as AGC's working resolution**, so the module no longer describes a limitation the project is removing — it describes, for the wrong reason, a figure that is now correct. The claim has two halves and they must be handled differently:
+
+- **The causal half is false and is what gets corrected.** `module.prop` states AGC remains at 12.6–15.2 MP *because the GCam 8.4 engine cannot select the 50 MP stream*. `IMPL-23` disproved it — with the pixel-array and RAW words applied, AGC completed three reproducible 50.3 MP captures — and `IMPL-43` measured the stream surface that makes the engine's selection a HAL-table question rather than an engine limitation. Project-Ontology invariant 7 records the real mechanism, the framework's high-resolution bucket exclusion, and `OQ-15` records it as answered.
+- **The resolution figure is correct, and correct for a new reason.** 12.58 MP is AGC's configured, deliberately pinned working resolution under `DEC-14`, not a ceiling the project failed to break. The source of that fact is `Faz-3-Plans/Faz3.11-phase-closure-and-configuration-record.md` and the `docs/agc-12mp-configuration.md` record it produces — **not** the journal's Faz 8 conclusion, which reached the same number by the wrong route and stays marked as superseded.
+
+**The failure mode this amendment exists to prevent** is an implementer reading the old framing, treating the whole claim as disproved, and writing "AGC now captures at 50 MP" or "the ceiling has been removed" into a shipped module description. Both would be false. The correction is: keep the figure, replace the cause, and cite `Faz3.11`'s configuration record as its source.
 
 ## 2. Goal
 
@@ -32,7 +39,7 @@ One decision from Main-Planing section 9 lands here: whether the AON module merg
 
 ## 4. Scope
 
-- Correction of the stale causal claim in `module.prop`'s description regarding the AGC resolution ceiling.
+- Correction of the **causal** half of the stale claim in `module.prop`'s description — the assertion that the GCam engine cannot select the 50 MP stream — while **retaining the 12.58 MP figure**, restated as AGC's pinned working resolution under `DEC-14` and sourced to `Faz3.11`'s configuration record rather than to the journal's Faz 8 ceiling.
 - Reduction of the description field to a module summary, with the changelog relocated.
 - A changelog file carrying the version history that the description currently holds.
 - Marking of superseded sections in `50MP-Entegrasyon-Plani.md`, without deleting them.
@@ -76,7 +83,7 @@ Project-Comprehension `EV-23` is the only row in the evidence register marked `c
   - Description: Search the user-facing documentation set — `module.prop`, `Kullanim.txt`, the web interface strings, and the journal — for the disproven causal statement. Correcting one instance while others persist is the failure mode to avoid.
   - Output: An instance list.
 - F9.3-02 — Correct the claim using the existing correct text
-  - Description: Replace the disproven cause with the correct one, drawing on `agc-50mp-yama/README.md`, which already states it accurately with measured values.
+  - Description: Replace the disproven cause with the correct one, drawing on `agc-50mp-yama/README.md`, which already states the mechanism accurately with measured values, and on Project-Ontology invariant 7. **Do not remove or raise the resolution figure while doing it:** under `DEC-14` the 12.58 MP figure is current and its source is `Faz3.11`'s `docs/agc-12mp-configuration.md`. Replacing "AGC is limited to 12.6 MP because the engine cannot select 50 MP" with anything claiming AGC now captures at 50 MP would be a new false claim in place of an old one.
   - Output: Corrected text at every located instance.
 - F9.3-03 — Reduce the description to a summary
   - Description: Rewrite `module.prop`'s description as what the field is for — a module summary — retaining the currently true capability statements and dropping the version history.
@@ -103,7 +110,7 @@ Project-Comprehension `EV-23` is the only row in the evidence register marked `c
 ## 8. Acceptance Criteria
 
 - Every instance of the stale causal claim is located and corrected; the instance list shows the search covered all four documentation surfaces.
-- The corrected text states the actual cause with its measured basis, drawn from the existing correct explanation rather than newly authored.
+- The corrected text states the actual cause with its measured basis, drawn from the existing correct explanation rather than newly authored — and it **retains the 12.58 MP figure** as AGC's pinned working resolution under `DEC-14`, cited to `Faz3.11`'s configuration record. A correction that raises or removes the figure is a failure of this criterion, not a stronger result.
 - `module.prop`'s description reads as a module summary and no longer carries the version history.
 - Every currently true capability statement survives the reduction.
 - A changelog file carries the relocated history with its entries preserved.

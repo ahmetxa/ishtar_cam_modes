@@ -2427,3 +2427,186 @@ was taken, at stage A; no preference was touched; no mode was switched.
 
 `FIND-3.5-01` and `FIND-4.5-02` remain **OPEN**. Nothing in this run is an image
 fix.
+
+## 28. Stage-C bisection names site 1; `F4.1-05b`'s additive lever does not exist on this binary (`IMPL-50`, 2026-09-03)
+
+Two small live experiments, run at the user's request after `IMPL-49` left
+`Faz4.1` blocked with the narrowing's cause un-decomposed and `F4.1-05b`
+unattempted. **(1)** the stage-C bisection, to halve the search for which of
+the 87 rows `IMPL-49` removed gcam actually needs. **(2)** an attempt at
+`F4.1-05b` as a strictly additive change on the broad base, not on top of the
+narrowing. Both acceptance criteria were stated before either was run, per
+`docs/faz41-predictions-impl49.md`'s own discipline.
+
+### Part 1 — the bisection: stage C crashes, and it names site 1
+
+`IMPL-48` committed `agc-50mp-yama/f41-stageC.tbl` (`fc7481c1… -> 6619ad47…`)
+with the split stated in advance: site 1 guarded, sites 2–4 restored to broad.
+Reached from the found state (`ce419bc9…`) by two applies — `f41-stageB.tbl`
+col 3, then `f41-stageC.tbl` col 3 — each matched against its pre-committed
+md5:
+
+| step | md5 | AGC |
+|---|---|---|
+| pre-check, stage A (broad, as found) | `ce419bc9…` | **launch, 1/1** |
+| apply stageB (all four gates → stock `#2`) | `fc7481c1…` | not tested (transit state) |
+| apply stageC (site 1 guarded; sites 2–4 broad) | `6619ad47…` | **crash, 3/3** |
+| revert stageC (→ stageB) | `fc7481c1…` | not tested (transit state) |
+| revert stageB (→ stage A) | `ce419bc9…` | **launch, 2/2** |
+
+Every transition matched its pre-committed md5. The crash buffer at stage C
+reproduces `IMPL-49`'s exact signature — `FATAL EXCEPTION: main …
+NullPointerException: Attempt to invoke virtual method 'boolean
+com.google.googlex.gcam.Gcam.f()' on a null object reference`, same class,
+same method, gcam's engine still null.
+
+**The decision tree stated before the run:** *C launches → the rows gcam
+needs are site 2's, site 1 may be narrowed. C crashes → site 1's rows are
+already load-bearing on their own.* **C crashes.** Site 1's own removed rows
+are sufficient, by themselves, to break AGC — sites 2, 3 and 4 being fully
+broad does not rescue it.
+
+This sharpens `IMPL-49`'s finding rather than merely confirming it. `IMPL-48`
+computed, host-side, that guarding site 1 alone costs it 116 int32 (`868 -
+752`, the row accounting that closed exactly in section 26) — and note what
+"guarded" means: the guard is *width-conditional*, so site 1's `8192x6144`
+rows (formats `0x24`/`0x25`/`0x26`) **survive** at stage C exactly as they do
+at stage D. What the guard removes from site 1 is the *same three formats at
+every other resolution*. **Those other-resolution rows, and not the
+`8192x6144`-specific ones, are what breaks gcam's initialisation** — the
+full-resolution RAW10 row `Faz4.1`'s preservation criterion cares about is
+present at every crashing stage measured so far (B, C, D) and gcam still
+fails to start. A fix aimed at "keep the 8192x6144 rows" was never going to
+help; it already doesn't.
+
+**What this does not settle.** The complementary cell — site 1 broad, sites
+2–4 guarded — was not run, so whether site 1's rows are *uniquely* sufficient
+or merely *also* sufficient (sites 2–4 might independently crash it too) is
+still open. `d000a`/`d0014` counts at stage C were not independently
+re-measured in this run; `IMPL-48`'s arithmetic predicts `d000a` cam 2 = 752,
+`d0014` = 24 at this configuration, but that prediction was not re-verified
+here — only the crash-or-launch verdict was measured, which is what the
+stated acceptance criterion required.
+
+### Part 2 — `F4.1-05b` attempted additively: no code cave exists, criterion UNMET
+
+The live HAL (`ce419bc9…`, the broad base) was pulled read-only for
+capstone/pyelftools analysis; its md5 was verified before and after the pull
+and it was never written back for this part — **no device write was
+attempted for `F4.1-05b`.**
+
+**The insertion point.** Site 1's format gate, disassembled at its live
+addresses:
+
+```
+0x16c18d8: sub  w11, w0, #0x22
+0x16c18dc: cmp  w11, #5
+0x16c18e0: b.lo #0x16c1a8c        ; in 0x22..0x26 -> emit
+0x16c18e4: cmp  w0, #0x36
+0x16c18e8: b.eq #0x16c1a8c        ; format 0x36 -> same emit target
+0x16c18ec: cmp  w0, #0x21         ; format 0x21 has its own handling, untouched by this design
+0x16c18f0: b.ne #0x16c1ac0
+```
+
+This is itself useful: the loop already reaches one shared emission label
+(`0x16c1a8c`) from two independent tests — the widened range, and a bare
+equality check for format `0x36`. That is the additive pattern `F4.1-05b`
+needs: one more equality check for format `0x20` (`RAW_SENSOR`), reaching the
+same label, touching neither the range test nor the `0x36` or `0x21` cases.
+
+**The instruction sequence, designed and hand-verified, never written:**
+
+```
+cmp  w0, #0x36
+ccmp w0, #0x20, #4, ne   ; #4 = 0b0100 = Z=1: forces "equal" when the first
+                         ; cmp already matched, else falls through to the
+                         ; second compare — a 3-instruction OR-of-equality
+b.eq #0x16c1a8c
+b    #0x16c18ec          ; return to the untouched 0x21 check
+```
+
+Four instructions, 16 bytes. The hook is a single `b <cave>` overwriting the
+original `cmp w0,#0x36 ; b.eq …` pair (8 bytes); the other 4 of those bytes
+become dead and unreferenced. This design changes nothing about any existing
+case — every value that worked before takes an identical path, just through
+two extra unconditional jumps — and adds exactly one new case.
+
+**The blocker: there is nowhere to put it.** The ELF program headers show
+exactly one executable `PT_LOAD` segment (`R+X`, offset `0x4f7000` size
+`0x14709e0`, ≈ 24.9 MB — effectively the whole `.text`); the other two
+`PT_LOAD` segments are `R+W`, not executable, so they cannot host branched-to
+code. An exhaustive byte-pattern scan of the entire executable segment, for
+any run of ≥16 contiguous free bytes matching either the AArch64 NOP encoding
+(`d503201f` LE) or zero-fill padding, found none:
+
+| pattern, minimum run | hits |
+|---|---|
+| NOP × 6 (24 B) | 0 |
+| NOP × 4 (16 B) | 0 |
+| NOP × 3 (12 B), longest found | 3, at `0xdd1004`, `0xdd8144`, `0xde9f94` |
+| zero-word × 4 (16 B) | 0 |
+| zero-word × 3 (12 B) | 4634 |
+
+The longest contiguous free run anywhere in the binary's sole executable
+region is 12 bytes — one instruction short of what a correct, non-destructive
+trampoline needs. This is a fully packed, size-optimised vendor build with no
+slack, not a search that stopped early.
+
+**Conclusion.** The additive lever `DEC-11`/`F4.1-05b` calls for does not
+exist on this binary as it stands. Providing one would require either growing
+the file — untested, high-risk, and outside every established method in this
+project, which patches fixed offsets in place (`dd … conv=notrunc`) and never
+resizes — or overwriting some other, currently load-bearing instruction
+sequence elsewhere, which would itself violate the additive constraint the
+criterion exists to enforce. Neither was attempted. **`F4.1-05b`'s criterion
+is reported UNMET**, per the standing discipline `IMPL-25`, `IMPL-48` and
+`IMPL-49` all followed, rather than reinterpreted or worked around.
+
+### What this does to `Faz4.1`
+
+Still `blocked`, per `IMPL-49`; nothing here reopens it. The bisection
+sharpens *which* removed rows matter — site 1's non-`8192x6144` rows, on
+their own, not an undifferentiated slice of the 87 — but a guard that keeps
+only the `8192x6144` rows (which is what every guard variant tried so far
+does) is now shown twice over, at two different guard widths (stage D: full
+guard; stage C: site 1 only), to be insufficient. **The one lever this run
+did not test is widening the guard to keep site 1's *other*-resolution rows
+too** — untested, and the natural next question if the narrowing goal is
+still pursued. `F4.1-05b` remains unattempted on-device and its criterion
+UNMET, unchanged from `IMPL-48`/`IMPL-49`.
+
+### Established, and not
+
+**Established.** Stage C crashes 3/3 with `gcam.Gcam.f()`'s exact NPE
+signature; the pre-check and post-revert controls launch 1/1 and 2/2. Site
+1's own guarded rows are, by themselves, sufficient to break AGC — sites 2–4
+being fully broad does not help. The `F4.1-05b` additive design is fully
+specified and capstone-verified host-side; the binary's sole executable
+segment has no contiguous free run ≥16 bytes anywhere, confirmed by an
+exhaustive pattern scan, so that design has no current implementation.
+
+**Not established.** Whether sites 2–4 are *also* independently sufficient to
+crash AGC when guarded alone — the complementary bisection cell was not run.
+Whether `d0014`'s narrowing contributes to the crash independently of
+`d000a`'s — still not separated, unchanged from `IMPL-49`. Whether growing the
+`.so` file is a workable route for this module at all — not attempted, and
+outside this session's scope.
+
+**Not attempted.** `F4.1-05b` was not written to the device. Widening the
+guard to preserve site 1's non-`8192x6144` rows was not tried.
+
+### Device state
+
+Restored to `ce419bc901bea61945d166aee11e1ab0`, confirmed by md5 after the
+final revert and by AGC launching 2/2. All four HAL transitions this run
+(stage A pre-check → stageB → stageC → stageB → stage A) matched their
+pre-committed md5 exactly; 13 camera devices came back on every restart. No
+preference was touched and no capture was taken — only crash-or-launch
+verdicts, which is what the stated acceptance criterion required. The scratch
+probe script and its crash-log copy were deleted from `/data/local/tmp` after
+use; the four `.tbl` tables were re-pushed from the committed repository
+copies and left in place, unmodified, for reuse. The HAL binary pulled for
+part 2's analysis was read-only and is not on the device's write path.
+
+`FIND-3.5-01` and `FIND-4.5-02` remain **OPEN**. Nothing in this run is an
+image fix.
