@@ -29,27 +29,90 @@ for each of the two families. The audit below covers all twelve.
 Files audited: `org.codeaurora.snapcam_preferences.xml` (5,851 B) and
 `primes.xml` (460 B), the only two in `shared_prefs/`.
 
-**Run 3 is the informative one. AGC does not self-arm the trap.** It was
-launched from a genuinely empty preference state — it had rebuilt its
-preferences from scratch during `IMPL-15`, showing its first-run dialog — and
-wrote none of the twelve keys. The trap is therefore a residue of *manual
-configuration or a `.agc` import*, never something the app produces on its own.
+**CORRECTED 2026-09-05 by `Faz3.11` under `FIND-3.7-01`, on the evidence of
+`IMPL-53`, `IMPL-54` and `IMPL-61`.** This paragraph previously read: *"Run 3 is
+the informative one. **AGC does not self-arm the trap.** … The trap is therefore
+a residue of manual configuration or a `.agc` import, never something the app
+produces on its own."* **That claim is false as written**, and the corrected
+statement is below. The old text is quoted rather than deleted because several
+later documents were written against it.
+
+**AGC does self-arm two of the twelve keys, and the trigger is the settings
+screen.**
+
+| Behaviour | Measured |
+|---|---|
+| A plain launcher start (`monkey -p org.codeaurora.snapcam -c android.intent.category.LAUNCHER 1`) | Arms **nothing**. `IMPL-61` ran this on every axis of the `Faz3.10` matrix. |
+| Opening `CameraSettingsActivity` | Writes **`pref_raw_key`** and **`pref_fix_resolution_key`**, both at value **`0`** (`IMPL-54`, 2026-09-04). |
+| Both keys at value `0` | Measured **inert** — identical stream configuration with them present and absent (`IMPL-53`, `IMPL-54`). Presence alone is not a fault. |
+
+**Why the original claim held for as long as it did, stated so this reads as a
+weaker test rather than as a simple error.** Run 3 launched AGC from a genuinely
+empty preference state — it had rebuilt its preferences from scratch during
+`IMPL-15`, showing its first-run dialog — and did so with a **plain launch**.
+That is exactly the case in which the app still arms nothing, so run 3's
+observation was correct; what it did not do was open the settings screen, which
+is the trigger. A plain launch from an empty state is a strictly weaker test than
+the claim it was used to support.
+
+**A third route exists and is not identified.** `FIND-3.10-02` (2026-09-05,
+`IMPL-61`): `prefs.trap.count` moved `0 → 2` — the same two keys, both at value
+`0` — during a session in which **no** axis opened the settings screen and every
+AGC start was a plain launcher start. Narrowed from the snapshots to
+15:45:35–15:50, during a capture sequence or a preferences restore; absent from
+the 15:43 backup and from the `Faz3.8` 11:45 backup. Not narrowed further. So the
+trap is a residue of manual configuration, a `.agc` import, the settings screen,
+**or at least one route not yet identified**.
+
+**Consequence for item 1 of the section 5 checklist: audit the twelve keys by
+VALUE, not by presence.** A bare `0 / 12` assertion now fails on a device whose
+state is measured harmless. Only a non-zero value is a fault.
 
 ### The clearance procedure, for when it is needed
 
-Not executed this run because nothing was set. Recorded so it exists before it
-is needed:
+**CORRECTED 2026-09-05 by `Faz3.11` under `FIND-3.7-01`, on the evidence of
+`IMPL-52` and `IMPL-61`.** The procedure recorded here previously used
+**`sed -i`**, which is wrong for this file and was never executed. `sed -i` does
+not edit in place: it writes a new file and renames it over the original, so the
+result is a **new inode** owned by **root**, with root's mode and with the wrong
+SELinux label. AGC then cannot read its own preferences. The three attributes it
+destroys are:
+
+| Attribute | Required value |
+|---|---|
+| owner | `u0_a450` |
+| mode | `0660` |
+| SELinux label | `u:object_r:app_data_file:s0:c194,c257,c512,c768` |
+
+**The inode-preserving route** — filter to a temp file, then `cat` the content
+back into the original, which rewrites the existing inode and touches none of the
+three attributes. `IMPL-61` used this form for two preference writes and their
+restore and confirmed owner, mode and label preserved each time:
 
 ```sh
+PREFS=/data/data/org.codeaurora.snapcam/shared_prefs/org.codeaurora.snapcam_preferences.xml
 adb shell su -c "am force-stop org.codeaurora.snapcam"
-# remove the two key families from every shared_prefs xml
-adb shell su -c "sed -i -E '/name=\"(pref_raw_key|pref_fix_resolution_key)(_[0-9])?\"/d' \
-    /data/data/org.codeaurora.snapcam/shared_prefs/*.xml"
-adb shell su -c "sh /data/local/tmp/prefaudit.sh"     # run 2: expect 0/12
+# filter the two key families out, to a temp file
+adb shell su -c "grep -vE 'name=\"(pref_raw_key|pref_fix_resolution_key)(_[0-9])?\"' \
+    $PREFS > /data/local/tmp/p.xml"
+# write the content back into the ORIGINAL inode
+adb shell su -c "cat /data/local/tmp/p.xml > $PREFS"
+adb shell su -c "rm /data/local/tmp/p.xml"
+adb shell su -c "sh /data/local/tmp/prefaudit.sh"     # run 2: expect all twelve at no value
 adb shell "monkey -p org.codeaurora.snapcam -c android.intent.category.LAUNCHER 1"
 # wait for the camera to settle, force-stop, then audit again
-adb shell su -c "sh /data/local/tmp/prefaudit.sh"     # run 3: expect 0/12
+adb shell su -c "sh /data/local/tmp/prefaudit.sh"     # run 3: same expectation
 ```
+
+Verify the result **by value**, and verify the attributes survived:
+
+```sh
+adb shell su -c "ls -lZ $PREFS"     # expect u0_a450, 0660, app_data_file:s0:c194,c257,c512,c768
+```
+
+Do not verify by md5 or by inode number alone: AGC rewrites this file on its own
+schedule — during `IMPL-53` it grew from 12,072 to 12,169 bytes with no
+configuration change — so a moved checksum proves nothing either way.
 
 A one-shot clearance is not sufficient on its own — run 3 exists because a
 preference rewritten on startup would defeat it. Deleting the whole preferences
@@ -178,8 +241,14 @@ buys is that capability *inside AGC specifically*.
 **Every Phase 3 sub-plan runs this before recording any result.** Referenced by
 name as "the Faz 3.1 per-measurement checklist".
 
-1. **Preferences clear.** Audit all twelve trap keys; expect 0/12. Do not accept
-   a single `scripts/smoke.sh` reading as proof — see the caveat below.
+1. **Preferences clear.** Audit all twelve trap keys **by value**. A key present
+   at value `0` is measured **inert** (`IMPL-53`, `IMPL-54`) and is not a fault;
+   only a non-zero value is. **Amended 2026-09-05 by `Faz3.11`**: this item read
+   "expect 0/12" until `FIND-3.10-02` measured the device sitting at 2/12 with
+   both keys at `0` and the stream configuration unaffected, so a presence count
+   now fails on a harmless state. Do not accept a single `scripts/smoke.sh`
+   reading as proof — its probe greps key **names** only and cannot see values
+   at all (`FIND-3.7-02`, open) — see the caveat below.
 2. **Bracket taken.** `scripts/smoke.sh -o <UTC>__<subplan>__<label>` before the
    change, and again after. Commit both.
 3. **One variable.** Exactly one of {sensor layer, HAL layer, APK, preference}
@@ -211,9 +280,56 @@ name as "the Faz 3.1 per-measurement checklist".
    or redirect to a file on the device and read that file back. Confirm any
    abort by a second method before treating a reboot as required.
 
+9. **AGC photo-size configuration verified.** Before recording **any** capture
+   result, confirm AGC's photo size is the configured one — **all three keys,
+   not the derived one alone.** `IMPL-52` measured that AGC re-derives its photo
+   size from two inputs at every start, so `pref_camera_picturesize_back_key` is
+   a **cache of the last start**, not a setting: it can read the expected value
+   while the inputs that produce it have already moved, and it can read a stale
+   value for one start after they move. Check all three `scripts/smoke.sh`
+   fields together:
+
+   | Field | Configured value |
+   |---|---|
+   | `agc.pref_48m` | `0` (`DEC-18`, 2026-09-04) |
+   | `agc.pref_resolution` | `full` |
+   | `agc.photo_size.back.derived` | `4096x3072` (`12.58` MP) |
+
+   **Mind the two lags.** The derived keys lag an input write by one AGC start
+   (`IMPL-52`), and the configured streams lag the derived key by one further
+   start (`FIND-3.10-04`, `IMPL-61`). After changing an input, take **two** cold
+   starts before reading, or you will read the old configuration and record it as
+   the new one.
+
+   **Do not diff whole snapshots to check this.** `scripts/smoke.sh`'s
+   `camera.halN.stream_config.rows` block is non-deterministic — it slices a
+   second, independent `dumpsys` by line numbers taken from a first
+   (`FIND-3.10-01`, P2, open), and six consecutive dumps returned 65530 / 50666 /
+   50666 / 50666 / 65530 / 65529 lines with nothing changing on the device. It
+   fails silently, because the output is always well-formed. Compare the stable
+   region, measured byte-identical across five consecutive runs:
+
+   ```sh
+   sed -n '/BEGIN COMPARABLE/,/END COMPARABLE/p' SNAP \
+     | grep -vE '^ +[0-9]+ [0-9]+ [0-9]+ (OUTPUT|INPUT)$'
+   ```
+
+   The defect can manufacture a spurious **difference** but not a spurious
+   **sameness**, so a passing whole-region diff taken before this item existed
+   still stands.
+
+   The full configuration record, including the failure-mode signature and the
+   re-arming routes, is
+   [`docs/agc-12mp-configuration.md`](agc-12mp-configuration.md). This is `R12`,
+   and it binds every later measurement in the project, not only Phase 3's.
+
 Item 8 was added by `IMPL-31` under `Faz-4-Plans/Faz4.6-raw-payload-geometry-diagnosis.md`
 work item `F4.6-09`, which is the first sub-plan to hold write authority for this
-file. It had been restated inline by `Faz4.5` and `Faz4.6` because no owner
+file. **`F4.6-09`'s authority is discharged.** Item 9 and the two section 1
+corrections above were added 2026-09-05 by
+`Faz-3-Plans/Faz3.11-phase-closure-and-configuration-record.md`, which holds
+write authority for this file for the duration of Phase 3's closure; no other
+sub-plan may write it in that window. It had been restated inline by `Faz4.5` and `Faz4.6` because no owner
 existed for it; those inline restatements are now redundant and this file is the
 single source. `AUDIT-FIX-08` is thereby **permanently discharged**.
 
@@ -236,3 +352,21 @@ and the disagreement is recorded.
 
 The audit script used this run reports key names only and never values:
 `for k in <twelve keys>; do grep -c "name=\"$k\"" shared_prefs/*.xml; done`.
+
+**Amended 2026-09-05 by `Faz3.11`.** That form is no longer sufficient, because
+item 1 now audits by value. Read the value with the name:
+
+```sh
+for k in pref_raw_key pref_raw_key_0 pref_raw_key_1 pref_raw_key_2 \
+         pref_raw_key_3 pref_raw_key_4 pref_fix_resolution_key \
+         pref_fix_resolution_key_0 pref_fix_resolution_key_1 \
+         pref_fix_resolution_key_2 pref_fix_resolution_key_3 \
+         pref_fix_resolution_key_4; do
+  grep -hoE "name=\"$k\"[^>]*>[^<]*<" \
+    /data/data/org.codeaurora.snapcam/shared_prefs/*.xml
+done
+```
+
+A key that prints nothing is absent. A key that prints with `>0<` is present and
+**inert**. Anything else is a fault. `scripts/smoke.sh`'s `prefs.trap.count`
+remains a presence count and cannot make this distinction (`FIND-3.7-02`, open).

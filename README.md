@@ -111,13 +111,28 @@ these checksums. No download location appears in this repository.
 > import measures the preference, not the HAL — and the result looks like the
 > patch failed.
 >
-> **Device state, measured 2026-08-31 (Faz 3.1): all twelve keys are UNSET**, and
-> they stayed unset across an AGC restart — the app does not self-arm the trap.
-> The earlier note that both were "currently present" is superseded. Audit
-> procedure, clearance procedure and the per-measurement checklist are in
+> **Device state, measured 2026-09-05 (Faz 3.10): two of the twelve keys are
+> PRESENT at value `0`, and both are measured inert** — identical stream
+> configuration with them present and absent (`IMPL-53`, `IMPL-54`). **Audit by
+> value, not by presence:** only a non-zero value is a fault.
+>
+> **AGC does self-arm two keys** — `pref_raw_key` and `pref_fix_resolution_key`,
+> at value `0`, when its **settings screen** opens (`FIND-3.7-01`, `IMPL-54`). A
+> plain launcher start arms nothing. The 2026-08-31 note that "the app does not
+> self-arm the trap" was measured against a plain launch from an empty first-run
+> state, which is a strictly weaker test; it is corrected here and in full in
+> `docs/phase3-preconditions.md` section 1. At least one further re-arming route
+> exists and is unidentified (`FIND-3.10-02`).
+>
+> Audit procedure, clearance procedure and the per-measurement checklist are in
 > [`docs/phase3-preconditions.md`](docs/phase3-preconditions.md); run the
-> per-key audit before any Phase 3 measurement rather than trusting a single
-> `smoke.sh` reading (`FIND-5.2-01`).
+> per-key **value** audit before any Phase 3 measurement rather than trusting a
+> single `smoke.sh` reading, whose probe reads key names only (`FIND-5.2-01`,
+> `FIND-3.7-02`).
+>
+> **The AGC 12.58 MP configuration this project ships — how to set it, how to
+> verify it, its failure mode, and why 50 MP in AGC is retired — is
+> [`docs/agc-12mp-configuration.md`](docs/agc-12mp-configuration.md).**
 
 ### Tooling and working paths
 

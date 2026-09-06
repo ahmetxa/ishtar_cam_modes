@@ -8,6 +8,14 @@ Ardından AOSPA beryl derlendiğinde A16'ya taşımak.
 **Cihaz:** Xiaomi 13 Ultra (ishtar) · AOSPA Android 15 (vauxite) · KernelSU Next 3.3.0
 **Kamera uygulaması:** AGC = `org.codeaurora.snapcam` (GCam portu)
 
+**Arama yüzeyi.** Bu günlük kronolojiktir ve fazlarını monoton olmayan bir
+sırayla numaralandırır; bir terimi, bir değişmezi ya da “bu neden böyle”
+sorusunu aramak için doğru yer değildir. Önce
+`Planner-docs/Project-Ontology.md` dosyasına bakın — sözlük, değişmezler ve
+açık sorular orada tutulur; bu dosya ise onların **nasıl ölçüldüğünün**
+kaydıdır. Aşılmış sonuçlar silinmez, **⚠ AŞILMIŞ SONUÇ** bloğuyla
+işaretlenir.
+
 ---
 
 ## Faz 1 — Envanter ve keşif  ✅ TAMAMLANDI
@@ -438,6 +446,18 @@ işleme profili. 50MP tamamen HAL'e bağlı.
 
 ## AGC'nin 50MP sınırı — bisection sonuçları
 
+> **⚠ AŞILMIŞ SONUÇ — silinmedi, işaretlendi (Faz 9.3, 2026-09-06).**
+> Bu bölümün “AGC 50MP'ye çıkamaz / tavanı 15,2 MP” sonucu **yanlış nedene**
+> dayanıyor. Gerçek neden Android'in yüksek-çözünürlük kovasıdır:
+> `getOutputSizes()` minimum kare süresi 1/20 sn'yi aşan boyutları eler ve
+> 8192×6144 = 66.666.666 ns olduğu için standart listeye girmez — bkz. bu
+> dosyada **Faz 11** (“Kök neden — ölçüldü, tahmin değil”) ve
+> `Planner-docs/Project-Ontology.md` değişmez 7. Ölçülen **rakamlar geçerlidir**;
+> geçersiz olan yorumdur. AGC'nin bugünkü çalışma çözünürlüğü `DEC-14` ile
+> sabitlenen **12,58 MP**'dir ve kaydı `docs/agc-12mp-configuration.md`
+> dosyasındadır. Aşağıdaki akıl yürütme, reddedilen hipotezin yeniden
+> denenmemesi için olduğu gibi bırakılmıştır.
+
 Cihazda ölçülen çekim: **3378×4504 = 15,2 MP** (yamasız hâlde 3072×4096 = 12,6 MP).
 Yani yama etki ediyor ama GCam 8192×6144 stream'ini kullanmıyor;
 4096×3072'yi ~1,1× ölçekliyor.
@@ -786,6 +806,18 @@ bind mount `/proc/1/mountinfo`'da mevcut, `android.scaler.availableStreamConfigu
 
 ## AGC neden hâlâ 15,2 MP — kesin açıklama
 
+> **⚠ AŞILMIŞ SONUÇ — silinmedi, işaretlendi (Faz 9.3, 2026-09-06).**
+> Bu bölümün “AGC 50MP'ye çıkamaz / tavanı 15,2 MP” sonucu **yanlış nedene**
+> dayanıyor. Gerçek neden Android'in yüksek-çözünürlük kovasıdır:
+> `getOutputSizes()` minimum kare süresi 1/20 sn'yi aşan boyutları eler ve
+> 8192×6144 = 66.666.666 ns olduğu için standart listeye girmez — bkz. bu
+> dosyada **Faz 11** (“Kök neden — ölçüldü, tahmin değil”) ve
+> `Planner-docs/Project-Ontology.md` değişmez 7. Ölçülen **rakamlar geçerlidir**;
+> geçersiz olan yorumdur. AGC'nin bugünkü çalışma çözünürlüğü `DEC-14` ile
+> sabitlenen **12,58 MP**'dir ve kaydı `docs/agc-12mp-configuration.md`
+> dosyasındadır. Aşağıdaki akıl yürütme, reddedilen hipotezin yeniden
+> denenmemesi için olduğu gibi bırakılmıştır.
+
 Kullanıcı "fotoğraflar hâlâ 12,6 MP" diye bildirdi; ölçüldüğünde dosya
 **3378×4504 = 15,2 MP** çıktı. AGC ayarlarında görünen "12,6 MP" sensörden
 gelen boyut, dosyadaki ise onun ölçeklenmiş hâli. İkisi arasındaki ilişki
@@ -818,6 +850,18 @@ etiketinde duyuruluyor:
 noktalık yama QCFA tablosunu akıttığı için standart listeye RAW giremiyor.
 
 ### Sonuç
+
+> **⚠ AŞILMIŞ SONUÇ — silinmedi, işaretlendi (Faz 9.3, 2026-09-06).**
+> Bu bölümün “AGC 50MP'ye çıkamaz / tavanı 15,2 MP” sonucu **yanlış nedene**
+> dayanıyor. Gerçek neden Android'in yüksek-çözünürlük kovasıdır:
+> `getOutputSizes()` minimum kare süresi 1/20 sn'yi aşan boyutları eler ve
+> 8192×6144 = 66.666.666 ns olduğu için standart listeye girmez — bkz. bu
+> dosyada **Faz 11** (“Kök neden — ölçüldü, tahmin değil”) ve
+> `Planner-docs/Project-Ontology.md` değişmez 7. Ölçülen **rakamlar geçerlidir**;
+> geçersiz olan yorumdur. AGC'nin bugünkü çalışma çözünürlüğü `DEC-14` ile
+> sabitlenen **12,58 MP**'dir ve kaydı `docs/agc-12mp-configuration.md`
+> dosyasındadır. Aşağıdaki akıl yürütme, reddedilen hipotezin yeniden
+> denenmemesi için olduğu gibi bırakılmıştır.
 
 Geriye tek aday kalıyor: **`activeArraySize` (4096×3072) sınırı.** Faz 4'ün
 bisection'ı bunu büyütmenin AGC'yi çökerttiğini zaten göstermişti
