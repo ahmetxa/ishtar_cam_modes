@@ -1,5 +1,5 @@
 ui_print ""
-ui_print "  ishtar IMX989 Camera Modes  v2.1"
+ui_print "  ishtar IMX989 Camera Modes  v2.2"
 ui_print "  --------------------------------"
 
 DEV=$(getprop ro.product.device)

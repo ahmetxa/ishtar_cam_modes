@@ -103,6 +103,8 @@ ARAYUZLER
      su -c sh /data/adb/modules/ishtar_cam_modes/action.sh tiles hide
    Yetki UID'ye baglidir; bir kez verilince kalicidir.
    Durum: action.sh tiles status
+   Ciktidaki takma_ad alani CERCEVENIN cevabidir, cekmecenin degil:
+   takma ad kapaliyken bile simge cekmecede durabilir (yukariya bkz).
 
 DIL
 ---

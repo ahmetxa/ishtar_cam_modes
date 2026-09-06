@@ -138,7 +138,7 @@ const I18N = {
     note: '<b>50MP and the 12-bit modes exclude each other.</b> DCG/LN patch photo ' +
           'modes only — switch back to <b>Stock</b> before recording video. 50MP leaves ' +
           'video untouched (1080p60 / 4K60 verified) but needs a third-party app: ' +
-          'measured 50.3 MP in OpenCamera, 12.6–15.2 MP in AGC; the GCam 8.4 engine cannot select the 50MP stream.',
+          'measured 50.3 MP in OpenCamera. Google Camera runs at its pinned 12.58 MP working resolution: getOutputSizes() drops any size whose minimum frame duration exceeds 1/20 s, and 8192×6144 measures 66,666,666 ns, so it never reaches the standard list.',
     ready: n => n + ' ready',
     wait: n => 'Switching to ' + n,
     remaining: s => s + 's',
@@ -166,7 +166,7 @@ const I18N = {
     note: '<b>50MP ile 12-bit modları birbirini dışlar.</b> DCG/LN yalnızca fotoğraf ' +
           'modlarını yamalar — video çekmeden önce <b>Stok</b>\'a dönün. 50MP videoyu ' +
           'etkilemez (1080p60 / 4K60 doğrulandı) ama üçüncü parti uygulama gerektirir: ' +
-          'OpenCamera\'da 50,3 MP, AGC\'de 12,6–15,2 MP ölçüldü; GCam 8.4 motoru 50MP akışını seçemiyor.',
+          'OpenCamera\'da 50,3 MP ölçüldü. Google Camera sabitlenmiş 12,58 MP çalışma çözünürlüğünde çalışır: getOutputSizes() minimum kare süresi 1/20 sn\'yi aşan boyutları eler ve 8192×6144 = 66.666.666 ns olduğu için standart listeye girmez.',
     ready: n => n + ' hazır',
     wait: n => n + dative(n) + ' geçiliyor',
     remaining: s => s + 'sn',

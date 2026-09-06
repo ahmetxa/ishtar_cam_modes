@@ -19,7 +19,7 @@
 #   action.sh lang <en|tr>   -> dili ayarla
 #   action.sh tiles install  -> kutucuk uygulamasini kur/guncelle
 #   action.sh tiles order    -> dort kutucugu WebUI sirasina diz
-#   action.sh tiles status   -> apk / baslatici / kok / kutucuk ozeti
+#   action.sh tiles status   -> apk / takma ad / kok / kutucuk ozeti
 #
 # Cikis kodu: 0 basarili, 1 hata.
 
@@ -55,7 +55,8 @@ apk_installed_md5() {
 
 root_granted() { grep -aq "$PKG" /data/adb/ksu/.allowlist 2>/dev/null; }
 
-# Baslaticinin GERCEK durumu -- kendi kaydimiza degil cerceveye sorulur.
+# Baslatici TAKMA ADININ durumu -- kendi kaydimiza degil cerceveye sorulur.
+# DIKKAT: bu cercevenin cevabidir, cekmecenin degil; ikisi bu ROM'da ayrisir.
 # Cihazda olculdu: modul "gizli" saydigi hâlde girdi cekmecede durabiliyor,
 # bu yuzden durum raporu tahmine dayanmamali.
 launcher_state() {
@@ -240,7 +241,7 @@ case "$1" in
       hide)
         : > "$MODDIR/hide_launcher"
         launcher_sync >/dev/null
-        echo "baslatici kapatildi -- uygulama cekmecede gorunmez" ;;
+        echo "baslatici takma adi kapatildi -- cekmeceden kalkip kalkmadigi baslaticiya bagli (AOSPA tutar)" ;;
       status)
         if pm list packages 2>/dev/null | grep -q "^package:$PKG$"; then
           if [ "$(apk_installed_md5)" = "$(md5of "$APK")" ]; then I=guncel; else I=eski; fi
@@ -252,7 +253,7 @@ case "$1" in
         if root_granted; then K=var; else K=yok; fi
         T=$(settings get secure sysui_qs_tiles 2>/dev/null | tr ',' '
 ' | grep -c "$PKG/")
-        printf 'apk=%s baslatici=%s (%s) kok_kaydi=%s kutucuk=%s
+        printf 'apk=%s takma_ad=%s (%s) kok_kaydi=%s kutucuk=%s
 ' "$I" "$L" "$S" "$K" "$T" ;;
       *)
         echo "kullanim: action.sh tiles {install|order|sync|show|hide|status}" >&2; exit 1 ;;

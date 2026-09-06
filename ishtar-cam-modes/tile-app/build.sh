@@ -22,7 +22,20 @@ JDK=$(echo "$SDK"/jdk/jdk-*)
 JAVA=$JDK/bin/java
 JAVAC=$JDK/bin/javac
 KEYTOOL=$JDK/bin/keytool
-KS=$HERE/debug.keystore
+KS=${KS:-$HERE/debug.keystore}
+# Imza anahtari: yerel, kendinden imzali bir DEBUG anahtaridir; yoksa
+# asagidaki 6. adimda uretilir. Parolasi bir sir DEGILDIR -- tipki
+# Android'in kendi debug.keystore parolasi ("android") gibi acikca
+# bilinir ve tek basina hicbir sey saglamaz, cunku anahtar dosyasinin
+# kendisi surum arsivine girmez; bunu scripts/build-release.py'nin A1
+# iddiasi garanti eder. Anahtarlar rastgele uretildigi icin parolayi
+# bilen biri bu anahtari yeniden uretemez.
+# Gercek bir anahtarla imzalamak icin disaridan verin:
+#   KS=/yol/release.jks KS_PASS=... KS_ALIAS=... ./build.sh <SDK_KOKU>
+# UYARI: farkli bir anahtarla derlenen APK, kurulu kopyanin uzerine
+# guncelleme olarak GECMEZ (imza uyusmazligi).
+KS_PASS=${KS_PASS:-ishtar}
+KS_ALIAS=${KS_ALIAS:-ishtar}
 PKG=ishtar-cam-tiles
 
 for f in "$BT/aapt2.exe" "$BT/zipalign.exe" "$JARS/d8.jar" "$JARS/apksigner.jar" \
@@ -84,12 +97,12 @@ echo "[6/6] imzalaniyor"
 if [ ! -f "$KS" ]; then
   echo "   imza anahtari uretiliyor (bir kez)"
   "$KEYTOOL" -genkeypair -v -keystore "$(w "$KS")" \
-    -storepass ishtar -keypass ishtar -alias ishtar \
+    -storepass "$KS_PASS" -keypass "$KS_PASS" -alias "$KS_ALIAS" \
     -keyalg RSA -keysize 2048 -validity 10950 \
     -dname "CN=ishtar cam modes, OU=module, O=local, C=TR" > /dev/null
 fi
 "$JAVA" -cp "$(w "$JARS/apksigner.jar")" com.android.apksigner.ApkSignerTool sign \
-  --ks "$(w "$KS")" --ks-pass pass:ishtar --key-pass pass:ishtar --ks-key-alias ishtar \
+  --ks "$(w "$KS")" --ks-pass "pass:$KS_PASS" --key-pass "pass:$KS_PASS" --ks-key-alias "$KS_ALIAS" \
   --v1-signing-enabled true --v2-signing-enabled true --v3-signing-enabled true \
   --out "$(w "$OUT/$PKG.apk")" "$(w "$OUT/aligned.apk")"
 

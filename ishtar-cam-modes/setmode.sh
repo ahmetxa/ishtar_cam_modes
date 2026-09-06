@@ -208,7 +208,8 @@ case "$MODE" in
     echo "50MP (FullRes). 8192x6144'u STANDART cozunurluk listesine ekler,"
     echo "     boylece ucuncu parti uygulamalar tam cozunurluk cekebilir."
     echo "     Olculdu: OpenCamera 8192x6144 (50,3 MP) cekiyor."
-    echo "     AGC 15,2 MP'de kaliyor -- GCam 8.4'un kendi siniri."
+    echo "     AGC 12,58 MP'de sabit calisir: 8192x6144'un kare suresi"
+    echo "     1/20 sn'yi astigi icin standart listede gorunmez."
     echo "     Video (1080p60 / 4K60) etkilenmiyor."
     echo "     DCG/LN ile birlikte KULLANILAMAZ; sensor modu stock'a alinir."
     ;;
