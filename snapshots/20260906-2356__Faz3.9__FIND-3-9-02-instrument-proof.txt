@@ -1,0 +1,105 @@
+FIND-3.9-02, route (a): instrument proof BEFORE spending a human shutter press.
+Host date: 2026-09-06 23:56:47 +0300   Device: dc27e5d0
+
+WHY THIS FILE EXISTS. IMPL-81's lesson was that a fixture is a hypothesis
+too. occatch.sh is a new instrument, so it is proved against a case whose
+answer is already known independently - AGC, measured at 4096x3072 YUV plus
+4096x3072 RAW10 by PC-06 earlier tonight - before it is pointed at the case
+whose answer is unknown. If it could not see a stream known to be present,
+it would not be fit to decide criterion 5.
+
+CORRECTION RECORDED HERE RATHER THAN LEFT IMPLICIT. This session first
+concluded Open Camera was uninstalled, from 'pm list packages' showing no
+match for opencamera or sourceforge in 502 packages. That was WRONG. Open
+Camera is installed under the package id com.xiaomi.module.evaluation; its
+activity class is still net.sourceforge.opencamera.MainActivity, which is
+how the Faz3.9 consumer-name line identified it. Package path:
+  /data/app/~~35cJEGqtGA5PckIh6fiAnw==/com.xiaomi.module.evaluation-*/base.apk
+Search by package id alone would have retired PC-05 and FIND-3.9-02 as
+impossible. The consumer name in the Faz3.9 artifact is what disproved it.
+
+=== WHAT IMPL-58 ACTUALLY SAW (the defect being repaired) ===
+  09-05 15:09:40 : Device 0 is open. Client instance dump:
+    Client PID: 19475
+      Consumer name: SurfaceView[com.xiaomi.module.evaluation/net.sourceforge.opencamera.MainActivity]#1(BLAST Consumer)1
+      Dims: 1920 x 1440, format 0x7fa30c06, dataspace 0x0
+    0x80300004 (StabilizedOutputDims) with type 0 (byte) defined in section org.quic.camera.eisrealtime
+    0x80310005 (StabilizedOutputDims) with type 0 (byte) defined in section org.quic.camera.eislookahead
+
+Only the 1920x1440 preview SurfaceView. No still stream. One read, taken
+after the capture, cannot see a stream that exists only during it.
+
+=== THE INSTRUMENT ===
+/data/local/tmp/occatch.sh, 2774 bytes on host and 2774 on device (checked;
+a truncated payload still passes bash -n, so length is checked, not syntax).
+Two instruments run at once:
+  A. a dumpsys sampler, ~490 ms mean interval, which satisfies criterion 5
+     LITERALLY if it catches the still stream.
+  B. the camera stack's own log, which records stream configuration WITH
+     dimensions at the instant it happens and so cannot miss it. This meets
+     criterion 5's PURPOSE with a DIFFERENT instrument than the criterion
+     names. That difference is stated, not hidden.
+
+=== PROOF RUN AGAINST AGC (known answer) ===
+prefs md5 BEFORE: 21762bdcb09f107aad2f397351cf1337
+=== BEGIN OCCATCH ===
+marker: 09-06 23:55:37.000
+window: 26s
+start:  2026-09-06 23:55:37
+
+PRESS THE SHUTTER NOW, ONCE, WITH OPEN CAMERA AT FULL RESOLUTION.
+
+--- INSTRUMENT A: dumpsys sampler, distinct observations ---
+--- CHANGE at sample 15, 23:55:46 ---
+      Consumer name: ImageReader-1440x1080f22m11-21063-2
+      Dims: 1440 x 1080, format 0x7fa30c06, dataspace 0x0
+      Consumer name: ImageReader-4096x3072f23m22-21063-0
+      Dims: 4096 x 3072, format 0x23, dataspace 0x8c20000
+      Consumer name: ImageReader-640x480f23m52-21063-1
+      Dims: 640 x 480, format 0x23, dataspace 0x8c20000
+      Consumer name: ImageReader-4096x3072f25m37-21063-3
+      Dims: 4096 x 3072, format 0x25, dataspace 0x1
+samples taken: 53
+
+--- INSTRUMENT A: every distinct Dims line seen ---
+      1       Dims: 640 x 480, format 0x23, dataspace 0x8c20000
+      1       Dims: 4096 x 3072, format 0x25, dataspace 0x1
+      1       Dims: 4096 x 3072, format 0x23, dataspace 0x8c20000
+      1       Dims: 1440 x 1080, format 0x7fa30c06, dataspace 0x0
+
+--- INSTRUMENT B: stream configuration from the camera stack log ---
+09-06 23:55:44.590 21063 21112 W AGC     : getImageReaderFormat ImageReaderFormat{ImageFormat=RAW10, Size=4096x3072}
+09-06 23:55:44.619 14127 14191 I cameraserver: Bypass roundBufferDimensionNearest for privilegedClient YUV streams width 4096 height 3072 for format 35
+09-06 23:55:44.619 14127 14191 I cameraserver: Bypass roundBufferDimensionNearest for privilegedClient YUV streams width 640 height 480 for format 35
+09-06 23:55:44.621 14127 14191 E Camera3-Device: configureStreamsLocked: Unable to get  tag
+09-06 23:55:44.621 14123 14129 E CamX    : [ERROR][HAL    ] camxhal3.cpp:2507 configure_streams() Get initAperture failure
+09-06 23:55:44.621 14123 14129 E CamX    : [ERROR][HAL    ] camxhal3.cpp:2538 configure_streams() Get customeEnable failure
+09-06 23:55:44.621 14123 14129 E CamX    : [ERROR][HAL    ] camxhal3.cpp:2724 configure_streams() FPS: 14 ~ 30
+
+--- INSTRUMENT B: any WxH pair naming 8192 or 6144 since the marker ---
+09-06 23:55:45.070  1628 21273 I StandardCaps: PictureSizeInputHelper: min [128 128] max [8192 8192] default [128 128]
+09-06 23:55:45.149  1628 21314 I StandardCaps: PictureSizeInputHelper: min [128 128] max [8192 8192] default [128 128]
+09-06 23:55:45.171 21063 21329 D CCodecConfig:   c2::u32 coded.pl.profile = 8192
+
+--- which app owned the camera ---
+    topResumedActivity=ActivityRecord{6f63019 u0 org.codeaurora.snapcam/com.android.camera.CameraLauncher t10}
+  ResumedActivity: ActivityRecord{6f63019 u0 org.codeaurora.snapcam/com.android.camera.CameraLauncher t10}
+=== END OCCATCH ===
+prefs md5 AFTER: 21762bdcb09f107aad2f397351cf1337
+
+=== VERDICT ON THE INSTRUMENT ===
+FIT FOR PURPOSE.
+  Instrument A saw all four AGC streams, including BOTH 4096x3072 entries
+    (YUV format 0x23 and RAW10 format 0x25). That matches PC-06's
+    independent read exactly, so the sampler reports truthfully.
+  53 samples in 26 s = 490 ms mean interval.
+  Instrument B logged the configure event with dimensions:
+    cameraserver: ... YUV streams width 4096 height 3072 for format 35
+    AGC: getImageReaderFormat ImageReaderFormat{ImageFormat=RAW10, Size=4096x3072}
+  prefs md5 UNCHANGED, 21762bdcb09f107aad2f397351cf1337 before and after.
+    The launch armed no trap key.
+
+=== NOT YET RUN ===
+The Open Camera half needs one human shutter press at full resolution
+inside a 60 s window. It was NOT performed in this session. Until it is,
+Faz3.9 criterion 5 stays PARTIAL and DEC-21 item 6 stays open.

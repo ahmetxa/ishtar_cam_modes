@@ -1,0 +1,121 @@
+VAL-MANUAL, machine half. Faz9.2, docs/release-checklist.md section 3a.
+Host date: 2026-09-06 23:51:00 +0300   Device: dc27e5d0
+State snapshot for PC-01/PC-06: snapshots/20260906-2346__release__VALMANUAL-PC01.txt
+That snapshot's comparable region is BYTE-IDENTICAL to the IMPL-81 closing
+bracket (snapshots/20260906-2101__Faz9.2__IMPL80-closing-bracket.txt), so the
+device had not drifted between IMPL-81 and this run. 47 lines, as expected.
+
+=== PC-01  sensor variant, identity and mount ===
+sensor.live.md5   = 9e4d0fe1a8bf2eb4146c9917a0ac2c4c  (stock, as expected)
+sensor.live.size  = 1062250 / expected 1062250
+sensor.mount.count = 1        hal.mount.count = 1
+module.version    = v2.2 / versionCode 13
+mode.file         = 50mp      hal.state = fullres  fe0245a4720fb07b01d96deef47f5569
+VERDICT: PASS on identity and mount.
+SCOPE NOTE, not a pass and not a failure: PC-01 as written expects
+sensor.live.variant to equal the selected mode. In 50mp the selected mode is a
+HAL-layer mode and the sensor layer is stock BY DESIGN, so the equality does not
+apply here. C-01's claim (the driver receives 12-bit/DCG/LN) is therefore NOT
+exercised by this run. Proving it needs a setmode.sh switch to a sensor mode and
+back, which changes device state and was not performed without approval.
+
+=== PC-04  8192x6144 in the standard list ===
+DEFECT FOUND IN THE CHECKLIST'S OWN SUBSTITUTE COMMAND. See section below.
+Re-measured with a corrected slicer, camera 0 (camera.main.hal_id = 0),
+android.scaler.availableStreamConfigurations (d000a): int32[456], 114 value lines.
+8192x6144 rows present: 7
+        [33 8192 6144 OUTPUT ]
+        [34 8192 6144 INPUT ]
+        [34 8192 6144 OUTPUT ]
+        [35 8192 6144 INPUT ]
+        [35 8192 6144 OUTPUT ]
+        [54 8192 6144 INPUT ]
+        [54 8192 6144 OUTPUT ]
+VERDICT: PASS. Format 33 (BLOB/JPEG) 8192x6144 OUTPUT is present in the
+STANDARD list, which is what C-04 claims.
+
+=== PC-07  the 1/20 s duration mechanism ===
+android.scaler.availableMinFrameDurations (d000b): int64[444], camera 0.
+int64 tables print two values per line, so each row spans two lines.
+  [33 8192 ] / [6144 66666666 ]
+  [34 8192 ] / [6144 66666666 ]
+  [35 8192 ] / [6144 66666666 ]
+  [54 8192 ] / [6144 66666666 ]
+VERDICT: PASS. 66,666,666 ns = 1/15 s, which EXCEEDS the 1/20 s
+(50,000,000 ns) threshold getOutputSizes() applies - that excess is the
+mechanism by which AGC drops the size. Measured value equals PC-07's
+expected 66666666 exactly, for all four formats.
+
+=== PC-06  AGC pin, machine half ===
+=== BEGIN PC-06 STREAMS ===
+prefs md5 BEFORE: 21762bdcb09f107aad2f397351cf1337
+-- resumed activity (discriminator: preview vs error dialog) --
+    topResumedActivity=ActivityRecord{64b2524 u0 org.codeaurora.snapcam/com.android.camera.CameraLauncher t8}
+  ResumedActivity: ActivityRecord{64b2524 u0 org.codeaurora.snapcam/com.android.camera.CameraLauncher t8}
+-- configured streams (single dump) --
+    Stream[0]: Output
+      Consumer name: ImageReader-1440x1080f22m11-15334-0
+      State: 4
+      Dims: 1440 x 1080, format 0x7fa30c06, dataspace 0x0
+      Max size: 0
+      Combined usage: 0x10020100, max HAL buffers: 8
+      Dynamic Range Profile: 0x1
+--
+    Stream[1]: Output
+      Consumer name: ImageReader-4096x3072f25m37-15334-1
+      State: 4
+      Dims: 4096 x 3072, format 0x25, dataspace 0x1
+      Max size: 0
+      Combined usage: 0x20103, max HAL buffers: 8
+      Dynamic Range Profile: 0x1
+--
+    Stream[2]: Output
+      Consumer name: ImageReader-4096x3072f23m22-15334-2
+      State: 4
+      Dims: 4096 x 3072, format 0x23, dataspace 0x8c20000
+      Max size: 0
+      Combined usage: 0x20003, max HAL buffers: 8
+      Dynamic Range Profile: 0x1
+--
+    Stream[3]: Output
+      Consumer name: ImageReader-640x480f23m52-15334-3
+      State: 4
+      Dims: 640 x 480, format 0x23, dataspace 0x8c20000
+      Max size: 0
+      Combined usage: 0x20103, max HAL buffers: 8
+      Dynamic Range Profile: 0x1
+-- closing the camera --
+prefs md5 AFTER: 21762bdcb09f107aad2f397351cf1337
+=== END PC-06 STREAMS ===
+
+VERDICT: PASS on the machine half.
+  ResumedActivity = CameraLauncher -> a real preview, not a rendered error
+    dialog. This is the discriminator.
+  Stream[2] YUV  (format 0x23) = 4096 x 3072
+  Stream[1] RAW10 (format 0x25) = 4096 x 3072
+  The matching pair is the point, and it matches.
+  prefs md5 UNCHANGED, 21762bdcb09f107aad2f397351cf1337 before and after,
+    so the launch armed no trap key. prefs.trap.armed = 0 in the snapshot.
+  From the same snapshot: agc.pref_48m = 0, agc.pref_resolution = full,
+    agc.photo_size.back.derived = 4096x3072, agc.photo_size.back.mp = 12.58.
+REMAINING for PC-06: one capture measured under 0.01 black fraction.
+  That is a human shutter press and was NOT performed.
+
+=== NEW DEFECT: the PC-04 substitute command does not work ===
+docs/release-checklist.md section 3a gives this as PC-04's healthy substitute:
+  awk '/^      android[.]scaler[.]availableStreamConfigurations [(]d000a[)]/,/^      [a-z]/' cam.dump | grep 8192
+It returns ZERO rows. The range end pattern ^      [a-z] also matches the
+HEADER line itself (android... is lowercase at the same six-space indent), and
+awk tests the end pattern on the same record that opened the range, so every
+range is one line long. Measured: 13 header matches, 13 lines emitted.
+The command therefore reports absence for a size that IS present, which is the
+worst possible failure mode for a release gate - it fails silently and safe-looking.
+Working replacement, flag-based so the header cannot close its own range:
+  awk 'index($0,"(d000a)")>0 && $0 ~ /^      android[.]/ {n++; f=(n==1); next} f && /^      [a-z]/ {f=0} f' cam.dump
+n selects the camera block in dump order; n==1 is camera 0.
+
+=== SUMMARY ===
+Machine half COMPLETE: PC-01 PASS (with the scope note), PC-04 PASS (after
+repairing the command), PC-06 PASS on its machine half, PC-07 PASS.
+User half NOT performed: PC-02, PC-03, PC-05, and PC-06's capture.
+Faz9.2 stays implemented. VAL-MANUAL is not complete.
