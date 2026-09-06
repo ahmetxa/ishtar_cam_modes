@@ -107,9 +107,48 @@ probe_app() {
     # Project-Ontology invariant 8: these keys break Gcam initialization
     # independently and already caused one misattributed failure. Report the
     # specific keys found, not a boolean, so Faz 3.1 knows which to clear.
+    #
+    # FIND-3.7-02 repair (DEC-20, IMPL-80). The two original fields count and
+    # name the keys that are PRESENT; neither reads a value. Presence is not
+    # danger: this device carries two trap keys both at value 0, so a gate
+    # written as an assertion that prefs.trap.count is 0 fails a HEALTHY
+    # device. The two
+    # fields added below read the values, and prefs.trap.armed is the one a
+    # gate should assert is 0. The original two are left byte-unchanged so
+    # snapshots taken before this repair still diff against later ones on
+    # those lines; the comparable region grows by exactly two lines.
     K=\$(grep -hoE \"pref_raw_key[a-z0-9_]*|pref_fix_resolution_key[a-z0-9_]*\" /data/data/$AGC/shared_prefs/*.xml 2>/dev/null | sort -u | tr \"\\n\" \" \")
+    # Two storage shapes are read. On this device these keys are strings
+    # whose value is element text; the attribute shape is read too so the
+    # audit does not silently miss a key stored the other way.
+    T1=\$(grep -hoE \"name=.(pref_raw_key[a-z0-9_]*|pref_fix_resolution_key[a-z0-9_]*).>[^<]*\" /data/data/$AGC/shared_prefs/*.xml 2>/dev/null | sed \"s/name=.//; s/.>/=/\")
+    T2=\$(grep -hoE \"name=.(pref_raw_key[a-z0-9_]*|pref_fix_resolution_key[a-z0-9_]*). value=.[a-zA-Z0-9_-]*\" /data/data/$AGC/shared_prefs/*.xml 2>/dev/null | sed \"s/name=.//; s/. value=./=/\")
+    T=\$(printf \"%s\\n%s\\n\" \"\$T1\" \"\$T2\" | grep -E \"=\" | sort -u | tr \"\\n\" \" \")
+    A=\$(echo \$T | tr \" \" \"\\n\" | grep -E \"=\" | grep -vE \"=(0|false)\" | grep -c .)
     echo \"prefs.trap.count                = \$(echo \$K | wc -w)\"
     echo \"prefs.trap.keys                 = \$K\"
+    echo \"prefs.trap.armed                = \$A\"
+    echo \"prefs.trap.values               = \$T\"
+    # R12 (DEC-14): AGC re-derives its photo size from two inputs at every
+    # start, so the derived keys below are a cache of the last start rather
+    # than a setting - a write to one does not survive a restart (IMPL-52).
+    # Reporting the derived key alone would show an effect with both of its
+    # causes invisible, so the inputs are reported beside it. The configured
+    # state is pref_48m_key=0, adopted by the user as DEC-18 on 2026-09-04 on
+    # the evidence of IMPL-53 and IMPL-54, deriving 4096x3072 on the shipped
+    # fullres base. That is a dated decision, not an intrinsic property. The
+    # key is reported because it governs exposure to the 8192x6144 path, not
+    # as a recommendation to arm it. Absent prefs emit the token absent, so a
+    # key that disappears is a diff rather than a silence.
+    PF=/data/data/$AGC/shared_prefs/${AGC}_preferences.xml
+    R48=\$(grep -m1 -o \"name=.pref_48m_key.>[^<]*\" \$PF 2>/dev/null | sed \"s/.*>//\")
+    RRES=\$(grep -m1 -o \"name=.pref_camera_resolution.>[^<]*\" \$PF 2>/dev/null | sed \"s/.*>//\")
+    RFRT=\$(grep -m1 -o \"name=.pref_camera_picturesize_front_key.>[^<]*\" \$PF 2>/dev/null | sed \"s/.*>//\")
+    RBCK=\$(grep -m1 -o \"name=.pref_camera_picturesize_back_key.>[^<]*\" \$PF 2>/dev/null | sed \"s/.*>//\")
+    echo \"agc.pref_48m                    = \${R48:-absent}\"
+    echo \"agc.pref_resolution             = \${RRES:-absent}\"
+    echo \"agc.photo_size.front.derived    = \${RFRT:-absent}\"
+    echo \"agc.photo_size.back.derived     = \${RBCK:-absent}\"
   "
 }
 
@@ -164,22 +203,58 @@ probe_cameras() {
 # On this device that resolves to HAL 0. Every other camera is still covered by
 # its entry count in the summary above, so a change elsewhere is not missed.
 probe_main_rows() {
-  local id="$1" start end
+  local id="$1"
   echo "camera.hal${id}.stream_config.rows:"
-  # Address the block by line number rather than by a sed range. A range whose
-  # end pattern also matches its own start line closes immediately, which is
-  # exactly what a generic "next static information header" pattern does here.
-  start=$(printf '%s\n' "$CAM_RAW" | grep -E "^[0-9]+[-:].*vendor_qti/${id} \(v1\.1\) static information" | head -1 | sed 's/[-:].*//')
-  end=$(printf '%s\n' "$CAM_RAW" | grep -E '^[0-9]+[-:].*static information: ==' | sed 's/[-:].*//' \
-        | awk -v s="$start" '$1 > s {print $1; exit}')
-  [ -n "$end" ] || end=999999
-  sh_root "dumpsys media.camera 2>/dev/null | sed -n \"${start},${end}p\" | sed -n \"/availableStreamConfigurations (d000a)/,/^      android\./p\" | grep -E \"^ +\[[0-9]\"" \
+  # FIND-3.10-01 repair (DEC-20, IMPL-80). The previous implementation took
+  # start/end line numbers from CAM_RAW and then sliced a SECOND, independent
+  # dumpsys with sed -n. The two invocations do not agree: six consecutive
+  # calls, with nothing changing on the device, returned 65530/50666/50666/
+  # 50666/65530/65529 lines, so the block landed correct, short or long at
+  # random and silently. Line numbers taken from one dump cannot address
+  # another. This matters because these rows carry the flagship 50 MP claim.
+  #
+  # The block is now located inside the SAME invocation that produces it, and
+  # by boundary rather than by line number: the camera block opens at its own
+  # static-information header and closes at the next one; the tag block opens
+  # at the d000a header and closes at the next tag header, which is the
+  # six-space "android." indent level.
+  #
+  # sh_root wraps the payload in su -c '...', so the payload may contain no
+  # single quote. The awk program below contains none, and no $ either, so no
+  # shell layer between here and the device can rewrite it.
+  sh_root "dumpsys media.camera 2>/dev/null | awk \"
+      /static information: ==/ { inblk = 0 }
+      /vendor_qti\/${id} .*static information: ==/ { inblk = 1; intag = 0; next }
+      inblk == 0 { next }
+      /^      android\.scaler\.availableStreamConfigurations \(d000a\)/ { intag = 1; next }
+      intag == 1 && /^      [a-z]/ { intag = 0 }
+      intag == 1 && /^ +\[[0-9]/ { print }
+    \"" \
     | sed 's/^ *//; s/^\[//; s/ *\]$//' | grep -vE '^$' | sort | sed 's/^/  /'
+}
+
+# The derived megapixel figure is arithmetic on the reported value, not an
+# assessment of it: 4096x3072 is 12.58 MP and 8192x6144 is 50.33 (IMPL-40),
+# and a reader should not have to know that to see the consequence. Computed
+# here rather than in the root shell so that a malformed preference becomes a
+# stable token instead of an arithmetic error. It is emitted directly under
+# the value it is computed from, which is why the back key is the last field
+# probe_app emits.
+derive_mp() {
+  local sz w h t
+  sz=$(printf '%s\n' "$APP" | sed -n 's/^agc\.photo_size\.back\.derived *= *//p')
+  case "$sz" in
+    [0-9]*x[0-9]*) w=${sz%%x*}; h=${sz##*x}; t=$((w * h))
+                   printf 'agc.photo_size.back.mp          = %d.%02d\n' "$((t / 1000000))" "$(((t % 1000000) / 10000))" ;;
+    absent)        printf 'agc.photo_size.back.mp          = absent\n' ;;
+    *)             printf 'agc.photo_size.back.mp          = unparseable\n' ;;
+  esac
 }
 
 # --- assemble ----------------------------------------------------------------
 SERIAL=$("$ADB" get-serialno 2>/dev/null | tr -d '\r')
 CAM_RAW=$(fetch_cam_raw)
+APP=$(probe_app)
 CAMS=$(probe_cameras)
 MAIN=$(printf '%s\n' "$CAMS" | grep 'facing=Back' | head -1 | sed 's/^camera.hal//; s/ .*//')
 
@@ -189,7 +264,8 @@ BODY=$(
   echo "camera.main.hal_id              = $MAIN"
   printf '%s\n' "$CAMS"
   probe_main_rows "$MAIN"
-  probe_app
+  printf '%s\n' "$APP"
+  derive_mp
 )
 
 emit() {
