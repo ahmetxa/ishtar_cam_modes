@@ -1,0 +1,6 @@
+  09-05 15:09:40 : Device 0 is open. Client instance dump:
+    Client PID: 19475
+      Consumer name: SurfaceView[com.xiaomi.module.evaluation/net.sourceforge.opencamera.MainActivity]#1(BLAST Consumer)1
+      Dims: 1920 x 1440, format 0x7fa30c06, dataspace 0x0
+    0x80300004 (StabilizedOutputDims) with type 0 (byte) defined in section org.quic.camera.eisrealtime
+    0x80310005 (StabilizedOutputDims) with type 0 (byte) defined in section org.quic.camera.eislookahead

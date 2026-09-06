@@ -1,0 +1,47 @@
+F3.10-07 NEGATIVE CONTROL - AGC configured streams at pref_48m_key=1
+Captured 2026-09-05 ~15:47 local. AGC pid 13491, SECOND cold start after the write.
+Addressed by PATTERN within a single dumpsys, not by line number - FIND-3.10-01.
+
+--- FIRST cold start after the write (pid 13021), for the record ---
+  Stream[2] Dims: 4096 x 3072, format 0x23 (YUV)
+  Stream[3] Dims: 4096 x 3072, format 0x25 (RAW10)
+  Derived key already read 8192x6144 at this point. The STREAMS had not moved.
+
+--- SECOND cold start (pid 13491) ---
+    Stream[0]: Output
+      Consumer name: ImageReader-1440x1080f22m11-13491-3
+      State: 4
+      Dims: 1440 x 1080, format 0x7fa30c06, dataspace 0x0
+      Max size: 0
+      Combined usage: 0x10020100, max HAL buffers: 8
+      Dynamic Range Profile: 0x1
+--
+    Stream[1]: Output
+      Consumer name: ImageReader-640x480f23m52-13491-0
+      State: 4
+      Dims: 640 x 480, format 0x23, dataspace 0x8c20000
+      Max size: 0
+      Combined usage: 0x20103, max HAL buffers: 8
+      Dynamic Range Profile: 0x1
+--
+    Stream[2]: Output
+      Consumer name: ImageReader-4096x3072f25m37-13491-1
+      State: 4
+      Dims: 4096 x 3072, format 0x25, dataspace 0x1
+      Max size: 0
+      Combined usage: 0x20103, max HAL buffers: 8
+      Dynamic Range Profile: 0x1
+--
+    Stream[3]: Output
+      Consumer name: ImageReader-8192x6144f23m22-13491-2
+      State: 4
+      Dims: 8192 x 6144, format 0x23, dataspace 0x8c20000
+      Max size: 0
+      Combined usage: 0x20003, max HAL buffers: 8
+      Dynamic Range Profile: 0x1
+
+--- preference state at this moment ---
+name="pref_camera_picturesize_back_key">8192x6144
+name="pref_camera_resolution">full
+name="pref_camera_picturesize_front_key">6528x4896
+name="pref_48m_key">1

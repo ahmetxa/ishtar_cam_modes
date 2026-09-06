@@ -1,0 +1,107 @@
+FIND-3.10-01 - scripts/smoke.sh: the stream_config.rows block is sliced from a
+SECOND dumpsys by line numbers taken from a FIRST one, and the two dumps differ
+=============================================================================
+Raised 2026-09-05 15:34 by the Step 4 session running Faz3.10, during F3.10-02
+(axis 1). Severity proposed: P2. Routed to Faz3.11 for disposition. NOT fixed by
+this session - scripts/smoke.sh is Faz3.8's delivered instrument, Faz3.8 is
+COMPLETE and verified, and Faz3.10 section 9 lists the script as "existing",
+not "modified". Fixing it here would be scope overflow into a closed sub-plan.
+
+WHAT WAS OBSERVED
+------------------
+Axis 1's bracket compared a 159-line comparable region (pre) against a 45-line
+one (post) with NO state change between them - all four preference keys, the HAL
+md5, both mount counts, the mode and the trap count were identical. The diff
+showed 114 deleted lines, every one of them a camera stream-configuration row.
+
+Five further runs, back to back, with nothing changing on the device:
+
+  comparable-region line count:  172, 172, 159, 172, and 45 earlier
+
+VAL-SMOKE's stated contract (smoke.sh header, lines 25-27) is "two runs with no
+intervening change must produce it byte-identically". On this device state, in
+this session, it does not.
+
+THE MECHANISM, measured rather than inferred
+---------------------------------------------
+scripts/smoke.sh calls the camera service dump TWICE by two different paths.
+
+  1. fetch_cam_raw() (line 147) runs
+       dumpsys media.camera | grep -nE -A1 "..."
+     The -n flag records ABSOLUTE LINE NUMBERS from that dump. Measured stable:
+     five consecutive fetches all returned exactly 192 lines.
+
+  2. probe_main_rows() (lines 186-198) derives "start" and "end" from those
+     line numbers, then issues a SECOND, INDEPENDENT dump and slices it:
+       dumpsys media.camera | sed -n "${start},${end}p" | ...
+
+     Line numbers from dump #1 are applied to dump #2. That is only correct if
+     the two dumps have identical line numbering.
+
+  3. They do not. Six consecutive calls to `dumpsys media.camera | wc -l`, with
+     nothing changing on the device, returned:
+
+       65530   50666   50666   50666   65530   65529
+
+     A swing of roughly 14,900 lines, and 65530/65529 sits at the 65535 ceiling,
+     so at least the large variant is being truncated at a cap. Whatever the
+     cause, the numbering of dump #2 is not the numbering of dump #1.
+
+  Consequence: the sed slice lands in the right place, short, or long, at
+  random. 159 lines was a correct landing; 45 and 172 were not. This is a RACE,
+  not a state change, and it is silent - the output is always well-formed.
+
+WHY THE CONCLUSIONS OF Faz3.8 AND Faz3.9 ARE NOT AFFECTED
+----------------------------------------------------------
+Stated explicitly so this finding is not read as retroactively weakening them.
+The defect can produce a SPURIOUS DIFFERENCE. It cannot produce a spurious
+SAMENESS: two runs that both land the same slice and compare equal are equal on
+those rows, and their stable fields were necessarily equal too. So:
+
+  - IMPL-55's VAL-IDEMPOTENT PASS (158-line region, byte-identical)  STANDS.
+  - IMPL-58's Faz3.9 bracket (159 lines, zero differing lines)        STANDS.
+
+Both were true results. What they were not is a demonstration that the region is
+deterministic in general; that property is what this finding withdraws.
+
+THE FALLBACK USED BY Faz3.10, AND WHY IT IS EQUIVALENT
+-------------------------------------------------------
+Every field Faz3.10 takes a verdict on comes from a DIFFERENT code path than the
+defective one - direct file reads and the stable 192-line CAM_RAW. Only the
+`camera.halN.stream_config.rows` blocks come from the racing second dump.
+
+So this sub-plan diffs the comparable region with the stream-config ROW lines
+excluded:
+
+  sed -n '/BEGIN COMPARABLE/,/END COMPARABLE/p' SNAP \
+    | grep -vE '^ +[0-9]+ [0-9]+ [0-9]+ (OUTPUT|INPUT)$'
+
+MEASURED DETERMINISM OF THAT REGION: five consecutive runs, all 45 lines, all
+four pairwise diffs against run 1 byte-identical. It carries all four preference
+keys, hal.live.md5 / state / size / mount.count, sensor.live.md5 / variant /
+mount.count, mode.file, prefs.trap.count, agc.apk.md5, and all thirteen
+camera.halN summary lines with pixelArray, activeArray and streamcfg=NNN.
+
+The excluded information is NOT lost. Each camera's summary line carries
+streamcfg=NNN, the entry COUNT of that camera's stream-configuration array, and
+it comes from the stable CAM_RAW path. smoke.sh's own comment at line 184-185
+says this is exactly what that count is for: "its entry count in the summary
+above, so a change elsewhere is not missed." A stream-table change would move
+the count. Across axis 1 and axis 2 all thirteen counts were identical
+(hal0=456, hal1=452, hal2..hal10=508, hal8/hal9=508, hal11/hal12=124).
+
+SUGGESTED REPAIR, for whoever dispositions this - NOT applied here
+------------------------------------------------------------------
+Take one dump and do all the slicing inside that single device-side invocation,
+so no line number ever crosses between two dumps. The natural form is to have
+fetch_cam_raw capture what probe_main_rows needs in the same pass, or to address
+the block by PATTERN within one dump rather than by absolute line number. The
+existing comment at lines 188-191 already explains why a naive sed range was
+rejected; the answer is a single-dump address, not a second dump.
+
+DISPOSITION REQUESTED FROM Faz3.11
+-----------------------------------
+Faz3.11 writes docs/agc-12mp-configuration.md and the ninth per-measurement
+checklist item. If the checklist tells an operator to diff two smoke snapshots,
+it must either carry the exclusion above or wait on a repaired smoke.sh -
+otherwise the checklist will report spurious failures at random.

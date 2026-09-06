@@ -1,0 +1,39 @@
+=== BEGIN AON BASELINE ===
+-- clock --
+Sun Sep  6 13:06:26 +03 2026
+1976.72 15157.53
+-- state re-verify --
+mode.file: 50mp
+prefs md5: 21762bdcb09f107aad2f397351cf1337
+prefs size: 12169 owner=u0_a450 mode=660
+-- step0.1 aon_front.pb in the vendor path --
+-rw-r--r-- 1 root root 5825 1970-05-23 02:01 /vendor/lib64/camera/aon_front.pb
+odm source:
+-rw-r--r-- 1 root root 5825 2009-01-01 02:00 /odm/lib64/camera/aon_front.pb
+md5 of both:
+72899c334c4a81a0837faeef45d38e87  /vendor/lib64/camera/aon_front.pb
+72899c334c4a81a0837faeef45d38e87  /odm/lib64/camera/aon_front.pb
+-- step0.2 module verdict, tag ishtar_aon_fix --
+-- step2 discriminator: which of the three lines --
+-- module presence --
+/data/adb/modules/ishtar_aon_fix
+id=ishtar_aon_fix
+name=ishtar AON front config fix
+version=v1.1
+versionCode=2
+author=ishtar arastirma
+description=[bind-mount] Eksik /vendor/lib64/camera/aon_front.pb yolunu olusturur. AON -> CSS -> NCS zincirini onarir; diyafram, OIS, lazer AF (ToF) ve yuz-sahne icin NCS saglayicilari olusur. KernelSU modul baglamasina BAGIMLI DEGILDIR. Yalnizca Xiaomi 13 Ultra (ishtar).
+-- step0.3 candidate provider strings in the current buffer --
+[aperture]
+[ois]
+grep: bad regex '\bOIS\b|opticalstab': trailing backslash (\)
+[laser af / tof]
+grep: bad regex 'laser|\bToF\b|vl53|distance': trailing backslash (\)
+[face / scene]
+-- provider-shaped lines (NCS / provider create) --
+09-06 12:34:10.527  5182  5505 V AconfigFlags: Read Aconfig default flag value com.android.graphics.surfaceflinger.flags.allow_n_vsyncs_in_targeter = false
+09-06 12:34:10.544  5182  5505 V AconfigFlags: Read Aconfig default flag value com.android.graphics.surfaceflinger.flags.allow_n_vsyncs_in_targeter = false
+09-06 12:34:13.187  2049  2049 I SyncManager: Loaded persisted syncs: 54 periodic syncs, 0 oneshot syncs, 54 total system server jobs, JobStats: FirstLoad: 125/58/54 LastSave: -1/-1/-1
+09-06 12:34:26.128  2049  2093 I ActivityManager: Start proc 6791:com.google.android.apps.paidtasks/u0a410 for service {com.google.android.apps.paidtasks/com.google.android.apps.paidtasks.sync.SyncService}
+09-06 12:52:24.129  4312 13454 I GmsCoreXrpcWrapper: (REDACTED) Creating a custom channel provider with trafficStatsTag=%d trafficStatsUid=%d
+=== END AON BASELINE ===

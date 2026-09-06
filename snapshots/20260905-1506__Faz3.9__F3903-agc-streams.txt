@@ -1,0 +1,12 @@
+  09-05 15:06:02 : Device 2 is open. Client instance dump:
+    Client PID: 16091
+      Consumer name: ImageReader-1440x1080f22m11-16091-0
+      Dims: 1440 x 1080, format 0x7fa30c06, dataspace 0x0
+      Consumer name: ImageReader-4096x3072f25m37-16091-1
+      Dims: 4096 x 3072, format 0x25, dataspace 0x1
+      Consumer name: ImageReader-4096x3072f23m22-16091-2
+      Dims: 4096 x 3072, format 0x23, dataspace 0x8c20000
+      Consumer name: ImageReader-640x480f23m52-16091-3
+      Dims: 640 x 480, format 0x23, dataspace 0x8c20000
+    0x80300004 (StabilizedOutputDims) with type 0 (byte) defined in section org.quic.camera.eisrealtime
+    0x80310005 (StabilizedOutputDims) with type 0 (byte) defined in section org.quic.camera.eislookahead

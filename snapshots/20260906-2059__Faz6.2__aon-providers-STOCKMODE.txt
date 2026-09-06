@@ -1,0 +1,88 @@
+=== BEGIN AON PROVIDERS ===
+prefs md5 BEFORE: 21762bdcb09f107aad2f397351cf1337
+prefs size BEFORE: 12169
+marker: 09-06 20:58:38.000
+-- resumed activity (discriminator: preview vs error dialog) --
+    topResumedActivity=ActivityRecord{7070ec2 u0 org.codeaurora.snapcam/com.android.camera.CameraLauncher t7}
+  ResumedActivity: ActivityRecord{7070ec2 u0 org.codeaurora.snapcam/com.android.camera.CameraLauncher t7}
+-- camera devices open --
+  09-06 20:58:50 : Device 2 is open. Client instance dump:
+-- AON / NCS / provider lines since marker --
+09-06 20:58:38.404  2720  2720 I adbd    : adbd service requested 'shell,v2,TERM=xterm-256color,raw:su -c 'sh /data/local/tmp/aonprov.sh''
+09-06 20:58:39.034 13189 13444 I CamX    : [ DUMP][CORE   ] camxresourcemanager.cpp:181 DumpState() client {AONPipeline_1, 0xb400007555ca5bc0}
+09-06 20:58:39.110 13189 13444 E CamX    : [ERROR][NCS    ] camxncsintfmiaperture.cpp:870 RegisterService() [Aperture]No Provider Objects available
+09-06 20:58:39.110 13189 13444 E CamX    : [ERROR][SENSOR ] camxncsdatasource.h:784 SetupNCSLinkForSensor() Aperture Sensor Handle is NULL
+09-06 20:58:39.172 13189 13444 E CamX    : [ERROR][NCS    ] camxncssensor.cpp:206 PutBackDataObj() Unable to put back object, NULL intf or acessor object
+09-06 20:58:39.173 13189 13655 I CamX    : [ DUMP][CORE   ] camxresourcemanager.cpp:181 DumpState() client {AONPipeline_1, 0xb400007555ca5bc0}
+09-06 20:58:39.173 13189 13194 E CamX    : [ERROR][NCS    ] camxncssensor.cpp:206 PutBackDataObj() Unable to put back object, NULL intf or acessor object
+09-06 20:58:39.174 13189 13444 E CamX    : [ERROR][NCS    ] camxncssensor.cpp:206 PutBackDataObj() Unable to put back object, NULL intf or acessor object
+09-06 20:58:39.175 13189 13194 E CamX    : [ERROR][NCS    ] camxncssensor.cpp:206 PutBackDataObj() Unable to put back object, NULL intf or acessor object
+09-06 20:58:39.176 13189 13444 E CamX    : [ERROR][NCS    ] camxncssensor.cpp:206 PutBackDataObj() Unable to put back object, NULL intf or acessor object
+09-06 20:58:39.178 13189 13194 E CamX    : [ERROR][NCS    ] camxncssensor.cpp:206 PutBackDataObj() Unable to put back object, NULL intf or acessor object
+09-06 20:58:39.211 13189 13318 E CamX    : [ERROR][NCS    ] camxncssensor.cpp:206 PutBackDataObj() Unable to put back object, NULL intf or acessor object
+09-06 20:58:39.214 13189 13324 E CamX    : [ERROR][SENSOR ] camxrecoveryscene.h:393 GetRecoveryData() Error NCS data: pysicalFNumber: 1.900000, targetFNumber: 0.000000
+09-06 20:58:39.214 13189 13324 E CamX    : [ERROR][SENSOR ] camxmultiplefacescene.h:249 GetStableFilteredFaceData() CameraId[0] RequestId[2] ProcessSequenceId[1] Failed to get ncs data
+09-06 20:58:39.223 13189 13324 E CamX    : [ERROR][SENSOR ] camxrecoveryscene.h:393 GetRecoveryData() Error NCS data: pysicalFNumber: 1.900000, targetFNumber: 0.000000
+09-06 20:58:39.223 13189 13324 E CamX    : [ERROR][SENSOR ] camxmultiplefacescene.h:249 GetStableFilteredFaceData() CameraId[0] RequestId[3] ProcessSequenceId[1] Failed to get ncs data
+09-06 20:58:39.223 13189 13321 E CamX    : [ERROR][NCS    ] camxncssensor.cpp:206 PutBackDataObj() Unable to put back object, NULL intf or acessor object
+09-06 20:58:39.225 13189 13326 E CamX    : [ERROR][NCS    ] camxncssensor.cpp:206 PutBackDataObj() Unable to put back object, NULL intf or acessor object
+09-06 20:58:39.313 13189 13324 E CamX    : [ERROR][SENSOR ] camxmultiplefacescene.h:249 GetStableFilteredFaceData() CameraId[0] RequestId[4] ProcessSequenceId[1] Failed to get ncs data
+09-06 20:58:39.347 13189 13323 E CamX    : [ERROR][SENSOR ] camxmultiplefacescene.h:249 GetStableFilteredFaceData() CameraId[0] RequestId[5] ProcessSequenceId[1] Failed to get ncs data
+09-06 20:58:39.381 13189 13319 E CamX    : [ERROR][SENSOR ] camxmultiplefacescene.h:249 GetStableFilteredFaceData() CameraId[0] RequestId[6] ProcessSequenceId[1] Failed to get ncs data
+09-06 20:58:39.421 13189 13318 E CamX    : [ERROR][SENSOR ] camxmultiplefacescene.h:249 GetStableFilteredFaceData() CameraId[0] RequestId[7] ProcessSequenceId[1] Failed to get ncs data
+09-06 20:58:39.471 13189 13322 E CamX    : [ERROR][SENSOR ] camxmultiplefacescene.h:249 GetStableFilteredFaceData() CameraId[0] RequestId[8] ProcessSequenceId[1] Failed to get ncs data
+09-06 20:58:39.541 13189 13320 E CamX    : [ERROR][SENSOR ] camxmultiplefacescene.h:249 GetStableFilteredFaceData() CameraId[0] RequestId[9] ProcessSequenceId[1] Failed to get ncs data
+09-06 20:58:39.611 13189 13319 E CamX    : [ERROR][SENSOR ] camxmultiplefacescene.h:249 GetStableFilteredFaceData() CameraId[0] RequestId[10] ProcessSequenceId[1] Failed to get ncs data
+09-06 20:58:39.683 13189 13320 E CamX    : [ERROR][SENSOR ] camxmultiplefacescene.h:249 GetStableFilteredFaceData() CameraId[0] RequestId[11] ProcessSequenceId[1] Failed to get ncs data
+-- aperture --
+09-06 20:58:38.920 13529 13529 W AGC     : ID:0 Name: Front:false Logical:true Flash:true OIS:true Focal:8.7 35mm:23 MFocus:6.6666665 Aperture:1.9 13.1072x9.8304 Level3:true
+09-06 20:58:38.920 13529 13529 W AGC     : ID:1 Name: Front:true Logical:false Flash:false OIS:false Focal:2.83 35mm:22 MFocus:0 Aperture:2 4.582656x3.436992 Level3:true
+09-06 20:58:38.920 13529 13529 W AGC     : ID:2 Name: Front:false Logical:false Flash:true OIS:true Focal:8.7 35mm:23 MFocus:6.6666665 Aperture:1.9 13.1072x9.8304 Level3:true
+09-06 20:58:38.920 13529 13529 W AGC     : ID:3 Name: Front:false Logical:false Flash:true OIS:false Focal:2.03 35mm:13 MFocus:20 Aperture:1.8 5.7344x4.3008 Level3:true
+09-06 20:58:38.920 13529 13529 W AGC     : ID:4 Name: Front:false Logical:false Flash:true OIS:true Focal:9.87 35mm:60 MFocus:2.5 Aperture:1.8 5.7344x4.3008 Level3:true
+09-06 20:58:38.920 13529 13529 W AGC     : ID:5 Name: Front:false Logical:false Flash:true OIS:true Focal:19.4 35mm:118 MFocus:1 Aperture:3 5.7344x4.3008 Level3:true
+09-06 20:58:38.920 13529 13529 W AGC     : ID:6 Name: Front:false Logical:true Flash:true OIS:true Focal:8.7 35mm:23 MFocus:6.6666665 Aperture:1.9 13.1072x9.8304 Level3:true
+09-06 20:58:38.920 13529 13529 W AGC     : ID:7 Name: Front:false Logical:true Flash:true OIS:true Focal:8.7 35mm:23 MFocus:6.6666665 Aperture:1.9 13.1072x9.8304 Level3:true
+09-06 20:58:38.920 13529 13529 W AGC     : ID:8 Name: Front:true Logical:false Flash:false OIS:false Focal:2.83 35mm:22 MFocus:0 Aperture:2 4.582656x3.436992 Level3:true
+09-06 20:58:38.920 13529 13529 W AGC     : ID:9 Name: Front:true Logical:false Flash:false OIS:false Focal:2.83 35mm:22 MFocus:0 Aperture:2 4.582656x3.436992 Level3:true
+-- ois --
+09-06 20:58:38.920 13529 13529 W AGC     : ID:0 Name: Front:false Logical:true Flash:true OIS:true Focal:8.7 35mm:23 MFocus:6.6666665 Aperture:1.9 13.1072x9.8304 Level3:true
+09-06 20:58:38.920 13529 13529 W AGC     : ID:1 Name: Front:true Logical:false Flash:false OIS:false Focal:2.83 35mm:22 MFocus:0 Aperture:2 4.582656x3.436992 Level3:true
+09-06 20:58:38.920 13529 13529 W AGC     : ID:2 Name: Front:false Logical:false Flash:true OIS:true Focal:8.7 35mm:23 MFocus:6.6666665 Aperture:1.9 13.1072x9.8304 Level3:true
+09-06 20:58:38.920 13529 13529 W AGC     : ID:3 Name: Front:false Logical:false Flash:true OIS:false Focal:2.03 35mm:13 MFocus:20 Aperture:1.8 5.7344x4.3008 Level3:true
+09-06 20:58:38.920 13529 13529 W AGC     : ID:4 Name: Front:false Logical:false Flash:true OIS:true Focal:9.87 35mm:60 MFocus:2.5 Aperture:1.8 5.7344x4.3008 Level3:true
+09-06 20:58:38.920 13529 13529 W AGC     : ID:5 Name: Front:false Logical:false Flash:true OIS:true Focal:19.4 35mm:118 MFocus:1 Aperture:3 5.7344x4.3008 Level3:true
+09-06 20:58:38.920 13529 13529 W AGC     : ID:6 Name: Front:false Logical:true Flash:true OIS:true Focal:8.7 35mm:23 MFocus:6.6666665 Aperture:1.9 13.1072x9.8304 Level3:true
+09-06 20:58:38.920 13529 13529 W AGC     : ID:7 Name: Front:false Logical:true Flash:true OIS:true Focal:8.7 35mm:23 MFocus:6.6666665 Aperture:1.9 13.1072x9.8304 Level3:true
+09-06 20:58:38.920 13529 13529 W AGC     : ID:8 Name: Front:true Logical:false Flash:false OIS:false Focal:2.83 35mm:22 MFocus:0 Aperture:2 4.582656x3.436992 Level3:true
+09-06 20:58:38.920 13529 13529 W AGC     : ID:9 Name: Front:true Logical:false Flash:false OIS:false Focal:2.83 35mm:22 MFocus:0 Aperture:2 4.582656x3.436992 Level3:true
+-- laser / tof --
+09-06 20:58:38.788  4362  4362 I TopTaskTracker: onTaskMovedToFront: (moved taskInfo to front) taskId=7, baseIntent=Intent { act=android.intent.action.MAIN cat=[android.intent.category.LAUNCHER] flg=0x10200000 cmp=org.codeaurora.snapcam/com.android.camera.CameraLauncher }
+09-06 20:58:38.795  6668  7221 W AiAiAutofill: Failed to set whitelist for augmented autofill service.
+09-06 20:58:38.795  6668  7221 W AiAiAutofill: java.lang.SecurityException: caller is not user's Augmented Autofill Service
+09-06 20:58:38.795  6668  7221 W AiAiAutofill: 	at android.view.autofill.AutofillManager.setAugmentedAutofillWhitelist(AutofillManager.java:2860)
+09-06 20:58:38.795  6668  7221 W AiAiAutofill: 	at efk.c(PG:66)
+09-06 20:58:38.795  6668  7221 W AiAiAutofill: 	at ego.h(PG:82)
+09-06 20:58:38.795  6668  7221 W AiAiAutofill: 	at ehd.a(PG:191)
+09-06 20:58:38.795  6668  7221 W AiAiAutofill: 	at qxr.a(PG:5)
+09-06 20:58:38.795  6668  7221 W AiAiAutofill: 	at qyh.a(PG:59)
+09-06 20:58:38.795  6668  7221 W AiAiAutofill: 	at ypf.a(PG:5)
+-- face / scene --
+09-06 20:58:39.214 13189 13324 E CamX    : [ERROR][SENSOR ] camxrecoveryscene.h:561 FilteredSceneDetection() Failed to get stable filtered recovery data
+09-06 20:58:39.214 13189 13324 E CamX    : [ERROR][SENSOR ] camxmultiplefacescene.h:249 GetStableFilteredFaceData() CameraId[0] RequestId[2] ProcessSequenceId[1] Failed to get ncs data
+09-06 20:58:39.214 13189 13324 E CamX    : [ERROR][SENSOR ] camxmultiplefacescene.h:330 GetStableFilteredFaceData() CameraId[0] RequestId[2] ProcessSequenceId[1] Failed to get face count
+09-06 20:58:39.214 13189 13324 E CamX    : [ERROR][SENSOR ] camxmultiplefacescene.h:368 FilteredSceneDetection() CameraId[0] RequestId[2] ProcessSequenceId[1] Failed to get face data
+09-06 20:58:39.223 13189 13324 E CamX    : [ERROR][SENSOR ] camxrecoveryscene.h:561 FilteredSceneDetection() Failed to get stable filtered recovery data
+09-06 20:58:39.223 13189 13324 E CamX    : [ERROR][SENSOR ] camxmultiplefacescene.h:249 GetStableFilteredFaceData() CameraId[0] RequestId[3] ProcessSequenceId[1] Failed to get ncs data
+09-06 20:58:39.223 13189 13324 E CamX    : [ERROR][SENSOR ] camxmultiplefacescene.h:330 GetStableFilteredFaceData() CameraId[0] RequestId[3] ProcessSequenceId[1] Failed to get face count
+09-06 20:58:39.223 13189 13324 E CamX    : [ERROR][SENSOR ] camxmultiplefacescene.h:368 FilteredSceneDetection() CameraId[0] RequestId[3] ProcessSequenceId[1] Failed to get face data
+09-06 20:58:39.313 13189 13324 E CamX    : [ERROR][SENSOR ] camxmultiplefacescene.h:249 GetStableFilteredFaceData() CameraId[0] RequestId[4] ProcessSequenceId[1] Failed to get ncs data
+09-06 20:58:39.313 13189 13324 E CamX    : [ERROR][SENSOR ] camxmultiplefacescene.h:330 GetStableFilteredFaceData() CameraId[0] RequestId[4] ProcessSequenceId[1] Failed to get face count
+-- provider creation lines --
+09-06 20:58:39.110 13189 13444 E CamX    : [ERROR][NCS    ] camxncsintfmiaperture.cpp:870 RegisterService() [Aperture]No Provider Objects available
+09-06 20:58:39.117 13189 13629 I vendor.qti.camera.provider-service_64: vendor/qcom/proprietary/adsprpc/src/fastrpc_apps_user.c:3321: Created user PD on domain 3, debug_trace 0x0, enabled attr=> RPC timeout:0, Debug Mode:N, CRC check:N, Unsigned:N, Signed:Y, Adapt QOS:N, PD dump: (Config:N, Debug:N), Perf: (Kernel:N, DSP:N), Iregion:N, QTF Tracing:N, UAF heap:N userPD initmem length:0x3
+09-06 20:58:39.119 13189 13629 I vendor.qti.camera.provider-service_64: vendor/qcom/proprietary/adsprpc/src/fastrpc_perf.c:273: fastrpc_perf_init: enabled systrace 0x0 and RPC traces (kernel 0, dsp 0) with frequency 1000
+-- closing the camera --
+prefs md5 AFTER: 21762bdcb09f107aad2f397351cf1337
+prefs size AFTER: 12169
+=== END AON PROVIDERS ===

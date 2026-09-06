@@ -1,0 +1,108 @@
+Faz 3.10 - NEGATIVE CONTROL PREDICTION, STATED BEFORE THE CONTROL CAPTURE
+=========================================================================
+Written 2026-09-05 15:17 local by the IMPL-58 session, immediately after Faz3.9 closed and
+BEFORE any Faz3.10 axis has been run and before any control capture exists.
+The filename carries a UTC timestamp so the ordering is evidenced by the
+artifact rather than asserted in the write-up afterwards. This is what
+AUDIT-FIX-40 asked for, and it copies the pattern of
+snapshots/20260905-1151__Faz3.9__F3904-prestated-threshold.txt.
+
+WHY THIS FILE EXISTS
+---------------------
+Faz3.10 section 8 grades the negative control on its FALSIFIABILITY, not on its
+result: "A control whose prediction is absent, or written after the capture,
+does not satisfy this criterion whatever the capture showed." So the prediction
+is committed here, in advance, in a form that can fail.
+
+THE CONTROL, as sections 4, 7 and 8 specify it (the authoritative sections;
+AUDIT-FIX-39 warns that section 3 and the section 9 security sentence still
+describe the PRE-REPAIR control and must not be read as the design)
+---------------------------------------------------------------------------
+  Stimulus:  pref_48m_key = 1     <- the INPUT key.
+  NOT valid: clearing pref_camera_picturesize_back_key. F3.10-07 declares that
+             invalid because IMPL-52 measured AGC re-derives the derived key on
+             the next start, so such a control measures nothing.
+  Then:      restart AGC, read all three preference keys plus the front key,
+             read BOTH configured streams from dumpsys with AGC open with their
+             formats, take ONE capture, measure it by the IMPL-40 method.
+  Then:      restore pref_48m_key = 0 by the inode-preserving write and
+             re-verify after an AGC restart.
+
+THE PREDICTION, stated now and gradeable either way
+----------------------------------------------------
+PREDICTION 1 - the derivation.
+  With the HAL base held at fe0245a4720fb07b01d96deef47f5569 and
+  pref_camera_resolution left at "full", setting pref_48m_key = 1 and restarting
+  AGC will derive:
+        pref_camera_picturesize_back_key   = 8192x6144
+        pref_camera_picturesize_front_key  = 6528x4896
+  Confidence: HIGH. This is not an inference - IMPL-56 MEASURED exactly this
+  transition on this same HAL base, both keys moving together.
+  NOTE THE LAG: IMPL-56 also measured that immediately after the write and
+  BEFORE any AGC start, the file still read the OLD derived values while
+  pref_48m_key already read 1. The derived keys are a cache of the last AGC
+  start. Any read taken before the restart will therefore look like a failure
+  and is not one. Read AFTER the restart.
+
+PREDICTION 2 - the configured streams.
+  dumpsys media.camera with AGC open will show 8192 x 6144 on both the RAW10
+  (format 0x25) and YUV (format 0x23) consumers, replacing the 4096 x 3072 that
+  IMPL-58 measured on both of them at the pinned value.
+  Confidence: HIGH.
+
+PREDICTION 3 - THE ONE THAT CAN FAIL. The capture will FOLD.
+  Predicted black fraction:  approximately 0.75, in or near the fold band.
+  Predicted verdict:         FOLD, not clean.
+  Stated as a falsifiable range: black fraction > 0.5 counts as FOLD CONFIRMED;
+  black fraction < 0.01 counts as PREDICTION FAILED - AGC captured 50 MP
+  cleanly, which would be a result of the first importance because it would
+  reopen the objective DEC-14 retired. Anything between 0.01 and 0.5 is a THIRD
+  outcome neither the fold cluster nor the clean cluster, and would itself be a
+  finding.
+
+  Reasoning. The fold is the reason the pin exists. Every AGC capture this
+  project has taken at 8192x6144 has folded, and the fold has only ever appeared
+  on the AGC RAW consumption path - never on Open Camera, and never on the stock
+  camera. DEC-14 retired "50 MP end-to-end in AGC" on exactly this evidence and
+  replaced it with "AGC stable at 12.6 MP under 50 MP". If this control comes
+  back clean, that retirement was premature.
+
+REFERENCES, all re-measured this session by the identical IMPL-40 method
+(PIL, grayscale, pixels below 4, over total) so the comparison is exact and not
+carried from memory
+-------------------------------------------------------------------------------
+  FOLD cluster
+    0.7497   EV-44 fullres stream, AGC 50 MP
+             snapshots/20260902-2242__Faz4.6__EV44-fullres-stream-50MP-folded-ORIGINAL.jpg
+    0.7502   UHR-enabled 50 MP still, AGC
+             snapshots/20260903-0857__Faz4.6__UHR-enabled-50MP-still-folded-ORIGINAL.jpg
+
+  CLEAN cluster
+    0.0000   stock camera 50 MP control
+             snapshots/20260902-1400__Faz4.6__stock50-clean-control-ORIGINAL.jpg
+    0.0000   Open Camera 50 MP, IMPL-58, this session
+             snapshots/20260905-1509__Faz3.9__F3904-oc-ORIGINAL.jpg
+    0.0000   AGC 12.58 MP pinned, IMPL-58, this session
+             snapshots/20260905-1508__Faz3.9__F3903-agc-ORIGINAL.jpg
+    0.0027   AGC 12.58 MP pinned, IMPL-54 / Faz3.7
+             snapshots/20260904-1831__Faz3.7__F3706-pinned-ORIGINAL.jpg
+
+  A PRECISION CORRECTION, recorded rather than absorbed. The fold band has been
+  stated in this project as 0.7490-0.7498, including in the Faz3.9 threshold
+  artifact written earlier today. Re-measuring the two folded originals gives
+  0.7497 and 0.7502. The UHR sample sits just ABOVE the stated upper bound, so
+  the band as previously written is very slightly too narrow. The honest band
+  from the two measured samples is 0.7497-0.7502. This does not affect any
+  verdict - the separation from the clean cluster is three orders of magnitude
+  either way - and the Faz3.9 threshold is NOT revised, because Faz3.9 was
+  graded against "< 0.01" and both its captures measured 0.0000. It is recorded
+  here so a later reader does not treat a 0.7502 control as out of band.
+
+WHAT WOULD MAKE THIS CONTROL INVALID
+--------------------------------------
+  - Reading the derived keys before the AGC restart (the lag above).
+  - Using the derived key as the stimulus instead of pref_48m_key.
+  - Any HAL, mode or mount change during the control - the base must stay
+    fe0245a4720fb07b01d96deef47f5569, which is what makes the stimulus single.
+  - Opening CameraSettingsActivity, which FIND-3.7-01 measured self-arms two
+    trap keys. Use a plain monkey LAUNCHER start.

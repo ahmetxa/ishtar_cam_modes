@@ -1,0 +1,363 @@
+Faz 3.10 - PIN STICKINESS MATRIX, COMPLETE RESULT
+==================================================
+Written 2026-09-05 15:53 local. Session 15:23-15:51, one continuous run on one
+device, user present at the device throughout.
+
+Graded against the rule committed BEFORE the first disturbance in
+  snapshots/20260905-1523__Faz3.10__F31001-verdict-rule-and-matrix-skeleton.txt
+and the control prediction committed by the PREVIOUS session in
+  snapshots/20260905-1517__Faz3.10__F31007-prestated-control-prediction.txt
+Neither was revised after any result was seen. Ordering is evidenced by file
+mtimes, and every artifact filename in this set was corrected to match its true
+mtime (see DEVIATION 1).
+
+
+HEADLINE - AND IT IS NOT THE MATRIX
+====================================
+All four survival axes SURVIVED. The pin is robust.
+
+But the negative control FALSIFIED its own pre-stated prediction, and that is
+the consequential result of this session:
+
+  PREDICTED   fold at approximately 0.75  (>0.5 = FOLD CONFIRMED)
+  MEASURED    0.0000, TWICE, at 6144x8192 / 50.33 MP - CLEAN
+  GRADE       PREDICTION FAILED  (the "< 0.01" branch, stated in advance)
+
+The 15:17 artifact stated the consequence of that branch itself, before the
+measurement existed: it "would reopen the objective DEC-14 retired." That is
+what happened. AGC captured a clean 50 MP image on the SHIPPED fullres HAL base
+with pref_48m_key=1, reproducibly. See FIND-3.10-03.
+
+
+PART 1 - THE SURVIVAL MATRIX
+=============================
+Verdict taken on the two INPUT keys, per rule R-1/R-2/R-3/R-4.
+Values written as before -> after. "=" means unchanged.
+
+| # | Axis                     | 48m   | resolution | rear derived | front       | HAL md5  | trap | VERDICT     |
+|---|--------------------------|-------|------------|--------------|-------------|----------|------|-------------|
+| 1 | AGC cold start           | 0 = 0 | full = full| 4096x3072 =  | 3264x2448 = | fe0245a4 | 0/12 | R-1 SURVIVED|
+| 2 | Camera-stack restart     | 0 = 0 | full = full| 4096x3072 =  | 3264x2448 = | fe0245a4 | 0/12 | R-1 SURVIVED|
+| 3 | QS mode switch (away)    | 0 = 0 | full = full| 4096x3072 =  | 3264x2448 = | c3fa63a8 | 0/12 | R-1 SURVIVED|
+| 3 | QS mode switch (back)    | 0 = 0 | full = full| 4096x3072 =  | 3264x2448 = | fe0245a4 | 0/12 | R-1 SURVIVED|
+| 4 | Device reboot            | 0 = 0 | full = full| 4096x3072 =  | 3264x2448 = | fe0245a4 | 0/12 | R-1 SURVIVED|
+
+Snapshots, in order, filenames carrying true mtimes:
+  1524 F31002-axis1-pre.txt          axis 1 before
+  1525 F31002-axis1-post.txt         axis 1 after   (also axis 2's before)
+  1531 F31003-axis2-post.txt         axis 2 after   (also axis 3's before)
+  1535 F31004-axis3-away-stock.txt   axis 3 away half
+  1536 F31004-axis3-back-50mp.txt    axis 3 back half (also axis 4's before)
+  1538 F31005-axis4-post-reboot.txt  axis 4 after
+  1550 F31008-restored-state.txt     closing state
+
+Every consecutive pair diffs to ZERO DIFFERING LINES across the 45-line stable
+region. Not one axis moved a single field.
+
+NOT ONE AXIS PRODUCED A SELF-HEALING ROW. R-2 was declared in advance and never
+fired: the derived rear key held its value directly on all four axes, so no row
+had to be classified as inputs-survived/derived-stale. R-2's pre-declaration was
+correct to make and turned out to be unnecessary, which is the right order.
+
+Disturbance detail per axis:
+  1  am force-stop org.codeaurora.snapcam, then monkey LAUNCHER. AGC resumed to
+     CameraLauncher first try, no DefaultErrorActivity, crash buffer zero.
+  2  restart_camera() sliced VERBATIM out of ishtar-cam-modes/setmode.sh
+     (lines 34, 110-124, 95-107, 47-91) into a pushed script, so invariant 3's
+     client-before-HAL ordering is the module's own code and not a
+     reimplementation. HAL_WANT was left empty so step 3b's HAL write is skipped
+     and the HAL md5 is held. Mount counts stayed 1/1.
+     FIND-2.3-04 was pre-declared and is honoured: CSIPHYHw AvailableResource
+     was NOT read as a leak signature on this axis.
+  3  QuickSettings tile, by the user's hand, 50mp -> stock -> 50mp.
+     The HAL md5 moved to c3fa63a86ee3ecaf9fbf02005d35f6b5 on the away half.
+     THAT IS BY DESIGN and is the disturbance itself. See DEVIATION 2 - the
+     pre-stated R-4 did not carve out the intermediate away-snapshot, and that
+     is a defect in the rule, disclosed rather than patched.
+  4  adb reboot, user-authorised. boot_completed at 55s, camera list back at 13
+     devices. VAL-PERSIST satisfied from the SAME snapshot: mode 50mp, HAL
+     fullres mount 1, sensor stock mount 1 - module persistence and pin
+     persistence judged together, reproducing IMPL-13's result.
+
+     NOTE, worth recording because it will recur: immediately after reboot the
+     preferences file was UNREADABLE - "No such file or directory" - and
+     /data/data/org.codeaurora.snapcam listed no shared_prefs directory. This is
+     the credential-encrypted storage boundary, not a loss of state. Moments
+     later the same reads succeeded and every value was intact. An operator
+     checklist that reads AGC preferences straight after a reboot must wait for
+     CE storage, or it will record a false total failure.
+
+
+PART 2 - THE FRONT KEY, STATED EXPLICITLY AS SECTION 8 REQUIRES
+================================================================
+NO AXIS MOVED pref_camera_picturesize_front_key. It read 3264x2448 before and
+after all four axes, on both halves of the mode switch, and across the reboot.
+
+It DID move across the negative control, in both directions:
+    3264x2448  ->  6528x4896   when pref_48m_key went 0 -> 1
+    6528x4896  ->  3264x2448   when pref_48m_key went 1 -> 0
+
+That is the EXPECTED behaviour, pre-declared at 15:23 from IMPL-56, and under
+the pre-stated rule it is explicitly NOT a finding. The front key tracks the
+rear because pref_48m_key governs both derivations.
+
+CONSEQUENCE FOR Faz3.11's F3.11-08: this is the evidence it was repaired by
+planning run 14 to consume. FIND-3.7-03 can be disposed of against a MEASURED
+result: the front key is derived from the same input as the rear, moves only
+when that input moves, and is untouched by cold start, camera-stack restart,
+mode switch and reboot. No axis routed a front-key finding.
+
+BOUNDARY, stated so Faz3.11 does not over-read it: this is a PREFERENCE-VALUE
+result. No front-camera capture was taken and no front-camera session was
+opened, exactly as the rule pre-declared. Front-camera IMAGE behaviour remains
+unmeasured, as it was after Faz3.9.
+
+
+PART 3 - THE NEGATIVE CONTROL
+==============================
+Stimulus: pref_48m_key = 1. NOT the derived key cleared - that stimulus is
+declared invalid by F3.10-07 and was not used.
+
+Write technique: file backed up to /data/local/tmp/agc_prefs_F31007_backup.xml
+and to snapshots/20260905-1543__Faz3.10__F31007-prefs-backup.xml; AGC
+force-stopped; addressed substitution `sed "/pref_48m_key/s|>0<|>1<|"` to a temp
+file, then `cat >` back into the original. Owner u0_a450, mode 0660 and label
+u:object_r:app_data_file:s0:c194,c257,c512,c768 all preserved. md5 e3ed08f7... ->
+3602997a...
+
+THE DERIVED-KEY LAG REPRODUCED: immediately after the write and before any AGC
+start, pref_48m_key already read 1 while all three derived values still read
+their old values. Reading there would have recorded a false failure.
+
+  PREDICTION 1 - the derivation.                              CORRECT.
+    Predicted  back 8192x6144, front 6528x4896.
+    Measured   back 8192x6144, front 6528x4896, after the AGC restart.
+
+  PREDICTION 2 - the configured streams.                      FALSIFIED.
+    Predicted  "8192 x 6144 on both the RAW10 and the YUV stream".
+    Measured   RAW10 0x25 at 4096x3072, YUV 0x23 at 8192x6144 - MISMATCHED.
+    The prediction overstated. The measured pair is exactly what IMPL-53
+    recorded on the shipped base, and what this sub-plan's OWN section 6
+    describes ("RAW10 stays at 4096x3072 while YUV goes to 8192x6144, because
+    the shipped base advertises no RAW10 row at 8192x6144"). So the prediction
+    contradicted the sub-plan it was written for; the measurement agrees with
+    the sub-plan. Recorded, not excused.
+
+    SECOND-ORDER LAG, NEW AND NOT PREVIOUSLY RECORDED: on the FIRST cold start
+    after the write, BOTH streams still read 4096x3072 even though the derived
+    key already read 8192x6144. The mismatched pair only appeared on the SECOND
+    cold start. The stream configuration lags the derivation by one start, just
+    as the derivation lags the input write by one start. Both cold starts are
+    recorded in the streams artifact. An operator who reads streams once after
+    a preference change will read the old configuration. See FIND-3.10-04.
+
+  PREDICTION 3 - THE FALSIFIABLE ONE.                         FAILED.
+    Predicted  fold at approximately 0.75. Grading stated in advance:
+                 > 0.5    FOLD CONFIRMED
+                 < 0.01   PREDICTION FAILED
+                 0.01-0.5 a third outcome, itself a finding
+    Measured   TWO captures, both in the fully armed state:
+
+       20260905-1546__Faz3.10__F31007-control-ORIGINAL.jpg
+         6144x8192   50.33 MP   black 0.0000   quadrants 0.0000/0.0000/0.0000/0.0000
+       20260905-1549__Faz3.10__F31007-control-ORIGINAL-2.jpg
+         6144x8192   50.33 MP   black 0.0000   quadrants 0.0000/0.0000/0.0000/0.0000
+
+    GRADE: PREDICTION FAILED. Not marginally - by three orders of magnitude,
+    into the CLEAN cluster, twice, with no fold quadrant signature whatsoever.
+
+    Ordering is evidenced: the armed state was recorded at 15:45:31 (streams)
+    and 15:45:35 (smoke snapshot); the first shutter press was at 15:45:54.
+    The capture followed the armed state, it did not precede it.
+
+    The second capture was taken because the first failed the prediction and a
+    single sample could not distinguish a reproducible capability from a
+    one-off. The user approved it. It is reported as a deliberate addition, not
+    folded in silently. See DEVIATION 3.
+
+MEASUREMENT SCALE VALIDATED, so these figures are comparable to the project's
+history: the same script re-measured
+    20260904-1831__Faz3.7__F3706-pinned-ORIGINAL.jpg  ->  0.0027
+    20260905-1508__Faz3.9__F3903-agc-ORIGINAL.jpg     ->  0.0000
+reproducing IMPL-54's and IMPL-58's recorded figures exactly.
+
+
+PART 4 - RESTORE AND CLOSE
+===========================
+pref_48m_key restored to 0 by the same inode-preserving technique. Owner, mode
+and SELinux label preserved.
+
+  after restart:  48m=0, resolution=full, back 4096x3072, front 3264x2448
+  both streams:   4096x3072 on YUV 0x23 AND RAW10 0x25 - the pinned pair
+  closing capture 20260905-1551__Faz3.10__F31008-restored-ORIGINAL.jpg
+                  3072x4096   12.58 MP   black 0.0001   PASS (< 0.01)
+
+The control is NOT the state the device is left in.
+
+CONFIRMING CAPTURE on the surviving state (F3.10-06), taken before the control:
+  20260905-1542__Faz3.10__F31006-confirming-ORIGINAL.jpg
+  3072x4096   12.58 MP   black 0.0001   PASS (< 0.01)
+
+Device left at: pref_48m_key=0, pref_camera_resolution=full, back 4096x3072
+(12.58 MP), front 3264x2448, HAL fe0245a4720fb07b01d96deef47f5569 fullres mount
+1, sensor 9e4d0fe1a8bf2eb4146c9917a0ac2c4c stock mount 1, mode.file 50mp,
+enumeration 13, AGC apk ce65f862c990e2acc02be356f75a7122, prefs md5
+21762bdcb09f107aad2f397351cf1337. TRAP COUNT 2/12, both keys at value 0 - see
+FIND-3.10-02.
+
+
+PART 5 - FINDINGS ROUTED
+=========================
+FIND-3.10-01  (P2)  scripts/smoke.sh stream_config.rows is sliced from a second
+                    dumpsys by line numbers taken from a first, and the two
+                    dumps differ by up to ~14,900 lines. Full evidence in
+                    snapshots/20260905-1532__Faz3.10__FIND-3-10-01-smoke-
+                    streamconfig-race.txt. NOT fixed here - smoke.sh is
+                    Faz3.8's delivered instrument and Faz3.8 is COMPLETE.
+                    Fallback used and justified there; the 45-line stable region
+                    was measured byte-identical across five consecutive runs.
+                    Faz3.11's checklist must carry the exclusion or wait on a
+                    repaired script.
+
+FIND-3.10-02  (P3)  A NEW TRAP RE-ARMING ROUTE THAT IS NOT THE SETTINGS SCREEN.
+                    prefs.trap.count went 0 -> 2 (pref_fix_resolution_key and
+                    pref_raw_key). BOTH READ VALUE 0, so both are inert by
+                    FIND-3.7-01's measurement. No axis in this matrix opened
+                    CameraSettingsActivity; every AGC start was a plain monkey
+                    LAUNCHER.
+                    WINDOW, narrowed from the snapshots: count was 0 at 15:45:35
+                    (control armed, snapshotted) and 2 by 15:50 (restored state).
+                    The keys were absent from the 15:43 backup and from the
+                    Faz3.8 11:45 backup. So the write happened during the 50 MP
+                    captures or the restore sequence, NOT at any settings screen.
+                    Not narrowed further: section 5 excludes diagnosis beyond
+                    classifying the symptom.
+                    This is section 4's last scope bullet delivered - "any
+                    additional re-arming route observed during the matrix ...
+                    recorded for Faz3.11's operator instructions."
+                    F3.10-01's rule pre-declared this exact case, so it is
+                    routed under a rule written in advance rather than judged
+                    after the reading appeared.
+
+FIND-3.10-03  (P1 proposed)  AGC CAPTURES 50 MP CLEANLY ON THE SHIPPED FULLRES
+                    BASE. Two captures, 6144x8192 / 50.33 MP / black 0.0000,
+                    with pref_48m_key=1 and the mismatched stream pair
+                    (RAW10 4096x3072, YUV 8192x6144). The fold that IMPL-43
+                    measured at 0.7497 and that this project has treated as the
+                    signature of the 50 MP path did NOT occur.
+                    This contradicts the premise on which DEC-14 retired "50 MP
+                    end-to-end in AGC" as unreachable, and the 15:17 prediction
+                    artifact named that consequence in advance.
+                    It is a USER DECISION, not an implementer's: it bears on
+                    DEC-14 itself, on Main-Planing lines 159 and 167 (already
+                    deferred to a single edit at the close of Phase 3 as
+                    AUDIT-FIX-30 and AUDIT-FIX-35), on the two superseded
+                    Faz4.1/Faz4.7 sub-plans, and on Faz3.11's retirement note.
+                    NOT ACTED ON by this session beyond measuring it and
+                    restoring the pin.
+                    WHAT IS NOT ESTABLISHED, stated so it is not over-read:
+                    why the fold is absent now when IMPL-43 measured it; whether
+                    the difference is the HAL base, the stream pair, the AGC
+                    build, the scene, or the second-cold-start effect; and
+                    whether 50 MP is stable across sessions rather than in this
+                    one. This finding reports a MEASUREMENT, not a capability
+                    claim, and the fold band 0.7497-0.7502 remains the recorded
+                    history of the captures that did fold.
+
+FIND-3.10-04  (P3)  The configured STREAMS lag a preference change by one AGC
+                    cold start, in addition to the already-known derived-key
+                    lag. First cold start after the write: both streams still
+                    4096x3072 with the derived key already at 8192x6144. Second
+                    cold start: the mismatched pair appeared. Operator-relevant
+                    and belongs in Faz3.11's instructions.
+
+
+PART 6 - DEVIATIONS, DECLARED RATHER THAN ABSORBED
+===================================================
+DEVIATION 1 - FILENAME TIMESTAMPS WERE WRONG AND WERE CORRECTED.
+  Eight artifacts were first written with estimated times up to 12 minutes ahead
+  of the real clock. Detected by comparing the device clock against the names.
+  Every file was renamed to its TRUE host mtime and the ledger references were
+  updated. The relative order was correct throughout and no conclusion changes.
+  The ordering claim that matters is unaffected and now sits on true mtimes:
+  control prediction 15:17, verdict rule 15:23, FIRST DISTURBANCE 15:24. Both
+  pre-stated artifacts precede the first measurement.
+  Recorded because AUDIT-FIX-40 exists precisely so filenames evidence ordering,
+  and a filename that lies about its time defeats that.
+
+DEVIATION 2 - A DEFECT IN THE PRE-STATED RULE, DISCLOSED NOT PATCHED.
+  R-4 as written says any snapshot whose HAL md5 is not fe0245a4... is invalid
+  and re-run. The mode-switch axis NECESSARILY moves the HAL md5 on its away
+  half - that is what a mode switch is. The rule's own caveat paragraph exempts
+  only the SENSOR layer on that axis, and Part C anticipated the return by
+  requiring the axis to end at 50mp/fullres "or R-4 fires on every later axis".
+  So the rule anticipated the return and never carved out the intermediate
+  away-snapshot. That is an ambiguity in the rule I wrote, not a result.
+  It changes nothing: the verdict is taken on the two INPUT keys, which did not
+  move on either half, and the axis returned to fe0245a4... exactly. Reported
+  because a rule amended after seeing a result is not a rule, and the honest
+  alternative to amending it is to say where it was wrong.
+
+DEVIATION 3 - A SECOND CONTROL CAPTURE WAS TAKEN, NOT PLANNED.
+  F3.10-07 specifies "one capture". Two were taken. The second was taken only
+  after the first FAILED the prediction, was proposed to the user with its
+  reason, and was approved before the shutter was pressed. Its purpose was to
+  distinguish reproducible from anecdotal on a result that reopens a retired
+  objective. The letter of "one capture" is unmet; the purpose is strengthened.
+  The user has not ruled on this deviation. Faz3.11 consumes it, alongside
+  Faz3.9's two undisposed deviations.
+
+DEVIATION 4 - SIX INCIDENTAL CAPTURES DURING THE AXIS RUNS.
+  Photographs exist at 15:25, 15:28, 15:30, 15:31, 15:35 and 15:36 that are not
+  part of the plan. They were the USER's own shutter presses while at the
+  device, confirmed by the user. They were NOT machine-initiated: a controlled
+  test measured 216 photos before and 216 after running the project's standard
+  `monkey -p ... -c LAUNCHER 1` launch with AGC open, so the launch command
+  takes no picture. Recorded so a later audit reading the camera roll against
+  this session does not mistake them for unauthorised captures.
+
+
+PART 7 - ACCEPTANCE CRITERIA, SECTION 8, GRADED
+================================================
+  1  One row per axis, all three keys + front key before/after, verdict,
+     snapshots ......................................................... MET
+  2  Verdict taken on the two INPUT keys; self-healing classification .... MET
+     (R-2 declared in advance; no row required it)
+  3  Front key in every axis row and both control halves; explicit
+     statement of whether any axis moved it ............................. MET
+     (no axis moved it; it tracked the rear across the control only)
+  4  Verdict rule written before the first disturbance, not amended,
+     with all three pre-declarations .................................... MET
+     (15:23 vs 15:24, on true mtimes; see DEVIATION 2 for its one defect,
+     disclosed rather than amended)
+  5  HAL md5 identical in every snapshot; an axis that changed it is
+     invalid ............................................ MET WITH EXCEPTION
+     (identical in all seven except the mode-switch away half, where the
+     change IS the disturbance - see DEVIATION 2)
+  6  Control stimulus is pref_48m_key=1, not the derived key cleared ..... MET
+  7  Control records all three keys + front key, BOTH configured streams
+     with formats, and a capture's black fraction against 0.0024/0.7497 .. MET
+  8  Fold-versus-clean prediction exists in writing with reasoning BEFORE
+     the capture, and the measured value is reported against it
+     including when it failed ........................................... MET
+     (prediction 15:17, captures 15:45:54 and 15:47:52; graded FAILED and
+     reported as such)
+  9  Pin restored via pref_48m_key=0, inode-preserving, confirmed after an
+     AGC restart by all three fields + front key, streams, clean capture . MET
+ 10  Confirming capture on the surviving state measures 12.58 MP and
+     passes the Faz3.7 threshold ........................................ MET
+     (12.58 MP, 0.0001)
+ 11  Mounts 1/1 and enumeration 13 in every snapshot; trap 0/12 except
+     where a settings-screen visit moved it ............. MET WITH EXCEPTION
+     (mounts and enumeration constant throughout; trap moved 0 -> 2 with NO
+     settings-screen visit, both keys inert at value 0, routed as
+     FIND-3.10-02 under the rule's own pre-declaration of exactly this case)
+ 12  Layer state confirmed persistent after reboot, in the same snapshot . MET
+ 13  Any failed axis recorded with symptom classified and routed ......... N/A
+     (no axis failed)
+ 14  No enforcement mechanism built, no .agc file imported .............. MET
+
+TRANSITION CRITERIA, SECTION 13: all eight satisfied. Faz3.11 has a matrix to
+turn into operator instructions, a stated front-key result to dispose of
+FIND-3.7-03 against, and four routed findings - one of which asks a question
+about the phase's objective that only the user can answer.

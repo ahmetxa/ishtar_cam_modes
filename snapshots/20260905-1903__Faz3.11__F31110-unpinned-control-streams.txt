@@ -1,0 +1,23 @@
+F3.11-10 READ-BACK - unpinned control state, AGC configured streams
+Captured 2026-09-05 19:03 local, third AGC start after the pref_48m_key=1 write.
+Addressed by PATTERN within a single dumpsys (FIND-3.10-01).
+
+Preference keys:
+  pref_48m_key                     = 1
+  pref_camera_resolution           = full
+  pref_camera_picturesize_back_key = 8192x6144
+  pref_camera_picturesize_front_key= 6528x4896
+
+Configured streams:
+      Consumer name: ImageReader-1440x1080f22m11-31111-3
+      Dims: 1440 x 1080, format 0x7fa30c06, dataspace 0x0
+      Consumer name: ImageReader-4096x3072f25m37-31111-0
+      Dims: 4096 x 3072, format 0x25, dataspace 0x1
+      Consumer name: ImageReader-640x480f23m52-31111-1
+      Dims: 640 x 480, format 0x23, dataspace 0x8c20000
+      Consumer name: ImageReader-8192x6144f23m22-31111-2
+      Dims: 8192 x 6144, format 0x23, dataspace 0x8c20000
+
+VERDICT: matches docs/agc-12mp-configuration.md section 5 exactly -
+  RAW10 0x25 stays 4096x3072, YUV 0x23 goes 8192x6144 - the MISMATCHED pair.
+  Third independent reproduction (IMPL-53, IMPL-61, IMPL-63).

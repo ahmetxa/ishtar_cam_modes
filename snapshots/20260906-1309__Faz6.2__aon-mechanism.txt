@@ -1,0 +1,41 @@
+=== BEGIN AON MECHANISM ===
+-- is the vendor path a bind mount? (decisive, no logcat needed) --
+[mounts on /vendor/lib64/camera]
+/dev/block/dm-41 /vendor/lib64/camera f2fs rw,lazytime,seclabel,nosuid,nodev,noatime,background_gc=on,discard,no_heap,user_xattr,inline_xattr,acl,inline_data,inline_dentry,flush_merge,extent_cache,mode=adaptive,active_logs=6,reserve_root=32768,resuid=0,resgid=1065,inlinecrypt,alloc_mode=default,checkpoint_merge,fsync_mode=nobarrier,discard_unit=block,memory=normal 0 0
+[symlink resolution]
+readlink -f: /vendor/lib64/camera/aon_front.pb
+-- module payload --
+/data/adb/modules/ishtar_aon_fix/.mnt/libPlatformValidatorShared.so
+/data/adb/modules/ishtar_aon_fix/.mnt/aon_front.pb
+/data/adb/modules/ishtar_aon_fix/module.prop
+/data/adb/modules/ishtar_aon_fix/post-fs-data.sh
+-- module log across all buffers --
+[free-text, all buffers]
+[earliest line still in the buffer]
+--------- beginning of events
+05-23 02:00:45.627   367   367 I liblog  : 374
+-- provider strings, toybox-safe patterns --
+[aperture]
+09-06 12:35:12.430  3961  3961 I sysui_multi_action: [757,268,758,1,759,268,806,com.xiaomi.settings.ishtar,871,com.xiaomi.settings.ishtar.camera.CameraApertureTileService,927,15,1593,0]
+09-06 12:35:15.873  3961  3961 I sysui_multi_action: [757,268,758,1,759,268,806,com.xiaomi.settings.ishtar,871,com.xiaomi.settings.ishtar.camera.CameraApertureTileService,927,15,1593,0]
+[ois]
+[laser/tof]
+09-06 12:50:51.950  6693 13924 E SQLiteCursor: 	at btof.call(PG:9)
+09-06 12:50:51.950  6693 13924 E SQLiteCursor: 	at btof.call(PG:9)
+09-06 12:50:51.950  6693 13924 E SQLiteCursor: 	at btof.call(PG:9)
+09-06 12:50:51.951  6693 13924 E SQLiteCursor: 	at btof.call(PG:9)
+09-06 12:50:51.951  6693 13924 E SQLiteCursor: 	at btof.call(PG:9)
+09-06 12:51:26.282  2049  4569 E AutofillManagerServiceImpl: Bad service name: com.miui.contentcatcher/.autofill.services.MiuiAutofillService
+09-06 12:51:26.293  2049  3726 I sysui_multi_action: [757,1721,758,4,908,com.google.android.as/com.google.android.apps.miphone.aiai.app.AiAiAugmentedAutofillService,1722,6]
+09-06 12:51:26.294  6301  6924 I AiAiAutofill: Connected AiAiAugmentedAutofillService.
+[face-scene]
+[ncs]
+09-06 12:34:10.527  5182  5505 V AconfigFlags: Read Aconfig default flag value com.android.graphics.surfaceflinger.flags.allow_n_vsyncs_in_targeter = false
+09-06 12:34:10.544  5182  5505 V AconfigFlags: Read Aconfig default flag value com.android.graphics.surfaceflinger.flags.allow_n_vsyncs_in_targeter = false
+09-06 12:34:13.187  2049  2049 I SyncManager: Loaded persisted syncs: 54 periodic syncs, 0 oneshot syncs, 54 total system server jobs, JobStats: FirstLoad: 125/58/54 LastSave: -1/-1/-1
+09-06 12:34:26.128  2049  2093 I am_proc_start: [0,6791,10410,com.google.android.apps.paidtasks,service,{com.google.android.apps.paidtasks/com.google.android.apps.paidtasks.sync.SyncService}]
+09-06 12:34:26.128  2049  2093 I ActivityManager: Start proc 6791:com.google.android.apps.paidtasks/u0a410 for service {com.google.android.apps.paidtasks/com.google.android.apps.paidtasks.sync.SyncService}
+09-06 12:34:39.050  2049  4549 W PackageManager: No change is needed for package: org.terayatirim.teraonline. Skipping suspending/un-suspending.
+09-06 13:06:26.690  2555  2555 I adbd    : adbd service requested 'shell,v2,TERM=xterm-256color,raw:su -c sh /data/local/tmp/aonbase.sh'
+09-06 13:07:06.998  2555  2555 I adbd    : adbd service requested 'shell,v2,TERM=xterm-256color,raw:su -c sh /data/local/tmp/aonbase2.sh'
+=== END AON MECHANISM ===

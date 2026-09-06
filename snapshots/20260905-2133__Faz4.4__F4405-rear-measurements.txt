@@ -1,0 +1,28 @@
+# taken   : 2026-09-05 21:33 local (device clock), measured 21:3x on host
+# item    : Faz4.4 F4.4-05 - stock camera and video path, REAR
+# app     : com.android.camera/.Camera (stock), opened Device 6, client com.android.camera
+# HAL     : fe0245a4720fb07b01d96deef47f5569 fullres, mode.file=50mp (unchanged, opening bracket 21:30)
+# method  : JPEG dimensions from the SOF marker; video dimensions from tkhd and frame rate from
+#           stts/mdhd in the MP4 container. Never from a filename or a UI label.
+# note    : videos are NOT stored under snapshots/ (46.5 MB + 15.7 MB); they are measured here and
+#           left on the device at /sdcard/DCIM/Camera/. The JPEG is stored as ...-ORIGINAL.jpg.
+
+--- BEGIN COMPARABLE ---
+preview.open                    = PASS  Device 6, Stream[0] SurfaceTexture 1440x1080 fmt 0x22 State 4
+preview.crashbuffer             = empty (logcat -b crash -d, no DURDU line)
+photo.file                      = IMG_20260905_213303.jpg
+photo.sof                       = 3072x4096
+photo.mp                        = 12.58
+photo.black.overall             = 0.0000
+photo.black.quads               = 0.0000 0.0000 0.0000 0.0000
+video.1080p60.file              = VID_20260905_213308.mp4
+video.1080p60.container         = 1920x1080
+video.1080p60.fps               = 60.0   (430 frames / 7.161 s)
+video.4k60.file                 = VID_20260905_213321.mp4
+video.4k60.container            = 3840x2160
+video.4k60.fps                  = 59.8   (446 frames / 7.458 s)
+playback.both                   = PASS (user-confirmed, human playback in the gallery)
+media.accounting.jpg            = 215 -> 216 (+1)
+media.accounting.mp4            = 6 -> 8 (+2)
+media.accounting.strays         = none
+--- END COMPARABLE ---

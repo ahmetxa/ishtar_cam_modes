@@ -1,0 +1,155 @@
+Faz 3.11 - F3.11-10 READ-BACK VERIFICATION, COMPLETE RESULT
+============================================================
+Written 2026-09-05 19:10 local. Session 19:02-19:09, one continuous run on one
+device, user present at the device throughout, ONE human shutter press.
+
+Purpose: follow docs/agc-12mp-configuration.md as written, from a genuinely
+unpinned state, and record what it gets wrong. A configuration record that has
+not been followed once is a draft.
+
+
+HEADLINE
+========
+THE DOCUMENT IS REPRODUCIBLE - and following it LITERALLY destroyed the
+preferences file, which is exactly what a read-back exists to find.
+
+  Every predicted field matched.        PASS
+  Both predicted stream pairs matched.  PASS
+  Capture 12.58 MP / black 0.0001.      PASS (threshold < 0.01)
+  Entry state restored exactly.         PASS (zero differing lines)
+  Section 2's write procedure.          FAILED, DESTRUCTIVELY - now corrected
+
+
+PART 1 - THE DESTRUCTIVE FAILURE
+=================================
+Section 2's procedure was issued EXACTLY as the document had it written:
+
+  adb shell su -c "sed '/pref_48m_key/s|>1<|>0<|' <PREFS> > /data/local/tmp/p.xml"
+  adb shell su -c "cat /data/local/tmp/p.xml > <PREFS>"
+
+Line 1 failed:
+  /system/bin/sh: syntax error: unexpected '1< '
+
+Line 2 then ran anyway and TRUNCATED THE LIVE PREFERENCES FILE TO 0 BYTES,
+because `cat T > P` truncates P before discovering T does not exist.
+
+  <PREFS> after:  0 bytes, owner u0_a450, mode 0660, label preserved
+  /data/local/tmp/p.xml:  No such file or directory
+
+TWO DEFECTS, AND THE SECOND IS THE ONE THAT MATTERS ANYWHERE:
+
+  1. QUOTING. A single-quoted sed expression does not survive the
+     host -> adb -> device-shell -> su -c chain intact. Host-specific. This
+     project already knows the route around it (push a script, run
+     `su -c 'sh /data/local/tmp/x.sh'`) and the document did not use it.
+
+  2. DESTRUCTIVE ORDERING. `cat tmp > live` truncates `live` FIRST. If the
+     filter step fails for ANY reason - a quoting slip, a full filesystem, a
+     typo in the key name - the preferences are gone before anything is read
+     back. Independent of shell, host and this particular bug.
+
+RECOVERY: restored from the backup taken at 19:02, four minutes earlier.
+  md5 21762bdcb09f107aad2f397351cf1337, 12169 bytes, byte-identical.
+  Owner, mode and SELinux label were intact throughout - the inode-preserving
+  claim held even while the content was destroyed.
+
+THE CORRECTION, now in section 2: back up FIRST, then guard the write behind
+three checks before the live file is touched at all -
+  GUARD 1  temp file exists and is non-empty
+  GUARD 2  temp size within 8 bytes of the original
+  GUARD 3  the target value is actually present in the temp file
+All three were exercised this session. The guarded form ran four times in both
+directions with no failure.
+
+
+PART 2 - THE READ-BACK PROPER
+==============================
+Performed AFTER the restore, from a genuinely unpinned state reached with the
+guarded procedure.
+
+STEP 2 - checklist item 1, per-key VALUE audit (its first use, on the run that
+wrote it):
+  pref_raw_key              = present, VALUE 0   -> INERT
+  pref_fix_resolution_key   = present, VALUE 0   -> INERT
+  the other ten             = ABSENT
+  VERDICT: PASS. A bare 0/12 presence assertion WOULD HAVE FAILED here on a
+  state that is measured harmless. The corrected item is the right check.
+
+STEP 4 - unpinned control, two cold starts after the write:
+  pref_48m_key                      = 1
+  pref_camera_resolution            = full
+  pref_camera_picturesize_back_key  = 8192x6144   (50.33 MP)
+  pref_camera_picturesize_front_key = 6528x4896
+  streams: RAW10 0x25 at 4096x3072, YUV 0x23 at 8192x6144 - MISMATCHED
+  Matches section 5's failure-mode tables exactly. THIRD independent
+  reproduction of the mismatched pair (IMPL-53, IMPL-61, IMPL-63).
+  Artifacts: 20260905-1903__Faz3.11__F31110-unpinned-control.txt
+             20260905-1903__Faz3.11__F31110-unpinned-control-streams.txt
+
+STEP 8 - after the guarded set to 0 and two cold starts:
+  agc.pref_48m                   = 0
+  agc.pref_resolution            = full
+  agc.photo_size.back.derived    = 4096x3072
+  agc.photo_size.back.mp         = 12.58
+  agc.photo_size.front.derived   = 3264x2448
+  hal.live.md5                   = fe0245a4720fb07b01d96deef47f5569  fullres  mount 1
+  sensor.live.md5                = 9e4d0fe1a8bf2eb4146c9917a0ac2c4c  stock    mount 1
+  mode.file                      = 50mp
+  agc.apk.md5                    = ce65f862c990e2acc02be356f75a7122
+  EVERY FIELD AS PREDICTED BY SECTION 3.
+  Artifact: 20260905-1907__Faz3.11__F31110-post-set.txt
+
+STEP 9 - configured streams, read by pattern in a single dumpsys:
+  Stream YUV   0x23  Dims: 4096 x 3072
+  Stream RAW10 0x25  Dims: 4096 x 3072
+  THE MATCHING PAIR, as predicted.
+
+STEP 10/11 - the capture:
+  Photo count 213 before, 214 after. Exactly one, human shutter at 19:08:41.
+  20260905-1908__Faz3.11__F31110-readback-ORIGINAL.jpg
+  md5 64041206a370574df53f964e24c64e17
+    3072x4096   12.58 MP   black 0.0001   PASS (< 0.01)
+    quadrants   0.0000 / 0.0000 / 0.0000 / 0.0003
+  Sits inside the recorded clean cluster 0.0000-0.0027 and matches IMPL-61's
+  two captures at 0.0001 exactly.
+
+STEP 12 - closing bracket:
+  20260905-1909__Faz3.11__F31110-close.txt diffed against the 19:02 entry
+  bracket across the 45-line stable region: ZERO DIFFERING LINES.
+  prefs md5 back to 21762bdcb09f107aad2f397351cf1337 - BYTE-IDENTICAL to the
+  entry state, despite the file having been unpinned, truncated to zero,
+  restored, unpinned again and pinned in between.
+  Trap still 2/12, both keys at value 0, both inert.
+
+
+PART 3 - WHAT THIS DID AND DID NOT ESTABLISH
+=============================================
+ESTABLISHED
+  The configuration is reproducible from the document alone.
+  Every predicted field and both stream pairs matched.
+  The capture passed the threshold by two orders of magnitude.
+  The state returned to its entry values exactly.
+  The corrected checklist item 1 passes where the old presence count fails.
+  Section 5's failure-mode tables hold against a fresh measurement.
+
+NOT ESTABLISHED - stated so it is not over-read
+  THE FRONT CAMERA WAS NOT EXERCISED. No front-camera session was opened and
+  no front-camera capture was taken, here or anywhere in Phase 3.
+  Reboot survival was NOT re-tested. That rests on IMPL-61, not on this run.
+  No 50 MP capture was attempted in the unpinned state, so FIND-3.10-03 still
+  stands on ONE session's evidence, not two.
+
+DEVIATIONS
+  None. One capture was specified and one was taken. No unplanned photograph
+  occurred - the count moved 213 -> 214.
+
+DEVICE LEFT AT
+  pref_48m_key=0, pref_camera_resolution=full, back 4096x3072 (12.58 MP),
+  front 3264x2448, both streams 4096x3072 on YUV 0x23 AND RAW10 0x25,
+  HAL fe0245a4720fb07b01d96deef47f5569 fullres mount 1,
+  sensor 9e4d0fe1a8bf2eb4146c9917a0ac2c4c stock mount 1, mode.file 50mp,
+  AGC apk ce65f862c990e2acc02be356f75a7122,
+  prefs md5 21762bdcb09f107aad2f397351cf1337, TRAP 2/12 both at value 0.
+  AGC force-stopped. Four scratch scripts removed from /data/local/tmp.
+  Backup retained at /data/local/tmp/agc_prefs_F31110_backup.xml and
+  snapshots/20260905-1902__Faz3.11__F31110-prefs-backup.xml.

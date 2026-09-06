@@ -1,0 +1,40 @@
+Faz 3.9 - Open Camera capture pass threshold, STATED BEFORE THE CAPTURE
+=======================================================================
+Written by IMPL-56's session on 2026-09-05, BEFORE any Faz3.9 capture
+exists. The filename carries a UTC timestamp so the ordering is evidenced
+by the artifact rather than asserted in the write-up afterwards.
+
+Acceptance criterion 3 of Faz3.9 requires the Open Camera original to be
+"clean by the same measurement, with its own pass threshold stated before
+the capture". This file is that statement.
+
+THRESHOLD
+  Open Camera original at 8192x6144:  black fraction < 0.01   -> PASS
+                                      black fraction >= 0.01  -> FAIL
+
+  The same threshold Faz3.7 stated in advance for the AGC capture, so the
+  two halves of the coexistence claim are graded on one scale. It is not
+  revised after the measurement, whatever the measurement shows.
+
+METHOD (identical for both originals, per F3.9-05)
+  The IMPL-40 method: PIL, grayscale conversion, count pixels with value
+  < 4, divide by total pixels. Run on the pulled original, never on a
+  gallery re-encode.
+
+REFERENCES THE THRESHOLD SITS AGAINST
+  clean 50 MP, same method   0.0000   IMPL-33, stock camera 6144x8192
+  clean 12.58 MP, same method 0.0024  IMPL-40 reference
+  Faz3.7's measured AGC pin   0.0027  IMPL-54, passed < 0.01
+  fold signature band         0.7490 - 0.7498   IMPL-31, IMPL-33, IMPL-46
+
+  A fold failure lands two and a half orders of magnitude above the
+  threshold, so 0.01 is not a marginal line: it separates the clean
+  cluster from the fold cluster with a very wide gap on both sides.
+
+PREDICTION, stated now and gradeable either way
+  Open Camera is expected to PASS. Its 8192x6144 path has been clean in
+  this project before (IMPL-15, EV-04) from a HAL state of this family,
+  and the fold signature has only ever appeared on AGC's RAW consumption
+  path, not on Open Camera's. If Open Camera instead lands in the fold
+  band, the coexistence claim fails and that failure is the result -
+  it is reported, not re-thresholded.

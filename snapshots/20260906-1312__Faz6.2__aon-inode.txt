@@ -1,0 +1,62 @@
+=== BEGIN AON INODE ===
+-- device/inode of the three candidate copies --
+/vendor/lib64/camera/aon_front.pb -> dev=65065 inode=128025 links=1 size=5825 ctx
+/odm/lib64/camera/aon_front.pb -> dev=65024 inode=51106557 links=1 size=5825 ctx
+/data/adb/modules/ishtar_aon_fix/.mnt/aon_front.pb -> dev=65065 inode=128025 links=1 size=5825 ctx
+-- selinux context --
+u:object_r:vendor_file:s0 /vendor/lib64/camera/aon_front.pb
+u:object_r:vendor_file:s0 /data/adb/modules/ishtar_aon_fix/.mnt/aon_front.pb
+-- filesystem each path sits on --
+/vendor/lib64/camera type=f2fs
+/vendor/lib64 type=erofs
+/data/adb/modules type=f2fs
+-- what is dm-41, and where do /data and /vendor come from --
+/dev/block/dm-5 /vendor erofs ro,seclabel,relatime,user_xattr,acl,cache_strategy=readaround 0 0
+/dev/block/dm-0 /odm erofs ro,seclabel,relatime,user_xattr,acl,cache_strategy=readaround 0 0
+/dev/block/dm-41 /data f2fs rw,lazytime,seclabel,nosuid,nodev,noatime,background_gc=on,discard,no_heap,user_xattr,inline_xattr,acl,inline_data,inline_dentry,flush_merge,extent_cache,mode=adaptive,active_logs=6,reserve_root=32768,resuid=0,resgid=1065,inlinecrypt,alloc_mode=default,checkpoint_merge,fsync_mode=nobarrier,discard_unit=block,memory=normal 0 0
+[dm names]
+total 0
+drwxr-xr-x 2 root root 700 2026-09-06 12:34 by-uuid
+lrwxrwxrwx 1 root root  16 1970-05-23 02:00 com.android.adbd -> /dev/block/dm-34
+lrwxrwxrwx 1 root root  16 1970-05-23 02:00 com.android.adservices -> /dev/block/dm-23
+lrwxrwxrwx 1 root root  16 1970-05-23 02:00 com.android.appsearch -> /dev/block/dm-38
+lrwxrwxrwx 1 root root  16 1970-05-23 02:00 com.android.art -> /dev/block/dm-19
+lrwxrwxrwx 1 root root  16 1970-05-23 02:00 com.android.cellbroadcast -> /dev/block/dm-21
+lrwxrwxrwx 1 root root  16 1970-05-23 02:00 com.android.configinfrastructure -> /dev/block/dm-16
+lrwxrwxrwx 1 root root  16 1970-05-23 02:00 com.android.conscrypt -> /dev/block/dm-30
+lrwxrwxrwx 1 root root  16 1970-05-23 02:00 com.android.extservices -> /dev/block/dm-18
+lrwxrwxrwx 1 root root  16 1970-05-23 02:00 com.android.healthfitness -> /dev/block/dm-15
+lrwxrwxrwx 1 root root  16 1970-05-23 02:00 com.android.ipsec -> /dev/block/dm-14
+lrwxrwxrwx 1 root root  16 1970-05-23 02:00 com.android.media -> /dev/block/dm-26
+lrwxrwxrwx 1 root root  16 1970-05-23 02:00 com.android.media.swcodec -> /dev/block/dm-35
+lrwxrwxrwx 1 root root  16 1970-05-23 02:00 com.android.mediaprovider -> /dev/block/dm-32
+lrwxrwxrwx 1 root root  16 1970-05-23 02:00 com.android.neuralnetworks -> /dev/block/dm-20
+lrwxrwxrwx 1 root root  16 1970-05-23 02:00 com.android.ondevicepersonalization -> /dev/block/dm-13
+lrwxrwxrwx 1 root root  16 1970-05-23 02:00 com.android.os.statsd -> /dev/block/dm-25
+lrwxrwxrwx 1 root root  16 1970-05-23 02:00 com.android.permission -> /dev/block/dm-12
+lrwxrwxrwx 1 root root  16 1970-05-23 02:00 com.android.profiling -> /dev/block/dm-39
+lrwxrwxrwx 1 root root  16 1970-05-23 02:00 com.android.resolv -> /dev/block/dm-11
+lrwxrwxrwx 1 root root  16 1970-05-23 02:00 com.android.scheduling -> /dev/block/dm-10
+lrwxrwxrwx 1 root root  15 1970-05-23 02:00 com.android.sdkext -> /dev/block/dm-9
+lrwxrwxrwx 1 root root  15 1970-05-23 02:00 com.android.tethering -> /dev/block/dm-8
+lrwxrwxrwx 1 root root  16 1970-05-23 02:00 com.android.tzdata -> /dev/block/dm-29
+lrwxrwxrwx 1 root root  16 1970-05-23 02:00 com.android.uwb -> /dev/block/dm-17
+lrwxrwxrwx 1 root root  16 1970-05-23 02:00 com.android.wifi -> /dev/block/dm-36
+lrwxrwxrwx 1 root root  15 1970-05-23 02:00 odm_a -> /dev/block/dm-0
+lrwxrwxrwx 1 root root  15 1970-05-23 02:00 product_a -> /dev/block/dm-1
+lrwxrwxrwx 1 root root  15 1970-05-23 02:00 system_a -> /dev/block/dm-2
+-- does the camera dir listing match the module workdir? --
+[vendor camera dir, count]
+2
+[module .mnt dir, count]
+2
+[module .mnt listing]
+aon_front.pb
+libPlatformValidatorShared.so
+-- module disabled markers --
+.
+..
+.mnt
+module.prop
+post-fs-data.sh
+=== END AON INODE ===

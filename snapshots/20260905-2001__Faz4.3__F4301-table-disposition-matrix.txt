@@ -1,0 +1,99 @@
+# Faz4.3 F4.3-01/F4.3-03/F4.3-06 - every patch table under agc-50mp-yama/ plus the canonical
+# table, dispositioned BY APPLICATION on the host. Read-only; no device write.
+# stock  c3fa63a86ee3ecaf9fbf02005d35f6b5   fullres fe0245a4720fb07b01d96deef47f5569
+
+=== canonical: ishtar-cam-modes/blobs/hal-fullres.patch ===
+entries parsed: 16
+non-4-byte entries: 0
+stock-column mismatches: 0 
+
+base   computed = c3fa63a86ee3ecaf9fbf02005d35f6b5 | recorded c3fa63a86ee3ecaf9fbf02005d35f6b5 | match True
+result computed = fe0245a4720fb07b01d96deef47f5569 | recorded fe0245a4720fb07b01d96deef47f5569 | match True
+live HAL copy   = fe0245a4720fb07b01d96deef47f5569 | equal to computed result: True
+byte-identical to live HAL: True (sizes 27268688 / 27268688)
+
+=== f41-revert.tbl  (20 entries)
+    stock-column matches stock   : 2/20
+    stock-column matches fullres : 2/20
+
+=== f41-stageB.tbl  (4 entries)
+    stock-column matches stock   : 0/4
+    stock-column matches fullres : 0/4
+
+=== f41-stageC.tbl  (12 entries)
+    stock-column matches stock   : 11/12
+    stock-column matches fullres : 12/12
+    -> applies cleanly to fullres, result md5 099f5948d1eaace6447aa9858d74d46a
+
+=== f41-stageD.tbl  (10 entries)
+    stock-column matches stock   : 8/10
+    stock-column matches fullres : 9/10
+
+=== hal-activearray-deneme.patch  (2 entries)
+    # ONCEDEN TAAHHUT EDILEN md5 (herhangi bir cihaz yazimindan ONCE,
+    # konak tarafinda hesaplandi; besteleyici once alti bilinen md5'i
+    # temel  stok    md5 c3fa63a86ee3ecaf9fbf02005d35f6b5
+    #   + yalniz f0000            md5 c8ed89e8fed41e3928396e7f65c8f6ff
+    #   + yalniz f000a            md5 bdfbe1fb68750a9cc75a5b06c2c05172
+    #   + ikisi birden (bu tablo) md5 90c012152454488f135a730f77f3e4d5
+    # temel  uc-katman md5 c3db54b0b154dd19211f221e3d5046e7
+    #   + yalniz f0000            md5 8371521de8e9fd69697f4eec5285455d
+    #   + yalniz f000a            md5 2c71565d919919bf0cbc75a83e6189d9
+    #   + ikisi birden (bu tablo) md5 c094101de0184e9216a57020873bac0b
+    # bes sozcugu boyle yazdi). Yukaridaki tek-etiket md5'leri tam da bu
+    stock-column matches stock   : 2/2
+    stock-column matches fullres : 2/2
+    -> applies cleanly to stock, result md5 90c012152454488f135a730f77f3e4d5
+    -> applies cleanly to fullres, result md5 34f459144b49cddd4a3d4824d72d2078
+
+=== hal-binsel-deneme.patch  (39 entries)
+    # ONCEDEN TAAHHUT EDILEN md5 (cihaza HICBIR yazim yapilmadan ONCE,
+    #   temel  (fullres + yedi-kelime yigini) md5 c094101de0184e9216a57020873bac0b
+    #   sonuc  (+ bu 39 satir)                md5 f95397b2954704c221b6fbb0e7efeed4
+    stock-column matches stock   : 39/39
+    stock-column matches fullres : 39/39
+    -> applies cleanly to stock, result md5 7a890ef2dd89ec04ab79a7dff58cc54f
+    -> applies cleanly to fullres, result md5 f8a4bd3c6c1d95a4a341abc6ab223de6
+
+=== hal-fullres-guard-deneme.patch  (18 entries)
+    # temel: fullres md5 fe0245a4720fb07b01d96deef47f5569 (kapilar #2 iken)
+    stock-column matches stock   : 16/18
+    stock-column matches fullres : 18/18
+    -> applies cleanly to fullres, result md5 32acb448000298f4542e233e4f16eefd
+
+=== hal-pixelarray-deneme.patch  (1 entries)
+    # temel  stok    md5 c3fa63a86ee3ecaf9fbf02005d35f6b5
+    # sonuc  stok+bu md5 77083b7c099d4c68a9213476141c450d
+    # temel  fullres md5 fe0245a4720fb07b01d96deef47f5569
+    # sonuc  fullres+bu md5 c539f04e6bbaedb907a5c987f16800ea
+    stock-column matches stock   : 1/1
+    stock-column matches fullres : 1/1
+    -> applies cleanly to stock, result md5 77083b7c099d4c68a9213476141c450d
+    -> applies cleanly to fullres, result md5 c539f04e6bbaedb907a5c987f16800ea
+
+=== hal-raw50-deneme.patch  (4 entries)
+    # temel: fullres md5 fe0245a4720fb07b01d96deef47f5569
+    # sonuc: md5 8d0915ce520fadaf092d31ed675aa98a
+    stock-column matches stock   : 4/4
+    stock-column matches fullres : 4/4
+    -> applies cleanly to stock, result md5 55b5f377d17d49355d6f824b91c98582
+    -> applies cleanly to fullres, result md5 8d0915ce520fadaf092d31ed675aa98a
+
+=== hal-uhrfull-deneme.patch  (18 entries)
+    # ONCEDEN TAAHHUT EDILEN md5 (konak tarafinda, IMPL-23 disiplini):
+    #   temel  (fullres + yedi-kelime yigini) md5 c094101de0184e9216a57020873bac0b
+    #   sonuc  (+ bu 18 satir)                md5 ce419bc901bea61945d166aee11e1ab0
+    stock-column matches stock   : 18/18
+    stock-column matches fullres : 18/18
+    -> applies cleanly to stock, result md5 e0eccc797ef7e21796cc55ff6b0129b3
+    -> applies cleanly to fullres, result md5 d3c2b9a8813cb72d51f6f8f3f2bf8a00
+
+=== hal-uhrtags-deneme.patch  (4 entries)
+    # ONCEDEN TAAHHUT EDILEN md5 (cihaza yazim yapilmadan ONCE, konak
+    #   temel  (fullres + yedi-kelime yigini) md5 c094101de0184e9216a57020873bac0b
+    #   sonuc  (+ bu dort satir)                md5 7c4d9117bda6a28274cf246ba4f3fd1e
+    stock-column matches stock   : 4/4
+    stock-column matches fullres : 4/4
+    -> applies cleanly to stock, result md5 57a2c342a63ca6415ec7a2e8f14c9f35
+    -> applies cleanly to fullres, result md5 3f9f18b7450af955dc8c088f88e7b3ea
+

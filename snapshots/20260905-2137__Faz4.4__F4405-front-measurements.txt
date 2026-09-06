@@ -1,0 +1,32 @@
+# taken   : 2026-09-05 21:37 local (device clock)
+# item    : Faz4.4 F4.4-05 - stock camera and video path, FRONT
+# app     : com.android.camera/.Camera (stock)
+# HAL     : fe0245a4720fb07b01d96deef47f5569 fullres, mode.file=50mp (unchanged)
+# method  : JPEG dimensions from the SOF marker; video dimensions from tkhd and frame rate from
+#           stts/mdhd in the MP4 container. Never from a filename or a UI label.
+# context : FIND-3.7-03 records front-camera IMAGE behaviour as unmeasured across all of Phase 3.
+#           These are the first front-camera image and video measurements in the project.
+
+--- BEGIN COMPARABLE ---
+photo.file                      = IMG_20260905_213736.jpg
+photo.sof                       = 4896x6528
+photo.mp                        = 31.96
+photo.black.overall             = 0.0002
+photo.black.quads               = 0.0000 0.0000 0.0000 0.0006
+photo.vs.reported.array         = activeArray/pixelArray read [3264 2448] on hal1/hal8/hal9;
+                                  the emitted JPEG is 6528x4896 = exactly 2x the reported array
+                                  in EACH axis. Same 2x relationship the rear shows (reported
+                                  [4096 3072], Open Camera captured 8192x6144). See FIND-4.4-04.
+video.1080p.file                = VID_20260905_213741.mp4
+video.1080p.container           = 1920x1080
+video.1080p.fps                 = 59.9   (407 frames / 6.792 s)
+video.1080p.ui.label.reported   = user read the profile as 1080p50; the CONTAINER measures 59.9 fps.
+                                  Container is authoritative per the Faz3.4 method. Discrepancy noted,
+                                  not resolved - it is a UI-label question, not a capture defect.
+video.4k60                      = NOT OFFERED on the front camera. Measured absence of a profile,
+                                  recorded as such rather than as a failure.
+playback.both                   = PASS (user-confirmed)
+media.accounting.jpg            = 216 -> 217 (+1)
+media.accounting.mp4            = 8 -> 9 (+1)
+media.accounting.strays         = none
+--- END COMPARABLE ---

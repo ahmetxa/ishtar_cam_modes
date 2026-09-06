@@ -1,0 +1,166 @@
+Faz 3.9 - COEXISTENCE RESULT
+============================
+Session 2026-09-05, 15:05 - 15:12 local. One continuous bracketed session.
+
+THE CLAIM, in the form Main-Planing section 4 states it
+-------------------------------------------------------
+"In 50 MP mode, Open Camera produces a full-resolution image using the sensor's
+native 8192x6144 array, AND the AGC 8.4.300 V9.6 port keeps working normally at
+12.58 MP (4096x3072) - it launches, previews, captures, and saves a clean image,
+in the same HAL state, without a crash or a corrupt frame."
+
+MEASURED: TRUE. Both halves, one HAL state, one session, no change in between.
+
+THE STATE, identical at both ends
+----------------------------------
+  opening bracket  snapshots/20260905-1505__Faz3.9__F3901-open.txt
+  closing bracket  snapshots/20260905-1512__Faz3.9__F3906-close.txt
+  comparable-region diff:  ZERO differing lines across 159 lines.
+
+  hal.live.md5        fe0245a4720fb07b01d96deef47f5569   (the DEC-15 shipped
+                      fullres artifact), size 27268688, hal.state=fullres,
+                      hal.mount.count=1
+  mode.file           50mp
+  sensor.live.md5     9e4d0fe1a8bf2eb4146c9917a0ac2c4c
+  sensor.live.variant stock, size 1062250, sensor.mount.count=1
+  enumeration         13 camera devices (camera.hal0 .. camera.hal12)
+  prefs.trap.count    0   (0/12 by the per-key audit, the FIND-5.2-01 authority)
+  pin, all four keys  pref_48m_key=0, pref_camera_resolution=full,
+                      back 4096x3072 (12.58 MP), front 3264x2448
+  AGC apk md5         ce65f862c990e2acc02be356f75a7122 (patched V9.6, v8.4.300)
+  OpenCamera apk md5  e4efeb07919bce10bc14f6f42e5b09f2, versionCode 93, v1.55
+
+SENSOR-LAYER ATTRIBUTION (F3.9-02), stated with its reason
+-----------------------------------------------------------
+The sensor layer is STOCK, and that is FORCED, not chosen. Project-Ontology
+invariant 4: selecting 50mp forces the sensor layer to stock, enforced at
+post-fs-data.sh:16-18 and setmode.sh:177-192, verified bracketed in IMPL-13.
+The bracket OBSERVES the rule rather than assuming it: mode.file=50mp and
+sensor.live.variant=stock in the same snapshot. Composition of a sensor mode
+with 50mp is unreachable and out of scope (Faz5.3 retained the exclusion).
+
+THE TWO MEASURED TRIPLES (F3.9-05), one method for both
+--------------------------------------------------------
+Method: the IMPL-40 method - PIL, grayscale, count pixels below 4, divide by
+total. Run on the pulled originals, never on a gallery re-encode.
+
+  AGC          3072x4096   12.58 MP   black = 0.0000   PASS (under 0.01)
+               snapshots/20260905-1508__Faz3.9__F3903-agc-ORIGINAL.jpg
+               md5 c7946e31869e0b17e1843361337a11dd, 1167338 B
+
+  OpenCamera   8192x6144   50.33 MP   black = 0.0000   PASS (under 0.01)
+               snapshots/20260905-1509__Faz3.9__F3904-oc-ORIGINAL.jpg
+               md5 13719c7931283e79a683495e2ed27198, 15125659 B
+
+Both thresholds were stated BEFORE the captures existed:
+  AGC   - the Faz3.7 threshold, under 0.01.
+  OC    - snapshots/20260905-1151__Faz3.9__F3904-prestated-threshold.txt,
+          written 2026-09-05 11:51, before any Faz3.9 capture. Its PREDICTION
+          was "Open Camera is expected to PASS". GRADED: correct.
+Neither threshold was revised after measuring.
+
+References these sit against: clean 50 MP 0.0000 (IMPL-33), clean 12.58 MP
+0.0024 (IMPL-40), the Faz3.7 pinned AGC 0.0027 (IMPL-54), fold band
+0.7490-0.7498. Both results land in the clean cluster, three orders of magnitude
+below the fold band. This AGC capture at 0.0000 is CLEANER than the IMPL-40
+0.0024 and Faz3.7 0.0027 references.
+
+CONFIGURED STREAMS, read from the camera service with each app open
+--------------------------------------------------------------------
+AGC (Device 2, PID 16091)
+  file: snapshots/20260905-1506__Faz3.9__F3903-agc-streams.txt
+  Dims: 1440 x 1080, format 0x7fa30c06   preview
+  Dims: 4096 x 3072, format 0x25         RAW10   <- the pin, as configured
+  Dims: 4096 x 3072, format 0x23         YUV     <- the pin, as configured
+  Dims:  640 x  480, format 0x23         thumbnail
+  AGC requested 4096x3072 from the service. Criterion 5, AGC half: SATISFIED.
+
+OpenCamera (Device 0, PID 19475)
+  file: snapshots/20260905-1509__Faz3.9__F3904-oc-streams.txt
+  Dims: 1920 x 1440, format 0x7fa30c06   preview, SurfaceView
+  The 8192x6144 still surface was NOT captured in either dumpsys read
+  (15:09:40 and 15:10:20). Criterion 5, OpenCamera half: NOT SATISFIED BY THE
+  PRESCRIBED METHOD. See FIND-3.9-02 below. It is supported instead by three
+  weaker substitutes, two of which precede the capture:
+    (a) the stored preference camera_resolution_0 = "8192 6144", read from the
+        Open Camera shared_prefs BEFORE the capture;
+    (b) the pulled original measures exactly 8192x6144;
+    (c) the opening bracket stream_config table carries 54 8192 6144 OUTPUT.
+
+AGC LAUNCH VERDICT (VAL-LAUNCH)
+--------------------------------
+Launched first try by a plain monkey LAUNCHER start - NOT CameraSettingsActivity,
+which FIND-3.7-01 measured self-arms two trap keys.
+  mCurrentFocus = org.codeaurora.snapcam/com.android.camera.CameraLauncher
+  No DefaultErrorActivity.
+  logcat -b crash, filtered with grep -v adbd: ZERO matches for snapcam, gcam,
+  opencamera, DefaultErrorActivity or NullPointer across the whole session.
+  No gcam.Gcam.f() NPE. Criterion 6: SATISFIED.
+
+STANDING CONDITIONS (F3.9-07), recorded not re-diagnosed
+---------------------------------------------------------
+  18 MapFrameToTexture / SABRE lines in the session log.
+  Invalid mesh: [4096,3072] at 15:08:13, from the AGC PID 16091.
+IMPL-40 established both appear ALONGSIDE clean captures and are therefore
+standing conditions, not defect signals. This session reconfirms it
+independently and more strongly: they accompanied an AGC capture measuring
+0.0000, the cleanest this project has recorded. They are not new observations
+and were not treated as signals.
+  FIND-2.3-03 (AGC video section black in plain stock, sensor and HAL
+unmodified) is a standing condition and was not exercised or investigated; the
+video path was not used by either capture. FIND-2.3-02 (ln2/ln4 crash AGC) is
+unreachable here under invariant 4 and was not approached.
+
+DEVIATIONS FROM THE PLAN, stated rather than absorbed
+------------------------------------------------------
+1. THREE captures occurred, not two. The user took a second Open Camera photo
+   at 15:10:12 (IMG_20260905_151012.jpg, saved as ...F3904-oc-EXTRA.jpg,
+   8192x6144, 50.33 MP, black 0.0000, md5 d7cc7b24f0f4fb1b402e7e9b59f2202d).
+   Criterion 4 reads "nothing between them but the two captures". Its LETTER is
+   not met - there were three. Its PURPOSE is met and is independently proven:
+   the extra event was another capture by the same app at the same settings, no
+   state change, and the zero-line bracket diff demonstrates the state held
+   across all three. The extra capture is reported as corroborating evidence,
+   not concealed and not counted as the designated capture 2.
+2. Criterion 5 OpenCamera half was not satisfied by dumpsys. See FIND-3.9-02.
+
+WHAT THIS EVIDENCE DOES NOT COVER
+-----------------------------------
+REAR CAMERA ONLY. AGC ran on Device 2 and Open Camera on Device 0, both
+facing=Back. No front-camera session was run and none is implied. FIND-3.7-03
+records that pref_camera_picturesize_front_key re-derives, and IMPL-56 measured
+that pref_48m_key governs the FRONT derivation too - the front key is RECORDED
+in both brackets (3264x2448, unchanged) but was never EXERCISED. Faz3.11 must
+not infer front-camera coverage from this result.
+This establishes LIVE readiness for the objective. It does not establish
+distribution readiness, which is Faz4.4.
+
+FINDINGS RAISED
+----------------
+FIND-3.9-01 (informational, no action owed) - the Open Camera build is installed
+  under applicationId com.xiaomi.module.evaluation, NOT net.sourceforge.opencamera,
+  wrapping the Open Camera net.sourceforge.opencamera.MainActivity. Any query by
+  the upstream package name returns a FALSE ABSENCE. firstInstallTime 2026-08-20,
+  so the Faz3.9 section 10 "both applications installed" precondition held all
+  along and this is not a plan defect.
+FIND-3.9-02 (P3, routed to Faz3.11) - the Open Camera still stream is attached
+  only transiently during capture, so a dumpsys read taken before or after the
+  shutter shows the preview surface alone. Criterion 5 OpenCamera half is
+  therefore not obtainable by a read bracketing the capture; it needs a read
+  DURING the capture, or the criterion needs the pulled original dimensions as
+  its evidence. AGC is unaffected - it holds its 4096x3072 RAW10 and YUV
+  surfaces for the whole session.
+
+TRANSITION VERDICT (section 13)
+--------------------------------
+  Both captures from one session, HAL md5 identical both ends       YES
+  Both clean by one method against thresholds stated in advance     YES
+  Both configured streams read from the service, apps open          PARTIAL
+  Every bracket difference named and accounted for                  YES (zero)
+  Enumeration 13 and trap 0/12 at both ends                         YES
+  Standing conditions recorded with prior evidence cited            YES
+  Faz3.10 has a specific reproducible state to attack               YES
+
+Faz3.10 attacks exactly this state: HAL fe0245a4720fb07b01d96deef47f5569,
+mode 50mp, sensor stock, pref_48m_key=0 and pref_camera_resolution=full deriving
+back 4096x3072 and front 3264x2448, enumeration 13, trap 0/12.

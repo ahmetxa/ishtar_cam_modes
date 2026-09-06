@@ -1,0 +1,204 @@
+Faz 3.10 - THE VERDICT RULE AND THE MATRIX SKELETON, WRITTEN BEFORE THE FIRST DISTURBANCE
+==========================================================================================
+Written 2026-09-05 15:21 local, by the Step 4 session that will run the matrix.
+No Faz3.10 axis has been run. No disturbance has been applied. No capture
+exists. The filename carries the timestamp so the ordering that F3.10-01 and
+section 8 require ("The verdict rule was written before the first disturbance
+and was not amended after a result was seen") is evidenced by the artifact
+rather than asserted afterwards.
+
+Companion artifact, written 15:17 by the previous session and NOT to be revised:
+  snapshots/20260905-1517__Faz3.10__F31007-prestated-control-prediction.txt
+That file commits the negative control's fold-versus-clean prediction. This file
+commits the verdict rule for the four survival axes. Together they are what
+section 8's two ordering criteria grade.
+
+AUTHORITATIVE SECTIONS: 4, 7, 8 and 13 of
+Planner-docs/Faz-3-Plans/Faz3.10-pin-stickiness-matrix.md.
+NOT authoritative: section 3, and the security sentence in section 9. Both still
+describe the PRE-REPAIR negative control (AUDIT-FIX-39, P3, open). They are not
+read as the design anywhere below.
+
+
+PART A - WHAT IS BEING MEASURED
+================================
+"The pin" is NOT one key. AGC re-derives its photo size at every start from two
+INPUT keys (R12, measured by IMPL-52):
+
+  INPUT  1  pref_48m_key                        expected 0
+  INPUT  2  pref_camera_resolution              expected full
+  DERIVED   pref_camera_picturesize_back_key    expected 4096x3072
+  RECORDED  pref_camera_picturesize_front_key   expected 3264x2448
+
+All four are read on every axis. The VERDICT is taken on INPUT 1 and INPUT 2
+only.
+
+
+PART B - THE VERDICT RULE
+==========================
+Applied per axis. Evaluated in order; the first rule that matches decides.
+
+  R-1  SURVIVED
+       Both input keys hold their pre-disturbance values, AND the derived rear
+       key holds its pre-disturbance value.
+
+  R-2  SELF-HEALING  (a PASS, not a failure)
+       Both input keys hold their pre-disturbance values, AND the derived rear
+       key differs. This is a pass because the derived key is a cache of the
+       last AGC start, re-derived correctly on the next one (IMPL-52). Section
+       8: "a row failed on the derived key alone does not satisfy this
+       criterion." The row records the stale value AND the value read after the
+       next AGC start, so the re-derivation is shown rather than assumed.
+
+  R-3  FAILED
+       Either input key moved. The symptom is CLASSIFIED (which key, from what
+       to what) and routed as a named finding. It is NOT diagnosed - section 5
+       excludes diagnosis. The matrix CONTINUES past a failed axis; it does not
+       stop.
+
+  R-4  INVALID - RE-RUN
+       The HAL md5 is not fe0245a4720fb07b01d96deef47f5569 in the axis
+       snapshot. Section 8: "an axis that changed it is invalid and is re-run."
+       This outranks any verdict above: an axis that moved the HAL measured a
+       different thing.
+
+PRE-DECLARATION 1 of 3 - THE SELF-HEALING CLASSIFICATION.
+  Declared above as R-2, before any axis ran. An inputs-survived / derived-stale
+  row is a self-healing PASS. This is stated now so it cannot be granted after
+  the reading appears.
+
+PRE-DECLARATION 2 of 3 - THE FRONT KEY IS NOT A VERDICT.
+  pref_camera_picturesize_front_key is recorded before and after on every axis
+  and on both halves of the negative control. It is a RECORDED VALUE, NOT A
+  FIFTH VERDICT AXIS. Consequences, fixed now:
+    - No disturbance is added to exercise it.
+    - No capture is taken through the front camera.
+    - A movement in it is ROUTED AS A FINDING against FIND-3.7-03, naming the
+      axis. It does NOT fail the row it appears in.
+    - If no axis moves it, the matrix SAYS SO EXPLICITLY. That explicit
+      statement - either way - is what Faz3.11's F3.11-08 consumes to dispose
+      of FIND-3.7-03 against evidence.
+  EXPECTATION, stated in advance so it is falsifiable: IMPL-56 measured that
+  pref_48m_key governs the FRONT derivation too (3264x2448 at pref_48m_key=0,
+  6528x4896 at 1). So the front key is expected to be STATIC across all four
+  survival axes (no axis disturbs the inputs) and to TRACK THE REAR across the
+  negative control (both halves). A front-key movement on a survival axis would
+  be a genuine finding; a front-key movement across the control would be the
+  expected behaviour and is not a finding.
+
+PRE-DECLARATION 3 of 3 - THE FIND-3.7-02 TRAP-COUNT EXCEPTION.
+  prefs.trap.count in the smoke snapshot counts key PRESENCE, not value
+  (FIND-3.7-02). FIND-3.7-01 measured that AGC writes two trap keys, at value
+  0 and therefore inert, whenever its SETTINGS SCREEN opens. Therefore:
+    - The default rule is trap count 0/12 in every snapshot.
+    - THE EXCEPTION, declared now and not after the fact: on an axis that
+      opened AGC's settings screen, a movement in the count is EXPECTED and
+      NOT harmful. What is read there instead is the two written keys' VALUES,
+      which must be 0.
+    - No axis in this matrix is designed to open the settings screen. Every AGC
+      start uses "monkey -p org.codeaurora.snapcam -c
+      android.intent.category.LAUNCHER 1", which IMPL-16 measured arms nothing.
+      The exception is declared because the reading could still appear (an
+      accidental touch, a route not yet mapped), not because it is planned.
+    - A trap key appearing at a value OTHER than 0, or re-arming observed on an
+      axis that never opened the settings screen, is a NEW FINDING and is
+      routed. This is the one thing section 6 names as genuinely new.
+
+INVARIANTS HELD CONSTANT, checked in every snapshot (from the Faz3.9 close):
+  hal.live.md5       fe0245a4720fb07b01d96deef47f5569   (hal.state=fullres)
+  hal mount count    1
+  sensor mount count 1
+  sensor.live.md5    9e4d0fe1a8bf2eb4146c9917a0ac2c4c   (variant stock)
+  mode.file          50mp
+  camera enumeration 13
+  prefs.trap.count   0/12
+  agc.apk.md5        ce65f862c990e2acc02be356f75a7122
+A move in the HAL md5 triggers R-4. A move in the others is recorded and routed
+but does not by itself invalidate the axis, EXCEPT on the mode-switch axis,
+where invariant 4 FORCES the sensor layer to stock during the transition by
+design - so on that axis the sensor layer moving is expected behaviour and the
+verdict is stated as "survives a mode switch", not "survives a HAL change".
+
+
+PART C - THE DISTURBANCE PROCEDURE, PER AXIS
+=============================================
+Every axis: read the four keys BEFORE, apply the disturbance, wait for the
+camera stack, cold-start AGC with monkey (never CameraSettingsActivity - the
+settings screen self-arms two trap keys, FIND-3.7-01), snapshot, read the four
+keys AFTER from the preferences file directly as well as from the snapshot
+(VAL-PREFPIN reads independently of the smoke field so the two views can be
+shown to agree).
+
+  AXIS 1  F3.10-02  AGC COLD START
+          am force-stop org.codeaurora.snapcam, then monkey LAUNCHER.
+          The cheapest axis, and the one R12 names explicitly.
+
+  AXIS 2  F3.10-03  CAMERA-STACK RESTART
+          The module's OWN sequence, from ishtar-cam-modes/setmode.sh - NOT an
+          ad-hoc killall. Ontology invariant 3 fixes the ordering as CLIENT
+          BEFORE HAL; reversing it leaks CSIPHY/CSID and blackens preview. The
+          invariant is RESPECTED here, not tested.
+          FIND-2.3-04 caveat, pre-declared: "CSIPHYHw:4 AvailableResource=0"
+          reads 0 on a clean boot too and is NOT diagnostic. It must not be
+          read as a leak signature on this axis.
+          Additional check on this axis: mount counts stayed 1/1.
+
+  AXIS 3  F3.10-04  QUICKSETTINGS MODE SWITCH
+          Away from the 50 MP state and back, through the tile. TWO
+          transitions, two snapshots. Ontology invariant 4: selecting 50mp
+          FORCES the sensor layer to stock, so this axis changes the HAL layer
+          and the sensor layer at once BY DESIGN. Not the ten-mode regression
+          (Faz2.3 did that and is verified).
+          The end state of this axis must be back at 50mp / fullres, or R-4
+          fires on every later axis.
+
+  AXIS 4  F3.10-05  DEVICE REBOOT
+          Reboot, wait for the camera stack, snapshot. The full LAYER STATE is
+          read from the same snapshot, so module persistence (IMPL-13's result)
+          and pin persistence are judged together - VAL-PERSIST.
+
+  F3.10-06  CONFIRMING CAPTURE on whatever state survived.
+          One human shutter press. Measured by the IMPL-40 method (PIL, L mode,
+          histogram, sum(hist[:4])/total). PASS THRESHOLD, stated here before
+          the capture: black fraction < 0.01, and dimensions deriving 12.58 MP.
+          This is the Faz3.7 threshold, unchanged.
+
+  F3.10-07  NEGATIVE CONTROL. Stimulus is pref_48m_key = 1. Clearing the
+          derived key is DECLARED INVALID (IMPL-52: AGC re-derives it). The
+          prediction is already committed in the 15:17 artifact and IS NOT
+          REVISED. One human shutter press.
+
+  F3.10-08  RESTORE pref_48m_key = 0 by the inode-preserving write (grep/sed to
+          a temp file, then "cat >" back - sed -i leaves the file root-owned
+          and mislabelled). Read the derived keys ONLY AFTER the AGC restart:
+          they LAG the input write and reading early records a false failure.
+          One human shutter press. The control must not be the state the device
+          is left in.
+
+
+PART D - THE MATRIX SKELETON
+=============================
+One row per axis. Filled in as each axis completes; no row is written in
+advance of its measurement.
+
+| # | Axis | 48m before/after | resolution before/after | rear derived before/after | front before/after | HAL md5 | trap | verdict | snapshots |
+|---|------|------------------|-------------------------|---------------------------|--------------------|---------|------|---------|-----------|
+| 1 | AGC cold start           | | | | | | | | |
+| 2 | Camera-stack restart     | | | | | | | | |
+| 3 | QS mode switch (away)    | | | | | | | | |
+| 3 | QS mode switch (back)    | | | | | | | | |
+| 4 | Reboot                   | | | | | | | | |
+| C | Negative control (48m=1) | | | | | | | | |
+| R | Restore (48m=0)          | | | | | | | | |
+
+Plus, recorded outside the table:
+  - the confirming capture's measured triple (dimensions, MP, black fraction)
+  - the control capture's black fraction against the 15:17 prediction
+  - the restore capture's black fraction
+  - both configured streams with formats, on the control and on the restore
+  - the explicit front-key statement (moved on axis N / did not move on any)
+  - any additional re-arming route observed, for Faz3.11's operator instructions
+  - zero or more routed findings for failed axes
+
+END OF PRE-STATED RULE. Nothing below this line existed when the first
+disturbance was applied.
