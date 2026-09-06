@@ -1,3 +1,23 @@
+# ============================================================
+# DURUM (Faz4.3 / IMPL-66, 2026-09-05): DENEY. SEVK EDILMEZ.
+# Bu tablo DENEYSELDIR ve silinmemistir - Main-Planing'in degistirilmis
+# Faz 4'u superseded deneylerin silinmek yerine ACIKCA ISARETLENMESINI
+# ister. docs/patch-table-format.md #9'a gore yeri DOGRUDUR: sonucu
+# 8d0915ce... icin halpatch.sh'de adlandirilmis bir sabit YOKTUR, yani
+# hal_state onu 'unknown' sayar ve blobs/ icine tasinmasi acilis yolunun
+# uzerine yeniden tohumlamasina yol acardi.
+#
+# YUKARIDAKI BASLIKTA ARTIK YANLIS OLAN IKI IDDIA (DEC-14, 2026-09-03):
+#  1. 'Bu yama TEK BASINA yeterli degil; ... daraltilmasi gerekiyor.'
+#     DARALTMA EMEKLIYE AYRILDI. IMPL-48..IMPL-50 daraltmanin her sayisal
+#     hedefi tutturdugu halde AGC'nin BASLAMASINI engelledigini olctu
+#     (iki bagimsiz ikiye-bolme asamasinda 3/3).
+#  2. '50MP-Entegrasyon-Plani.md Faz 12' artik projenin plani degildir.
+#
+# OLCULDU (IMPL-64, 2026-09-05): bu 4 noktanin IKISI (5965999, 5966028 =
+# 0x16c22bc, 0x16c2330) akis-yapilandirma kapilari DEGIL, SURE tablosu
+# kapilaridir (d000b / d0015). Yalnizca 5965367 ve 5965574 d000a'ya dokunur.
+# ============================================================
 # ishtar 50MP -- HAL RAW genisletme DENEMESI (2026-08-23)
 # camera.qcom.so / InitializeScalerStaticCaps icindeki bicim araligi testi:
 #   sub wN, wFmt, #0x22 ; cmp wN, #2  -> "bicim 0x22..0x23 ise yayinla"

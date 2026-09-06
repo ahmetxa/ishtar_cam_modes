@@ -1,3 +1,9 @@
+# ============================================================
+# DURUM (Faz4.3 / IMPL-66, 2026-09-05): OLU DENEY. SEVK EDILMEZ.
+# Faz4.1 (fullres-dimension-guard) DEC-14 ile 2026-09-03'te SUPERSEDED
+# oldu. Bu tablo o daraltma muhafizidir. IMPL-49 uyguladiginda AGC
+# baslamadi. Kayit icin saklaniyor; SILINMEDI, ama YENIDEN UYGULANMAZ.
+# ============================================================
 # ishtar Faz 4.1 -- tam-cozunurluk BOYUT KORUMASI (dimension guard), 2026-09-03
 #
 # 18 SATIR. hal-raw50-deneme.patch'in DARALTILMIS halidir; onun YERINE gecer.

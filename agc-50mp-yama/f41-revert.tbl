@@ -1,3 +1,8 @@
+# ============================================================
+# DURUM (Faz4.3 / IMPL-66, 2026-09-05): OLU. Faz4.1 ikiye-bolme asamasi.
+# Faz4.1 DEC-14 ile 2026-09-03'te SUPERSEDED oldu. Bu dosya o aramanin
+# ara asamasidir, bagimsiz bir yama degildir. SILINMEDI; UYGULANMAZ.
+# ============================================================
 # Faz4.1 single-step revert: stage D -> the state the device was found in
 # 87f92dd49afea0a0652640923d72f3a6 -> ce419bc901bea61945d166aee11e1ab0
 5965362 \013\210\000\121 \137\005\000\161

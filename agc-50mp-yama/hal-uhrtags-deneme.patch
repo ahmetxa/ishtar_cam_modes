@@ -1,3 +1,9 @@
+# ============================================================
+# DURUM (Faz4.3 / IMPL-66, 2026-09-05): OLU DENEY. SEVK EDILMEZ.
+# Faz4.7 (ultra-high-resolution-sensor-mode) DEC-14 ile SUPERSEDED oldu.
+# Temeli c094101d... (fullres + yedi-kelime yigini) zincirlenmis bir
+# durumdur; stok ya da fullres uzerine dogrudan uygulanamaz.
+# ============================================================
 # ishtar Faz 4.6 -- ULTRA-HIGH-RESOLUTION statik etiket kapisi -- A15 / vauxite
 #
 # DORT SATIR. Ayri tablo; raw50 / pixelarray / activearray tablolarinin

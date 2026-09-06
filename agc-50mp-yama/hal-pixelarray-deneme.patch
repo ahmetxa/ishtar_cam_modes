@@ -1,3 +1,8 @@
+# ============================================================
+# DURUM (Faz4.3 / IMPL-66, 2026-09-05): DENEY. SEVK EDILMEZ.
+# Basliktaki iki md5 de IMPL-66'da uygulanarak DOGRULANDI.
+# 50MP hedefi DEC-14 ile emekliye ayrildi; kayit icin saklaniyor.
+# ============================================================
 # ishtar Faz 3.3 -- pixelArraySize (f0006) DENEY yamasi -- A15 / vauxite
 #
 # TEK SATIR. blobs/hal-fullres.patch ile BIRLESTIRME -- hal_write

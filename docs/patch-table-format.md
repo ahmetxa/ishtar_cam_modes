@@ -233,6 +233,51 @@ therefore means adding its constant and its `hal_state` arm in the same change
 Naming: `hal-<capability>.patch` for canonical, `hal-<capability>-deneme.patch`
 for experimental, matching what both existing files already do.
 
+### Faz 4.3 outcome, 2026-09-05 (`IMPL-65` / `IMPL-66`)
+
+**Faz 4.3 consolidated nothing, and that is the result rather than an omission.**
+The user settled the reading of Main-Planing's "one consolidated table carrying
+the broad emission" on 2026-09-05: **broad** means the un-narrowed emission the
+shipped `fullres` base already carries, not the `raw50` widening. Under that
+reading the consolidated canonical table **is**
+`ishtar-cam-modes/blobs/hal-fullres.patch`, unchanged, and no third HAL state is
+produced — so `halpatch.sh`'s and `customize.sh`'s two-state classifiers stay
+correct and §7's three-copy consistency requirement is untouched.
+
+**Verified by application, not by transcription** (`IMPL-65`). All 16 stock-column
+escapes were compared against a stock binary before writing: **0 mismatches**.
+Applying the table to `c3fa63a86ee3ecaf9fbf02005d35f6b5` produces
+`fe0245a4720fb07b01d96deef47f5569`, **byte-identical** to the live HAL the device
+runs and on which Phase 3's result and the Phase 9 claim were measured.
+
+**A convention this established, worth keeping.** Verify the **stock column
+against the base binary before writing anything**. The parser cannot do this —
+§7 records that it has no notion of a base md5 — and a stock-column mismatch is
+the one defect a result md5 detects only *after* the file has been modified. A
+pre-write column check turns a chained table applied to the wrong base from a
+corrupted output into a refusal. `hal_set:101`'s post-write md5 remains the
+enforcement; this is the cheaper check that precedes it.
+
+**`ARC-07` is resolved by this section, not by moving a file.** Project-Comprehension
+read "a HAL artifact living in an application-layer directory" as architectural
+drift. The rule above says otherwise: the directory follows *canonical versus
+experimental*, not *layer*. `hal-raw50-deneme.patch`'s result has no named
+constant in `halpatch.sh`, so `hal_state` classifies it `unknown`, and moving it
+into `blobs/` would put a table the boot path treats as damage where the boot
+path looks — the re-seed in §8 point 3 would run over it. **Moving it was the
+unsafe act; leaving it is the correct one.**
+
+**Every experimental table is now marked in place** (`IMPL-66`), per the amended
+Phase 4's requirement that superseded experiments be "clearly marked as
+experiments rather than deleted": the seven `.patch` files and four `f41-*.tbl`
+bisection stages under `agc-50mp-yama/` each carry a `DURUM` header stating
+whether they are a live experiment or dead, and why. **The marking is
+comment-only and was verified behaviour-neutral** — record lines, per-table match
+counts and every applied result md5 are byte-for-byte identical before and after
+(§1 rule 2: the parser skips `#` lines). `hal-raw50-deneme.patch`'s marking also
+corrects the two claims in its own header that `DEC-14` falsified, rather than
+leaving them to be read as current.
+
 ## 10. Applicability to sensor blobs
 
 Sensor modes do **not** use this format. They are whole-file replacements:

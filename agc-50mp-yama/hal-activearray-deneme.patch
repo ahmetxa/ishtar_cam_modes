@@ -1,3 +1,8 @@
+# ============================================================
+# DURUM (Faz4.3 / IMPL-66, 2026-09-05): DENEY. SEVK EDILMEZ.
+# Stok uzerine 'ikisi birden' sonucu 90c01215... IMPL-66'da uygulanarak
+# DOGRULANDI. Faz4.5 tamamlandi; FIND-4.5-02 acik (DEC-19).
+# ============================================================
 # ishtar Faz 4.5 -- aktif dizi (f0000 / f000a) DENEY yamasi -- A15 / vauxite
 #
 # IKI SATIR. blobs/hal-fullres.patch ile BIRLESTIRME -- hal_write
