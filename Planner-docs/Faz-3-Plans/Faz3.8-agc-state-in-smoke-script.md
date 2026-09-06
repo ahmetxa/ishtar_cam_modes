@@ -2,6 +2,8 @@
 
 ## 1. Context
 
+**Amended 2026-09-05 by planning run 13 (`AUDIT-FIX-26`, discharged against the measurements of `IMPL-52`, `IMPL-53` and `IMPL-54`).** `F3.7-10` has reported, and what it reported changes this sub-plan's **field design**, not only its wording. `pref_camera_picturesize_back_key` is **derived**, not set: AGC re-derives it from `pref_camera_resolution` — a two-value key, `full` / `medium` — on every start, and `pref_48m_key` decides which pair of sizes that surface can express. Measured on the shipped `fullres` base `fe0245a4720fb07b01d96deef47f5569`: at `pref_48m_key`=**1**, *Full resolution* derives `8192x6144`; at `pref_48m_key`=**0** it derives `4096x3072`, and the RAW10 and YUV streams then match at `4096x3072` instead of forming the mismatched pair that carries the fold signature. **Three consequences follow, and nothing else in this file was rewritten:** (1) the instrument must report the two **inputs** as well as the derived output, because the output is a cache of the last AGC start while the inputs are what the next start will read — section 4, `F3.8-03` and criterion 8 changed; (2) the sensitivity check moves `pref_48m_key`, not the derived key, because writing the derived key does not survive an AGC restart (`IMPL-52` measured this) — `F3.8-07` changed; (3) the justification comment states the configured state **with its attribution and date** rather than as an intrinsic property — section 11's sixth risk changed. The read-only command set, the no-verdict rule and the byte-identical comparable region are untouched, and no field name already emitted by `scripts/smoke.sh` changes.
+
 `Main-Planing.md`'s Phase 3 risk note states the mitigation this sub-plan implements, in one sentence: "the smoke script should report AGC's selected size alongside the HAL md5, so the state is visible without opening the app." Risk `R12`, raised by `DEC-14` as the replacement for the closed `R4`, states the failure it prevents: "AGC's default behaviour is to select the largest advertised size, which under the broad HAL table is the 8192x6144 path that yields an unusable frame. *Impact:* the user discovers the regression through a bad photograph rather than a check."
 
 That impact is not hypothetical for this project. Risk `R5` describes the same feedback-loop failure generally — "regressions surface only when the user notices them, sometimes days later" — and Autopsy `AUTOPSY-P0-02` records a three-step misattribution caused by state not being captured before and after a change. The whole reason `scripts/smoke.sh` exists is that this project's validation surface is a device and a human eye, and the script is the one instrument that turns device state into a diffable text file.
@@ -20,7 +22,7 @@ The problem is an unobservable state with a bad default. `R12`'s mitigation has 
 
 It belongs second in the phase because everything after it is a repeated measurement. `Faz3.9`'s coexistence bracket and `Faz3.10`'s four-axis stickiness matrix each take several snapshots, and a snapshot that cannot show the pin makes those runs depend on a separate ad-hoc read that nobody diffs. Building the instrument before the repeated measurements is the same reasoning that pulled the smoke script forward into Phase 2 in the first place.
 
-**The vibecoding slice strategy.** The first useful slice is one added line in `probe_app` reporting `pref_camera_picturesize_back_key`'s raw value. That alone closes most of `R12`. The second slice adds `pref_48m_key` and a derived megapixel figure, so a reader who does not remember that `4096x3072` is 12.58 MP still sees the consequence. The fastest validation signal is the existing idempotence check: run the script twice with nothing changed and diff the comparable regions — they must be byte-identical, which is `VAL-IDEMPOTENT` from `IMPL-04`.
+**The vibecoding slice strategy.** ~~The first useful slice is one added line in `probe_app` reporting `pref_camera_picturesize_back_key`'s raw value. That alone closes most of `R12`.~~ **Re-sliced 2026-09-05: one line is no longer the useful first slice.** The derived key alone reports what the *last* AGC start computed, so a snapshot could read `4096x3072` while `pref_48m_key` had already moved and the next start would derive `8192x6144`. The first useful slice is therefore **two** lines — `pref_48m_key` and `pref_camera_resolution`, the inputs — and that is what closes most of `R12`. The second slice adds the derived key beside them and a derived megapixel figure, so a reader who does not remember that `4096x3072` is 12.58 MP still sees the consequence, and so cause and effect sit on consecutive lines. The fastest validation signal is the existing idempotence check: run the script twice with nothing changed and diff the comparable regions — they must be byte-identical, which is `VAL-IDEMPOTENT` from `IMPL-04`.
 
 **What must not be over-planned.** The script must not start judging. Its own header states the contract: "It does NOT judge whether a state is correct. It reports; a human or a later checklist interprets." A field named `agc.photo_size` is a report. A field named `agc.photo_size.ok` would be a verdict, and it would be wrong the moment the target size changes. The derived megapixel figure is arithmetic on the reported value, not an assessment of it.
 
@@ -28,8 +30,8 @@ It belongs second in the phase because everything after it is a repeated measure
 
 ## 4. Scope
 
-- A new field in `probe_app` reporting the value of `pref_camera_picturesize_back_key` for the AGC package.
-- A new field reporting `pref_48m_key`, since it decides whether the 50 MP entry is even offered and is therefore half of `R12`'s exposure.
+- A new field in `probe_app` reporting the value of `pref_camera_picturesize_back_key` for the AGC package, labelled as the **derived** value it is — a cache of what the last AGC start computed, not an input anything can usefully set (`IMPL-52`).
+- New fields reporting the two **inputs** that value is derived from: `pref_48m_key`, which decides which pair of sizes the settings surface can express, and `pref_camera_resolution`, the two-value (`full` / `medium`) key AGC actually reads. Together these are `R12`'s real exposure surface. The derived key alone is a lagging indicator: it reports the last start rather than the next one, so a snapshot taken after an input changed but before AGC restarted would read clean while the state is already bad.
 - A derived megapixel field computed from the reported size, so the consequence is legible without arithmetic by the reader.
 - A stable, explicit representation for the absent case — a preference that has never been written must produce a fixed token, not an empty value that varies with quoting.
 - Preservation of the read-only command set and of the byte-identical comparable region.
@@ -57,7 +59,7 @@ The output field format is a fixed-width `name = value` produced by `echo "agc.v
 
 `IMPL-04` records the three validations this change must not break: `VAL-IDEMPOTENT` (byte-identical comparable region across two runs, 150 lines at the time), `VAL-SENSITIVITY` (a `dcgB` → `dcgA` transition produced a diff of exactly 3 lines), and `VAL-READONLY` (per-command review, no mutating command). The line count has grown since; the property, not the number, is what is preserved.
 
-`IMPL-43` establishes that `pref_camera_picturesize_back_key` is the value worth reporting, and that `pref_48m_key` is necessary but not the selector. `IMPL-40` establishes that `4096x3072` corresponds to a clean 12.58 MP result and `8192x6144` to the folded 50.33 MP one, which is what makes the derived megapixel field meaningful rather than decorative.
+`IMPL-43` established that `pref_camera_picturesize_back_key` is the value worth reporting, and that `pref_48m_key` is "necessary but not the selector". **`IMPL-52` and `IMPL-53` narrowed both halves, and this sub-plan follows the narrowed version.** The key is the proximate selector for *what AGC opens*, but it is not an input: AGC re-derives it from `pref_camera_resolution` on every start, so a direct write to it is discarded. `pref_48m_key` is not merely an availability switch either — it selects which pair of values the two-value surface derives, which on the shipped base is `8192x6144` / `1920x1440` at `1` and `4096x3072` / `1920x1440` at `0`. Reporting the derived key without its two inputs would report an effect while leaving both causes invisible. `IMPL-40` establishes that `4096x3072` corresponds to a clean 12.58 MP result and `8192x6144` to the folded 50.33 MP one, which is what makes the derived megapixel field meaningful rather than decorative.
 
 `Faz3.7`'s `F3.7-01` and `F3.7-03` will have read the actual preference file layout on device — including whether the value is stored as a `<string>` element and exactly how the size is spelled — before this sub-plan is written. That reading is this sub-plan's input and is the reason for the ordering.
 
@@ -69,9 +71,9 @@ The output field format is a fixed-width `name = value` produced by `echo "agc.v
 - F3.8-02 — Add the photo-size field
   - Description: Emit `agc.photo_size` with the raw preference value, using only commands from the reviewed read-only set. Choose and document the absent-value token.
   - Output: One new reported field with a defined absent case.
-- F3.8-03 — Add the 50 MP availability field
-  - Description: Emit `agc.pref_48m` with its raw value, since it governs whether the 50 MP entry appears in AGC's list at all and is therefore the other half of `R12`'s exposure surface.
-  - Output: One new reported field.
+- F3.8-03 — Add the two derivation-input fields
+  - Description: Emit `agc.pref_48m` and `agc.pref_resolution` with their raw values. These are the inputs AGC reads at start to derive the photo size, so they — not the derived key — are what a bracket must contain if it is to explain a change rather than merely record one. Emit them adjacent to the derived field so a reader sees cause and effect on consecutive lines.
+  - Output: Two new reported fields, each with a defined absent case.
 - F3.8-04 — Add the derived megapixel field
   - Description: Compute megapixels from the reported size on the host side, so a reader sees the consequence without arithmetic. Emit a fixed token when the size is absent or unparseable rather than emitting an empty or error value.
   - Output: One derived field whose absent and unparseable cases are both stable.
@@ -82,8 +84,8 @@ The output field format is a fixed-width `name = value` produced by `echo "agc.v
   - Description: Two consecutive runs with no intervening change; diff the comparable regions; they must be byte-identical including the new fields.
   - Output: An idempotence result stated as a line count and a diff verdict.
 - F3.8-07 — Run the sensitivity check
-  - Description: Change the pin from `4096x3072` to another advertised size and back, taking a snapshot at each point. The diff must show exactly the new fields changing and nothing else.
-  - Output: A sensitivity result stated as a diff line count with the changed lines named.
+  - Description: Move `pref_48m_key` from `0` to `1` and back, restarting AGC at each step so the derived key is actually re-derived, and take a snapshot at each point. Writing the derived key directly is **not** a valid sensitivity stimulus — `IMPL-52` measured that such a write does not survive an AGC restart, so a check built on it would exercise the field against a value AGC never reads. The diff must show exactly the new fields changing and nothing else, and it must show the input field and the derived field moving **together**, which is the property that proves the derivation is being observed rather than assumed.
+  - Output: A sensitivity result stated as a diff line count with the changed lines named, plus the input/derived pairing observed at both values.
 - F3.8-08 — Re-affirm the read-only property for the added commands
   - Description: Review each device-side command the new fields introduce against `IMPL-04`'s permitted set, and record the review rather than asserting the property.
   - Output: A per-command review covering only the additions.
@@ -97,7 +99,7 @@ The output field format is a fixed-width `name = value` produced by `echo "agc.v
 - Every device-side command the change introduces is one of the commands `IMPL-04`'s read-only review permits, and the review of the additions is recorded rather than asserted.
 - The script emits no verdict: no field says whether the state is correct.
 - The new fields carry a comment citing `R12` and `DEC-14`.
-- A snapshot taken with AGC pinned at `4096x3072` and one taken with it at `8192x6144` are distinguishable by reading the file alone, without opening the app and without a capture.
+- A snapshot taken at `pref_48m_key`=`0` (deriving `4096x3072`) and one taken at `pref_48m_key`=`1` (deriving `8192x6144`) are distinguishable by reading the file alone, without opening the app and without a capture — and the snapshot shows **both** the input that was changed and the derived value it produced, so the file explains the state rather than only exhibiting it.
 - The existing fields — layer state, mount counts, camera rows, trap keys — are unchanged in name, order, and format.
 
 ## 9. Validation and Test Approach
@@ -122,7 +124,7 @@ Local versus live: the field design and the derived-megapixel arithmetic are hos
 
 ## 10. Dependencies and Sequencing
 
-Depends on `Faz3.7` for the observed preference layout, the key spelling, and the value format — this is the ordering's whole purpose. Depends on `Faz2.1` for the script and for the three validation designs it reuses.
+Depends on `Faz3.7` for the observed preference layout, the key spelling, and the value format — this is the ordering's whole purpose, and **the dependency is now satisfied**: `IMPL-52`, `IMPL-53` and `IMPL-54` read the file on device. The layout is `/data/data/org.codeaurora.snapcam/shared_prefs/org.codeaurora.snapcam_preferences.xml`, each value a `<string name="...">...</string>` element, sizes spelled `WIDTHxHEIGHT` with a lowercase `x`, and `pref_48m_key` stored as the string `0` or `1`. The **front** camera derives too — `pref_camera_picturesize_front_key` moved `6528x4896` to `3264x2448` across the same base transition (`IMPL-54`) — which the implementer must weigh when deciding whether the field set is rear-only. Depends on `Faz2.1` for the script and for the three validation designs it reuses.
 
 Does **not** depend on `DEC-15`. The field reports whatever base is live; which base the phase adopts changes the values, not the instrument.
 
@@ -145,7 +147,7 @@ Subagents are not recommended.
 - Risk: the field becomes a verdict. Impact: the script starts asserting correctness against a target that will change, and a future reader trusts a stale judgment. Mitigation: the acceptance criteria forbid a verdict field explicitly; the derived megapixel value is arithmetic on the reported value only.
 - Risk: the preference lives in a different `shared_prefs` file than expected, or under a different key on a different AGC build, and the field silently reports absent forever. Impact: the `R12` detector reads clean while the state is bad — worse than having no detector, because it is trusted. Mitigation: `VAL-SENSITIVITY` requires the field to be observed **changing** with the state; a field that never changes has not been validated.
 - Risk: the sensitivity run leaves the device pinned at the wrong size. Impact: the next measurement in the project starts contaminated. Mitigation: the run restores the pin and the post-bracket is diffed against the pre-bracket, per checklist item 5.
-- Risk: reporting `pref_48m_key` is read as a recommendation to turn it on. Impact: someone arms the 50 MP entry and reintroduces the failure mode. Mitigation: the justification comment states that it is reported because it governs exposure, and that the objective's state is off.
+- Risk: reporting `pref_48m_key` is read as a recommendation to turn it on. Impact: someone arms the 50 MP entry and reintroduces the failure mode. Mitigation: the justification comment states that it is reported because it governs exposure, and names the configured state **with its attribution** — `pref_48m_key`=`0`, adopted by the user as `DEC-18` on 2026-09-04 on the evidence of `IMPL-53` and `IMPL-54`, deriving `4096x3072` on the shipped `fullres` base. The attribution is the point: the key was `1` for most of this project's history, and a comment asserting `0` as an intrinsic property rather than as a dated decision would be the same class of stale-fact-in-a-durable-place defect that `AUDIT-FIX-18` and `AUDIT-FIX-26` both record.
 - Risk (`R8`): a future AGC update renames the key and the field goes quietly absent. Impact: the detector degrades without notice. Mitigation: the absent token is explicit and visible in the diff, so an absent value is a change rather than a silence; `Faz3.11` records re-verification after any AGC update as an operator instruction.
 
 ## 12. Desired End State
@@ -163,5 +165,5 @@ The ledger summary Step 4 should append records: the exact field names added, th
 - Sensitivity is demonstrated: the fields were observed changing with the state, and only those fields changed.
 - The absent case emits a stable documented token.
 - The read-only review of the added commands is recorded, not asserted.
-- The device is left pinned where `Faz3.7` left it, confirmed by a post-bracket.
+- The device is left where `Faz3.7` left it — `pref_48m_key`=`0`, `pref_camera_resolution`=`full`, deriving `4096x3072` on HAL `fe0245a4720fb07b01d96deef47f5569` — confirmed by a post-bracket, since the sensitivity run moves that key and must put it back.
 - `Faz3.9` and `Faz3.10` can bracket every run with a snapshot that contains the state under test.

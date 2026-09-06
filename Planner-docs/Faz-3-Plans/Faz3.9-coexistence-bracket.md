@@ -2,6 +2,12 @@
 
 ## 1. Context
 
+**Amended 2026-09-05 by planning run 13 (`AUDIT-FIX-26`, discharged against `IMPL-53` and `IMPL-54`; `AUDIT-FIX-29`'s `DEC-15` residue cleared here).** `F3.7-10` has reported and `Faz3.7` is `verified`. Two corrections and one definition follow, and nothing else in this file was rewritten.
+
+**The definition, which rescues the rest of the file.** Throughout this sub-plan "the pin" now means the **configured derivation** — `pref_48m_key`=`0` together with `pref_camera_resolution`=`full`, which on the shipped `fullres` base derives `pref_camera_picturesize_back_key`=`4096x3072` — and **not** a direct write to the derived key, which `IMPL-52` measured does not survive an AGC restart. Every remaining occurrence of "the pin" and of "pinned `4096x3072`" in this file is to be read in that sense; the observable it names is unchanged, only its mechanism is. `DEC-18` (2026-09-04) adopted `0` as the phase's configured state, so the session runs at that value rather than establishing it.
+
+**The two corrections.** (1) `DEC-15` **was answered on 2026-09-04** — the shipped `fullres` artifact `fe0245a4720fb07b01d96deef47f5569` — and `IMPL-53` transitioned the device onto it with the revert path exercised; sections 10 and 11 no longer describe it as an open precondition. (2) The out-of-scope bullet "Turning `pref_48m_key` on" rested on a premise `IMPL-52` measured false: the key was already **on** when that bullet was written. It now reads correctly against the adopted state. **`FIND-3.7-03` is new input for this sub-plan:** `pref_camera_picturesize_front_key` re-derives across a base change too (`6528x4896` to `3264x2448`, `IMPL-54`), so a session that opens either app on the **front** camera is not covered by this sub-plan's rear-camera evidence.
+
 `DEC-14`'s replacement objective has two halves and this sub-plan proves the second one. `Main-Planing.md` section 4 states it: "In 50 MP mode, Open Camera produces a full-resolution image using the sensor's native 8192x6144 array, **and the AGC 8.4.300 V9.6 port keeps working normally at 12.58 MP (`4096x3072`) — it launches, previews, captures, and saves a clean image, in the same HAL state, without a crash or a corrupt frame.**"
 
 The phrase carrying the work is **in the same HAL state**. Each half is already on record separately. `IMPL-22` measured Open Camera at 50.3 MP; `IMPL-40` measured a clean AGC 12.58 MP capture; `IMPL-15` even had both layers mounted simultaneously with Open Camera clean at 8192x6144. What has never been recorded is the two consumers measured **against one another in a single bracketed session with no HAL change between them**, which is the only form of evidence that supports the word "coexistence".
@@ -44,7 +50,7 @@ It belongs third in the phase because it needs the pin (`Faz3.7`) and benefits e
 - Diagnosing `FIND-2.3-03` (AGC video black). It reproduces in plain `stock` and is not module-caused; it is recorded, not investigated.
 - Diagnosing `FIND-2.3-02` (`ln2`/`ln4` crash AGC). Those modes are not reachable in a `50mp` state under invariant 4.
 - Any attempt to make AGC capture above 12.58 MP, in any form. `DEC-14` retired that objective.
-- Turning `pref_48m_key` on. Its value is recorded; changing it is `Faz3.10`'s negative control.
+- Moving `pref_48m_key` off its adopted value of `0` (`DEC-18`). Its value is recorded in every result; changing it is `Faz3.10`'s negative control and `Faz3.8`'s sensitivity stimulus, not this sub-plan's business. **The original bullet read "Turning `pref_48m_key` on", which rested on a premise `IMPL-52` measured false — the key was already `1` at the time it was written.**
 - Testing survival across reboot, mode switch, cold start or camera-stack restart. That is `Faz3.10` in full.
 - Extending the smoke script. `Faz3.8` owns it.
 
@@ -67,7 +73,7 @@ Project-Ontology invariant 4 records that `50mp` forces the sensor layer to stoc
 ## 7. Planned Work Breakdown
 
 - F3.9-01 — Establish and bracket the session's starting state
-  - Description: Confirm the HAL md5 matches the base `DEC-15` selected, the mode is the 50 MP state, the pin reads `4096x3072`, the trap count is 0/12, and enumeration is 13. Take the opening snapshot.
+  - Description: Confirm the HAL md5 is `fe0245a4720fb07b01d96deef47f5569` (the base `DEC-15` selected), the mode is the 50 MP state, the trap count is 0/12, and enumeration is 13. Confirm the pin by reading **all three** of its keys, not only the last one: `pref_48m_key`=`0` and `pref_camera_resolution`=`full` are the inputs, and `pref_camera_picturesize_back_key`=`4096x3072` is what they derived at the last AGC start. Reading only the derived key would pass on a stale value that the next AGC start would overwrite. Take the opening snapshot.
   - Output: A named opening bracket with every value it will be compared against.
 - F3.9-02 — Record the sensor-layer state and its reason
   - Description: State which sensor blob is live and why, citing invariant 4's forcing rule rather than describing the value as a choice.
@@ -126,7 +132,7 @@ Local versus live: only the artifact measurement is host-side. Live readiness is
 
 ## 10. Dependencies and Sequencing
 
-Depends on `Faz3.7` for the pin, the measurement method and the stated pass threshold, and on `Faz3.8` for a bracket that contains the pin. Depends on `DEC-15` being answered, because the session must be run on the base the phase adopts — running it on the other base produces a valid measurement of the wrong artifact.
+Depends on `Faz3.7` for the pin, the measurement method and the stated pass threshold, and on `Faz3.8` for a bracket that contains the pin. **Both dependencies on `DEC-15` are discharged:** it was answered on 2026-09-04 (the shipped `fullres` artifact `fe0245a4720fb07b01d96deef47f5569`), and `IMPL-53` put the device on that base with the live md5 read back at both ends and the revert path exercised. The reason the decision mattered is unchanged and still governs: running the session on the other base would produce a valid measurement of the wrong artifact, so the opening bracket verifies the md5 rather than assuming it.
 
 Depends on `Faz2.1` for the script and `Faz2.2` for the baseline lineage.
 
@@ -134,11 +140,11 @@ Does **not** depend on `Faz4.1`, `Faz4.7`, or any Phase 4 work. Both of those ar
 
 Blocks `Faz3.10`, which attacks the state this sub-plan establishes, and contributes the central evidence `Faz3.11` records.
 
-Required decisions: `DEC-15` must be answered before the session runs. No other decision is required.
+Required decisions: **none outstanding.** `DEC-15` (the base) and `DEC-18` (`pref_48m_key`=`0` as the configured state) were both answered by the user on 2026-09-04 and are recorded in the ledger. The session verifies both rather than deciding either.
 
 Required credentials or live endpoints: none. Root through KernelSU, `adb`, and both applications installed.
 
-Required human approvals: physical device access, two shutter presses, and confirmation that the session may proceed on the `DEC-15` base.
+Required human approvals: physical device access and two shutter presses. Confirmation of the base is no longer an approval — `DEC-15` is answered and the device is already on that base — but the opening bracket must still read the md5 back rather than trusting this sentence.
 
 Fresh-session token and context risk: **low to medium**. Two captures, two dumpsys reads and two brackets; the volume risk is the dumpsys output, which should be filtered on the device as the smoke script already does rather than pulled whole.
 
@@ -151,7 +157,7 @@ Subagents are not recommended. The session is one stateful sequence.
 - Risk: a standing condition — SABRE failures, `Invalid mesh` — is read as a defect and the session is aborted or the result is hedged. Impact: wasted device time and a weaker result than the evidence supports. Mitigation: `F3.9-07` records them as standing conditions with `IMPL-40`'s positive-control evidence cited.
 - Risk: AGC fails to launch for an unrelated reason — a contaminated boot after a provider abort (`FIND-3.4-03`). Impact: a launch failure is attributed to coexistence. Mitigation: checklist item 8 requires a reboot after any provider abort before the session begins, and the session's opening bracket is taken after that reboot.
 - Risk (`R12`): the pin drifted between `Faz3.7` and this session. Impact: the AGC capture is folded and the failure is attributed to coexistence rather than to the pin. Mitigation: the opening bracket now reports the pin (`Faz3.8`), so drift is visible before the capture instead of after.
-- Risk: the session is run on the experimental base while the result is later read as a statement about the shipped module. Impact: a claim about an artifact that was never measured — the same risk `Faz3.7` raised. Mitigation: `DEC-15` is a hard precondition here rather than a routed question, and both md5s appear in the result.
+- Risk: the session is run on the experimental base while the result is later read as a statement about the shipped module. Impact: a claim about an artifact that was never measured — the same risk `Faz3.7` raised. Mitigation: `DEC-15` is answered and the device is on the shipped base, verified live by `IMPL-53` and again by the opening bracket; both md5s appear in the result, and any figure carried from `IMPL-52` is labelled as measured on the experimental `ce419bc901bea61945d166aee11e1ab0`.
 - Risk: the two captures are separated by a long gap and an unnoticed intervening event. Impact: a session in name only. Mitigation: the two captures are consecutive with no intervening command other than launching the second app, and the closing bracket is taken immediately.
 - Risk (invariant 4): an attempt is made to compose a sensor mode with `50mp` to make the session more interesting. Impact: an unreachable state, a wasted session, and a result that answers no question the objective asks. Mitigation: the sensor-layer state is recorded as forced, not chosen, and composition is out of scope — `Faz5.3` already decided to retain the exclusion.
 
