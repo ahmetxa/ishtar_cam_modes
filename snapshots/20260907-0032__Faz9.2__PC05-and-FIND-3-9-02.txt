@@ -1,0 +1,98 @@
+=== PC-05 (C-05) and FIND-3.9-02 — one human shutter press ===
+Run: IMPL-85, 2026-09-07 00:31:11 - 00:33:11 (120 s window)
+Device: Xiaomi 13 Ultra (dc27e5d0), mode 50mp, no state change beyond
+        foregrounding Open Camera.
+
+--- Preconditions, read before the press ---
+mode                : 50mp
+HAL md5             : fe0245a4720fb07b01d96deef47f5569  (fullres)
+sensor md5          : 9e4d0fe1a8bf2eb4146c9917a0ac2c4c  (stock)
+AGC prefs md5 before: 21762bdcb09f107aad2f397351cf1337
+AGC prefs md5 after : 21762bdcb09f107aad2f397351cf1337   <- guard holds, unchanged
+/proc/uptime        : 11889 s at session start, no reboot
+occatch.sh          : 2774 bytes on device, length checked
+
+Open Camera identity — FIND-3.9-01 reconfirmed:
+  package  : com.xiaomi.module.evaluation
+  apk      : /data/app/~~35cJEGqtGA5PckIh6fiAnw==/
+             com.xiaomi.module.evaluation-evwoDSWydJcFoN1t42bFCw==/base.apk
+  activity : net.sourceforge.opencamera.MainActivity
+  stored resolution preference: "8192 6144"  (already full; read before the
+  press so the press was not spent discovering a wrong setting)
+
+NOTE ON PROCEDURE. Two earlier windows (60 s at 00:23:17, 180 s at 00:26:53)
+caught nothing: 124 and 393 samples, zero camera clients, launcher resumed
+throughout. The cause was not timing. The app is installed under a Xiaomi
+evaluation package name, so it does not present as "Open Camera" in the
+launcher and the user could not find it. It was then started explicitly by its
+activity class and confirmed foreground by the resumed-activity check before
+the third window opened. Recorded because the false start is what identified
+the cause, and because a future run of this row will hit the same wall.
+
+--- INSTRUMENT A: dumpsys sampler — criterion 5 satisfied LITERALLY ---
+Sample 128 of 179, at 00:32:38, both streams present in ONE dumpsys read:
+
+      Consumer name: SurfaceView[com.xiaomi.module.evaluation/
+                     net.sourceforge.opencamera.MainActivity]#1(BLAST Consumer)1
+      Dims: 1920 x 1440, format 0x7fa30c06, dataspace 0x0
+      Consumer name: Camera2-JpegConsumer
+      Dims: 8192 x 6144, format 0x21, dataspace 0x8c20000
+
+Distinct Dims lines across the whole window:
+      3   Dims: 1920 x 1440, format 0x7fa30c06, dataspace 0x0
+      1   Dims: 8192 x 6144, format 0x21, dataspace 0x8c20000
+
+format 0x21 = 33 = BLOB, the same format PC-04 finds at 8192x6144 in the
+d000a list. The still stream appeared in exactly ONE of 179 samples, which
+is the direct measurement of why IMPL-58's single after-the-fact read saw
+only the 1920x1440 preview.
+
+**This satisfies Faz3.9 criterion 5 with the instrument the criterion names.**
+Instrument B's log-reader substitution was built as insurance and was NOT
+needed. IMPL-83 required that any substitution be stated rather than hidden;
+no substitution was used, so there is nothing to disclose.
+
+--- INSTRUMENT B: camera stack log, for completeness ---
+Configuration lines at 00:32:37.523 and 00:32:38.133 are CamX/Camera3-Device
+messages that do not carry dimensions on this path:
+  configureStreamsLocked: Unable to get  tag
+  camxhal3.cpp:2507 configure_streams() Get initAperture failure
+  camxhal3.cpp:2538 configure_streams() Get customeEnable failure
+  camxhal3.cpp:2724 configure_streams() FPS: 14 ~ 30
+These are pre-existing vendor errors present in the IMPL-83 proof run too and
+are not caused by this capture.
+
+FALSE POSITIVE, recorded so it is not mistaken for evidence: the script's
+"any WxH pair naming 8192 or 6144" grep matches sensor timestamps. In this run
+it returned only
+  light_event: ts=13309602561443, lux: 71.0
+where "6144" is a substring of the timestamp. The earlier windows produced the
+same artifact with "8192" inside ts=12819282840271. This grep is a net, not a
+measurement; Instrument A is the measurement.
+
+--- PC-05: dimensions from the JPEG SOF marker, never the filename ---
+file    : /sdcard/DCIM/OpenCamera/IMG_20260907_003238.jpg
+bytes   : 16464141
+SOF     : 0xFFC0 (baseline), precision 8
+SOF says: height 6144, width 8192
+result  : 8192 x 6144 = 50.33 MP          <- PC-05 expected exactly this
+
+Guard against a 50 MP black frame, which would satisfy the dimension test and
+mean nothing. IMPL-40 method, PIL, MAX_IMAGE_PIXELS=None, convert("L"),
+histogram, sum(hist[:4])/total:
+  pixels          : 50331648
+  black fraction  : 0.000008
+  threshold       : < 0.01   -> PASS
+
+--- VERDICT ---
+PC-05 (C-05, "Third-party app captures 50.3 MP")  : PASS
+FIND-3.9-02 (Faz3.9 criterion 5, Open Camera half): REPAIRED, literally,
+                                                    via route (a)
+
+One shutter press discharged both. DEC-21 item 6, which the user ruled REPAIR
+rather than accept-as-partial, is satisfied on its own terms.
+
+SCOPE. Rear camera, one device, one capture. This says nothing about the front
+camera and nothing about AGC, which remains pinned at 12.58 MP by design.
+Writing "AGC now captures at 50 MP" would be a false claim; the 50.33 MP path
+is Open Camera's BLOB path, not AGC's.

@@ -1,0 +1,155 @@
+=== VAL-MANUAL — all seven user-performed rows, exercised once ===
+Run: IMPL-85, 2026-09-07, 00:23 - 00:55
+Device: Xiaomi 13 Ultra (dc27e5d0). User at the phone throughout; every
+        capture is a human shutter press.
+
+WHAT VAL-MANUAL ACTUALLY IS — see FIND-9.2-06.
+Faz9.2 defines VAL-MANUAL as "the user-performed checks in the checklist,
+exercised once to confirm they are executable as written". Section 3 of
+docs/release-checklist.md classifies coverage as smoke / host / user and puts
+exactly SEVEN rows in `user`: C-02, C-03, C-05, C-09, C-11, C-12, C-13, proved
+by PC-02, PC-03, PC-05, PC-09, PC-11, PC-12, PC-13. The checklist states the
+count itself at lines 492 and 609.
+
+IMPL-82 executed PC-01, PC-04, PC-06 and PC-07 and recorded them as
+"VAL-MANUAL's machine half, four rows PASS". All four are `smoke`-coverage
+rows and none belongs to VAL-MANUAL. That work is not wasted — it discharges
+the `pending` evidence-record rows C-01 and C-04 — but before this run
+VAL-MANUAL stood at ZERO of seven, not four of eight.
+
+--- RESULTS, seven of seven exercised ---
+
+PC-05 (C-05) third-party app captures 50.3 MP .............. PASS
+  Full detail in snapshots/20260907-0032__Faz9.2__PC05-and-FIND-3-9-02.txt.
+  SOF marker 0xFFC0: 8192 x 6144 = 50.33 MP. Black fraction 0.000008.
+  dumpsys caught the still stream live at 8192 x 6144 format 0x21, so
+  FIND-3.9-02 is REPAIRED LITERALLY, with the instrument criterion 5 names.
+  The occatch.sh log-reader substitute was built as insurance and NOT needed.
+
+PC-03 (C-03) dcgB leaves shutter speed alone ............... PASS
+  One stock and one dcgB capture, Open Camera, same scene and light.
+    dcgB  IMG_20260907_004709.jpg  ExposureTime 0.04 s = 1/25 s
+    stock IMG_20260907_004834.jpg  ExposureTime 0.04 s = 1/25 s
+  EQUAL. The row needs no other similarity, but the pair happens to be well
+  controlled, which strengthens it: ISO 1406 vs 1409, BrightnessValue -2.05
+  both, mean luma 103.17 vs 103.64, both 4096x3072 12.58 MP.
+
+PC-02 (C-02) dcgB 25 pct less noise, 2x detail ............. EXERCISED, claim NOT re-measured
+  The row is executable as written: a stock/dcgB pair at matched exposure was
+  captured, which is exactly what it asks for. Its QUANTITATIVE claim is not
+  confirmed here and must not be reported as confirmed.
+  Indicative flat-tile noise proxy (sigma inside the flattest 9 of 190 tiles):
+    dcgB  1.640      stock 1.693      -> dcgB about 3 pct lower
+  Directionally consistent with the claim, but ~3 pct is nowhere near 25 pct,
+  and this proxy cannot settle it: a handheld pair, 9 flat tiles, ISO ~1400,
+  and pipeline denoising already applied to both JPEGs. C-02 is `waived` in the
+  section 7 evidence record as a one-time measurement carried forward while the
+  sensor blobs are byte-unchanged; that waiver still governs, and the original
+  controlled measurement in 50MP-Entegrasyon-Plani.md remains the authority.
+
+PC-09 (C-09) four tiles, mutually exclusive ................ PASS
+  Scripted readback: apk=guncel takma_ad=gorunur kok_kaydi=var kutucuk=4.
+  Checked by eye in QuickSettings while the device was in `stock`: four tiles
+  present, exactly one active, and the active one matched the current mode.
+  C-09's detector is marked "partial, IMPL-75" precisely because the scripted
+  readback cannot see activeness; the eye check is the part that closes it.
+
+PC-11 (C-11) an Action button exists ....................... PASS
+  Action invoked from the KernelSU manager. It advanced the mode and reported
+  the new one. Confirmed independently on device: mode went 50mp -> dcgB, and
+  the layer state moved with it (see PC-08 below).
+
+PC-12 (C-12) UI language independent of locale ............. PASS
+  System locale left at en-US throughout (persist.sys.locale re-read after).
+  Module language set to `tr`. action.sh info field 4 followed the MODULE:
+    before: 50mp|aktif|9e4d0fe1...|en|fullres
+    after : 50mp|aktif|9e4d0fe1...|tr|fullres
+  action.sh source states the intent directly: "SISTEM DILINDEN BAGIMSIZDIR".
+  setmode.sh output was Turkish while the system stayed English. The user
+  confirmed by eye that the manager WebUI text was Turkish.
+  Restored to `en` at end of session, matching the opening baseline.
+
+PC-13 (C-13) video 1080p60 and 4K60 unaffected ............. PARTIAL — see FIND-9.2-07
+  Dimensions correct, FRAME RATE IS NOT 60. Measured from the container, never
+  the filename, by two independent methods that agree.
+    VID_20260907_003930  3840x2160  245 samples / 8.153 s -> 30.05 fps
+    VID_20260907_003956  1920x1080  299 samples / 9.951 s -> 30.05 fps
+  stts cross-check, video track: dominant delta 2997 at timescale 90000
+  = 30.030 fps. (Track 1's 46.875 is AAC audio framing, not a frame rate.)
+  The user explicitly set Settings -> Video settings -> Video frame rate -> 60
+  and re-recorded; the output was still 30 fps. Open Camera stores no frame
+  rate preference key at all.
+
+  DISCRIMINATOR — the module is exonerated. The same 1080p recording was
+  repeated in `stock`, where BOTH the HAL and the sensor are unpatched:
+    VID_20260907_004852  1920x1080  289 samples / 9.624 s -> 30.03 fps
+    stts dominant delta 2997/3000 at 90000 -> 30.00-30.03 fps
+  30 fps in `stock` as well, so the behaviour is MODE-INDEPENDENT and is not
+  caused by this module. C-13's "unaffected" half is therefore supported; its
+  "1080p60 and 4K60" half could not be exercised at 60 fps at all.
+  Recorded as FIND-9.2-07 rather than silently passed or silently failed.
+  Note this is NOT the AGC video defect of regression-v2.1.md section 6 — that
+  one blacks the preview and prevents recording entirely. Open Camera recorded
+  cleanly in every mode tried here; only the rate is wrong.
+
+--- INCIDENTAL RESULTS, obtained because the switches were already needed ---
+
+PC-08 (C-08) 50MP excludes DCG and LN ...................... CONFIRMED ON DEVICE
+  PC-08 asks for on-device confirmation by switching modes and re-reading
+  hal.state and the sensor variant in one snapshot. Observed directly:
+    50mp : sensor 9e4d0fe1a8bf2eb4146c9917a0ac2c4c (stock), HAL fullres
+                  (camera.qcom.so fe0245a4720fb07b01d96deef47f5569)
+    dcgB : sensor ee73da4e8f4f542161e7faa2a8a2141e (dcgB),  HAL stock
+                  (camera.qcom.so c3fa63a86ee3ecaf9fbf02005d35f6b5)
+  The patched layers swap; they are never both patched. Ontology invariant 4
+  holds by observation, not only by reading setmode.sh:179-190.
+
+PC-01 scope note (C-01) .................................... NOW EXERCISED
+  The user approved a switch to a sensor mode and back. In `50mp` the selected
+  mode is a HAL-layer mode and the sensor is stock BY DESIGN, so PC-01's
+  `sensor.live.variant` equality does not apply there and C-01's claim (the
+  driver receives 12-bit/DCG/LN) is not exercised by the 50mp snapshot. In
+  `dcgB` the live sensor blob IS the dcgB blob, ee73da4e..., so the sensor
+  layer variant equals the selected mode and C-01 is exercised on its own
+  terms. The scope note is resolved.
+
+LANGUAGE PERSISTENCE — a suspected defect, tested and NOT confirmed.
+  After the Action press the lang file read `en` again despite having been set
+  to `tr`, with an mtime later than the write. Rather than assume the mode
+  switch reset it, the switch was isolated: lang set to `tr`, then a pure
+  `setmode.sh stock` performed with no UI involved. Lang read `tr` afterwards
+  and action.sh info reported `stock|aktif|9e4d0fe1...|tr|stock`.
+  setmode.sh does NOT reset the language. The earlier reset happened while the
+  user was in the KernelSU manager WebUI, so the WebUI is the remaining
+  candidate. NOT raised as a finding, because it was not isolated to a cause
+  and one unexplained observation is not a defect report.
+
+--- CLOSING BRACKET — zero drift ---
+snapshots/20260907-0052__Faz9.2__VALMANUAL-closing-bracket.txt
+Comparable region 47 lines, BYTE-IDENTICAL to the IMPL-81/IMPL-82 known-good
+bracket (20260906-2346__release__VALMANUAL-PC01.txt), zero differing lines,
+after six mode transitions and two language changes.
+
+  mode 50mp | sensor 9e4d0fe1a8bf2eb4146c9917a0ac2c4c stock
+  HAL fe0245a4720fb07b01d96deef47f5569 fullres | lang en
+  prefs.trap.armed = 0   <- asserted on `armed`, never on count (count 2 is
+                            the pre-existing baseline, both keys at 0)
+  agc.pref_48m = 0 | agc.pref_resolution = full
+  agc.photo_size.back.derived = 4096x3072 | back.mp = 12.58
+  agc.photo_size.front.derived = 3264x2448
+  agc.apk.md5 ce65f862c990e2acc02be356f75a7122
+
+AGC PREFS MD5 MOVED, AND THE PINNED CONFIGURATION DID NOT.
+  21762bdcb09f107aad2f397351cf1337 -> 07912a88e63284f090954adfc6d7629c
+  The guard held across the PC-05 capture; the md5 moved later, across the mode
+  switches, which restart the camera stack. IMPL-52 measured that
+  pref_camera_picturesize_back_key is DERIVED and re-derived at every AGC
+  start, so a changed md5 after a stack restart is expected and is not by
+  itself a regression. All four pinned fields were re-read individually and are
+  intact: back 4096x3072, resolution full, front 3264x2448, pref_48m_key 0.
+  The 47-line comparable region being byte-identical is the stronger statement.
+
+--- SCOPE ---
+Rear camera, one device, one session. Nothing here is evidence about the front
+camera. AGC remains pinned at 12.58 MP by design; the 50.33 MP path is Open
+Camera's BLOB path. Writing "AGC now captures at 50 MP" would be a false claim.
