@@ -1,0 +1,38 @@
+# IMPL-89 evidence - independent re-derivation of IMPL-88 frame timing
+# taken   : 2026-09-10T12:31:41 local, host-only, no device contact
+# purpose : confirm by a second method, without ffmpeg, that the IMPL-88 clause (b) shortfall is a
+#           decode-order artifact and that presentation-order frame intervals sit at 60 Hz.
+# method  : own MP4 parser; video trak only; tkhd 16.16 dims, mdhd timescale; decode times from
+#           stts, presentation = decode + ctts offset, sorted; band 1350-1650 ticks = 60 Hz +/- 10 pct.
+#           Note: tkhd width/height below are printed as raw 16.16 fixed-point (divide by 65536:
+#           251658240x141557760 = 3840x2160, 125829120x70778880 = 1920x1080).
+# inputs  : host copies from IMPL-88, md5 re-checked this run:
+#   4d0ba4f7408e04f37ea355f8c155d3cd */c/Users/ahmet/AppData/Local/Temp/impl88/VID_20260909_164724.mp4
+#   b1d7c7c81bc5be481c35efaab4dfe698 */c/Users/ahmet/AppData/Local/Temp/impl88/VID_20260909_164734.mp4
+
+VID_20260909_164724.mp4 251658240x141557760 timescale 90000
+  samples (stts)          : 343  ctts present: True  ctts entries: 343  elst: [(70, -1), (57280, 0)]
+  net cadence stts        : 59.88 fps over 5.728 s
+  raw stts deltas in band : 282/343 = 82.2 pct
+  presentation deltas band: 341/342 = 99.7 pct
+  presentation cadence    : 59.88 fps (first 0.017 s, last 5.728 s)
+  top presentation deltas : [(1498, 164), (1499, 121), (1490, 15), (1507, 12), (1508, 7), (1491, 6)]
+  out-of-band pres deltas : [2997]
+  distinct ctts offsets   : 2  min/max 0 1508
+VID_20260909_164734.mp4 125829120x70778880 timescale 90000
+  samples (stts)          : 398  ctts present: True  ctts entries: 398  elst: [(66271, 1076)]
+  net cadence stts        : 60.06 fps over 6.627 s
+  raw stts deltas in band : 256/398 = 64.3 pct
+  presentation deltas band: 397/397 = 100.0 pct
+  presentation cadence    : 60.06 fps (first 0.117 s, last 6.727 s)
+  top presentation deltas : [(1498, 185), (1499, 172), (1491, 14), (1506, 9), (1507, 6), (1508, 6)]
+  out-of-band pres deltas : []
+  distinct ctts offsets   : 12  min/max 0 10517
+
+READING
+  Reproduces IMPL-88 exactly on the literal clause (b): raw stts in-band 82.2 pct (4K) and 64.3 pct (1080p).
+  Presentation-order intervals: 341/342 (the single outlier, 2997 ticks, is one dropped frame) and 397/397.
+  The 1080p clip carries 12 distinct ctts offsets up to 10517 ticks, i.e. reordered decode, which is why
+  stts deltas are not frame intervals. ffmpeg decoded 392 of 398 samples because the edit list ends at
+  0.012 + 6.627 s while the last presentation times run to 6.727 s; the file itself holds 398 samples, all
+  at 60 Hz spacing. Both clips are 60 fps. Scope: 50mp mode, stock Camera app, two clips.
