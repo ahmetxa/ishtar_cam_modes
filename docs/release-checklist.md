@@ -219,7 +219,15 @@ adb shell "su -c 'sh /data/adb/modules/ishtar_cam_modes/action.sh lang'"
 
 # PC-13  Video. Record 1080p60 and 4K60, pull, and read dimensions from the
 #        MP4 tkhd box, not the filename. For a version 0 tkhd the 16.16 width
-#        sits at body+24+52. Precedent and the dcgB video caveat are in
+#        sits at body+24+52. Frame-rate half: read the stts box (a decode-time
+#        table) for net cadence = samples / (span / timescale) and corroborate
+#        with the presentation-order per-frame deltas; the muxer stacks
+#        decode-time runs onto one stamp, so raw single-delta fractions can
+#        understate the rate. Method, the pre-stated rule and the IMPL-87 /
+#        IMPL-88 precedent (Open Camera clips ~30 fps, measured
+#        mode-independent; stock Camera app clips 60 fps) are in
+#        snapshots/20260909-1726__kamerateyit__PC13-fps-analysis.txt.
+#        Precedent and the dcgB video caveat are in
 #        docs/regression-v2.1.md section 6.
 
 # PC-14  No 27 MB binary in the archive. This is now assertion-backed: the
@@ -540,23 +548,27 @@ release does not ship on it.
 | C-10 | pass | build-release.py contents specification, webroot included | 2026-09-06 |
 | C-11 | pending | needs VAL-INSTALL | — |
 | C-12 | pending | needs VAL-INSTALL | — |
-| C-13 | pending | needs VAL-INSTALL, see regression-v2.1.md section 6 | — |
+| C-13 | pass | IMPL-88 2026-09-09: stock Camera app clips, 4K60 net 59.88 fps / 1080p60 net 60.06 fps, presentation deltas at 60 Hz, container metadata com.android.capture.fps 60.0; IMPL-87's Open Camera clips stay ~30 fps, and IMPL-85 measured the same rate in stock mode, so it is mode-independent; why the applications differ was not measured (logcat rolled), and no module-regression inference is drawn; snapshots/20260909-1726__kamerateyit__PC13-fps-analysis.txt | 2026-09-09 |
 | C-14 | pass | build-release.py --self-test, assertion A2 proven to fire | 2026-09-06 |
 | C-15 | pass | CHANGELOG.md header, module.prop points to it | 2026-09-06 |
 | C-16 | pass | customize.sh:5-9 read this session | 2026-09-06 |
 | C-17 | pending | needs VAL-INSTALL, mount counts must each read 1 | — |
 | C-18 | pass | customize.sh and halpatch.sh guards read this session | 2026-09-06 |
 
-**Totals: 8 pass, 2 waived, 8 pending. Zero fail.**
+**Totals: 9 pass, 2 waived, 7 pending. Zero fail.**
 
-**What the pending rows share.** All eight need the archive to be installed.
-`VAL-INSTALL` has never been run for this archive — it was offered to the user
-and not taken — so **the device is running module content installed before
-`IMPL-75` and `IMPL-77` changed `action.sh`, `Kullanim.txt`, `module.prop` and
-`webroot/index.html`.** Device evidence gathered today describes the *previous*
-content, not this archive. That is why those rows read `pending` and not `pass`,
-and stating it is the whole reason this format separates archive identity from
-results.
+**What the pending rows share — corrected 2026-09-09 (`IMPL-88`).** The
+original text here said `VAL-INSTALL` had never been run for this archive;
+that was true when written and was falsified later the same day: `VAL-INSTALL`
+ran **2026-09-06 and passed** (section 6a below), the device runs the `v2.2` /
+`versionCode 13` content, and every smoke bracket since reads it. What keeps
+the seven rows `pending` is that this table predates the runs that measured
+them: `IMPL-82` discharged the machine halves of `PC-01` and `PC-04`, and
+`IMPL-85` exercised `PC-05`, `PC-09`, `PC-11` and `PC-12` in full — none of
+that was transcribed here, because an implementation run does not amend a
+sub-plan artifact, a debt the `Faz9.2` ledger row records. Each row therefore
+awaits either its own probe run or the transcription of results that already
+exist; `VAL-INSTALL` no longer gates any of them.
 
 **Waivers.** `C-02` and `C-03` are one-time sensor measurements recorded in the
 journal. The sensor blobs are byte-unchanged in this release, so the claims are

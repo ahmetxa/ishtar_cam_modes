@@ -1,0 +1,152 @@
+# IMPL-88 evidence - PC-13 frame-rate half, 1080p60 and 4K60
+# taken   : 2026-09-09T17:27:01 local
+# device  : dc27e5d0 (Xiaomi 13 Ultra, AOSPA Android 15, ishtar_cam_modes v2.2 / 13, mode 50mp)
+# scope   : two user-recorded clips with the STOCK Camera app (first-party), per the
+#           user's instruction to re-test the PC-13 60 fps thread IMPL-87 left open.
+#           IMPL-87's clips were Open Camera recordings; a different consumer by design.
+#
+# PRE-STATED DECISION RULE (fixed in-session before any clip was analyzed):
+#   a clip counts as 60 fps iff stts net cadence >= 55 fps AND >= 90 pct of sample
+#   deltas sit within +/-10 pct of the timescale-implied 60 fps delta; 30 fps class
+#   by the same test against 30; profiles judged separately; no module-regression
+#   inference from any outcome.
+#
+# DECLARED DEVIATION against the literal rule (declare, don't absorb):
+#   the raw single-delta in-band fraction is 82.2 pct (4K) and 64.3 pct (1080p),
+#   below the 90 pct bar, because Android's muxer stacks runs of samples onto one
+#   decode-time stamp (stts is a decode-time table; the runs carry 1-9 tick deltas)
+#   and compensates with a long delta; each (run, compensation) pair spans exactly
+#   whole frame periods. The verdict is therefore taken on net cadence plus the
+#   presentation-order per-frame deltas (method 3), which decode-order timestamp
+#   regrouping cannot mask; the raw fraction is stated here.
+#
+# INPUTS (host copies pulled 2026-09-09 ~16:52 local; device-side md5 matched):
+#   /sdcard/DCIM/Camera/VID_20260909_164724.mp4  32691596 B  md5 4d0ba4f7408e04f37ea355f8c155d3cd
+#   /sdcard/DCIM/Camera/VID_20260909_164734.mp4   9724319 B  md5 b1d7c7c81bc5be481c35efaab4dfe698
+#   recorded by the user 2026-09-09 16:47 local, ~5-6 s each; no reboot, no mode switch.
+
+==============================================================================
+METHOD 1: stts box parsing, one-off (same method as IMPL-87; tkhd dims, mdhd
+timescale, per-sample delta histogram, net cadence = samples / (span / timescale))
+==============================================================================
+--- VID_20260909_164724.mp4 (4K) ---
+  tkhd size     : 3840x2160
+  mdhd timescale: 90000
+  stts          : 23 distinct deltas, 343 samples, span 5.73 s
+    delta    1498  x 144  ( 42.0%)  ->  60.08 fps-equivalent
+    delta    1499  x  78  ( 22.7%)  ->  60.04 fps-equivalent
+    delta       9  x  30  (  8.7%)  -> 10000.00 fps-equivalent
+    delta    1490  x  25  (  7.3%)  ->  60.40 fps-equivalent
+    delta    1489  x  10  (  2.9%)  ->  60.44 fps-equivalent
+    delta    1507  x   9  (  2.6%)  ->  59.72 fps-equivalent
+    delta    2988  x   7  (  2.0%)  ->  30.12 fps-equivalent
+    delta    1491  x   6  (  1.7%)  ->  60.36 fps-equivalent
+  net cadence   : 59.88 fps
+  raw in-band   : 282/343 = 82.2 pct (1350-1650 ticks; the literal-rule fraction, see deviation)
+
+--- VID_20260909_164734.mp4 (1080p) ---
+  tkhd size     : 1920x1080
+  mdhd timescale: 90000
+  stts          : 22 distinct deltas, 398 samples, span 6.63 s
+    delta    1498  x 126  ( 31.7%)  ->  60.08 fps-equivalent
+    delta       9  x 122  ( 30.7%)  -> 10000.00 fps-equivalent
+    delta    1499  x  88  ( 22.1%)  ->  60.04 fps-equivalent
+    delta    1491  x  12  (  3.0%)  ->  60.36 fps-equivalent
+    delta   11926  x   8  (  2.0%)  ->   7.55 fps-equivalent
+    delta    1506  x   8  (  2.0%)  ->  59.76 fps-equivalent
+    delta    1507  x   6  (  1.5%)  ->  59.72 fps-equivalent
+    delta    1508  x   6  (  1.5%)  ->  59.68 fps-equivalent
+  net cadence   : 60.06 fps
+  raw in-band   : 256/398 = 64.3 pct (1350-1650 ticks; the literal-rule fraction, see deviation)
+
+==============================================================================
+METHOD 2 (corroboration): container metadata (com.android.capture.fps) and
+decoded frame count, ffmpeg-win-x86_64-v7.1.exe via pip imageio-ffmpeg
+==============================================================================
+--- VID_20260909_164724.mp4 (4K) ---
+    com.android.capture.fps: 60.000000
+  Stream #0:0[0x1](eng): Audio: aac (LC) (mp4a / 0x6134706D), 48000 Hz, stereo, fltp, 156 kb/s (default)
+  Stream #0:1[0x2](eng): Video: hevc (Main) (hvc1 / 0x31637668), yuv420p(tv, bt709), 3840x2160, 43788 kb/s, 59.88 fps, 60 tbr, 90k tbn (default)
+decode tail: frame=  343 fps= 45 q=-0.0 Lsize=N/A time=00:00:05.73 bitrate=N/A speed=0.754x    
+
+--- VID_20260909_164734.mp4 (1080p) ---
+    com.android.capture.fps: 60.000000
+  Stream #0:0[0x1](eng): Audio: aac (LC) (mp4a / 0x6134706D), 48000 Hz, stereo, fltp, 156 kb/s (default)
+  Stream #0:1[0x2](eng): Video: hevc (Main) (hvc1 / 0x31637668), yuv420p(tv, bt709), 1920x1080, 9690 kb/s, 60.06 fps, 60 tbr, 90k tbn (default)
+decode tail: frame=  392 fps=239 q=-0.0 Lsize=N/A time=00:00:06.53 bitrate=N/A speed=3.98x    
+
+==============================================================================
+METHOD 3 (decisive): presentation-order per-frame pts-delta histogram
+(ffmpeg showinfo, 90k tbn; presentation order is what a viewer sees)
+==============================================================================
+--- VID_20260909_164724.mp4 (4K) ---
+frames decoded: 343  first pts 0.007s last pts 5.718s
+presentation pts-deltas: 342 total, 15 distinct, min 1490 max 2997 ticks
+in 60 Hz band (1350-1650 ticks): 341/342 = 99.7 pct
+  pts-delta    1498 x 164 ( 48.0%) ->  60.08 fps-equiv
+  pts-delta    1499 x 121 ( 35.4%) ->  60.04 fps-equiv
+  pts-delta    1490 x  15 (  4.4%) ->  60.40 fps-equiv
+  pts-delta    1507 x  12 (  3.5%) ->  59.72 fps-equiv
+  pts-delta    1508 x   7 (  2.0%) ->  59.68 fps-equiv
+  pts-delta    1491 x   6 (  1.8%) ->  60.36 fps-equiv
+  pts-delta    1506 x   5 (  1.5%) ->  59.76 fps-equiv
+  pts-delta    1497 x   3 (  0.9%) ->  60.12 fps-equiv
+
+--- VID_20260909_164734.mp4 (1080p) ---
+frames decoded: 392  first pts 0.000s last pts 6.510s
+presentation pts-deltas: 391 total, 8 distinct, min 1490 max 1508 ticks
+in 60 Hz band (1350-1650 ticks): 391/391 = 100.0 pct
+  pts-delta    1498 x 183 ( 46.8%) ->  60.08 fps-equiv
+  pts-delta    1499 x 168 ( 43.0%) ->  60.04 fps-equiv
+  pts-delta    1491 x  14 (  3.6%) ->  60.36 fps-equiv
+  pts-delta    1506 x   9 (  2.3%) ->  59.76 fps-equiv
+  pts-delta    1507 x   6 (  1.5%) ->  59.72 fps-equiv
+  pts-delta    1508 x   6 (  1.5%) ->  59.68 fps-equiv
+  pts-delta    1490 x   4 (  1.0%) ->  60.40 fps-equiv
+  pts-delta    1496 x   1 (  0.3%) ->  60.16 fps-equiv
+
+==============================================================================
+LOG EVIDENCE (caveated, NOT used in the verdict): CamX lines timestamped
+16:47:49, ~8-15 s AFTER both clips closed (16:47:29 / 16:47:40 mtimes), so
+they describe a post-recording reconfigure, not the recording session; the
+logcat buffer has rolled since, the recording window is unrecoverable.
+==============================================================================
+09-09 16:47:49.734 D/CAM_MiCamera2(27842): capture, isHighSpeed false
+09-09 16:47:49.765 E/CamX    (19213): [ERROR][HAL    ] camxhal3.cpp:2507 configure_streams() Get initAperture failure
+09-09 16:47:49.765 E/CamX    (19213): [ERROR][HAL    ] camxhal3.cpp:2538 configure_streams() Get customeEnable failure
+09-09 16:47:49.765 E/CamX    (19213): [ERROR][HAL    ] camxhal3.cpp:2724 configure_streams() FPS: 30 ~ 30
+
+==============================================================================
+HOST-COPY MD5 CHAIN
+==============================================================================
+4d0ba4f7408e04f37ea355f8c155d3cd *C:/Users/ahmet/AppData/Local/Temp/impl88/VID_20260909_164724.mp4
+b1d7c7c81bc5be481c35efaab4dfe698 *C:/Users/ahmet/AppData/Local/Temp/impl88/VID_20260909_164734.mp4
+
+==============================================================================
+CLOSING BRACKET: snapshots/20260909-1704__kamerateyit__bracket-C.txt
+comparable region byte-identical to bracket-A
+(snapshots/20260908-1935__kamerateyit__bracket-A.txt): 161/161 lines,
+zero-diff, measured this session on the BEGIN/END COMPARABLE regions.
+The recording session changed no module state: v2.2/13, 50mp, sensor
+9e4d0fe1, HAL fe0245a4, mounts 1/1, trap.armed=0, pref_48m=0,
+pref_resolution=full, back.derived 4096x3072.
+==============================================================================
+
+VERDICT
+  4K60    VID_20260909_164724.mp4: tkhd 3840x2160, 343 stts samples / 5.73 s,
+          net cadence 59.88 fps; 343 frames decoded; container metadata
+          com.android.capture.fps 60.000000; presentation deltas all in the
+          60 Hz band except a single 2-period gap (2997 ticks = one dropped
+          frame in 343). -> PC-13 4K60 PASS.
+  1080p60 VID_20260909_164734.mp4: tkhd 1920x1080, 398 stts samples / 6.63 s,
+          net cadence 60.06 fps; 392 frames decoded; container metadata
+          com.android.capture.fps 60.000000; 100 pct of presentation deltas
+          inside 1490-1508 ticks (60 Hz +/- 0.7 pct). -> PC-13 1080p60 PASS.
+
+  IMPL-87 CONTEXT: that session's four Open Camera clips measured ~30 fps by
+  the same stts method, under the same module state (bracket-C equals
+  bracket-A). 60 fps is functional with the module active; what differs
+  between the sessions is the recording application. WHY Open Camera's clips
+  came out 30 was not measured (the logcat window rolled) and is not claimed
+  here. No module regression inference in either direction; per the ledger,
+  none was ever drawn from this thread.
