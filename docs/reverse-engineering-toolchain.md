@@ -216,11 +216,14 @@ This procedure covers **analysis and repackaging only**, and it runs on the
 Windows host as-is.
 
 Building the ROM or the kernel is a different toolchain in a different
-environment, with a different and unrelated blocker: WSL2 is not installed, and
-provisioning it is Phase 7's entire purpose (`Faz7.1`). Nothing in this document
-unblocks a build, and the presence of a working Python interpreter here does
-**not** narrow the Phase 7 gap — that gap is a Linux environment, not an
-interpreter.
+environment. Under `DEC-24` (2026-09-10) that environment is not WSL2 on this
+host but a rented Hetzner Cloud server running Ubuntu 22.04 LTS (`DEC-22`),
+provisioned, used and deleted within one session by `docs/build-environment.md`;
+`Faz7.1` stages its inputs on GitHub and `Faz7.2` runs it. Nothing in this
+document unblocks a build, and the presence of a working Python interpreter here
+does **not** narrow the Phase 7 gap — that gap is a Linux build server, not an
+interpreter. (Corrected 2026-09-11 by `IMPL-91`; the retired sentence said
+provisioning WSL2 "is Phase 7's entire purpose".)
 
 Keep the two separate when reporting status. "The toolchain works" is true of
 this document and false of Phase 7.

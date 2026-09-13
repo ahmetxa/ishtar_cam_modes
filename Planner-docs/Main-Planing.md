@@ -72,7 +72,7 @@ What must never be compromised:
 
 **Production readiness.** Sensor-mode layer: effectively M5–M6 (validated end-to-end for a single user, released as a zip, used daily). 50 MP + AGC layer: M4 (a single dependency verified in isolation; end-to-end does not complete). Android 16: M0.
 
-**Missing critical components.** Version control. A rollback story that does not depend on manually copied md5 strings. Any automated verification. A root `README.md`. A build environment capable of compiling the ROM or kernel — WSL2 is not installed; disk is no longer the constraint at 799 GB free.
+**Missing critical components.** Version control. A rollback story that does not depend on manually copied md5 strings. Any automated verification. A root `README.md`. A build environment capable of compiling the ROM or kernel — WSL2 will not be installed: on 2026-09-10 the user decided (`DEC-24`) to build on a rented Hetzner VDS, with every input prepared on GitHub first.
 
 ## 4. Target End State
 
@@ -122,8 +122,8 @@ Phases below are the master roadmap **from the current state forward**. They do 
 | 4 | Minimal correct HAL patch | Duration rows; narrowing retired | M5 | medium |
 | 5 | Mode-0 12-bit composition | 50 MP + LN together | M5 | medium |
 | 6 | AON fix upstreaming | Remove the workaround | M4 | low |
-| 7 | Android 16 build environment | WSL2 + first AOSPA build | M3 | medium |
-| 8 | beryl port + kernel LTS | Second device, kernel merge | M5 | high |
+| 7 | Android 16 build environment | GitHub-staged inputs + first AOSPA `beryl` build on a rented VDS | M3 | medium |
+| 8 | Camera work on Android 16 + kernel LTS | Camera patches on the `beryl` vendor blobs; kernel merge | M5 | high |
 | 9 | Release engineering | Reproducible, documented releases | M6 | low |
 
 ### Phase 1 — Workspace safety net
@@ -206,29 +206,29 @@ The open question this phase must actually answer is **stickiness**, not feasibi
 
 ### Phase 7 — Android 16 build environment
 
-**Goal.** Reach the point where an AOSPA Android 16 build can actually be attempted.
+**Goal.** Reach the point where an AOSPA Android 16 (`beryl`) build for `ishtar` can be attempted, at the lowest rental cost.
 
-**Description.** Disk is no longer a blocker (C: 953 GB, 799 GB free, re-measured 2026-08-23). The remaining blocker is that **WSL2 is not installed**. Neither the kernel nor AOSP can build on Windows/NTFS; the workspace's kernel checkouts already carry 14 case-collision paths and required a sparse-checkout trick excluding three DOS-reserved filenames. Sources must be cloned inside the WSL filesystem, never under `/mnt/c`.
+**Description.** Neither the kernel nor AOSP can build on the Windows host: the workspace's kernel checkouts already carry 14 case-collision paths and needed a sparse-checkout trick excluding three DOS-reserved filenames. WSL2 will not be installed — on 2026-09-10 the user decided (`DEC-24`) to build on a rented Hetzner VDS. Rental is billed by time, so every input the build needs is prepared on the user's GitHub account (`ahmetxa`) before a server is rented: the device tree carrying the project's changes, a local manifest pinning every other input to a full commit id, and the provisioning and build procedure. The `beryl` inputs already exist upstream under `xiaomi-8550` — the device and common trees, both vendor blob repositories and both kernel trees carry `beryl` branches — so the work is pinning inputs and closing gaps, not porting. `calcite` is evaluated only after `beryl` builds and boots.
 
-**Desired end state.** A WSL2 environment that completes one AOSPA build for `ishtar`.
+**Desired end state.** One AOSPA `beryl` build for `ishtar` completed on a rented VDS from inputs staged on GitHub, with the output retrieved and the server released.
 
-**Acceptance signals.** A flashable build output exists and boots.
+**Acceptance signals.** A flashable build output exists and boots; the rental time the build consumed is recorded.
 
-**First vibecoding slice.** Install WSL2 and verify a trivial kernel `make defconfig` inside `~/`, before attempting a full ROM sync.
+**First vibecoding slice.** Before renting anything, stage the device tree and a local manifest on GitHub and prove from the Windows host that every pinned project resolves to a commit on its branch.
 
-**Note.** This phase is largely environment work and depends on user action on the host machine.
+**Note.** The server's distribution (`DEC-22`) is decided from the AOSPA build requirements before renting. Flashing and the boot check remain the user's actions.
 
-### Phase 8 — beryl port and kernel LTS merge
+### Phase 8 — Camera work on Android 16 and kernel LTS merge
 
-**Goal.** Extend the work to a second device and bring the kernel up to date.
+**Goal.** Carry the project's camera work onto the Android 16 build and bring the kernel up to date.
 
-**Description.** Port the device tree and the camera work to `beryl`, and merge GKI LTS into the kernel tree. Both are substantial and both depend on Phase 7.
+**Description.** `beryl` is AOSPA's Android 16 branch, not a second device; this phase previously read it as a second Xiaomi target, which was corrected on 2026-09-10. Phase 7 builds `ishtar` itself on `beryl`. What remains is (1) the camera module work on the vendor blobs that build ships — every HAL and sensor patch is bound to one exact vendor build (Project-Ontology invariant 10) — and (2) merging GKI LTS into the kernel tree. The `beryl` device tree's history carries the same last blob update as the Android 15 tree (`OS2.0.101.0.VMAMIXM`), so the patches may carry over unchanged; that stays unverified until the binaries are compared. Both parts depend on Phase 7.
 
-**Desired end state.** `beryl` builds and boots; the kernel tree is on a current LTS base.
+**Desired end state.** The camera modes work on the Android 16 build, and the kernel tree is on a current LTS base.
 
-**Acceptance signals.** Successful build and boot for the second target; kernel merge with no regressions in camera or sensor paths.
+**Acceptance signals.** The module's md5 guards accept the Android 16 camera HAL and sensor module, or the patches are re-derived for them, and the release checklist passes on that build; kernel merge with no regressions in camera or sensor paths.
 
-**First vibecoding slice.** Diff `device_ishtar` against the `beryl` reference tree to size the port before committing to it.
+**First vibecoding slice.** Compare the `beryl` vendor blobs' `camera.qcom.so` and IMX989 sensor module against the md5s the module guards, before committing to any re-derivation.
 
 ### Phase 9 — Release engineering
 
@@ -262,7 +262,7 @@ The open question this phase must actually answer is **stickiness**, not feasibi
 
 **R8 — Vendor blob dependency (severity: medium, structural).** Every patch is bound to one exact build of `camera.qcom.so` (27,268,688 bytes, md5 recorded in the patch table). *Impact:* any AOSPA update that changes the blob invalidates all sixteen-plus offsets at once. *Mitigation:* keep the md5 guard as the detector, and keep the disassembly *method* documented so offsets can be re-derived rather than re-discovered from scratch.
 
-**R9 — Windows host cannot build (severity: medium).** No WSL2; NTFS case-insensitivity already breaks kernel checkouts. *Impact:* Phases 7 and 8 cannot start. *Mitigation:* Phase 7 is scoped as environment work; disk is no longer part of the problem.
+**R9 — Windows host cannot build (severity: medium).** NTFS case-insensitivity already breaks kernel checkouts, and WSL2 will not be installed. *Impact:* nothing builds locally, so every build is paid server time. *Mitigation:* `DEC-24` — build on a rented Hetzner VDS with every input staged on GitHub and resolved before renting, so rental time is spent building rather than discovering missing inputs.
 
 **R10 — Token/context risk in reverse-engineering phases (severity: medium).** Phase 3 involves disassembling a 27 MB stripped binary. *Impact:* long sessions, context exhaustion, repeated re-derivation. *Mitigation:* record every located address in the ontology immediately, not at the end of the session; prefer scripted extraction over interactive exploration.
 
@@ -295,7 +295,7 @@ The open question this phase must actually answer is **stickiness**, not feasibi
 
 **Ontology terms Step 2 must keep consistent.** *Sensor layer* vs *HAL layer* vs *application layer*; *mode* as the single-file runtime state; *patch table* as an offset+md5 triple list; *stock* as both a mode name and a restore target; *fullres* as the HAL state, distinct from *50mp* as the mode name.
 
-**Subagents.** Not recommended by default for this project. The work is deep rather than broad, the evidence is concentrated in a few large files the parent already holds, and device state is stateful and easy to corrupt with parallel access. Consider a bounded read-only explorer only for the Phase 8 device-tree diff.
+**Subagents.** Not recommended by default for this project. The work is deep rather than broad, the evidence is concentrated in a few large files the parent already holds, and device state is stateful and easy to corrupt with parallel access. Consider a bounded read-only explorer only for Phase 8's comparison of the Android 16 vendor blobs against the module's md5 guards.
 
 **Token/context risk and validation checkpoints.** **Corrected 2026-09-04 (`AUDIT-FIX-20`, deferred since the `DEC-14` re-plan and folded into this amendment rather than left for a third edit of this file).** Phases 1, 2, 3, 6, 9: low. Phases 4, 5, 7: medium. Phase 8: high — the bands now agree with section 6's table, which this paragraph had contradicted, and Phase 8 is no longer omitted from the list. The retired text banded Phase 3 `high` and instructed a checkpoint "after every located address by writing it into the ontology before continuing"; that described the write-site search in a 27 MB stripped binary which `DEC-14` retired. The replacement Phase 3 is configuration work, and its checkpoint is the bracketed `scripts/smoke.sh` snapshot plus the eight-item per-measurement checklist in `docs/phase3-preconditions.md`, run before any result is recorded. `Faz3.10` alone rises to medium, on run count rather than analysis depth.
 
