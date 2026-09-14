@@ -1,0 +1,57 @@
+IMPL-94 — Faz7.2 F7.2-01 pre-rental gate record
+Date: 2026-09-13 (UTC times below). Host: Windows, Git Bash. Text only: no address, no key, no token.
+Sub-plan: Planner-docs/Faz-7-Plans/Faz7.2-first-aospa-build.md. Runbook: docs/build-environment.md.
+Audit basis: tenth Step 3 audit, PASS_WITH_WARNINGS, no P0/P1. Active findings kept visible:
+AUDIT-FIX-22, -25, -33, -37, -41, -42, -50, -52, -53, -54 (this session owns -52, -53, -54).
+
+GATE RESULT: NOT PASSED — no rental today. Rental approval was not requested.
+  Reason: manual check 4 (10-hour window) answered No; checks 1 and 2 not yet performed.
+
+1. Runbook section 5 scripted block, run as written (before the edit)
+   Run 18:35:12Z–18:35:48Z. GH = WinGet gh.exe; python (not python3); TMPDIR = session scratchpad, outside the workspace.
+   Exit status: 0. Final line: "pre-rental checks passed".
+   Covered: manifest clone HEAD = 22283d8a866d042e02336fcb4698253ac6bf9c3b; check.py all OK ("resolved");
+   negative case exit 1 with "14 element(s) failed"; both ahmetxa repositories private=false.
+
+2. Runbook edit (one change set, docs/build-environment.md)
+   a. Section 10 built-symlink test: $OUT/odm/lib64/camera/aon_front.pb -> $OUT/vendor/lib64/camera/aon_front.pb,
+      readlink kept, else message names the vendor path, header names the expected target.
+      Expected readlink target: /odm/lib64/camera/aon_front.pb (AOSPA extract-utils install_symlink;
+      entry at refs/a16_ishtar/proprietary-files.txt:1037, re-read today:
+      odm/lib64/camera/aon_front.pb;SYMLINK=vendor/lib64/camera/aon_front.pb). Any other target is a failure.
+   b. Section 4 (AUDIT-FIX-52): a sync failure matching a sync-path detector in the table (shallow sync of a
+      vendor/xiaomi/* blob repository, or vendor/xiaomi/camera) gets its listed fix, counted against the 2 attempts.
+   c. Section 5 (AUDIT-FIX-53): read-only gh api check that AOSPA/manifest beryl HEAD = 7dfc0650e27ec43b1d5cedf5e74213cf8667f2c2;
+      a mismatch exits 1 before renting.
+   d. AUDIT-FIX-54: section 10's repo manifest -r and section 11's package/image copies made record-and-continue
+      (section 11 writes retrieval.txt: retrieved / NOT PRODUCED / COPY FAILED per artifact, and always writes SHA256SUMS);
+      the operator rule is also recorded: a remaining non-zero exit in 10 or 11 means record the failing line,
+      run the rest by hand, retrieve what exists, never skip teardown.
+   Validation:
+   - bash -n on all 9 scripted blocks: OK (touched: section 5, section 10, section 11 server block).
+   - New section 5 check run alone at 18:37:53Z: "base check passed" (HEAD dated 2026-05-24T04:58:20Z).
+   - Scratch dry run, no build tree: section 10 continued past a failing repo stub and wrote build-evidence.txt
+     and manifest-resolved.err (its final tar failed only on Windows GNU tar reading a C: path as a remote host;
+     not applicable on the Linux server). Section 11 exited 0, listed all 9 expected artifacts NOT PRODUCED,
+     and wrote SHA256SUMS over evidence.tar.gz and retrieval.txt.
+   - File remains UTF-8 LF; diff read back.
+   Recorded disagreement: DEC-25 item (3) reads "a sync failure stops the session" without the sync-path exception.
+   The runbook now carries the exception, by the tenth audit's Faz7.2 row and the user's instruction for this session;
+   DEC-25's text itself was not edited.
+
+3. Manual checks (user answers, 2026-09-13 ~18:40Z)
+   1. Hetzner Console Limits tab allows one CCX53: NOT YET CHECKED ("I havent tried yet").
+   2. Public SSH key present in the Console: NOT YET CHECKED ("I havent looked yet").
+   3. ~/Documents/Projeler/ishtar-builds/ exists outside every repository: did not exist; created at the user's request
+      at 18:40:08Z; git rev-parse from it finds no repository; no .git in ~/Documents/Projeler. PASS.
+   4. The 10-hour ceiling fits today: NO. FAIL.
+
+4. Stopping rule re-read (DEC-25; runbook section 4), stated back
+   1. Clock runs from the Console showing the server created to deletion of the server and its Primary IP; ceiling 10 h (~EUR 8.6 + VAT).
+   2. Sync failure: stop, collect section 10 evidence, tear down — unless it matches the shallow-sync or vendor/xiaomi/camera detector, which gets that row's fix.
+   3. Build failure: only manifest class (table detector, missing project, wrong branch or commit) gets a fix; at most 2 attempts in the whole session, sync-path fixes included.
+   4. Any other error class: stop, retrieve, tear down; the error becomes a replanning input. Fixes edit ishtar-beryl.xml on the server, go in fixes.diff, are never pushed in-session.
+   5. Hour 8, whatever the state: retrieve what exists (10, 11), pass sha256sum -c, delete server and every Primary IP (never shut down).
+
+Next time (fresh rental-day session): re-run section 5 (now including the base check) on that day, confirm checks 1, 2 and 4
+(3 stays satisfied if the directory still exists), then ask for rental approval. Runbook edit is uncommitted.

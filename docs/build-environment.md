@@ -82,7 +82,10 @@ and [Hetzner Cloud FAQ](https://docs.hetzner.com/cloud/general/faq/):
 - **Ceiling.** 10 hours, about €8.6 plus VAT at the section 3 price.
 - **Sync failure** (`repo sync`, or barista's "Unexpected exit status from the
   brewing process" in the build log): stop. Retrieve the evidence in section
-  10, then tear down.
+  10, then tear down. **Exception (`AUDIT-FIX-52`):** a sync failure that
+  matches a sync-path detector in the table below — the shallow sync of a
+  `vendor/xiaomi/*` blob repository, or `vendor/xiaomi/camera` — gets that
+  row's fix attempt, counted against the same 2 attempts as a build failure.
 - **Build failure:** classify it. Only a manifest-class error — a deferred
   item's detector in the table below, a missing project, or a wrong branch or
   commit — gets a fix attempt, and at most **2** attempts in the session. Any
@@ -128,6 +131,11 @@ grep -qx '14 element(s) failed' "$work/neg.txt"
 for r in ahmetxa/android_local_manifests ahmetxa/android_device_xiaomi_ishtar; do
   test "$("$GH" api "repos/$r" --jq .private)" = false
 done
+base="$("$GH" api repos/AOSPA/manifest/commits/beryl --jq .sha)"
+if [ "$base" != 7dfc0650e27ec43b1d5cedf5e74213cf8667f2c2 ]; then
+  echo "AOSPA/manifest beryl moved past the pin ($base): stop, do not rent (AUDIT-FIX-53)"
+  exit 1
+fi
 echo "pre-rental checks passed"
 ```
 
@@ -271,18 +279,22 @@ export PATH="$HOME/.bin:$PATH"
 cd ~/beryl
 E=~/evidence
 OUT=out/target/product/ishtar
-repo manifest -r -o "$E/manifest-resolved.xml"
-if grep -nE '://[^/" ]+@' "$E/manifest-resolved.xml"; then
-  echo "credential-shaped URL in the resolved manifest: do not copy it"; exit 1
+if repo manifest -r -o "$E/manifest-resolved.xml" 2> "$E/manifest-resolved.err"; then
+  if grep -nE '://[^/" ]+@' "$E/manifest-resolved.xml"; then
+    echo "credential-shaped URL in the resolved manifest: do not copy it"; exit 1
+  fi
+else
+  rm -f "$E/manifest-resolved.xml"
+  echo "repo manifest -r failed: recorded in manifest-resolved.err, continuing"
 fi
 {
   echo "== consumed tree entry"
   grep -n 'aon_front.pb' device/xiaomi/ishtar/proprietary-files.txt || echo "aon_front.pb entry MISSING"
-  echo "== built symlink"
-  if [ -L "$OUT/odm/lib64/camera/aon_front.pb" ]; then
-    echo "symlink -> $(readlink "$OUT/odm/lib64/camera/aon_front.pb")"
+  echo "== built symlink (expected target /odm/lib64/camera/aon_front.pb)"
+  if [ -L "$OUT/vendor/lib64/camera/aon_front.pb" ]; then
+    echo "symlink -> $(readlink "$OUT/vendor/lib64/camera/aon_front.pb")"
   else
-    echo "odm/lib64/camera/aon_front.pb is NOT a symlink or does not exist"
+    echo "vendor/lib64/camera/aon_front.pb is NOT a symlink or does not exist"
   fi
   echo "== camera blobs (md5, size, path)"
   for f in odm/lib64/hw/camera.qcom.so odm/lib64/hw/camera.xiaomi.so \
@@ -308,6 +320,19 @@ tar -C ~ -czf ~/out-pkg/evidence.tar.gz evidence
 The evidence list serves `Faz8.1` (the three blob md5s and sizes) and `Faz7.3`
 (the `aon_front.pb` entry and the built symlink). Elapsed time per stage is in
 `timeline.txt`.
+
+**Where the symlink is built.** The entry
+`odm/lib64/camera/aon_front.pb;SYMLINK=vendor/lib64/camera/aon_front.pb`
+(`refs/a16_ishtar/proprietary-files.txt:1037`) installs the regular file at
+`$OUT/odm/lib64/camera/aon_front.pb`. AOSPA extract-utils' `install_symlink`
+module creates the symlink at `$OUT/vendor/lib64/camera/aon_front.pb`, and its
+expected `readlink` target is `/odm/lib64/camera/aon_front.pb`. Any other target
+is a failure, not a pass.
+
+**Operator rule for sections 10 and 11 (`AUDIT-FIX-54`).** Both blocks record a
+missing file and continue. If either still exits non-zero, record the failing
+line, run the remaining lines by hand, retrieve what exists, and never skip
+teardown.
 
 ## 11. Retrieval with sha256 at both ends (`AUDIT-FIX-44`)
 
@@ -335,18 +360,32 @@ set -euo pipefail
 cd ~/beryl
 OUT=out/target/product/ishtar
 P=~/out-pkg
-test "$(ls -1 aospa-*-image.zip | wc -l)" -eq 1
-test "$(ls -1 aospa-*.zip | wc -l)" -eq 2
-cp aospa-*.zip "$P/"
-for i in boot init_boot vendor_boot dtbo recovery vbmeta vbmeta_system; do
-  cp "$OUT/$i.img" "$P/"
+R="$P/retrieval.txt"
+: > "$R"
+# A missing artifact is recorded, not fatal (AUDIT-FIX-54). Expected: one aospa-*-image.zip, two aospa-*.zip.
+for z in aospa-*.zip; do
+  [ -f "$z" ] || continue
+  if cp "$z" "$P/"; then echo "retrieved      $z" >> "$R"; else echo "COPY FAILED    $z" >> "$R"; fi
 done
-( cd "$P" && sha256sum -- * > SHA256SUMS )
+[ "$(ls -1 "$P"/aospa-*-image.zip 2>/dev/null | wc -l)" -eq 1 ] || echo "NOT PRODUCED   aospa-*-image.zip (expected exactly 1)" >> "$R"
+[ "$(ls -1 "$P"/aospa-*.zip 2>/dev/null | wc -l)" -eq 2 ] || echo "NOT PRODUCED   aospa-*.zip (expected exactly 2)" >> "$R"
+for i in boot init_boot vendor_boot dtbo recovery vbmeta vbmeta_system; do
+  if [ ! -f "$OUT/$i.img" ]; then
+    echo "NOT PRODUCED   $i.img" >> "$R"
+  elif cp "$OUT/$i.img" "$P/"; then
+    echo "retrieved      $i.img" >> "$R"
+  else
+    echo "COPY FAILED    $i.img" >> "$R"
+  fi
+done
+( cd "$P" && rm -f SHA256SUMS && sha256sum -- * > SHA256SUMS )
+cat "$R"
 du -sh "$P"
 ```
 
-If the build failed, only `evidence.tar.gz` exists: run
-`( cd ~/out-pkg && sha256sum -- * > SHA256SUMS )` alone.
+If the build failed, the same block records every package and image as
+`NOT PRODUCED` and still writes `SHA256SUMS` over `evidence.tar.gz` and
+`retrieval.txt`.
 
 On the Windows host (Git Bash):
 

@@ -1,0 +1,108 @@
+DEC-26 — Scaleway rental handover, received 2026-09-14
+Source: a separate AI conversation the user held about renting the build server. The user pasted its
+handover into this session on 2026-09-14. Kept verbatim below as the primary record. Text only: no address,
+no key material, no token. The claims are the other conversation's, NOT verified by this project; see the
+check notes at the end.
+
+===== BEGIN HANDOVER (verbatim) =====
+# Handover: Android ROM/Kernel Compilation Server Setup
+
+## Context
+I am setting up a cloud server to compile custom ROMs and up-to-date kernels for my phone. I tried Hetzner Cloud but could not rent a server more powerful than the CCX33 due to new account limits. Therefore, I switched to Scaleway.
+
+## Decisions Made
+
+**Provider:** Scaleway (account opened and verified; server rental is enabled). Hourly billing; Payments stop when the server is deleted.
+
+**Instance type:** POP2-16C-64G — 16 dedicated vCPUs, 64 GB RAM, AMD EPYC, x86_64, €0.59/hour.
+Selection criteria:
+- The AOSP build system requires an x86_64 Linux host. At Scaleway, the letter "A" in the name indicates ARM (Ampere Altra), while "X" and the POP2 family indicate x86_64. The entire STANDARD2-A / BASIC2-A series was eliminated because they are arm64.
+- Requirement for a 4 GB RAM-per-core ratio. When compiling Android 14+, each `clang` process consistently uses ~2 GB; with 16 cores, 32 GB results in an OOM (Out of Memory) error.
+- The COMPUTE3-X and POP2-HC families were eliminated because they offer 2 GB/core; the MEMORY3-X and POP2-HM families (8 GB/core) were eliminated due to excessive cost.
+- An alternative was identified for sessions where I will only compile kernels: the POP2-8C-32G (€0.29/hour).
+
+**Operating System:** Ubuntu 24.04 LTS (AOSP/LineageOS documentation assumes this; the necessary 32-bit support is available in the repository). **SSH key:** ed25519 key included, passphrase saved, added to the
+Scaleway account. Completed.
+
+**Volume capacity (610 GB total, included):**
+| Volume | Tier | to you | Content |
+|----------|----------|----------|---------------------------------|
+| Boot | 5K | 40GB | System, packages, swap |
+| Source | 5K | 310GB | .repo + source product + ccache |
+| Work | 15K | 260GB | out/ directory |
+
+Rationale: The IOPS tier is defined per volume; splitting them increases
+total IOPS. The source tree—read-heavy—is placed in the cheaper 5K tier,
+while the `out/` directory—involving constant small-file writes—is in
+the 15K tier.
+Note: The provider sells in GB (decimal), while Linux reports in GiB—
+310 GB results in ~288 GiB on the server. Volumes can be expanded
+(hot resizing + resize2fs) but cannot be shrunk.
+
+## Current Status
+I have finalized the volume configuration but have not yet created or
+launched the server. Next step: launch the server, set up the operating
+system, and archive the build environment. ## Agreed-Upon Setup Steps
+
+mkfs.ext4 -m 0 /dev/sdb # Source
+mkfs.ext4 -m 0 /dev/sdc # Working
+mkdir -p /android /android/out
+mount -o noatime,nodiratime /dev/sdb /android
+mount -o noatime,nodiratime /dev/sdc /android/out
+
+export OUT_DIR=/android/out
+export CCACHE_DIR=/android/ccache
+export USE_CCACHE=1
+ccache -M 60G # Note 100G; to fit within the Source volume
+
+Disk identifiers to be confirmed via `lsblk`. RAID will not be used.
+Monitoring during compilation: `watch -n 60 df -h /android /android/out`
+
+## Cost Notes
+- IPv4 address is not included in the instance price; there is an additional hourly charge of 0.004 EUR.
+- Block storage (5K tier) costs ~0.087 EUR per GB/month; the The 15K tier is more expensive.
+Volume charges continue to accrue even when the server is powered off.
+- If the server is deleted via the CONSOLE, attached volumes remain;
+if deleted via the API, all attached volumes are deleted as well.
+- Cost-saving strategy: The working volume (output/reproducible data) can be deleted
+along with the server, while the source volume (source code + ccache) is retained.
+
+## My Next Questions
+After creating the server, I need assistance with setting up the AOSP/LineageOS
+build environment on Ubuntu, syncing the repo, and performing the initial build.
+===== END HANDOVER =====
+
+Check notes, 2026-09-14 (this project, read-only; no rental)
+
+Measured:
+- ccache. AOSPA beryl uses ccache only when BOTH USE_CCACHE and CCACHE_EXEC are set:
+  AOSPA/android_build beryl core/ccache.mk lines 29-32 (the guard) and 54-58 (CC_WRAPPER/CXX_WRAPPER := $(CCACHE_EXEC)).
+  Soong binds "ccache -k cache_dir" into the nsjail sandbox only when CCACHE_EXEC is set
+  (AOSPA/android_build_soong beryl ui/build/sandbox_linux.go lines 310-314).
+  The handover sets USE_CCACHE=1 and CCACHE_DIR but not CCACHE_EXEC, so as written ccache would be inactive.
+  A cold cache also does not speed up a first build.
+- Sizing against runbook section 2 (AOSP requirements page, quoted there): 64 GB RAM equals the stated
+  "minimum of 64 GB of RAM" with no margin (the CCX53 had 128 GB); 610 GB total clears the 400 GB floor.
+
+Conflicts with recorded project decisions:
+- DEC-25 (1) server: Hetzner CCX53 -> Scaleway POP2-16C-64G. DEC-25 (4) billing basis was Hetzner's.
+- DEC-22 OS: Ubuntu 22.04 answered; 24.04 was the fallback with the AppArmor sysctl (runbook section 7).
+  The handover's claim that the documentation "assumes" 24.04 does not match runbook section 2's quote
+  ("Ubuntu 18.04 or later").
+- DEC-25 (2) ceiling: 10 h and the hour-8 rule were sized on 32 vCPU; 16 vCPU roughly halves compile throughput.
+- DEC-25 teardown: zero resources left. The handover proposes retaining the source volume.
+- OUT_DIR=/android/out: runbook sections 9-11 and AOSPA's packaging paths use relative out/target/product/ishtar.
+  Mounting the work volume at <tree>/out keeps those paths and needs no OUT_DIR.
+- mkfs on /dev/sdb and /dev/sdc by kernel name: attachment order is not a stable identity, and formatting a
+  retained source volume would destroy it. Identify volumes by ID and size, and skip mkfs when blkid finds a filesystem.
+- Build user: runbook section 7 builds as `builder`, not root; the mount points need that owner.
+- Boot volume: runbook section 11 stages the retrieval set in ~/out-pkg, which would sit on the 40 GB boot volume with the swap.
+
+Scope notes:
+- The project builds AOSPA beryl, not LineageOS. The kernel is built inline by the same ./rom-build.sh run from
+  kernel_platform, so it needs no volume of its own. A standalone kernel build (the LTS merge scoped by Faz8.2,
+  DEC-08 recommendation defer) is not planned; POP2-8C-32G is recorded as an alternative only.
+
+Unverified (to be read from Scaleway's own documentation before the runbook is rewritten, AUDIT-FIX-43 standard):
+hourly billing and whether a stopped instance bills; block volume billing by tier; Console versus API deletion of
+attached volumes; flexible IPv4 billing and whether it survives instance deletion; snapshot billing; all prices.

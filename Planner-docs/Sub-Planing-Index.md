@@ -260,19 +260,20 @@ The revised Phase 4 order is:
 **The revised order for the Android 16 front:**
 
 1. **`Faz7.1`** — host-only and free. Nothing that costs money or touches the device can start before it.
-2. **`Faz8.1`, static half only (`F8.1-01` to `F8.1-05`)** — pulled ahead of the rental because it is a read-only comparison of two files at the pinned vendor commit, and it needs `Faz7.1` only to confirm that pin. If the HAL differs, the user learns that the camera work does not carry over before paying for a build.
+2. **`Faz8.1`, static half only (`F8.1-01` to `F8.1-05`, plus `F8.1-08` and `F8.1-09` on static values, as `Faz8.1` section 10 defines it)** — pulled ahead of the rental because it is a read-only comparison of two files at the pinned vendor commit, and it needs `Faz7.1` only to confirm that pin. If the HAL differs, the user learns that the camera work does not carry over before paying for a build. **Ran as `IMPL-92` (2026-09-11): both layers carry-over on static values.** Boundary aligned with `Faz8.1` by planning run 19 (`AUDIT-FIX-47`).
 3. **`Faz8.2`** — may run in parallel with steps 4 and 5 once `Faz7.1` `F7.1-05` names the consumed kernel. It needs no build and no server.
 4. **`Faz7.2`** — the paid session, only after `Faz7.1`'s transition criteria hold on the day.
 5. **`Faz7.3`** — the flash, only with a retrieved, verified package and a recorded return path.
-6. **`Faz8.1`, agreement half (`F8.1-06`, `F8.1-07`)**, then **`Faz8.3`** — the functional test, only on a carry-over classification.
+6. **`Faz8.1`, agreement half (`F8.1-06`, `F8.1-07`)**, then **`Faz8.3`** — the functional test, only when both layers are carry-over.
 
-**Two sequencing points are decided here explicitly.** First, `Faz8.1`'s static half runs before the rental even though it is numbered in Phase 8. That is execution order, not renumbering, and `Faz6.1` is the precedent. Second, a re-derivation label from `Faz8.1` does **not** schedule disassembly. It blocks `Faz8.3` and raises a ledger section 7 replanning input, because a HAL re-derivation on a new binary is the one piece of Phase 8 that Main-Planing bands `high` and that nobody has yet decided to do (`DEC-07`).
+**Two sequencing points are decided here explicitly.** First, `Faz8.1`'s static half runs before the rental even though it is numbered in Phase 8. That is execution order, not renumbering, and `Faz6.1` is the precedent. Second, a re-derivation label from `Faz8.1` does **not** schedule disassembly. It blocks `Faz8.3` and raises a ledger section 7 replanning input, because a HAL re-derivation on a new binary is the one piece of Phase 8 that Main-Planing bands `high` and that nobody has yet decided to do (`DEC-07`). **Added 2026-09-13 by planning run 19 (`AUDIT-FIX-46`):** a sensor adaptation label is routed the same way. It blocks `Faz8.3` and raises a replanning input, because no sub-plan adapts a blob and an adapted blob cannot pass the unchanged v2.2 archive's `EXPECT_MD5`.
 
 **What this amendment does not claim.** It does not audit the six sub-plans; Step 3 must run first. It does not change `Main-Planing.md`, whose section 9 *Do not expand yet* paragraph is recorded in section 2 as a known ambiguity.
 
 ## 5. Out-of-Scope or Deferred Topics
 
 - **A HAL offset re-derivation on the Android 16 blobs.** Only the comparison that decides whether one is needed is planned (`Faz8.1`). If the HAL differs, `DEC-07` and a ledger section 7 replanning input follow; the disassembly itself is not decomposed. The former second-device port is not deferred but void, because `beryl` is a branch, not a device.
+- **Sensor-layer adaptation on the Android 16 blob.** If `Faz8.1` finds the IMX989 sensor module changed with its container format intact, regenerating `blobs/*.bin` from the new stock input would also change `EXPECT_MD5`, and so need a new release. Only the classification is planned: `DEC-07` and a ledger section 7 replanning input follow, and `Faz8.3` stays blocked. Added 2026-09-13 by planning run 19 (`AUDIT-FIX-46`); `IMPL-92` found the sensor module unchanged on static values.
 - **The kernel LTS merge itself.** Only scoping is planned (`Faz8.2`), without a checkout, a build or a rented server. A commit under `DEC-08` would need a rented build, a flash with `Faz7.3`'s return path, and the checklist's camera rows. That work is not decomposed.
 - **`calcite`.** Evaluated only after `beryl` builds and boots, per Main-Planing Phase 7 and the manifest repository's `README.md`.
 - **Release signing and release targeting for Android 16 builds.** The first build uses AOSPA's default signing. Release keys, and whether Android 16 becomes a release target at all, are Phase 9 decisions made after `Faz8.3`'s evidence.
@@ -353,7 +354,7 @@ The revised Phase 4 order is:
 
 **Validator status amendment, 2026-09-01 (Phase 4 re-plan run).** A Python interpreter is now available on this host, and the bundled validator was executed for this run rather than emulated. ~~It reports **11** warnings in `--mode step2 --strict`, and that is the correct baseline for a Step 2 run at commit `947a01b`.~~ **Discharged 2026-09-05 (`AUDIT-FIX-24`): the eleven warnings were resolved by `AUDIT-FIX-11` and the current baseline is zero.** Re-measured this run and by Step 3's sixth audit: `--mode step2 --strict` reports `warning_count=0` and `error_count=0`. The reasoning below about mode differences is retained because it is still correct about *why* the modes differ; only the number is stale. The **12**-warning figure recorded in `IMPL-24` and `IMPL-25` is the `--mode step3` / `--mode step4` baseline: those modes read `Sub-Planing-Audit.md` and add one further warning, `step4_has_nonblocking_warnings=P2:2,P3:3`, which no Step 2 run can produce. The eleven are unchanged in identity and count before and after this run's edits, so the `FIND-1.4-01` baseline is held; the mode, not the baseline, is what differs.
 
-**Ninth re-plan run, 2026-09-10 (planning run 18, Phases 7 and 8 under `SNAP-2026-09-10-MAIN`).** Scope: the Step 2 half of the section 7 trigger that `DEC-24` fired, which planning run 17 left outstanding. **Files written:** `Planner-docs/Faz-7-Plans/Faz7.1-github-input-staging.md`, `Faz7.3-flash-boot-and-aon-verification.md`, `Planner-docs/Faz-8-Plans/Faz8.1-android16-camera-blob-comparison.md` and `Faz8.3-camera-modes-on-android16-build.md` (new); `Faz7.2-first-aospa-build.md` and `Faz8.2-kernel-lts-merge-scoping.md` (rewritten at their paths); this index (banner, sections 2, 3, 4, 4d, 5, 6 and 7); and `Planner-docs/Planing-Ledger.md` (sections 2, 3, 4, 6, 7 and 8). The former Phase 7.1 and Phase 8.1 files were **removed**: their premises no longer exist, and keeping them would leave two sub-plans per number. All six sub-plans use CRLF line endings like their siblings. `Main-Planing.md`, `Autopsy.md`, `Project-Ontology.md`, `Project-Comprehension.md` and `Sub-Planing-Audit.md` were not edited.
+**Ninth re-plan run, 2026-09-10 (planning run 18, Phases 7 and 8 under `SNAP-2026-09-10-MAIN`).** Scope: the Step 2 half of the section 7 trigger that `DEC-24` fired, which planning run 17 left outstanding. **Files written:** `Planner-docs/Faz-7-Plans/Faz7.1-github-input-staging.md`, `Faz7.3-flash-boot-and-aon-verification.md`, `Planner-docs/Faz-8-Plans/Faz8.1-android16-camera-blob-comparison.md` and `Faz8.3-camera-modes-on-android16-build.md` (new); `Faz7.2-first-aospa-build.md` and `Faz8.2-kernel-lts-merge-scoping.md` (rewritten at their paths); this index (banner, sections 2, 3, 4, 4d, 5, 6 and 7); and `Planner-docs/Planing-Ledger.md` (sections 2, 3, 4, 6, 7 and 8). The former Phase 7.1 and Phase 8.1 files were **removed**: their premises no longer exist, and keeping them would leave two sub-plans per number. ~~All six sub-plans use CRLF line endings like their siblings.~~ **Corrected 2026-09-13 by planning run 19 (`AUDIT-FIX-48`):** measured at byte level, all 42 sub-plans and this index are LF-only, and only `Main-Planing.md`, `Planing-Ledger.md` and `Autopsy.md` are CRLF. No session should convert any file's line endings on the strength of the struck sentence. `Main-Planing.md`, `Autopsy.md`, `Project-Ontology.md`, `Project-Comprehension.md` and `Sub-Planing-Audit.md` were not edited.
 
 **Commands run.**
 - Repository state: `git status --short`, `git branch --show-current`, `git log --oneline -3`, `git remote -v`; `find Planner-docs -maxdepth 4 -type f`; `git diff` of the three run-17 files.
@@ -370,3 +371,45 @@ The revised Phase 4 order is:
 **Not verified in this run.** Whether the Android 16 guarded blobs' md5s match; this was deliberately not measured, because it is `Faz8.1`'s work. The AOSPA `beryl` build requirements behind `DEC-22`. Whether the `beryl` build expects a prebuilt or a source kernel. The firmware the `beryl` build expects. The Android 16 camera service names `setmode.sh` must match.
 
 **Validator status.** Before the edits, `--mode step2 --strict` reported `error_count=0`, `warning_count=0`, `subplan_count=40`. After the edits: `--mode step2 --strict` passed with `error_count=0`, `warning_count=0`, `secret_findings=0`, `subplan_count=42`, `index_reference_count=42`, `phase_folder_count=9`.
+
+**Tenth re-plan run, 2026-09-13 (planning run 19, a bounded Step 2 amendment).** Scope: step 2 of `docs/pre-rental-plan.md` — reconcile `Faz7.2` with `IMPL-91` and `docs/build-environment.md`, and discharge the ninth audit's `AUDIT-FIX-43` … `-49` and `-51`, plus the sub-plan half of `-50`. **Files written:**
+
+- `Planner-docs/Faz-7-Plans/Faz7.2-first-aospa-build.md`: sections 1 to 13, rewritten against the runbook, with no work item added or removed.
+- `Faz7.3-flash-boot-and-aon-verification.md`: sections 1 to 4 and 6 to 13.
+- `Planner-docs/Faz-8-Plans/Faz8.1-android16-camera-blob-comparison.md`: sections 1 and 3 to 13.
+- `Faz8.3-camera-modes-on-android16-build.md`: sections 1 and 4 to 13.
+- This index: sections 4d, 5 and 7.
+- `Planner-docs/Planing-Ledger.md`: the section 2 row for run 19, the `IMPL-89` row, and the section 4 rows for `Faz7.2`, `Faz7.3` and `Faz8.3`.
+
+**No sub-plan was created or deleted, the set stays at 42, and no snapshot is cut**, following the precedent of runs 13 to 15: `SNAP-2026-09-10-SUBPLANS` stays active. `Main-Planing.md`, `Project-Ontology.md`, `Project-Comprehension.md`, `Sub-Planing-Audit.md`, `Faz7.1`, `Faz8.2` and every file outside `Planner-docs/` were not edited.
+
+**Two user rulings, taken in this run on 2026-09-13.**
+
+1. **Fix rule.** `Faz7.2` follows the runbook's section 4 fix rule, which replaces the sub-plan's earlier push-before-retry rule. A manifest-class fix is edited on the server, recorded in `fixes.diff`, not pushed during the session, and landed on GitHub after it.
+2. **Symlink path.** Runbook section 10's built-symlink test reads `odm/lib64/camera/aon_front.pb`. The measured entry `odm/lib64/camera/aon_front.pb;SYMLINK=vendor/lib64/camera/aon_front.pb` — `refs/a16_ishtar/proprietary-files.txt:1037`, and line 1031 in `device_ishtar` — creates the symlink at the `vendor` path, so `F7.2-01` corrects the runbook before renting.
+
+**Three readings, recorded rather than hidden.**
+
+- `F7.2-04` reads runbook section 4's deferred-items table as allowing its listed fixes for the two sync-path detectors, counted against the 2 attempts, next to the general "sync failure: stop".
+- `F7.3-01` writes re-establishment steps where AOSPA's documentation does not settle the data requirement.
+- `AUDIT-FIX-50` asked for PC-17 to be graded on `prefs.trap.armed`. The checklist shows that PC-17 reads the two mount counts, so `Faz8.3` grades PC-17 on those and takes the trap reading from `prefs.trap.armed`.
+
+**Measured in this run.**
+
+- Read-only `gh api` calls:
+  - `ahmetxa/android_local_manifests`: HEAD `22283d8`, plus its `README.md` and tree at that commit;
+  - both `ahmetxa` repositories read `private=false`;
+  - branches of `xiaomi-8550/proprietary_vendor_xiaomi_ishtar` (`beryl`, `vauxite`), `ThankYouMario/proprietary_vendor_xiaomi_ishtar` (`vauxite`) and `xiaomi-8550/proprietary_vendor_xiaomi_sm8550-common` (including `beryl` and `vauxite`).
+- Local reads:
+  - `docs/build-environment.md` in full;
+  - the `aon_front.pb` entries in both device trees;
+  - `docs/aon-verification.md` steps 1 and 3;
+  - `docs/release-checklist.md` PC-04, PC-17, section 3's map and section 4;
+  - `setmode.sh`'s `restart_camera()` and `wait_svc()`;
+  - `docs/release-manifest.md`'s v2.2 sha256;
+  - `.gitignore`;
+  - the line endings of every planner file, at byte level.
+
+**Not verified:** AOSPA's data requirement for 15 → 16 and 16 → 15, the firmware `beryl` needs, the vendor repository in the `vauxite` beans, and the Android 16 init service names. Each is the measurement of the work item that names it. **Findings not touched:** `AUDIT-FIX-22`, `-25`, `-33`, `-37`, `-41` and `-42`; the document half of `-50` is routed to `F8.3-08`. The tenth Step 3 audit must read these amendments before `Faz7.2`, `Faz7.3` and `Faz8.3` enter the Step 4 queue.
+
+**Validator status.** Before the edits, `--mode step2 --strict` reported `error_count=0`, `warning_count=0`, `secret_findings=0` and `subplan_count=42`. After the sub-plan and index edits, `--mode step2 --strict` and `--mode step3-preflight --strict` both passed with `error_count=0`, `warning_count=0`, `secret_findings=0`, `subplan_count=42` and `index_reference_count=42`, and both were re-run after the ledger edit.

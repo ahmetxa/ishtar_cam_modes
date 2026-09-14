@@ -1,10 +1,15 @@
 # Pre-Rental Plan — from the verified staging to the `Faz7.2` rental decision
 
 Written 2026-09-13, after `IMPL-93`. This is an operator plan, not a ClaudeQB
-artifact: it orders the work that should happen before the first Hetzner rental
-and says which fresh session does each part. The sub-plans, the audit and the
-ledger stay the sources of truth; where this file and they disagree, they win
+artifact: it orders the work that should happen before the first build-server
+rental and says which fresh session does each part. The sub-plans, the audit and
+the ledger stay the sources of truth; where this file and they disagree, they win
 and this file is corrected.
+
+**Updated 2026-09-14 (`DEC-26`).** The rental-day gate did not pass
+(`IMPL-94`), and Hetzner's new-account limit then capped the account at CCX33.
+The user moved the rental to Scaleway in a separate conversation. Steps 3a–3c
+below re-target the runbook and `Faz7.2` before any rental.
 
 **Rule for every session below.** One step per fresh chat window. Each session
 starts by reading this file and `git status`, does only its own step, and ends
@@ -21,10 +26,11 @@ anywhere.
 | `Faz7.1` GitHub input staging | verified | `IMPL-91`; manifest `22283d8`, both repositories public (`DEC-25`); runbook `docs/build-environment.md` |
 | `Faz8.1` static half | done, sub-plan `implemented` | `IMPL-92`; both camera layers carry-over at vendor pin `f92e7a9` |
 | `Faz8.2` kernel scoping | verified | `IMPL-93`; `DEC-08` recommendation defer |
-| Ninth Step 3 audit | `PASS_WITH_WARNINGS`, no P0/P1 | `Planner-docs/Sub-Planing-Audit.md`; 15 active P2/P3 findings |
-| `Faz7.2` paid build | queued, not started | the next implementation row |
-| `Faz7.3`, `Faz8.3` | queued, blocked in practice | need the bounded amendment for `AUDIT-FIX-45` and `-46` first |
-| Workspace | committed locally | checkpoint `097d687`; not pushed; `devir-teslim-promptu.md` untracked (stale 2026-09-09 handoff, the user's call) |
+| Tenth Step 3 audit | `PASS_WITH_WARNINGS`, no P0/P1, queue head `Faz7.2` | `Planner-docs/Sub-Planing-Audit.md`; 10 active P2/P3 findings. It graded the Hetzner text, so it no longer covers a rental |
+| `Faz7.2` rental-day gate | run 2026-09-13, not passed | `IMPL-94`: section 5 exited 0, and `AUDIT-FIX-52`, `-53` and `-54` are repaired in the runbook. The 10-hour window did not fit that day, and the limit and SSH key checks were not yet done |
+| Rental provider | Scaleway POP2-16C-64G, `DEC-26` partly answered | handover `snapshots/20260914-1434__DEC26__scaleway-handover.txt`; the runbook and `Faz7.2` still describe a Hetzner CCX53 |
+| `Faz7.3`, `Faz8.3` | queued behind `Faz7.2` | amended by run 19, audited by the tenth audit |
+| Workspace | last commit `d3993de`; not pushed | uncommitted: run 19, the tenth audit, `IMPL-94` with its runbook repair, and the `DEC-26` records. `devir-teslim-promptu.md` untracked (stale 2026-09-09 handoff, the user's call) |
 
 ## 2. Why these steps, in this order
 
@@ -41,6 +47,9 @@ anywhere.
   either stops on a false contradiction or improvises.
 - The **tenth Step 3 audit** is required because sub-plans change. Step 4 must
   not run against an audit of text that no longer exists.
+- The **re-target steps 3a–3c** exist for the same reason. A provider change
+  alters billing semantics, provisioning, disks and teardown, which are exactly
+  the parts a paid session cannot improvise.
 - The **rental-day session** runs `Faz7.2`'s own pre-rental gate on the day,
   as the runbook requires, and stops for the user's approval before money is
   spent.
@@ -59,7 +68,7 @@ anywhere.
 - Not done on purpose: no push to the private `origin` (`ahmetxa/ishtar`);
   `devir-teslim-promptu.md` left untracked.
 
-### Step 2 — Bounded Step 2 amendment (planning run 19)
+### Step 2 — Bounded Step 2 amendment (planning run 19, done 2026-09-13)
 
 - Session: fresh. ClaudeQB Step 2 rules (`references/Second-Planner.md`),
   **bounded**: no phase is re-decomposed, no sub-plan created or deleted, the
@@ -93,7 +102,7 @@ anywhere.
 - Done when: the six files above are amended, the validators pass, and the
   user has decided whether to commit locally.
 
-### Step 3 — Tenth Step 3 audit
+### Step 3 — Tenth Step 3 audit (done 2026-09-13)
 
 - Session: fresh, the canonical `references/handoffs/run-step3.md` handoff.
   Modifies only `Planner-docs/Sub-Planing-Audit.md`.
@@ -103,15 +112,92 @@ anywhere.
 - Done when: the audit says Step 4 may begin, or names the blocker; the user
   has decided whether to commit locally.
 
+### Steps 3a–3c — Re-target the rental to Scaleway (added 2026-09-14, `DEC-26`)
+
+The handover is kept verbatim, with the checks already made against it, in
+`snapshots/20260914-1434__DEC26__scaleway-handover.txt`. `Faz7.2` and runbook
+sections 1–3, 5–7, 11 and 12 describe a Hetzner CCX53 and are re-targeted
+before any rental.
+
+#### Step 3a — Decisions and runbook re-target
+
+- Session: fresh. No rental, no push, and no commit without asking.
+- First, the user answers `DEC-26`'s open items (ledger section 8), each with
+  the recommendation recorded there:
+  - (a) Ubuntu 22.04 (`DEC-22`) or 24.04;
+  - (b) the time ceiling on 16 vCPU;
+  - (c) whether the source volume survives teardown;
+  - (d) whether an out-of-memory kill gets one retry.
+- Read Scaleway's own documentation and quote it with links, as runbook
+  section 3 did for Hetzner (the `AUDIT-FIX-43` standard):
+  - hourly instance billing, and what a stopped instance bills;
+  - block volume billing per tier;
+  - what deleting an instance does to its attached volumes, from the Console
+    and from the API;
+  - flexible IPv4 billing and deletion;
+  - snapshots.
+
+  Prices are confirmed in the Console, not taken from the handover.
+- Rewrite `docs/build-environment.md` against the answers:
+  - section 1: the host rows;
+  - section 2: a POP2-16C-64G column;
+  - section 3: Scaleway's semantics;
+  - section 4: the ceiling and hour rule, if (b) changes them;
+  - section 5: the manual checks, now the Scaleway quota and the SSH key in the project;
+  - section 6: instance and volume creation;
+  - section 7: the volume setup below, swap, and the `sysctl` made persistent on 24.04;
+  - sections 8–11: the tree at `/android/beryl`, `~/out-pkg` off the boot volume, a `mountpoint` check before the build, and `du` of `.repo`, the tree and `out` recorded after sync and build;
+  - section 12: teardown lists zero instances, volumes, flexible IPs and snapshots, unless (c) keeps the source volume.
+
+  Keep the `AUDIT-FIX-52`, `-53` and `-54` repairs, and run `bash -n` on every block.
+- Proposed volume layout, 2026-09-14:
+
+| Volume | Size, tier | Mount | Holds |
+|---|---|---|---|
+| Boot | 40 GB, 5K | `/` | OS, packages, `repo`, `~/logs`, `~/evidence`, a 16 GB swap file |
+| Source | 310 GB, 5K | `/android` | `/android/beryl` (`.repo` and the checkout); `/android/pkg`, the retrieval staging behind `~/out-pkg`; ccache only if enabled |
+| Work | 260 GB, 15K | `/android/beryl/out` | The build output. Runbook paths stay `out/…`, with no `OUT_DIR` |
+
+  Volumes are identified by their ID and size, never by `/dev/sdX` order, and
+  `mkfs` runs only on a volume where `blkid` finds no filesystem. ccache stays
+  off for the first build: AOSPA `beryl` needs both `USE_CCACHE` and
+  `CCACHE_EXEC`, and a cold cache does not speed up a first build.
+- Ledger: record `DEC-26` as answered, plus one implementation row.
+- Out of scope: the `Faz7.2` text (step 3b), every other Planner-docs file, and
+  any rental.
+
+#### Step 3b — Bounded Step 2 amendment (planning run 20)
+
+- Session: fresh. The Step 2 rules and byte rules above, bounded to `Faz7.2`
+  plus the index and ledger where they state a live provider fact.
+- Replace the CCX53, the Hetzner Console, the Primary IP and 128 GB with the
+  re-targeted runbook's values. Teardown and `VAL-TEARDOWN` gain volumes and
+  flexible IPs, and `F7.2-01`'s manual checks follow runbook section 5.
+- Carried, not edited: `Main-Planing.md` lines 75, 211 and 265 (`R9`) and
+  `Project-Comprehension.md` `EV-20` name Hetzner. No phase, objective or
+  acceptance signal changes, so this goes to the next Step 1 amendment with
+  `AUDIT-FIX-41` and `-42`.
+- Gates: as Step 2.
+
+#### Step 3c — Eleventh Step 3 audit
+
+- Session: fresh, the canonical `references/handoffs/run-step3.md` handoff.
+- Focus: the step 3b amendment read against the re-targeted runbook; close
+  `AUDIT-FIX-52`, `-53` and `-54` if the runbook carries their repairs; rebuild
+  the queue. Expected head: `Faz7.2`.
+
 ### Step 4 — Rental day: `Faz7.2` gate, then the paid session
 
+- **Status:** first run 2026-09-13 as `IMPL-94`, gate not passed. Waits for
+  steps 3a–3c.
 - Session: fresh, the canonical `references/handoffs/run-step4.md` handoff,
-  limited to `Faz7.2`, started on a day with the full 10-hour window free.
+  limited to `Faz7.2`, started on a day with the full time window free.
 - Part A, free: `F7.2-01`. Run `docs/build-environment.md` section 5 as
-  written. The user confirms in the Hetzner Console: the CCX53 limit, the
-  public SSH key, the `~/Documents/Projeler/ishtar-builds/` output directory
-  outside every repository, and the time window. Re-read the budget and
-  stopping rule (`DEC-25`, runbook section 4).
+  written, including the base-pin check. The user confirms in the provider
+  console: the instance quota, the public SSH key, the
+  `~/Documents/Projeler/ishtar-builds/` output directory outside every repository
+  (created 2026-09-13), and the time window. Re-read the budget and stopping
+  rule (`DEC-25` as amended by `DEC-26`, runbook section 4).
 - **Stop for the user's rental approval.** Without it, the session records the
   gate result and ends.
 - Part B, paid, only after approval: runbook sections 6 to 13 in order,
@@ -121,6 +207,8 @@ anywhere.
 
 - Push to the private `origin` (`ahmetxa/ishtar`) as an off-machine copy
   before the paid session. The user's decision.
+- Commit the uncommitted run 19, tenth audit, `IMPL-94` and `DEC-26` records
+  locally. The user's decision.
 - Decide what to do with `devir-teslim-promptu.md`: keep untracked, delete, or
   rewrite. It describes the 2026-09-09 state (WSL2, `IMPL-88` next) and should
   not be used as a handoff.
