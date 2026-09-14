@@ -28,9 +28,9 @@ anywhere.
 | `Faz8.2` kernel scoping | verified | `IMPL-93`; `DEC-08` recommendation defer |
 | Tenth Step 3 audit | `PASS_WITH_WARNINGS`, no P0/P1, queue head `Faz7.2` | `Planner-docs/Sub-Planing-Audit.md`; 10 active P2/P3 findings. It graded the Hetzner text, so it no longer covers a rental |
 | `Faz7.2` rental-day gate | run 2026-09-13, not passed | `IMPL-94`: section 5 exited 0, and `AUDIT-FIX-52`, `-53` and `-54` are repaired in the runbook. The 10-hour window did not fit that day, and the limit and SSH key checks were not yet done |
-| Rental provider | Scaleway POP2-16C-64G, `DEC-26` partly answered | handover `snapshots/20260914-1434__DEC26__scaleway-handover.txt`; the runbook and `Faz7.2` still describe a Hetzner CCX53 |
+| Rental provider | Scaleway **POP2-32C-128G**, `DEC-26` answered 2026-09-14 (step 3a) | `IMPL-95`: runbook `docs/build-environment.md` re-targeted on sourced Scaleway semantics; Ubuntu 22.04, 10 h ceiling with hour-8 rule, delete everything, no retry after an out-of-memory kill. `Faz7.2` still describes a Hetzner CCX53 (step 3b) |
 | `Faz7.3`, `Faz8.3` | queued behind `Faz7.2` | amended by run 19, audited by the tenth audit |
-| Workspace | last commit `d3993de`; not pushed | uncommitted: run 19, the tenth audit, `IMPL-94` with its runbook repair, and the `DEC-26` records. `devir-teslim-promptu.md` untracked (stale 2026-09-09 handoff, the user's call) |
+| Workspace | last commit `f724b64` (run 19, the tenth audit, `IMPL-94`, the `DEC-26` records); not pushed | uncommitted: step 3a (`IMPL-95`: the runbook, the ledger, this file). `devir-teslim-promptu.md` untracked (stale 2026-09-09 handoff, the user's call) |
 
 ## 2. Why these steps, in this order
 
@@ -119,8 +119,20 @@ The handover is kept verbatim, with the checks already made against it, in
 sections 1–3, 5–7, 11 and 12 describe a Hetzner CCX53 and are re-targeted
 before any rental.
 
-#### Step 3a — Decisions and runbook re-target
+#### Step 3a — Decisions and runbook re-target (done 2026-09-14, `IMPL-95`)
 
+- **Done.** The existing set was first committed locally as `f724b64`.
+  - The user's answers: (a) Ubuntu 22.04, with `DEC-22`'s 24.04 fallback.
+  - (b) and (d): the user moved the instance to **POP2-32C-128G** instead of
+    retrying on 64 GB. That keeps the 10 h ceiling with the hour-8 rule; an
+    out-of-memory kill is a stop.
+  - (c): everything is deleted at teardown.
+  - Scaleway's pages were read and quoted in runbook section 3. Two points need
+    the worse-case design: the Instance API text says `terminate` only detaches
+    Block volumes, and the flexible IP survives the Instance. Also found: the
+    610 GB needs a validated identity (a 500 GB quota otherwise).
+  - Runbook sections 1–13 re-targeted, and every block passes `bash -n`. The
+    volume table below stands, apart from its 16-vCPU premise.
 - Session: fresh. No rental, no push, and no commit without asking.
 - First, the user answers `DEC-26`'s open items (ledger section 8), each with
   the recommendation recorded there:
