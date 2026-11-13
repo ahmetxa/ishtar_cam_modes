@@ -199,7 +199,7 @@ after a reboot will record a false total failure.**
 Take a snapshot with the Phase 3 instrument:
 
 ```sh
-scripts/smoke.sh -o snapshots/<YYYYmmdd-HHMM>__<subplan>__<label>
+scripts/smoke.sh -o <YYYYmmdd-HHMM>__<subplan>__<label>
 ```
 
 ### Expected fields

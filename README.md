@@ -2,7 +2,9 @@
 
 Workspace for the IMX989 main-camera work on the Xiaomi 13 Ultra (`ishtar`):
 sensor-driver mode switching, a full-resolution camera HAL patch, an AON
-front-camera fix, and an AOSPA Android 16 track.
+front-camera fix, and an AOSPA Android 16 track. The Android 16 track was
+abandoned on 2026-11-13 (`DEC-28`); the phone now runs HyperOS 4, and none
+of the project's modules is installed.
 
 This file describes what each top-level path **is**. It does not describe how
 the system works — `Planner-docs/Project-Ontology.md` does that. See
@@ -15,19 +17,25 @@ or record.
 
 | Path | Role | What it is |
 |---|---|---|
-| `ishtar-cam-modes/` | **deliverable** | The main KernelSU/Magisk module. Ten sensor modes plus the 50MP HAL layer, a WebUI, and four QS tiles. Source at v2.1 / versionCode 12. |
-| `ishtar-aon-fix/` | **deliverable** | Standalone module symlinking `aon_front.pb` into `/vendor`. Deliberately independent of module mounting. v1.1. |
-| `agc-50mp-yama/` | **deliverable** | The AGC (GCam port) 50MP patch: two smali sources, the experimental HAL patch table, and the reproduction recipe. |
+| `ishtar-cam-modes/` | **deliverable** | The main KernelSU/Magisk module. Ten sensor modes plus the 50MP HAL layer, a WebUI, and four QS tiles. Source at v2.2 / versionCode 13. |
+| `ishtar-aon-fix/` | **deliverable** | Standalone module that copies `/vendor/lib64/camera` into the module, adds `aon_front.pb` and bind-mounts the directory; it exits without change when the file already exists (HyperOS 4 ships it). Deliberately independent of module mounting. v1.1. |
+| `agc-50mp-yama/` | **deliverable** | The AGC (GCam port) 50MP patch: the reproduction recipe (`README.md`), two smali sources, seven experimental HAL patch tables (`hal-*-deneme.patch`), four Faz 4.1 stage tables (`f41-*.tbl`), `find_tag_write_site.py` and `tools/`. |
 
 ## Documentation
 
 | Path | Role | What it is |
 |---|---|---|
-| `Planner-docs/` | **record** | Planning and continuity artifacts. Start here — see [Orientation](#orientation). |
-| `docs/` | **record** | Format and procedure contracts: `patch-table-format.md`, `reverse-engineering-toolchain.md`. |
+| `Planner-docs/` | **record** | Planning and continuity artifacts. See [Orientation](#orientation) for the reading order. |
+| `docs/` | **record** | 18 documents: formats, procedures, evidence, runbooks and the generated release manifest. The two format and procedure contracts are `patch-table-format.md` and `reverse-engineering-toolchain.md`. |
 | `README.md` | **record** | This file. |
+| `PROJECT_LOG.md` | **record** | Project log (Turkish): the continuity record of work done. |
+| `NEXT_PROMPT.md` | **record** | Entry prompt for the next session (Turkish). |
+| `ORCHESTRATION_PLAN.md` | **record** | The window plan for the current run (Turkish). |
+| `CHANGELOG.md` | **record** | Module release notes. |
 | `UNTRACKED-BY-DESIGN.md` | **record** | Why the large paths are absent from version control. Summarised under [Exclusions](#exclusions). |
 | `50MP-Entegrasyon-Plani.md` | **record** | The 50MP integration journal. Long, partly superseded; sections are marked in Phase 9, not here. |
+
+The repository's remote is the private GitHub repository `ahmetxa/ishtar_cam_modes` (`DEC-27`); pushes use explicit refspecs only.
 
 ## Build inputs and reference trees
 
@@ -74,7 +82,7 @@ control; see [Exclusions](#exclusions).
 
 | Archive | md5 | Status |
 |---|---|---|
-| `ishtar-cam-modes-v2.1.zip` | `fea919b67a4693a4591127be4a6e9daa` | **Most recent, and currently installed** on device `dc27e5d0` as versionCode 12. Flashed 2026-08-31 (`IMPL-11`). |
+| `ishtar-cam-modes-v2.1.zip` | `fea919b67a4693a4591127be4a6e9daa` | Superseded by v2.2. Was versionCode 12; flashed on AOSPA A15 on 2026-08-31 (`IMPL-11`). |
 | `ishtar-cam-modes-v2.0.zip` | `9c115f5d6ab03f5a8a264e3bf3106495` | Superseded by v2.1 on 2026-08-31. Was versionCode 11. |
 | `ishtar-cam-modes-v1.9.zip` | `d7845bc848b6ea72297c50a821ef260a` | Superseded. |
 | `ishtar-cam-modes-v1.0.zip` | `9cf8facb01d7e87c67cbfa60b0bdb0ff` | Superseded. |
@@ -82,6 +90,8 @@ control; see [Exclusions](#exclusions).
 
 All five were audited for signing-key containment on 2026-08-24 and are
 **clean** — no keystore entry in any of them.
+
+`dist/` (excluded by `*.zip`) holds `scripts/build-release.py` outputs, not root archives: `ishtar-cam-modes-v2.2.zip` (md5 `e95789572311cc95266d3ab4045cdcba`; installed on AOSPA A15 by `IMPL-81`) and `ishtar-cam-modes-v2.1.zip` (md5 `4a8226d6f4c4cacd97d8b96086bb36fa`), an `IMPL-76` rebuild that differs from the root v2.1 archive. On HyperOS 4 no project module is installed.
 
 ### Application builds
 
@@ -139,13 +149,14 @@ these checksums. No download location appears in this repository.
 | Path | Role |
 |---|---|
 | `platform-tools/` | **tooling** — vendored `adb`; the only host-device channel. |
-| `scripts/` | **tooling** — `smoke.sh`, the read-only device state snapshot. |
-| `snapshots/` | **record** — smoke output, `<UTC yyyymmdd-HHMM>__<subplan>__<label>.txt`. |
-| `common_clone.log`, `kernel_clone.log` | **record** — clone logs, 32 and 86 bytes. |
+| `scripts/` | **tooling** — `smoke.sh`, the read-only device state snapshot; `build-release.py`, the deterministic release builder (`--self-test`). |
+| `snapshots/` | **record** — smoke output, `<yyyymmdd-HHMM>__<subplan>__<label>.txt`. The time in the name is typed by the operator and is not a reliable clock: it matches the header time as UTC in some files and as UTC+3 in others. The header's `taken` line is UTC and authoritative. |
 | `.gitignore`, `.gitattributes` | **tooling** — `.gitattributes` disables CRLF conversion, which matters: the module's shell scripts run under the on-device shell and a CRLF checkout would restore a broken module. |
 | `.claude/`, `.git/` | **tooling** — local state. |
 
 ## Orientation
+
+A session first reads `NEXT_PROMPT.md`, then `ORCHESTRATION_PLAN.md` (the window plan), then the list below.
 
 A session starting with no context should read, in this order:
 
@@ -183,7 +194,6 @@ summary is:
 | `ishtar-cam-modes/active/`, `mode`, `lang` | Runtime state, regenerated on boot. Confirmed absent from the release archives too. | Regenerated. |
 | `ishtar-cam-modes/active_hal/` | Never exists in the workspace at all — it is seeded **on the device** from the device's own 27 MB stock HAL, which is why no 27 MB blob ships. | Created by `hal_seed` at boot. |
 | `tile-app/debug.keystore`, `tile-app/out/`, `tools/__pycache__/` | Credentials and build output. | Not recoverable by design; the keystore has never been distributed. |
-| `snapshots/` | Machine-generated device records. | Re-run `scripts/smoke.sh`. |
 
 Two deliberate deviations from the original scope list — the exclusion of
 `device_ishtar/` and the *inclusion* of the two `.agc` files — are argued in

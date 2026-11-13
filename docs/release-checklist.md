@@ -162,7 +162,7 @@ inside a Markdown cell splits the cell.
 # PC-01  Sensor variant, identity and mount, from one snapshot.
 #        Expect sensor.live.variant to equal the selected mode, and
 #        sensor.mount.count = 1. Stock is 9e4d0fe1a8bf2eb4146c9917a0ac2c4c.
-scripts/smoke.sh -o snapshots/<YYYYmmdd-HHMM>__release__<label>
+scripts/smoke.sh -o <YYYYmmdd-HHMM>__release__<label>
 
 # PC-02  A/B photographs, stock against dcgB, same scene and light.
 #        Compare noise and detail. This is a one-time measurement recorded in
