@@ -43,12 +43,13 @@ Emekliye ayrılan hedef: AGC'de uçtan uca 50 MP (`DEC-14`, 2026-09-03; §5).
 ## 2. Şu an neredeyiz (2026-11-13)
 
 ### 2.1 Git ve depo
-- **Dal ve commit'ler (2026-11-13 oturum sonu):** `main` 63 commit: ilk `ff6934e` (2026-08-24), `587e3b5` (IMPL-95, 2026-09-14) ve bu oturumun `7fa0a51`'i (planlama koşusu 20 + 11. denetim, değiştirilmeden). `integrate/impl-96` dalı `main`'den üç commit önde: `37edb5f` (HyperOS 4 kanıtı), `6a20999` (ROM derleme belgelerine tarihsel not, cihaz notları) ve bu belgeyle `NEXT_PROMPT.md`'yi taşıyan oturum commit'i. Etiket yok. Tüm commit'ler tek kimlikle (GitHub `ahmetxa`). (Ö13)
-- **Remote:** `origin` = `https://github.com/ahmetxa/ishtar_cam_modes.git`, özel depo (kullanıcı kararı 2026-11-13; önerilen `DEC-27`).
+- **Dal ve commit'ler (2026-11-13 oturum sonu):** `main` 63 commit: ilk `ff6934e` (2026-08-24), `587e3b5` (IMPL-95, 2026-09-14) ve `7fa0a51` (planlama koşusu 20 + 11. denetim, değiştirilmeden). `integrate/impl-96` dalı `7fa0a51` üzerine yeniden kuruldu: `70946ff` (HyperOS 4 kanıtı; probe satır 42, 190, 191 redakte), `03b0898` (tarihsel notlar, cihaz notları), `775b321` (oturum belgeleri), sonra C0 (`ORCHESTRATION_PLAN.md`'yi ekleyen commit). Eski hash'lerin eşlemesi §11'dedir; eski hash'ler yalnız yedek bundle'da ve yerel reflog'da. Etiket yok. Tüm commit'ler tek kimlikle (GitHub `ahmetxa`). (Ö13)
+- **Remote:** `origin` = `https://github.com/ahmetxa/ishtar_cam_modes.git`, özel depo (kullanıcı kararı 2026-11-13; `DEC-27` atandı; ledger'a Pencere 1'de yazılır).
   - 62 commit `git push` ile hash'leri değişmeden gönderildi: `git ls-remote origin` → `main` = `587e3b5`; kök `ff6934e` GitHub API'de aynı hash ve tarihle; `private=true`, varsayılan dal `main` (Ö13).
-  - `7fa0a51` ve `integrate/impl-96` dalı push edilmedi (kullanıcı kararı bekliyor).
+  - `7fa0a51` ve `integrate/impl-96` dalı push edilmedi. Push Pencere 2'de karara bağlanır; yalnız açık refspec: `git push origin main integrate/impl-96`.
   - Eski `ishtar-eski` remote'u (`ahmetxa/ishtar`) 2026-11-13'te yerelden kaldırıldı. Tek dalı `main@f8a05ca` yerel `main`'in atası; içeriğinin tamamı yeni depoda.
 - **Silinecek GitHub depoları (K5/K6, kullanıcı kararı 2026-11-13):** `ahmetxa/ishtar`, `ahmetxa/android_local_manifests`, `ahmetxa/android_device_xiaomi_ishtar`. Silme yapılmadı: `gh` belirtecinde `delete_repo` yetkisi yok, silmeyi kullanıcı yapar. Hiçbirinde release, tag ya da açık issue yoktu. İki açık deponun ayna yedeği `C:/Users/ahmet/Documents/Projeler/ishtar-arsiv/` altında: `android_local_manifests.git` (`main@22283d8`) ve `android_device_xiaomi_ishtar.git` (`beryl@d48816f`, `vauxite@713784c`); ikisinde de `git fsck` temiz.
+  - Ölçüm (2026-11-13, `gh api`): üç depo da hâlâ var.
 - **Boyut (Ö13):**
   - 344 izlenen dosya.
   - `size-pack` 17.86 MiB, ayrıca 74.38 MiB gevşek nesne (343 adet).
@@ -57,10 +58,12 @@ Emekliye ayrılan hedef: AGC'de uçtan uca 50 MP (`DEC-14`, 2026-09-03; §5).
 - **Bütünlük ve satır sonları:** `git fsck --no-dangling` temiz. `.gitattributes` varsayılan olarak `* -text` kullanır; `*.sh *.prop *.patch mode lang` için LF zorlanır.
 - **Commit durumu (2026-11-13):**
   1. Planlama koşusu 20 ve 11. denetimin dört dosyası (`Faz7.2`, ledger, `Sub-Planing-Audit.md`, `docs/pre-rental-plan.md`) değiştirilmeden `7fa0a51` olarak `main`'e işlendi. İçerik: `DEC-26` ile `Faz7.2`'nin Scaleway'e yeniden hedeflenmesi ve 11. Step 3 denetimi (`PASS_WITH_WARNINGS`, P0/P1 yok, kuyruk başı `Faz7.2`/`F7.2-01`). Kuyruk 2026-11-13'ten beri geçersiz: ROM derleme bırakıldı (§2.5). Ledger 11. denetimi hâlâ "outstanding" sayıyor; düzeltmesi IMPL-96'da.
-  2. `docs/rom-build-device-notes.md` (2026-09-20, AOSPA A15 salt-okur cihaz oturumu) §10 ekiyle `6a20999`'da işlendi; IMPL satırı hâlâ yok (IMPL-96).
+  2. `docs/rom-build-device-notes.md` (2026-09-20, AOSPA A15 salt-okur cihaz oturumu) §10 ekiyle `03b0898`'da işlendi; IMPL satırı hâlâ yok (IMPL-96).
   3. `devir-teslim-promptu.md` 2026-11-13'te kullanıcı kararıyla silindi (K4); yerini `NEXT_PROMPT.md` aldı.
-  4. Bu belge ve `NEXT_PROMPT.md` oturum commit'iyle `integrate/impl-96` dalına işlendi.
+  4. Oturum belgelerinin ilk sürümü `775b321` olarak `integrate/impl-96` dalına işlendi; son sürüm C0'dadır.
+  5. C0 (`ORCHESTRATION_PLAN.md`, bu günlük ve `NEXT_PROMPT.md`'yi taşıyan commit) işlendi; `git log --diff-filter=A -- ORCHESTRATION_PLAN.md` ile bulunur.
 - **Silinenler (2026-11-13, K4):** kökteki boş `UsersahmetAppDataLocalTempaon-smoke/` dizini ve `.gitignore:48` (`*.log`) nedeniyle hiç izlenmemiş üç log: `install.log` (izlenen `snapshots/20260831-1603__faz2.2__install-transcript-v2.1.txt` ile satır satır aynıydı), `common_clone.log` (tek satır: `Cloning into 'common_sm8550'...`), `kernel_clone.log` (tek satır: `fatal: destination path 'kernel_ishtar' already exists and is not an empty directory.`).
+- **K8 (probe kimlikleri, 2026-11-13):** Commit edilmiş ama push edilmemiş probe anlık görüntüsündeki cihaz tanımlayıcıları redakte edildi ve dal `integrate/impl-96` `main` üzerinde yeniden kuruldu (§11). Redaksiyonsuz uç yalnız `../ishtar-arsiv/impl-96-unredacted.bundle` içinde (repo dışı; 77.094 B; sha256 `b9fa9c5cd5d0ae78f9f051ab62ecbfc2d9b2fa2fecd33f40247ef88bf58f6cd3`; `git bundle verify` geçti; önkoşul `7fa0a51`). R-identity-check (`git log --all -p`; yalnız sayım): `persist.sys.miui.sno` ve `ro.ril.miui.imei0`/`imei1` satırları `<redacted>` olmalı, Luhn geçen 15 haneli sayı olmamalı; son sonuç: tüm ref'lerde 0 eşleşme. Adlandırılmış yedek dal açılmadı.
 - Ledger §6'nın depo paragrafı (47 commit, 225 dosya, remote yok) bayattır (§8).
 
 ### 2.2 Sürüm ve paket
@@ -80,7 +83,7 @@ Emekliye ayrılan hedef: AGC'de uçtan uca 50 MP (`DEC-14`, 2026-09-03; §5).
 - **`Kullanim.txt`:** `ishtar-cam-modes/Kullanim.txt` zip'in içinde dağıtılıyor ve hâlâ v1.9 kılavuzu (13 bayat ifade; hiçbiri AGC'nin 50 MP çektiğini iddia etmiyor). Dosyayı düzenlemek, cihazda kurulu v2.2 ile bayt-özdeşliği bozar; K1=(b) gereği bir sonraki sürümde düzeltilecek (§4).
 
 ### 2.3 Cihaz
-**2026-11-13 ölçümü (HyperOS 4, salt-okunur, yalnız `dc27e5d0`):** `snapshots/20261113-1819__IMPL96__hyperos4-readonly-probe.txt` ve `snapshots/20261113-1821__IMPL96__hyperos4-smoke-baseline.txt` (commit `37edb5f`).
+**2026-11-13 ölçümü (HyperOS 4, salt-okunur, yalnız `dc27e5d0`):** `snapshots/20261113-1819__IMPL96__hyperos4-readonly-probe.txt` ve `snapshots/20261113-1821__IMPL96__hyperos4-smoke-baseline.txt` (commit `70946ff`).
 - **ROM:** HyperOS `OS4.0.0.44.WMACNXM`, Android 17 (SDK 37), yapı `CP2A.260605.016`, güvenlik yaması 2026-09-01; vendor/odm parmak izi `Xiaomi/ishtar/ishtar:13/TKQ1.221114.001/OS4.0.0.44.WMACNXM:user/release-keys`. Kullanıcıya göre üçüncü taraf bir geliştiricinin derlemesi.
 - **Kernel:** `5.15.215-KylinKernel-260925-Release` (derleme 2026-09-25). SELinux Enforcing; doğrulanmış önyükleme `orange`, kilit açık.
 - **Root:** KernelSU `4.3.0-r1` (ksud uapi 6); adb kabuğu `su` ile `u:r:ksu:s0` alıyor. `pm list packages`'ta ne KernelSU Next (`com.rifsxd.ksunext`) ne de resmî KernelSU yöneticisi (`me.weishu.kernelsu`) var.
@@ -159,8 +162,8 @@ Aşağıdaki her şey (2026-09-20 ölçümü, kanonik yapılandırma, son ölç�
   - P2 açık: `AUDIT-FIX-22`
   - P3 açık: `-37`, `-41`, `-42`, `-50`, `-55`, `-56`, `-57`
   - P3 kabul edilmiş: `-25`, `-33`
-- **Sıradaki numaralar:** `IMPL-96`, planlama koşusu 21, 12. denetim, `DEC-27` (ilk kullanımı: 2026-11-13 depo taşıma kararı).
-- **Açık kararlar (ledger):** `DEC-07` ve `DEC-08` Android 16 derlemesine bağlıydı; 2026-11-13'ten beri konusuz, IMPL-96'da kapanacak (`DEC-28`, önerilen). `DEC-09` koşullu; ancak tetiklenirse gündeme gelir. Diğer tüm DEC'ler yanıtlandı. Oturum kararları K5–K7 açık (§4).
+- **Sıradaki numaralar:** `IMPL-96`, planlama koşusu 21, 12. denetim. `DEC-27`…`DEC-32` ayrıldı (Pencere 1'de ledger'a yazılacak); sonraki boş numara `DEC-33`.
+- **Açık kararlar:** K1–K8 yanıtlı (K7 = (a) → `DEC-32`; K8 = A → `DEC-31`, yürütüldü). K9 (50MP HAL yeniden türetmesi) ve push açık. Konusuz altı karar (`DEC-07`, `DEC-08`, `DEC-22`, `DEC-24`, `DEC-25`, `DEC-26`) `DEC-28` ile kapanır (ROM derleme bırakıldı; Pencere 1'de ledger'a işlenecek). `DEC-09` koşullu; ancak tetiklenirse gündeme gelir. Diğer tüm DEC'ler yanıtlandı.
 - **Doğrulayıcı (Ö13):** depoda değil, ClaudeQB eklentisinin içinde duruyor. `py -3` (CPython 3.14.10) ile çalıştırılır.
   - Komut: `py -3 C:/Users/ahmet/.claude/plugins/cache/claudeqb/claudeqb/0.2.1/skills/claudeqb/scripts/validate_planner_docs.py --root . --mode all`
   - Sonuç: `error_count=0`, `warning_count=1` (`step4_has_nonblocking_warnings=P2:1,P3:9`), `p0_findings=0`, `p1_findings=0`, `subplan_count=42`, `secret_findings=0`. HEAD ağacında da aynı.
@@ -168,7 +171,7 @@ Aşağıdaki her şey (2026-09-20 ölçümü, kanonik yapılandırma, son ölç�
   - 2026-09-09 devrindeki "0 uyarı / 0 hata" tabanı yanlıştır.
 
 ### 2.5 Faz 7/8 cephesi
-**2026-11-13: ROM derleme fikri bırakıldı (kullanıcı kararı, K2).** Telefon HyperOS 4 portuna geçtiği için Faz 7/8'in amacı (kiralık sunucuda AOSPA `beryl` derlemesi, Android 16 kamera işi, kernel LTS) ortadan kalktı; kiralama hiç yapılmadı. Ledger §7'deki duran tetikleyici "vendor blobs change through a system update" de ateşlendi. Resmî kapanış planlama koşusu 21'de (Step 1 değişikliği), kayıt `IMPL-96`'da (önerilen `DEC-28`). Bu bölümün geri kalanı tarihsel kayıttır.
+**2026-11-13: ROM derleme fikri bırakıldı (kullanıcı kararı, K2).** Telefon HyperOS 4 portuna geçtiği için Faz 7/8'in amacı (kiralık sunucuda AOSPA `beryl` derlemesi, Android 16 kamera işi, kernel LTS) ortadan kalktı; kiralama hiç yapılmadı. Ledger §7'deki duran tetikleyici "vendor blobs change through a system update" de ateşlendi. Resmî kapanış planlama koşusu 21'de (Step 1 değişikliği), kayıt `IMPL-96`'da (`DEC-28` atandı; ledger'a Pencere 1'de yazılır). Bu bölümün geri kalanı tarihsel kayıttır.
 
 **Derleme ortamı kararının geçmişi** (L:549, L:598-601):
 1. WSL2 planı (IMPL-86, 2026-09-07).
@@ -220,32 +223,21 @@ Aşağıdaki her şey (2026-09-20 ölçümü, kanonik yapılandırma, son ölç�
 
 **Doğrulanmamış girdi ve çelişki:**
 1. DEV §4 (2026-09-20): Kullanıcıya göre MIUI ve AOSPA'nın kerneli "has been upstreamed by third parties". K3 ile 2026-11-13'te düştü: telefon artık 5.15.215 kernelli HyperOS 4'te (§2.3).
-2. **Çelişki (giderildi):** DEV §7 "An Android 16 build ships a different binary, so the table does not carry over" diyordu; oysa IMPL-92 (L:102, L:521) pinlenmiş A16 HAL'inin md5'ini stok korumayla eşit ölçmüştü. Cümle yerinde bırakıldı; 2026-11-13'te DEV §10'a düzeltme notu eklendi (`6a20999`). Android 16 derlemesi bırakıldığı için konu kapandı.
+2. **Çelişki (giderildi):** DEV §7 "An Android 16 build ships a different binary, so the table does not carry over" diyordu; oysa IMPL-92 (L:102, L:521) pinlenmiş A16 HAL'inin md5'ini stok korumayla eşit ölçmüştü. Cümle yerinde bırakıldı; 2026-11-13'te DEV §10'a düzeltme notu eklendi (`03b0898`). Android 16 derlemesi bırakıldığı için konu kapandı.
 
-### 2.6 Bu oturumun durumu
-- **Genel durum:** omp'ta bir orkestratör oturumu. `O0` keşif ve `O1` plan tamamlandı; kullanıcı `O2`'yi 2026-11-13'te onayladı. `O0`–`O5`, kullanıcının orkestrasyon şablonundaki "Faz 0–5"tir; ClaudeQB proje fazlarıyla karışmasın diye böyle yazılır (§10).
-- Kullanıcının istediği bu iki belge yazıldı; tüm geçmiş yeni özel depo `ahmetxa/ishtar_cam_modes`'a taşındı (§2.1).
-- **Kullanıcı kararları (2026-11-13):** K1 = (b); K2: ROM derleme fikri bırakıldı, telefon HyperOS 4'te; K3 düştü; K4 uygulandı; K5 ve K6: ROM derleme fikri için açılan üç GitHub deposu silinecek (silme kullanıcıda, §2.1); `O2` onaylandı. Açık: K7 (projenin HyperOS 4'teki yönü) ve push. Ayrıntı §4.
+### 2.6 Bu oturumun durumu (Pencere 0, 2026-11-13)
+
+- **Genel durum:** Bu pencere `ORCHESTRATION_PLAN.md`'nin Pencere 0'ıdır (keşif, plan, sözleşme). O0 keşfi ve O1 planı tamamlandı; kullanıcı planı onayladı ("onay"). Kural: her yeni sohbet penceresi planın tek bir fazını yürütür (kullanıcı isteği). `O0`–`O5` adları orkestrasyon şablonundan gelir; ClaudeQB proje fazlarıyla karışmasın diye böyle yazılır (§10).
+- **Kararlar (2026-11-13):** K1 = (b) (`DEC-29`); K2: ROM derleme bırakıldı (`DEC-28`); K3 düştü; K4 uygulandı; K5 ve K6: üç ROM deposu silinecek, silmeyi kullanıcı yapar (`DEC-30`); K7 = (a) (`DEC-32`); K8 = A (`DEC-31`, yürütüldü); konusuz = altı karar (`DEC-07`, `DEC-08`, `DEC-22`, `DEC-24`, `DEC-25`, `DEC-26`). Açık: K9 (Pencere 3) ve push (Pencere 2). Ayrıntı §4.
+- **K8 yürütüldü:** `integrate/impl-96` `main` (`7fa0a51`) üzerine yeniden kuruldu; yeni hash'ler §2.1'de, eski→yeni eşleme §11'de. Redaksiyonsuz uç depo dışında (§2.1, §11). Eski hash'ler yalnız bundle'da ve yerel reflog'da.
 - **Bu pencerede yapılanlar:**
-  - `O2-a`: `7fa0a51` (dört dosya, değiştirilmeden) ve `integrate/impl-96` dalı.
-  - HyperOS 4 salt-okunur ölçümü (§2.3) → `37edb5f`.
-  - T4: kiralama planı ve runbook'a tarihsel not, cihaz notlarına §10 → `6a20999`.
-  - K5/K6: iki açık deponun yedeği alındı; eski remote kaldırıldı.
-  - Bu belge ile `NEXT_PROMPT.md` güncellenip işlendi.
-- **Yeni pencereye kalanlar.** Kullanıcının önerisiyle: bağlam ~690k token olduğu için bayt hassasiyeti gereken ledger işi taze pencerede yapılır.
-  - **L:** Ledger'a IMPL-96 satırı ve bağlı düzeltmeler:
-    - 11. denetimin kaydı ve geçersiz kuyruğu
-    - §4 `Faz7.2`/`7.3`/`8.1`/`8.3` engel hücreleri
-    - §6 depo ve cihaz paragrafları
-    - §7'ye "ROM derleme bırakıldı" ve "vendor blobs changed" girdileri; `DEC-24`/`DEC-26` "outstanding" metinlerinin ve kernel iddiasının kapanışı
-    - 2026-09-20 notlarının ve HyperOS 4 ölçümünün kaydı
-    - K4 silinenleri
-    - `DEC-27`…`DEC-30`
-  - **K7** kararı; sonra **RUN21** (planlama koşusu 21: Faz 7/8'i emekliye ayırmak, yol haritasını K7'ye göre yeniden yazmak) ve 12. denetim.
-  - **T2:** `README.md`, `UNTRACKED-BY-DESIGN.md` (v2.2, remote, silinen loglar). **T3:** `docs/release-checklist.md:165`. **V:** son `reviewer` geçişi.
-  - Düşenler: T1 (`Kullanim.txt`; K1=(b)), T5 (K3).
-- **Yalnız ana oturumun dokunacağı sıcak noktalar:** ledger, denetim dosyası, Main-Planing, Sub-Planing-Index, CHANGELOG, sürüm yerleri (`module.prop`, `customize.sh`), üretilen `docs/release-manifest.md`, `.gitignore` ve tüm git işlemleri.
-- Yeni oturum buradan `NEXT_PROMPT.md` ile devam eder.
+  - O0 keşfi: dört scout (`LedgerMap`, `PlanDocsMap`, `ModuleMap`, `DocsFactCheck`) ve salt-okur ölçümler; üç ROM deposu hâlâ var; doğrulayıcı ve self-test taban ile aynı (§11).
+  - `ORCHESTRATION_PLAN.md` yazıldı; `NEXT_PROMPT.md` Pencere 1'i gösterecek şekilde güncellendi.
+  - K8 yürütüldü (yukarıda); bu belge ve §11 girdisi güncellendi.
+  - C0 (`ORCHESTRATION_PLAN.md`, bu günlük ve `NEXT_PROMPT.md`'yi taşıyan commit) işlendi; `git log --diff-filter=A -- ORCHESTRATION_PLAN.md` ile bulunur.
+- **Eski iş birimleri:** L, T2, T3, V ve RUN21 artık planda Pencere 1-4 olarak duruyor (`ORCHESTRATION_PLAN.md` §1, §5-§8). T1 (K1=(b)) ve T5 (K3) düştü.
+- **Sıcak noktalar:** `ORCHESTRATION_PLAN.md` §3'teki liste (yalnız ana oturum dokunur): ledger, `Main-Planing.md`, `Sub-Planing-Index.md`, `Sub-Planing-Audit.md`, `Project-Ontology.md`; `CHANGELOG.md`; sürüm yerleri `module.prop`, `customize.sh`; üretilen `docs/release-manifest.md`; `.gitignore`, `.gitattributes`; `snapshots/`; `ORCHESTRATION_PLAN.md`; tüm git işlemleri.
+- Yeni pencere `NEXT_PROMPT.md` ile devam eder; sıradaki faz Pencere 1 — IMPL-96 uygulaması (`ORCHESTRATION_PLAN.md` §5).
 
 ## 3. Kronoloji
 
@@ -412,7 +404,7 @@ Ledger §5'teki her koşu için bir satır var ve satırlar numara sırasındad�
 | IMPL-93 | 2026-09-13 | Faz8.2 | kernel LTS kapsamı, yalnız blobless klonlarla | verified; 1 / 16 çakışma, hiçbiri kamera sürücüsünde değil; `DEC-08`: ertele | L:522 |
 | IMPL-94 | 2026-09-13 | Faz7.2 | `F7.2-01` kapısı; runbook'ta `AUDIT-FIX-52/53/54`; symlink testi `vendor/` yoluna taşındı | kapı GEÇMEDİ (10 saatlik pencere yok, diğer kontroller açık); §5 exit 0; kiralama yok | L:523; snap 20260913-2140 |
 | IMPL-95 | 2026-09-14 | Faz7.2 runbook'u (PRP adım 3a) | önceki set `f724b64` olarak commit'lendi; `DEC-26` yanıtlandı; BE Scaleway'e taşındı | POP2-32C-128G, 3 volume, sıfıra söküm; `bash -n` 10/10; commit `587e3b5`; kiralama ve push yok | L:524; snap 20260914-1434 |
-| IMPL-96 (devam ediyor) | 2026-11-13 | depo, kayıt işleri ve HyperOS 4 taban ölçümü | Depo taşıma; K4 silinenleri; `7fa0a51`; HyperOS 4 salt-okunur ölçümü (`37edb5f`); tarihsel notlar (`6a20999`); oturum belgeleri. Ledger satırı yeni pencerede yazılacak: 11. denetim ve geçersiz kuyruk; §4 Faz 7/8 engel hücreleri; §6 depo/cihaz paragrafları; §7 girdileri; `DEC-27`…`DEC-30` (önerilen) | O2 onaylandı; ledger satırı yazılmadı | §2.6 |
+| IMPL-96 (devam ediyor) | 2026-11-13 | depo, kayıt işleri ve HyperOS 4 taban ölçümü | Depo taşıma; K4 silinenleri; `7fa0a51`; HyperOS 4 salt-okunur ölçümü (`70946ff`; probe satır 42, 190, 191 redakte); tarihsel notlar ve cihaz notları (`03b0898`); oturum belgeleri (`775b321`); K8 bundle. Ledger satırı Pencere 1'de yazılacak: `DEC-27`…`DEC-32` (`ORCHESTRATION_PLAN.md` §5) | O2 onaylandı; K7 = (a), K8 = A; ledger satırı yazılmadı | §2.6, §11 |
 
 ### 3.3 Planlama koşuları ve denetimler
 ClaudeQB adımları:
@@ -624,19 +616,22 @@ Kanonik kaynak `Planner-docs/Planing-Ledger.md` §8'dir (satır :569–:601; sat
 | DEC-25 | 2026-09-11 → 2026-09-11 | Bütçe, durma kuralı, sunucu, repo erişimi | CCX53; 10 sa tavan + 8. saat kuralı; ≤2 manifest-sınıfı düzeltme; kapatma değil silme; manifest ve device repoları public; sunucuda kimlik bilgisi yok | yanıtlandı; (1) ve (4) DEC-26 ile değişti; (3)'te sync-path istisnası eksik (AUDIT-FIX-56) | ledger:600 |
 | DEC-26 | 2026-09-14 → 2026-09-14 | Hetzner engelinden sonra Scaleway kiralaması | POP2-32C-128G (Instance EUR 1.18/sa, tümü yaklaşık EUR 1.28/sa); Ubuntu 22.04 (+yedek); 10 sa / 8. saat kuralı kalıyor, yaklaşık EUR 12.8 + KDV; OOM'da yeniden deneme yok; her şey silinir; disk 40 GB 5K, `ishtar-src` 310 GB 5K `/android`, `ishtar-out` 260 GB 15K `/android/beryl/out`; ccache kapalı; `OUT_DIR` yok | yanıtlandı (IMPL-95) | ledger:601; `docs/build-environment.md:118-130` |
 
-**Oturum kararları (2026-11-13).** Bunlar henüz DEC değil; IMPL-96'da ledger'a işlenecek. Önerilen numaralar: `DEC-27` depo taşıma, `DEC-28` ROM derlemenin bırakılması ve HyperOS 4, `DEC-29` K1, `DEC-30` K5+K6 (ROM derleme fikri için açılan üç GitHub deposunun silinmesi). K7'nin yanıtı sonraki numarayı alır.
+**Oturum kararları (2026-11-13).** Bu numaralar atandı; ledger'a IMPL-96 ile (Pencere 1) yazılacak. Atanan numaralar: `DEC-27` depo taşıma, `DEC-28` ROM derlemenin bırakılması ve HyperOS 4, `DEC-29` K1, `DEC-30` K5+K6, `DEC-31` K8, `DEC-32` K7. Sonraki boş numara `DEC-33`.
 
 | id | soru | yanıt / durum (öneri kalın) |
 |---|---|---|
-| K1 | `ishtar-cam-modes/Kullanim.txt` (v1.9 kılavuzu, zip içinde) | **Yanıtlandı (b):** bir sonraki sürümde düzeltilecek (`DEC-29` önerilen) |
-| K2 | Planlama koşusu 21'in zamanı (Main-Planing Hetzner→Scaleway, EV-20, AUDIT-FIX-41/42/57) | **Yanıtlandı, kapsam değişti:** ROM derleme fikri bırakıldı; telefon HyperOS 4 portunda (kernel 5.15.215). Koşu 21 artık Faz 7/8'i emekliye ayırır (`DEC-28` önerilen) |
+| K1 | `ishtar-cam-modes/Kullanim.txt` (v1.9 kılavuzu, zip içinde) | **Yanıtlandı (b):** bir sonraki sürümde düzeltilecek (`DEC-29` atandı; ledger'a Pencere 1'de yazılır) |
+| K2 | Planlama koşusu 21'in zamanı (Main-Planing Hetzner→Scaleway, EV-20, AUDIT-FIX-41/42/57) | **Yanıtlandı, kapsam değişti:** ROM derleme fikri bırakıldı; telefon HyperOS 4 portunda (kernel 5.15.215). Koşu 21 artık Faz 7/8'i emekliye ayırır (`DEC-28` atandı; ledger'a Pencere 1'de yazılır) |
 | K3 | T5: kernel-upstream iddiasının salt-okur doğrulaması | **Düştü:** kullanıcıya göre gereksiz; telefon zaten 5.15.215 kernelli portta |
 | K4 | `devir-teslim-promptu.md`, boş `UsersahmetAppDataLocalTempaon-smoke/` ve gereksiz eski loglar | **Uygulandı (2026-11-13):** beş öğe silindi (§2.1) |
-| K5 | Eski özel depo `ahmetxa/ishtar` | **Yanıtlandı: sil.** Kullanıcı: depo ROM derleme fikri için açılmıştı. Tek dalı `main@f8a05ca` yerel `main`'in atası; içeriğin tamamı yeni depoda; release, tag ya da issue yok. `gh` belirtecinde `delete_repo` yok; silmeyi kullanıcı yapar (`DEC-30` önerilen) |
-| K6 | Halka açık ROM depoları `ahmetxa/android_local_manifests`, `ahmetxa/android_device_xiaomi_ishtar` | **Yanıtlandı: sil** (derleme alınmayacak). Önce ayna yedek alındı: `C:/Users/ahmet/Documents/Projeler/ishtar-arsiv/` (§2.1). Silmeyi kullanıcı yapar (`DEC-30` önerilen) |
-| K7 | HyperOS 4'te projenin yönü | **Açık.** Ölçüm yapıldı (§2.3). Seçenekler: (a) modülleri HyperOS 4'e uyarla: sensör katmanı aynı blob üzerinde; 50MP katmanı yeni HAL'de baştan tersine mühendislik ister; kutucuk/WebUI zinciri KernelSU Next'e bağlı. (b) Yalnız AGC'yi sürdür: şu an yamasız V9.6, tuzaklar kurulu (10), 12,58 MP türetiliyor. (c) AOSPA dönemini kapat |
-| O2 | Depo hijyeni ve IMPL-96 kurulumu | **Onaylandı (2026-11-13):** `7fa0a51`, `integrate/impl-96`, `37edb5f`, `6a20999`; ledger satırı yeni pencerede |
-| Push | `7fa0a51` ve `integrate/impl-96` dalı | **Açık:** kullanıcı kararı |
+| K5 | Eski özel depo `ahmetxa/ishtar` | **Yanıtlandı: sil.** Kullanıcı: depo ROM derleme fikri için açılmıştı. Tek dalı `main@f8a05ca` yerel `main`'in atası; içeriğin tamamı yeni depoda; release, tag ya da issue yok. `gh` belirtecinde `delete_repo` yok; silmeyi kullanıcı yapar (`DEC-30` atandı; ledger'a Pencere 1'de yazılır) |
+| K6 | Halka açık ROM depoları `ahmetxa/android_local_manifests`, `ahmetxa/android_device_xiaomi_ishtar` | **Yanıtlandı: sil** (derleme alınmayacak). Önce ayna yedek alındı: `C:/Users/ahmet/Documents/Projeler/ishtar-arsiv/` (§2.1). Silmeyi kullanıcı yapar (`DEC-30` atandı; ledger'a Pencere 1'de yazılır) |
+| K7 | HyperOS 4'te projenin yönü | **Yanıtlandı: (a)** modülü HyperOS 4'e uyarla (`DEC-32`, Pencere 1'de yazılacak). Seçenekler: (a) modülleri HyperOS 4'e uyarla: sensör katmanı aynı blob üzerinde; 50MP katmanı yeni HAL'de baştan tersine mühendislik ister; kutucuk/WebUI zinciri KernelSU Next'e bağlı. (b) Yalnız AGC'yi sürdür: şu an yamasız V9.6, tuzaklar kurulu (10), 12,58 MP türetiliyor. (c) AOSPA dönemini kapat. Kaynak: `ORCHESTRATION_PLAN.md` §2 |
+| K8 | Probe snapshot'ındaki cihaz kimlikleri (push öncesi) | **Yanıtlandı: A** (redaksiyon, `DEC-31`); dal yeniden kuruldu (`70946ff`, `03b0898`, `775b321`; eşleme §11); **yürütüldü**. Redaksiyonsuz uç yalnız depo dışı bundle'da (§11) |
+| Konusuz | ROM derlemeye bağlı altı karar | `DEC-07`, `DEC-08`, `DEC-22`, `DEC-24`, `DEC-25`, `DEC-26`: `DEC-28` ile konusu kalmadı; ledger'a Pencere 1'de işlenecek |
+| K9 | 50MP HAL katmanının HyperOS 4 HAL'inde (`2a955e68…`) yeniden türetilmesi | **Açık.** Pencere 3'ün başında sorulur |
+| O2 | Depo hijyeni ve IMPL-96 kurulumu | **Onaylandı (2026-11-13):** `7fa0a51`, `integrate/impl-96`, `70946ff`, `03b0898`, `775b321`; ledger satırı Pencere 1'de |
+| Push | `7fa0a51` ve `integrate/impl-96` dalı | **Açık.** Pencere 2'de sorulur; yalnız açık refspec |
 
 ## 5. Bulgular, kanıtlanmış sınırlar, emekliye ayrılan hedefler
 
@@ -721,6 +716,7 @@ Kanonik kaynak `Planner-docs/Planing-Ledger.md` §8'dir (satır :569–:601; sat
 | Faz9.2 / release | 11 / 1 | 2026-09-06 20:44 – 2026-09-07 00:55 | v2.2 kurulumu, known-bad testi, VAL-MANUAL (IMPL-80…85) |
 | kamerateyit | 4 | 2026-09-08 19:35 – 2026-09-09 17:26 | A/B/C bracket'ları, PC-13 fps analizi (IMPL-87/88) |
 | IMPL89 / IMPL94 / DEC26 | 1 / 1 / 1 | 2026-09-10 / 09-13 / 09-14 | bağımsız PTS kontrolü; kiralama kapısı geçilmedi; Scaleway devir metni (doğrulanmamış iddialar) |
+| K8 bundle (repo dışı) | 1 | 2026-11-13 | redaksiyon öncesi `integrate/impl-96` ucu; eski hash'lerin tek kaynağı (reflog ile birlikte) |
 
 **Önemli yakalamalar:**
 - `20260902-2242__Faz4.6__EV44-fullres-stream-50MP-folded-ORIGINAL.jpg`: AGC'nin ilk 50.33 MP karesi, katlanmış.
@@ -771,8 +767,10 @@ Kanonik kaynak `Planner-docs/Planing-Ledger.md` §8'dir (satır :569–:601; sat
 | `UNTRACKED-BY-DESIGN.md` | Faz1.1 dışlama kaydı | 2026-08-24; bayat (remote yok diyor) |
 | `ishtar-cam-modes/Kullanim.txt` | Kullanıcı kılavuzu, zip'in içinde | v1.9 içeriği; 13 bayat ifade (K1) |
 | `devir-teslim-promptu.md` | Eski devir promptu | 2026-09-09; **2026-11-13'te silindi** (K4); yerini NEXT_PROMPT.md aldı |
-| `PROJECT_LOG.md` | Bu belge: proje günlüğü özeti | 2026-11-13; izlenmiyor |
-| `NEXT_PROMPT.md` | Yeni oturum için yapıştırılacak prompt | 2026-11-13; izlenmiyor |
+| `PROJECT_LOG.md` | Bu belge: proje günlüğü özeti | 2026-11-13; ilk sürüm `775b321`, son sürüm C0'da (`git log --diff-filter=A -- ORCHESTRATION_PLAN.md`) |
+| `NEXT_PROMPT.md` | Yeni oturum için yapıştırılacak prompt | 2026-11-13; ilk sürüm `775b321`, son sürüm C0'da (`git log --diff-filter=A -- ORCHESTRATION_PLAN.md`) |
+| `ORCHESTRATION_PLAN.md` | Pencere planı: fazlar, kararlar, geçitler, sözleşme (Ek A) | 2026-11-13; C0 ile eklendi (`git log --diff-filter=A -- ORCHESTRATION_PLAN.md`); Pencere 1 girişi |
+| `../ishtar-arsiv/impl-96-unredacted.bundle` (repo dışı) | Redaksiyon öncesi `integrate/impl-96` ucu (K8); yalnız yedek | 2026-11-13; 77.094 B; `git bundle verify` geçti |
 
 ## 8. Bilinen belge kaymaları ve küçük takipler
 
@@ -887,7 +885,7 @@ Birleşik ve tekilleştirilmiş liste. Kanıtlar extract'lardan alındı; satır
 | `IMPL-NN` | Uygulama koşusu (Step 4); her koşu bir satır | ledger §5; sıradaki **IMPL-96** |
 | planlama koşusu N | Step 1/2 (ve eski denetim) koşuları | ledger §2; sıradaki **21** |
 | N. denetim | Step 3 denetimi; yalnızca `Sub-Planing-Audit.md`'ye yazar, kendi koşu satırı yok | sıradaki **12.** |
-| `DEC-NN` | Kullanıcı kararı | ledger §8; sıradaki **DEC-27** (2026-11-13 depo taşıma kararına ayrıldı) |
+| `DEC-NN` | Kullanıcı kararı | ledger §8; sıradaki **DEC-33**; `DEC-27`…`DEC-32` 2026-11-13'te ayrıldı, ledger'a Pencere 1'de yazılacak |
 | `FIND-x.y-NN` | Faz x.y'nin bulgusu; atamadan önce kullanılmadığı kontrol edilir | ledger, belgeler |
 | `AUDIT-FIX-NN` | Denetim kaydı maddesi, P0–P3 (şu ana dek 57) | Audit §13 |
 | `AUTOPSY-Pn-NN` | Otopsi öncelik bulguları | `Planner-docs/Autopsy.md` §13 |
@@ -896,8 +894,9 @@ Birleşik ve tekilleştirilmiş liste. Kanıtlar extract'lardan alındı; satır
 | `C-NN` / `PC-NN` | Release iddiası / probu (01–18) | `docs/release-checklist.md` |
 | `SNAP-YYYY-MM-DD-{MAIN,SUBPLANS,AUTOPSY}` | Plan snapshot'ı; etkin olanlar `-09-10-MAIN/-SUBPLANS` | ledger §3 |
 | `EV`/`CQ`/`H`/`TRACE`/`ARC`/`QAS`; `OQ` | Comprehension kayıtları; ontoloji soruları | Comprehension; Ontology §8 |
-| `Kararlar #n`; `BASELINE-2026-08-31-V21`; `K1–K7` | Günlük kararları; adlandırılmış baseline; oturum kararları | günlük; ledger:73; §4 |
+| `Kararlar #n`; `BASELINE-2026-08-31-V21`; `K1–K9` | Günlük kararları; adlandırılmış baseline; oturum kararları | günlük; ledger:73; §4 |
 | `O0`–`O5`; `O2-a`/`O2-b`; `T1`–`T5`, `L`, `M`, `RUN21`, `V` | 2026-11-13 orkestrasyon aşamaları (kullanıcının komut şablonundaki "Faz 0–5") ve iş birimleri; proje fazı değildir | §2.6; §11; aşağıdaki not |
+| `Pencere N` | `ORCHESTRATION_PLAN.md` fazı (Pencere 0, 1, 2 …); ClaudeQB fazı değildir | `ORCHESTRATION_PLAN.md` §1 |
 | durum sözlüğü | `planned`, `ready`, `ready_with_warnings`, `in_progress`, `implemented`, `verified`, `blocked`, `superseded`. Bileşik değer parser'ı bozar | ledger:97 |
 
 **"Faz" adının üç anlamı (2026-11-13 adlandırma denetimi):**
@@ -972,4 +971,23 @@ Ek not: `docs/pre-rental-plan.md`'deki "Step 1–4" o planın kendi sırasıdır
   - İki açık deponun ayna yedeği alındı; `ishtar-eski` remote'u kaldırıldı. Silme yapılmadı (`delete_repo` yetkisi yok).
   - HyperOS 4 ölçümünün sonuçları §2.3'te. İlk ana bilgisayar ayrıştırması yanlış başlığı hedefledi; snapshot'taki o bölüm aynı oturumda doğru sonuçlarla değiştirildi ve diğer telefonun seri numarası kayıttan çıkarıldı.
   - Bağlam büyüklüğü nedeniyle ledger IMPL-96 satırı bilerek yeni pencereye bırakıldı.
+
+**2026-11-13: Pencere 0 (omp, ikinci pencere).** Kapsam: `ORCHESTRATION_PLAN.md` Pencere 0 (keşif, plan, sözleşme). Bu girdi bir IMPL satırı değildir; ledger'a yazılmadı.
+
+- **O0 keşfi (salt-okur):**
+  - Dört scout paralel çalıştı: `LedgerMap`, `PlanDocsMap`, `ModuleMap`, `DocsFactCheck`. Olgular `ORCHESTRATION_PLAN.md` Ek A'da, kapsam dışı bulgular §10'da.
+  - GitHub (`gh api`, 2026-11-13): `ahmetxa/ishtar`, `ahmetxa/android_local_manifests` ve `ahmetxa/android_device_xiaomi_ishtar` üçü de hâlâ var. Silme yapılmadı.
+  - Telefon (`dc27e5d0`): prop'lar ve md5'ler probe ile aynı (HAL `2a955e68…`, sensör `9e4d0fe1…`, AON sembolik bağı, 13 modül, proje modülleri yok, AGC versionName `8.4.300.414775575.18`).
+  - Doğrulayıcı ve self-test taban ile aynı: `error_count=0`, `warning_count=1` (`P2:1,P3:9`), `subplan_count=42`; `SELF-TEST: PASS`.
+- **Gizlilik bulgusu:** Commit edilmiş ama push edilmemiş probe anlık görüntüsü cihaz tanımlayıcıları içeriyordu (iki IMEI ve bir `persist` özelliği). Değerler hiçbir dosyaya, rapora ya da mesaja yazılmadı; kontroller maskeli yapıldı. Bu girdide de değer yazılmamıştır.
+- **O1 plan ve onay:** `ORCHESTRATION_PLAN.md` yazıldı; kullanıcı "onay" dedi. Pencere-fazı kuralı kullanıcının isteğidir.
+- **Kararlar (2026-11-13):** K7 = (a) → `DEC-32`; K8 = A → `DEC-31` (yürütüldü); konusuz = `DEC-07`, `DEC-08`, `DEC-22`, `DEC-24`, `DEC-25`, `DEC-26`; K9 açık (Pencere 3); push açık (Pencere 2). Ledger'a yazılacak numaralar: `DEC-27`…`DEC-32`; sonraki boş numara `DEC-33`.
+- **Kabul edilen danışma noktaları:** adlandırılmış yedek dal açılmadı; redaksiyonsuz bundle depo dışında; push yalnız açık refspec ile; push öncesi güvenlik incelemesi `origin/main..integrate/impl-96` aralığının tamamını kapsar (`7fa0a51` dahil).
+- **K8 yürütümü:**
+  - Bundle: `../ishtar-arsiv/impl-96-unredacted.bundle`; 77.094 B; sha256 `b9fa9c5cd5d0ae78f9f051ab62ecbfc2d9b2fa2fecd33f40247ef88bf58f6cd3`; `git bundle verify` geçti; önkoşul `7fa0a51`.
+  - Hash eşlemesi: `37edb5f` → `70946ff` (probe satır 42, 190, 191 `<redacted>`); `6a20999` → `03b0898`; `fcceaab` → `775b321` (içerik aynı). Eski ağaca göre fark yalnız bu üç satır.
+  - Maskeli tarama: tüm ref'lerden erişilebilen geçmişte 0 eşleşme. Eski hash'ler yalnız bundle'da ve yerel reflog'da. Güncel metinler (§2, §3.2, §4) yalnız yeni hash'leri kullanır; eski girdiler olduğu gibi kalır.
+  - Geçitler: doğrulayıcı ve self-test taban ile aynı (yukarıda).
+- **Belgeler:** `ORCHESTRATION_PLAN.md` (C0 ile eklendi); `NEXT_PROMPT.md` Pencere 1'i gösterecek şekilde güncellendi; bu belge §2, §3.2, §4, §6, §7 ve §10'da güncellendi.
+- **Kapanış:** C0 (`ORCHESTRATION_PLAN.md`, bu günlük ve `NEXT_PROMPT.md`'yi taşıyan commit) işlendi; `git log --diff-filter=A -- ORCHESTRATION_PLAN.md` ile bulunur. Sonraki pencere: Pencere 1 — IMPL-96 uygulaması (`ORCHESTRATION_PLAN.md` §5).
 - **Sonraki giriş için şablon:** `YYYY-MM-DD — koşu kimliği — yapılan — ölçüm — bekleyen kararlar`. Aynı anda §2, §3.2 ve §4 de güncellenir.
