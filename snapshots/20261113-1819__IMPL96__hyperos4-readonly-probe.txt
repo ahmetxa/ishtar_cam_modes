@@ -1,0 +1,374 @@
+# IMPL-96 — HyperOS 4 read-only probe, 2026-11-13T15:19:00.913Z (file name in host local time)
+# Host: Windows; platform-tools/adb.exe 37.0.1; target serial dc27e5d0 (product ishtar, model 2304FPN6DC), always addressed with -s.
+# Other devices connected at the time and NOT touched: one other phone (serial not recorded) and emulator-5554.
+# Read-only: getprop, uname, getenforce, pm list/path, dumpsys package/media.camera (filtered on the host), stat, md5sum, ls, /proc/self/mounts, su -c id and read-only root listings.
+# Nothing was written, mounted, installed, set or stopped on the device.
+
+### adb devices (only dc27e5d0 was addressed, always with -s)
+List of devices attached
+(another phone; serial not recorded)	device
+dc27e5d0	device
+emulator-5554	device
+
+### getprop (filtered)
+[bpf.hyperos_progs_loaded]: [1]
+[init.svc.cameraserver]: [running]
+[init.svc.miuitcptracker]: [stopped]
+[init.svc.vendor.camera-provider]: [running]
+[init.svc.vendor.camera-provider-2-7-ext-uvc]: [running]
+[init.svc_debug_pid.miuitcptracker]: []
+[miui.usb.dialog]: [1]
+[persist.bt.miui_auracast.enable]: [true]
+[persist.device_config.netd_native.trust_miui_add_dns]: []
+[persist.miui.auto_ui_enable]: [true]
+[persist.miui.coastline2OnScreenTime]: [58000]
+[persist.miui.density_v2]: [600]
+[persist.miui.dexopt.ota]: [true]
+[persist.miui.extm.bdsize]: [6144]
+[persist.miui.extm.daily_flush_count]: [1835008]
+[persist.miui.extm.enable]: [0]
+[persist.miui.extm.version]: [4.0]
+[persist.miui.gpu.partition.enable]: [true]
+[persist.miui.launcher.wmark]: [10]
+[persist.miui.seasonsOffScreenTime]: [86000]
+[persist.miui.seasonsOnScreenTime]: [85000]
+[persist.miui.slide.wmark]: [45]
+[persist.miui.thirdappopt_enable]: [true]
+[persist.miui.wifi.upf.enable]: []
+[persist.sys.miui.camera.boost.killAdj_threshold]: [251:200:100:50]
+[persist.sys.miui.camera.quickcamera.supported]: [true]
+[persist.sys.miui.camera.version]: [3.0]
+[persist.sys.miui.damon.enable]: [true]
+[persist.sys.miui.sno]: [<redacted>]
+[persist.sys.miui.sys_dumpstack]: [am.ActivityManagerService,wm.WindowManagerGlobalLock]
+[persist.sys.miui.sys_monitor]: [am.ActivityManagerService,wm.WindowManagerGlobalLock]
+[persist.sys.miui.unfairMemory.enable]: [false]
+[persist.sys.miui_animator_sched.big_prime_cores]: [3-7]
+[persist.sys.miui_animator_sched.bigcores]: [3-6]
+[persist.sys.miui_animator_sched.sched_threads]: [2]
+[persist.sys.miui_art_ota_time]: [1793877111886]
+[persist.sys.miui_art_report.enable]: [127]
+[persist.sys.miui_boot_dexopt_progress]: [100]
+[persist.sys.miui_default_resolution]: [1440x3200]
+[persist.sys.miui_gnss_dc]: [true]
+[persist.sys.miui_resolution]: [1080,2400,432]
+[persist.sys.miui_scout_binder_full_kill_process]: [true]
+[persist.sys.miuitcptracker.ctrl]: [false]
+[persist.sys.smart_gc.packages]: [com.miui.home,com.android.systemui]
+[persist.sys.stability.miui_fbo_enable]: [true]
+[persist.sys.stability.miui_fbo_start_count]: [0]
+[persist.vendor.camera.3rdhighResolutionBlob.scenes]: [false]
+[persist.vendor.camera.3rdlive.scenes]: [false]
+[persist.vendor.camera.3rdvideocall.scenes]: [false]
+[persist.vendor.camera.IsVariableApertureSupported]: [true]
+[persist.vendor.camera.frontMain.vendorID]: [01]
+[persist.vendor.camera.gesture.emoji.active]: [0]
+[persist.vendor.camera.gesture.emoji.support]: [1]
+[persist.vendor.camera.logstate]: [3]
+[persist.vendor.camera.mawlog.main]: [1]
+[persist.vendor.camera.mi.dualcal.state]: [3]
+[persist.vendor.camera.mi.module.info]: [back_main=0x65;back_tele=0x70;back_tele4x=0x70;]
+[persist.vendor.camera.mi.module.infoext]: [front_main=0x67;back_ultra=0x70;]
+[persist.vendor.camera.mialgoengine.openlifo]: [1]
+[persist.vendor.camera.mivi.groupsEnable]: []
+[persist.vendor.camera.mivi.loglevel]: []
+[persist.vendor.camera.mivi.version]: [2]
+[persist.vendor.camera.modulename0.info]: [0pen0mjc750dbnfsb0dpn/ruj/tfotpsnpevmf/jtiubs`tfndp`jny:9:`xjef/cjo]
+[persist.vendor.camera.modulename1.info]: [0pen0mjc750dbnfsb0dpn/ruj/tfotpsnpevmf/jtiubs`tvooz`pw43d`gspou/cjo]
+[persist.vendor.camera.modulename2.info]: [0pen0mjc750dbnfsb0dpn/ruj/tfotpsnpevmf/jtiubs`tfndp`jny969`vmusb/cjo]
+[persist.vendor.camera.modulename3.info]: [0pen0mjc750dbnfsb0dpn/ruj/tfotpsnpevmf/jtiubs`tfndp`jny969`ufmf4y/cjo]
+[persist.vendor.camera.modulename4.info]: [0pen0mjc750dbnfsb0dpn/ruj/tfotpsnpevmf/jtiubs`tfndp`jny969`ufmf6y/cjo]
+[persist.vendor.camera.offlinedebug.mask]: []
+[persist.vendor.camera.privapp.list]: [org.codeaurora.snapcam]
+[persist.vendor.camera.provider.restart.time]: [1794498241]
+[persist.vendor.camera.rearMain.vendorID]: [03]
+[persist.vendor.camera.rearTele.vendorID]: [03]
+[persist.vendor.camera.rearTele4x.vendorID]: [03]
+[persist.vendor.camera.rearUltra.vendorID]: [03]
+[persist.vendor.camera.sceneActivityByMeta]: [1]
+[persist.vendor.camera.sensor.hw.d0]: [shk-3001_wide:1 shk-3002_wide:1]
+[persist.vendor.camera.sensor.hw.d1]: [shk-3001_wide:2]
+[persist.vendor.camera.sensor.hw.d2]: [shk-3002_wide:3]
+[persist.vendor.camera.sensor.hw.d3]: [shk-3001_wide:1]
+[persist.vendor.camera.sensor.hw.d4]: []
+[persist.vendor.camera.sensor.hw.d5]: [shk-3001_wide:1]
+[persist.vendor.camera.sensor.hw.d6]: [shk-3001_wide:1]
+[persist.vendor.camera.sensor.hw.d7]: [shk-3001_wide:1]
+[persist.vendor.camera.sensor.hw.d8]: [shk-3001_wide:1]
+[persist.vendor.camera.sensor.hw.d9]: [shk-3002_wide:1]
+[persist.vendor.camera.sensor.hw.time.d0]: [1791997395]
+[persist.vendor.camera.sensor.hw.time.d1]: [1792056800]
+[persist.vendor.camera.sensor.hw.time.d2]: [1792168747]
+[persist.vendor.camera.sensor.hw.time.d3]: [1793984975]
+[persist.vendor.camera.sensor.hw.time.d4]: [1794088600]
+[persist.vendor.camera.sensor.hw.time.d5]: [1794168496]
+[persist.vendor.camera.sensor.hw.time.d6]: [1794223083]
+[persist.vendor.camera.sensor.hw.time.d7]: [1792604374]
+[persist.vendor.camera.sensor.hw.time.d8]: [1794412735]
+[persist.vendor.camera.sensor.hw.time.d9]: [1792753257]
+[persist.vendor.camera.sensor.probe]: [<front:SSSSS><tele3x:SSSSS><tele5x:SSSSS><ultra:SSSSS><wide:SSSSS>]
+[persist.vendor.camera.uw_act_status]: [0]
+[persist.vendor.camera.w_act_status]: [32]
+[persist.vendor.camera.w_vcm_id]: [184]
+[persist.vendor.display.miui.composer_boost]: [4-7]
+[ro.board.platform]: [kalama]
+[ro.boot.flash.locked]: [0]
+[ro.boot.slot_suffix]: [_a]
+[ro.boot.vbmeta.device_state]: [unlocked]
+[ro.boot.verifiedbootstate]: [orange]
+[ro.bootimage.build.fingerprint]: [Xiaomi/ishtar/ishtar:13/TKQ1.221114.001/OS3.0.305.0.WMACNXM:user/release-keys]
+[ro.build.date]: [Wed Sep 23 15:51:02 CST 2026]
+[ro.build.display.id]: [CP2A.260605.016]
+[ro.build.fingerprint]: [Xiaomi/ishtar/ishtar:17/CP2A.260605.016/OS4.0.0.44.WMACNXM:user/release-keys]
+[ro.build.tags]: [release-keys]
+[ro.build.type]: [user]
+[ro.build.version.codename]: [REL]
+[ro.build.version.incremental]: [OS4.0.0.44.WMACNXM]
+[ro.build.version.release]: [17]
+[ro.build.version.sdk]: [37]
+[ro.build.version.security_patch]: [2026-09-01]
+[ro.config.miui_activity_embedding_enable]: [true]
+[ro.config.miui_orientation_projection_enable]: [true]
+[ro.config.miui_otamonitor_enable]: [true]
+[ro.crypto.type]: [file]
+[ro.hardware]: [qcom]
+[ro.kernel.version]: [5.15]
+[ro.mi.os.custfeatureresolve]: [true]
+[ro.mi.os.logs.romtype]: [commercial]
+[ro.mi.os.soc.vendor]: [qcom]
+[ro.mi.os.version.beta]: [true]
+[ro.mi.os.version.code]: [4]
+[ro.mi.os.version.incremental]: [OS4.0.0.44.WMACNXM]
+[ro.mi.os.version.name]: [OS4.0]
+[ro.mi.os.version.publish]: [false]
+[ro.miui.allow_app_playbackcapture]: [true]
+[ro.miui.audio.karaoke.suppot.lowlatency]: [true]
+[ro.miui.audio.policy.engine.odm]: [true]
+[ro.miui.block_device_path]: [/dev/block/bootdevice/by-name]
+[ro.miui.build.region]: [cn]
+[ro.miui.cust_hardware]: [V1]
+[ro.miui.cust_variant]: [cn]
+[ro.miui.device.xunlei.largemem]: [true]
+[ro.miui.enable_cloud_verify]: [true]
+[ro.miui.fromAppleRelayCall.version]: [1]
+[ro.miui.has_cust_partition]: [true]
+[ro.miui.has_gmscore]: [1]
+[ro.miui.has_security_keyboard]: [1]
+[ro.miui.mcc]: [9460]
+[ro.miui.mnc]: [9999]
+[ro.miui.notch]: [1]
+[ro.miui.pm.install.buffer.size]: [49152]
+[ro.miui.pm.install.speedinstall]: [/data/apk-tmp]
+[ro.miui.product.home]: [com.miui.home]
+[ro.miui.region]: [CN]
+[ro.miui.remove_uri_80_flag]: [1]
+[ro.miui.restrict_imei]: [1]
+[ro.miui.shell_anim_enable_fcb]: [true]
+[ro.miui.support.enable_new_factory_reset]: [1]
+[ro.miui.support_audiorecord_compress]: [true]
+[ro.miui.support_miui_ime_bottom]: [1]
+[ro.miui.support_submix_multichannel]: [true]
+[ro.miui.ui.font.animation]: [disable]
+[ro.miui.ui.font.mi_font_path]: [/system/fonts/MiSansVF.ttf]
+[ro.miui.ui.font.mi_fonts_customization_xml]: [/product/etc/mi_fonts_customization.xml]
+[ro.miui.ui.font.theme_apply]: [true]
+[ro.miui.ui.font.version]: [3]
+[ro.miui.ui.fonttype]: [mipro]
+[ro.miui.ui.version.code]: [816]
+[ro.miui.ui.version.name]: [V816]
+[ro.miui.vicegwsd]: [true]
+[ro.odm.build.date]: [Sat Sep 26 16:56:55 CST 2026]
+[ro.odm.build.fingerprint]: [Xiaomi/ishtar/ishtar:13/TKQ1.221114.001/OS4.0.0.44.WMACNXM:user/release-keys]
+[ro.odm.build.version.incremental]: [OS4.0.0.44.WMACNXM]
+[ro.product.brand]: [Xiaomi]
+[ro.product.device]: [ishtar]
+[ro.product.first_api_level]: [33]
+[ro.product.manufacturer]: [Xiaomi]
+[ro.product.mod_device]: [ishtar]
+[ro.product.model]: [2304FPN6DC]
+[ro.product.name]: [ishtar]
+[ro.ril.miui.imei0]: [<redacted>]
+[ro.ril.miui.imei1]: [<redacted>]
+[ro.serialno]: [dc27e5d0]
+[ro.soc.manufacturer]: [QTI]
+[ro.soc.model]: [SM8550]
+[ro.treble.enabled]: [true]
+[ro.vendor.build.date]: [Sat Sep 26 16:56:55 CST 2026]
+[ro.vendor.build.fingerprint]: [Xiaomi/ishtar/ishtar:13/TKQ1.221114.001/OS4.0.0.44.WMACNXM:user/release-keys]
+[ro.vendor.build.security_patch]: [2026-02-01]
+[ro.vendor.build.version.incremental]: [OS4.0.0.44.WMACNXM]
+[ro.vendor.camera.interpolation.mialgo.support]: [true]
+[ro.vendor.miui.cust_hardware]: [V1]
+[ro.vendor.miui.cust_variant]: [cn]
+[ro.vendor.miui.mcc]: [9460]
+[ro.vendor.miui.mnc]: [9999]
+[ro.vendor.miui.region]: [CN]
+[ro.vendor.radio.build_profile]: [miui]
+[ro.vndk.version]: [33]
+[sys.miui.gki_ndcd]: [off]
+[sys.miui_bpf_ready]: [1]
+[vendor.audio.hal.miuiDebuglevel]: [2]
+[vendor.miui.wifi.p2phc]: [1]
+
+### kernel
+Linux localhost 5.15.215-KylinKernel-260925-Release #2 SMP PREEMPT Fri Sep 25 20:27:58 CST 2026 aarch64 Toybox
+Linux version 5.15.215-KylinKernel-260925-Release (lin@DreamKylin-Studio) (Android (13290119, +pgo, +bolt, +lto, +mlgo, based on r547379) clang version 20.0.0 (https://android.googlesource.com/toolchain/llvm-project b718bcaf8c198c82f3021447d943401e3ab5bd54), LLD 20.0.0 (/mnt/disks/build-disk/src/android/llvm-r547379-release/out/llvm-project/llvm b718bcaf8c198c82f3021447d943401e3ab5bd54)) #2 SMP PREEMPT Fri Sep 25 20:27:58 CST 2026
+
+### selinux
+Enforcing
+
+### root-manager packages
+(none found)
+
+### camera-related packages
+org.codeaurora.ims
+com.xiaomi.cameratools
+com.xiaomi.cameramind
+com.android.camera
+org.codeaurora.snapcam
+com.xiaomi.android.overlay.ishtar
+com.xiaomi.module.evaluation
+
+### camera-related package versions
+org.codeaurora.ims: versionName=1.0 versionCode=1 lastUpdateTime=1970-06-06 00:51:33
+com.xiaomi.cameratools: versionName=26.06.22.17.0 versionCode=260622170 lastUpdateTime=1970-06-06 00:51:33
+com.xiaomi.cameramind: versionName=1.0.0 versionCode=1 lastUpdateTime=1970-06-06 00:51:33
+com.android.camera: versionName=1+6.4.000380.1 versionCode=740003801 lastUpdateTime=1970-06-06 00:51:32
+org.codeaurora.snapcam: versionName=8.4.300.414775575.18 versionCode=64764891 lastUpdateTime=2026-09-20 11:44:38
+com.xiaomi.android.overlay.ishtar: versionName=13 versionCode=33 lastUpdateTime=1970-06-06 00:51:32
+com.xiaomi.module.evaluation: versionName=1.55 versionCode=93 lastUpdateTime=2026-09-20 11:40:37
+
+### AGC apk (path|size|md5)
+/data/app/~~GVDFkeHwFlzldUkqbfXI1g==/org.codeaurora.snapcam-JrsNTHxRZsZxZvAD2Oe6Ww==/base.apk|151031793|fa4066eb3bf82cc097906fd108073500
+
+### camera files (path|size|md5) and ls -l
+/odm/lib64/hw/camera.qcom.so|27305440|2a955e68ad043380675529edb64a40f7
+/vendor/lib64/hw/camera.qcom.so|MISSING
+/odm/lib64/camera/com.qti.sensormodule.ishtar_semco_imx989_wide.bin|1062250|9e4d0fe1a8bf2eb4146c9917a0ac2c4c
+/vendor/lib64/camera/com.qti.sensormodule.ishtar_semco_imx989_wide.bin|MISSING
+/odm/lib64/camera/aon_front.pb|5825|72899c334c4a81a0837faeef45d38e87
+/vendor/lib64/camera/aon_front.pb|30|72899c334c4a81a0837faeef45d38e87
+===LS
+ls: /vendor/lib64/hw/camera.qcom.so: No such file or directory
+ls: /vendor/lib64/camera/com.qti.sensormodule.ishtar_semco_imx989_wide.bin: No such file or directory
+-rw-r--r-- 1 root root     5825 2009-01-01 02:00 /odm/lib64/camera/aon_front.pb
+-rw-r--r-- 1 root root  1062250 2009-01-01 02:00 /odm/lib64/camera/com.qti.sensormodule.ishtar_semco_imx989_wide.bin
+-rw-r--r-- 1 root root 27305440 2009-01-01 02:00 /odm/lib64/hw/camera.qcom.so
+lrw-r--r-- 1 root root       30 2009-01-01 02:00 /vendor/lib64/camera/aon_front.pb -> /odm/lib64/camera/aon_front.pb
+
+### camera dirs (summary)
+ODM: 37 entries; sensormodule files: 5; imx989: com.qti.actuator.ishtar_semco_imx989_ak7316_wide_actuator.so, com.qti.eeprom.ishtar_semco_imx989_p24c256f_wide_eeprom.so, com.qti.sensor.ishtar_semco_imx989_wide.so, com.qti.sensormodule.ishtar_semco_imx989_wide.bin, com.qti.tuned.ishtar_semco_imx989_wide.bin; first error line: -
+VENDOR: 2 entries; sensormodule files: 0; imx989: none; first error line: -
+
+### mounts touching camera files
+(none)
+
+### dumpsys media.camera (filtered)
+Number of camera devices: 13
+Number of normal camera devices: 4
+Number of public camera devices visible to API1: 4
+'== Camera device N' sections: 13; dump ok=true
+
+### root check (timeout 20 su -c id)
+uid=0(root) gid=0(root) groups=0(root),1004(input),1007(log),1011(adb),1015(sdcard_rw),1028(sdcard_r),1078(ext_data_rw),1079(ext_obb_rw),3001(net_bt_admin),3002(net_bt),3003(inet),3006(net_bw_stats),3009(readproc),3011(uhid),3012(readtracefs) context=u:r:ksu:s0
+exit=0
+
+### root: /data/adb and modules (read-only)
+total 5993
+drwx------  8 root   root         3452 1970-07-29 08:12 .
+drwxrwx--x 62 system system       4096 2026-11-12 18:44 ..
+drwxr-xr-x 10 root   net_admin    3452 2026-10-26 11:09 box
+drwx------  6 root   root         3452 1970-07-29 08:12 ksu
+-rwxr-xr-x  1 root   root      6102016 2026-11-05 17:40 ksud
+drwxr-xr-x 15 root   root         3452 2026-10-26 20:17 modules
+drwx------  2 root   root         3452 1970-07-11 23:38 modules_update
+dr-xr-xr-x  3 root   root         3452 2026-11-12 18:44 neozygisk
+drwxr-xr-x  2 root   root         3452 2026-10-26 10:07 service.d
+===MODULES
+== FreePPS flags: action.sh bin free module.prop service.sh 
+id=FreePPS
+name=FreePPS
+version=v1.7.0
+versionCode=20260821
+== advsettings-en flags: advsettings-en.log module.prop payload post-fs-data.sh service.sh uninstall.sh 
+id=advsettings-en
+name=Advanced Settings English Translation
+version=v3.1.0
+versionCode=7
+== box_for_root flags: LICENSE action.sh disable module.prop system uninstall.sh webroot 
+id=box_for_root
+name=Box for KernelSU
+version=v1.10.2
+versionCode=20250905
+== com.google.android.apps.youtube.music-morphe flags: com.google.android.apps.youtube.music-stock.apk com.google.android.apps.youtube.music.apk log.txt module.prop post-fs-data.log post-fs-data.sh service.sh stock-paths.txt 
+id=com.google.android.apps.youtube.music-morphe
+name=YouTube Music Morphe
+version=9.38.51
+versionCode=0
+== com.google.android.youtube-morphe flags: com.google.android.youtube-stock-split_config.arm64_v8a.apk com.google.android.youtube-stock-split_config.en.apk com.google.android.youtube-stock-split_config.xxhdpi.apk com.google.android.youtube-stock.apk com.google.android.youtube.apk log.txt module.prop nomount-only post-fs-data.log post-fs-data.sh service.sh stock-paths.txt 
+id=com.google.android.youtube-morphe
+name=YouTube Morphe
+version=21.45.82
+versionCode=0
+== com.lucky_apps.RainViewer-morphe flags: com.lucky_apps.RainViewer-stock.apk com.lucky_apps.RainViewer.apk log.txt module.prop post-fs-data.log post-fs-data.sh service.sh stock-paths.txt 
+id=com.lucky_apps.RainViewer-morphe
+name=RainViewer Morphe
+version=8.1
+versionCode=0
+== com.paget96.batteryguru-morphe flags: com.paget96.batteryguru-stock-split_config.arm64_v8a.apk com.paget96.batteryguru-stock-split_config.en.apk com.paget96.batteryguru-stock-split_config.xxxhdpi.apk com.paget96.batteryguru-stock.apk com.paget96.batteryguru.apk log.txt module.prop nomount-only post-fs-data.log post-fs-data.sh service.sh stock-paths.txt 
+id=com.paget96.batteryguru-morphe
+name=Battery Guru Morphe
+version=2.5.1.0
+versionCode=0
+== com.quizlet.quizletandroid-morphe flags: com.quizlet.quizletandroid-stock.apk com.quizlet.quizletandroid.apk log.txt module.prop post-fs-data.log post-fs-data.sh service.sh stock-paths.txt 
+id=com.quizlet.quizletandroid-morphe
+name=Quizlet Morphe
+version=10.57
+versionCode=0
+== com.todoist-morphe flags: com.todoist-stock.apk com.todoist.apk log.txt module.prop post-fs-data.log post-fs-data.sh service.sh stock-paths.txt 
+id=com.todoist-morphe
+name=Todoist Morphe
+version=v12296
+versionCode=0
+== com.twitter.android-morphe flags: com.twitter.android-stock-split_config.arm64_v8a.apk com.twitter.android-stock-split_config.en.apk com.twitter.android-stock-split_config.xxxhdpi.apk com.twitter.android-stock.apk com.twitter.android.apk log.txt module.prop nomount-only post-fs-data.log post-fs-data.sh service.sh stock-paths.txt 
+id=com.twitter.android-morphe
+name=X Morphe
+version=12.41.0-prod.01
+versionCode=0
+== droom.sleepIfUCan-morphe flags: droom.sleepIfUCan-stock-split_config.arm64_v8a.apk droom.sleepIfUCan-stock-split_config.en.apk droom.sleepIfUCan-stock-split_config.xxxhdpi.apk droom.sleepIfUCan-stock.apk droom.sleepIfUCan.apk log.txt module.prop nomount-only post-fs-data.log post-fs-data.sh service.sh stock-paths.txt 
+id=droom.sleepIfUCan-morphe
+name=Alarmy Morphe
+version=26.42.1
+versionCode=0
+== unlimitedphotos flags: app_replace_list.txt classes.dex common_setup.sh example.fgp.prop fgp.prop module.prop post-fs-data.sh zygisk 
+id=unlimitedphotos
+name=Google Photos Unlimited Backup
+version=v5
+versionCode=50000
+== zygisksu flags: action.sh bin lib lib64 module.prop post-fs-data.sh sepolicy.rule service.sh uninstall.sh 
+id=zygisksu
+name=NeoZygisk
+version=v2.4 (289-08080ef-release)
+versionCode=289
+===ISHTAR
+
+### root manager version
+4.3.0-r1:KernelSU
+
+41140
+
+ksud 4.3.0-r1 (uapi: 6)
+
+### host: local AGC APK md5s (name|size|md5), compared with the device's fa4066eb3bf82cc097906fd108073500
+AGC8.4.300_V14_snap.apk|160312926|46763b3628f025a54828aab05c01d47a
+AGC8.4.300_V9.6_50MP_patched.apk|151023603|ce65f862c990e2acc02be356f75a7122
+AGC8.4.300_V9.6_snap.apk|151031793|fa4066eb3bf82cc097906fd108073500
+
+### camera static metadata (dumpsys media.camera, "Camera HAL device … static information" sections, filtered on the host)
+hal0 standard android.scaler.availableStreamConfigurations: largest size 4096x3072 for every format (see the stream_config rows in 20261113-1821__IMPL96__hyperos4-smoke-baseline.txt).
+android.sensor.info.pixelArraySizeMaximumResolution: absent on all 13 camera devices.
+android.scaler.availableStreamConfigurationsMaximumResolution: absent on all 13 camera devices.
+android.request.availableCapabilities: ULTRA_HIGH_RESOLUTION_SENSOR absent on all 13 camera devices.
+'8192 6144' occurs 428 times in the dump, only in these tags: 114x xiaomi.scaler.availableStreamConfigurations; 96x org.codeaurora.qcamera3.quadra_cfa.availableStreamConfigurations; 96x xiaomi.scaler.availableHeicStreamConfigurations; 58x xiaomi.scaler.availableSuperResolutionStreamConfigurations; 40x org.quic.camera2.VideoConfigurations.info.VideoConfigurationsTable; 8x android.scaler.availableRawSizes (cameras 0, 2-7 and 10; a deprecated tag that Camera2 apps do not use to choose streams); 8x org.codeaurora.qcamera3.quadra_cfa.qcfa_dimension; 8x org.quic.camera2.sensormode.info.SensorModeTable.
+Reading: on this build a standard Camera2 app gets at most 4096x3072 (12.58 MP) from the main camera; 8192x6144 is published only in vendor tags.
+Correction: a first host-side parse in this session looked under the "Camera device N dynamic info" headers, found none of these tags, and was replaced by this section.
