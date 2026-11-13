@@ -36,7 +36,7 @@ ClaudeQB adımları: Step 1 (ana plan) → Step 1.5 (otopsi, ontoloji, kavrayı�
 
 Karar eşlemesi (plan §2): `DEC-27` depo taşıma; `DEC-28` ROM derleme bırakıldı, HyperOS 4; `DEC-29` K1 (`Kullanim.txt`); `DEC-30` K5+K6 (üç depo silinir); `DEC-31` K8 (kimlik redaksiyonu); `DEC-32` K7 = (a).
 
-**Pencere N** = `ORCHESTRATION_PLAN.md` §1'deki faz numarası (Pencere 0–5+). Bu, ClaudeQB'nin "Faz n" (proje fazları 1–9) ve bu oturumun `O0`–`O5` orkestrasyon aşamalarından **ayrıdır**. Tek başına "Faz N" hep ClaudeQB proje fazıdır; alt plan `Faz n.m`, iş maddesi `Fn.m-NN`. `50MP-Entegrasyon-Plani.md`'deki ClaudeQB öncesi "Faz 10" ayrı bir numaralamadır (PROJECT_LOG §3.4).
+**Pencere N** = `ORCHESTRATION_PLAN.md` §1'deki faz numarası (Pencere 0–5+). Bu, ClaudeQB'nin "Faz n" (proje fazları 1–9) ve bu oturumun `O0`–`O5` orkestrasyon aşamalarından **ayrıdır**. Tek başına "Faz N" hep ClaudeQB proje fazıdır; alt plan `Faz n.m`, iş maddesi `Fn.m-NN`. `50MP-Entegrasyon-Plani.md`'deki ClaudeQB öncesi "Faz 10" ayrı bir numaralamadır (PROJECT_LOG §3.4). Görev kimlikleri (`W1`–`W6`, `T3`, `I1`, `REV`, `SEC`) ve Ek A olgu kimlikleri (`REL`, `TRAP` vb.) yalnız plana aittir; `R1`–`R12` Main-Planing risk kimlikleridir (plan §3, Adlandırma).
 
 | Dosya | Rol |
 |---|---|
@@ -68,7 +68,7 @@ Pencere başında (plan §0 adım 1):
 
 ## 3. Mevcut durum (2026-11-13, Pencere 0 sonu)
 
-Ayrıntı: plan Ek A.2 (G1–G12, D1–D11, V1–V3, R1, T3, A1, M1).
+Ayrıntı: plan Ek A.2 (G1–G12, K4, D1–D11, V1–V3, REL, T3, TRAP, M1, E1–E13).
 
 - **Git:** `main` 63 commit, ucu `7fa0a51` (planlama koşusu 20 + 11. denetim, değiştirilmeden). `7fa0a51` HEAD değil, `main`'in ucudur. **Push edilmedi.** Çalışma dalı **`integrate/impl-96`** = `main` üzerine `70946ff` (IMPL-96 snapshot'ları; probe satır 42, 190, 191 redakte), `03b0898` (tarihsel notlar: `docs/build-environment.md`, `docs/pre-rental-plan.md`, `docs/rom-build-device-notes.md`), `775b321` (`PROJECT_LOG.md`, `NEXT_PROMPT.md`), sonra C0 (`ORCHESTRATION_PLAN.md`'yi ekleyen commit; hash'i `git log --diff-filter=A -- ORCHESTRATION_PLAN.md` ile bulunur). Etiket yok. Ağaç temiz olmalı.
 - **Redaksiyon:** K8 (`DEC-31`) ile dal yeniden kuruldu. Eski hash'ler (`37edb5f`, `6a20999`, `fcceaab`) yalnız redakte edilmemiş bundle'da (`../ishtar-arsiv/impl-96-unredacted.bundle`, 77.094 B, sha256 `b9fa9c5cd5d0ae78f9f051ab62ecbfc2d9b2fa2fecd33f40247ef88bf58f6cd3`, `git bundle verify` OK, önkoşulu `7fa0a51`) ve yerel reflog'da durur; yeni yazılan hiçbir belge eski hash'i atamaz.
@@ -97,7 +97,7 @@ Ayrıntı: plan Ek A.2 (G1–G12, D1–D11, V1–V3, R1, T3, A1, M1).
 
 ```mermaid
 flowchart TD
-  P1["Pencere 1: IMPL-96 ledger, README/UNTRACKED, T3, C1"] --> P2["Pencere 2: PROJECT_LOG W5, NEXT_PROMPT W6, R2, push kararı"]
+  P1["Pencere 1: IMPL-96 ledger, README/UNTRACKED, T3, C1"] --> P2["Pencere 2: PROJECT_LOG W5, NEXT_PROMPT W6, SEC, push kararı"]
   P2 --> P3["Pencere 3: planlama koşusu 21 (K9 ve kapsam soruları)"]
   P3 --> P4["Pencere 4: 12. denetim (run-step3.md)"]
   P4 --> P5["Pencere 5+: K7 = (a) Step 4 dilimleri"]
@@ -109,17 +109,17 @@ Plan §5. Hedef: 2026-11-13 oturumlarının ledger kaydı (IMPL-96) ve O2 kapsam
 
 Görevler:
 - **W1** (`LedgerDraftA`): §5 IMPL-96 satırı (7 boru, `## 6.` başlığına bitişik, boş satır yok); §6 notları `:527` (depo), `:529` (v2.2/13), `:531` (cihaz, HyperOS 4, modül kurulu değil), `:541` (derleme bırakıldı). Yalnız taslak: `local://impl96-draft-a.md`.
-- **W2** (`LedgerDraftB`): §4'te Faz6.1, 7.2, 7.3, 8.1, 8.3 hücrelerine tarihli not (durumlar değişmez; `Updated At` 2026-11-13; 11. denetim 2026-09-14'te yapıldı; `:101`'deki "tenth audit" düzeltilir; Faz7.2 `Run ID`'sine eksik `IMPL-94`). §7: yeni üst girdi (`> **REPLANNING INPUT 2026-11-13 (`DEC-28`): …**`); `:564` tetikleyicisi ateşlendi; `:549`, `:551`, `:553`, `:555` kapanır. §8: `DEC-27`…`DEC-32` satırları (`:601`'den sonra); `DEC-01`'e `Previous status, kept:` ile not; `DEC-07`, `DEC-08`, `DEC-22`, `DEC-24`, `DEC-25`, `DEC-26` durumlarına "moot by `DEC-28`" (serbest metin). Yalnız taslak: `local://impl96-draft-b.md`.
-- **W3** (`ReadmeDrift`): `README.md` `:3-5` (Android 16 izine `DEC-28` notu), `:18` (v2.2/13), `:19` (AON aslında kopya + bind mount), `:20`, `:77-81` (`dist/` v2.2; AOSPA'da kuruluydu, HyperOS 4'te kurulu değil), `:142-144` (betikler; silinen loglar), `:186` (`snapshots/` izleniyor), remote; kökteki `PROJECT_LOG.md`, `NEXT_PROMPT.md`, `ORCHESTRATION_PLAN.md`.
-- **W4** (`UntrackedDrift`): `UNTRACKED-BY-DESIGN.md` `:9-10`, `:36` (izlenen dosya sayısı yazım anında `git ls-files | wc -l` ile ölçülür), `:38-41` ve `:63` (loglar K4 ile silindi), `:61`, `:89` (`DEC-05` kapandı), `:128-132` (remote, `DEC-27`), `candidates/*.bin` kuralının gerekçesi (`.gitignore:58`).
+- **W2** (`LedgerDraftB`): §4'te Faz6.1, 7.2, 7.3, 8.1, 8.3 hücrelerine tarihli not (durumlar değişmez; `Updated At` 2026-11-13; 11. denetim 2026-09-14'te yapıldı; `:101`'deki "tenth audit" ifadesine düzeltme notu, metin korunur; Faz7.2 `Run ID`'sine eksik `IMPL-94`). §7: yeni üst girdi (`> **REPLANNING INPUT 2026-11-13 (`DEC-28`): …**`); `:564` tetikleyicisi ateşlendi; `:549`, `:551`, `:553`, `:555`'e kapanış notu. §8: `DEC-27`…`DEC-32` satırları (`:601`'den sonra); `DEC-01`'e `Previous status, kept:` ile not; `DEC-07`, `DEC-08`, `DEC-22`, `DEC-24`, `DEC-25`, `DEC-26` durumlarına "moot by `DEC-28`" (serbest metin). **Hepsi ekleme biçiminde:** başlık ya da var olan metin yeniden yazılmaz; `Updated At` dışında hiçbir hücre değiştirilmez. Yalnız taslak: `local://impl96-draft-b.md`.
+- **W3** (`ReadmeDrift`): `README.md`; hedefler plan §5.1'deki W3 tablosunda (yer, şu anki metin, hedef, Ek A kaynağı).
+- **W4** (`UntrackedDrift`): `UNTRACKED-BY-DESIGN.md`; hedefler plan §5.1'deki W4 tablosunda.
 - **T3** (orkestratör): `docs/release-checklist.md:165` ve `docs/agc-12mp-configuration.md:202`'de `-o snapshots/<…>` → `-o <…>`. Yalnız bu iki satır.
 - **I1** (orkestratör): W1 ve W2 taslaklarını `Planner-docs/Planing-Ledger.md`'ye `edit` ile uygula.
-- **R1 ∥ R2** (salt-okur `reviewer` ∥ `security-reviewer`): C1 adayı diff; olgu doğruluğu (Ek A, snapshot'lar), biçim, kapsam taşması; sır, kimlik, sunucu adresi. P0/P1 bulgu kapanmadan C1 yok.
+- **REV ∥ SEC** (salt-okur `reviewer` ∥ `security-reviewer`): C1 adayı diff; olgu doğruluğu (Ek A, snapshot'lar), biçim, kapsam taşması; sır, kimlik, sunucu adresi. P0/P1 bulgu kapanmadan C1 yok.
 
-Sıra: W1 ∥ W2 ∥ W3 ∥ W4 (ve T3) → I1 → geçitler (§8) → R1 ∥ R2 → düzeltmeler → kapanış.
+Sıra: W1 ∥ W2 ∥ W3 ∥ W4 (ve T3) → I1 → geçitler (§8) → REV ∥ SEC → düzeltmeler → kapanış.
 Önkoşul: Pencere 0 `done`; ağaç temiz; dal `integrate/impl-96`. Açılışta silinecek depolar `gh api repos/ahmetxa/<ad>` ile yeniden ölçülür (404 = silinmiş) ve IMPL-96'ya ölçüldüğü hâliyle yazılır.
 
-Kabul: ledger CRLF korunur (NUL 0; satır sayısı 644 + eklenenler; değişen satırlarda yalnız ekleme, her değişen satır için difflib kontrolü); README ve UNTRACKED LF; her ekleme "çapa + konum + metin" ile izlenebilir; yalnız Ek A olguları; İngilizce gövdeler.
+Kabul: ledger CRLF korunur (NUL 0; satır sayısı 644 + eklenenler; değişen satırlarda yalnız ekleme, tek istisna beş §4 satırının `Updated At` hücresi; her değişen satır için difflib kontrolü); README ve UNTRACKED LF; her ekleme "çapa + konum + metin" ile izlenebilir; yalnız Ek A olguları; İngilizce gövdeler.
 
 **Kapanış (onayla; R-closing):** pencerenin bütün dosyaları tek commit'te: C1 başlığı `IMPL-96: repository move, ROM-build retirement, HyperOS 4 baseline`; içerik: `Planner-docs/Planing-Ledger.md`, `README.md`, `UNTRACKED-BY-DESIGN.md`, `docs/release-checklist.md`, `docs/agc-12mp-configuration.md`, `ORCHESTRATION_PLAN.md` (§1 satırı), `PROJECT_LOG.md` (§11 girdisi) ve bu dosya. §1'de Pencere 1 `done` olur; commit başlıkla anılır, hash plana yazılmaz. Bu dosya Pencere 2 için yeniden yazılır.
 
@@ -133,7 +133,7 @@ Kabul: ledger CRLF korunur (NUL 0; satır sayısı 644 + eklenenler; değişen s
 
 ### 4.3 Pencere 2–5+ (özet; ayrıntı plan §6–§9)
 
-- **Pencere 2:** W5 (PROJECT_LOG bayat satırları, `DocsFactCheck` listesi), W6 (bu dosyanın Pencere 3 için yeniden yazımı), R2 (push'un göndereceği her şey: `origin/main..integrate/impl-96`, `7fa0a51` dahil; sır, IMEI benzeri 15 haneli sayılar, seri numaraları, sunucu adresleri; tüm ref'lerde R-identity-check, §8). Onaylar ayrı: C2 (R-closing: Pencere 2'nin bütün dosyaları tek commit'te: W5 ve W6 dosyaları, plan, log, bu dosya), `main` fast-forward, push, `ls-remote` karşılaştırması. Silinecek depolar ölçülür.
+- **Pencere 2:** W5 (PROJECT_LOG bayat ifadeleri; plan §6'daki alıntı listesi), W6 (bu dosyanın Pencere 3 için yeniden yazımı), SEC (push'un göndereceği her şey: `origin/main..integrate/impl-96`, `7fa0a51` dahil; sır, IMEI benzeri 15 haneli sayılar, seri numaraları, sunucu adresleri; tüm ref'lerde R-identity-check, §8). Onaylar ayrı: C2 (R-closing: Pencere 2'nin bütün dosyaları tek commit'te: W5 ve W6 dosyaları, plan, log, bu dosya), `main` fast-forward, push, `ls-remote` karşılaştırması. Silinecek depolar ölçülür.
 - **Pencere 3 — planlama koşusu 21 (Step 1 + Step 2):** Açık sorular kullanıcıya **başta** sorulur: (1) K9 — 50MP HAL katmanı HyperOS 4 HAL'inde yeniden türetilsin mi (R10 bağlam riski); (2) kutucuk/WebUI zinciri (`com.rifsxd.ksunext`, bu ROM'da yok): kurulu KernelSU `4.3.0-r1` yöneticisi ve WebUI önce ölçülür; (3) yeni, korumalı AGC tuzak temizleme prosedürü kapsama girsin mi; (4) v2.3 kapsamı (`Kullanim.txt`, modül içindeki bayat yorumlar, tile-app `versionName`). Faz 7/8 "Retired 2026-11-13 by `DEC-28`" notuyla emekliye ayrılır; K7 = (a) için iki seçenek (yeni Faz 10 ya da Faz 8'in kamera yarısının yeniden hedeflenmesi) kullanıcı seçer.
 - **Pencere 4 — 12. denetim (Step 3):** `run-step3.md`; yalnız `Sub-Planing-Audit.md` yazılır. Beklenen: `Faz7.2`, `7.3`, `8.1`, `8.3` SUPERSEDED; `Faz4.6` DEFERRED.
 - **Pencere 5+ — K7 = (a) Step 4 dilimleri:** `run-step4.md`; 12. denetimin kuyruğu, pencere başına bir dilim; kimlikler `IMPL-97`'den devam eder.
@@ -214,7 +214,7 @@ ANDROID_SERIAL=dc27e5d0 MSYS_NO_PATHCONV=1 "C:/Program Files/Git/bin/bash.exe" s
 | `--self-test` | `SELF-TEST: PASS`; VAL-BUILD2 sha256 `407fb9be180d96ff0fc6d409d27ad35d4b3de10e0ea3dea8e53a1daee33cb2e0`; A1, A2, A3 PASS; yalnız geçici dizinlere yazar |
 | `smoke.sh` (HyperOS 4, modül yokken) | `agc.apk.md5 = fa4066eb…`, `prefs.trap.armed = 10`, `agc.pref_48m = absent`, `agc.pref_resolution = full`, `agc.photo_size.back.derived = 4096x3072`. `sensor.*`/`hal.*` alanları geçersiz (`d41d8cd9…` boş girdinin md5'i) |
 
-**R-identity-check (push öncesi; yürürlükte olan kural; `ORCHESTRATION_PLAN.md` Ek A.5 ve §5 R2'deki eski sayım kuralının yerini alır):** `git log --all -p` ile her ref'te ve izlenen dosyalarda `persist.sys.miui.sno` ile `ro.ril.miui.imei0`/`imei1` anahtarlı her satır `<redacted>` olmalı; Luhn denetimini geçen 15 haneli sayı bulunmamalı. Değerler bu dosyaya ya da herhangi bir çıktıya yazılmaz, geri kazanılmaya çalışılmaz. Raporlanan: geçti/kaldı, `<redacted>` dışında kalan anahtar satır sayısı ve Luhn adayı sayısı. Ardından `origin/main..integrate/impl-96` için güvenlik incelemesi (R2), `7fa0a51` dahil.
+**R-identity-check (push öncesi; `ORCHESTRATION_PLAN.md` Ek A.5):** `git log --all -p` ile her ref'te ve izlenen dosyalarda `persist.sys.miui.sno` ile `ro.ril.miui.imei0`/`imei1` anahtarlı her satır `<redacted>` olmalı; Luhn denetimini geçen 15 haneli sayı bulunmamalı. Değerler bu dosyaya ya da herhangi bir çıktıya yazılmaz, geri kazanılmaya çalışılmaz. Raporlanan: geçti/kaldı, `<redacted>` dışında kalan anahtar satır sayısı ve Luhn adayı sayısı. Ardından `origin/main..integrate/impl-96` için güvenlik incelemesi (SEC), `7fa0a51` dahil.
 
 `smoke.sh -o` yalnız **ad** alır ve `snapshots/` önekini kendisi ekler (`scripts/smoke.sh` satır 282–285); önek verilmez. `docs/release-checklist.md:165` ve `docs/agc-12mp-configuration.md:202` bu yüzden yanlıştır; Pencere 1'de T3 ile düzeltilir. Düz `py -3 scripts/build-release.py` `docs/release-manifest.md`'nin üzerine yazar; sürüm prosedürü dışında çalıştırılmaz.
 

@@ -897,6 +897,7 @@ Birleşik ve tekilleştirilmiş liste. Kanıtlar extract'lardan alındı; satır
 | `Kararlar #n`; `BASELINE-2026-08-31-V21`; `K1–K9` | Günlük kararları; adlandırılmış baseline; oturum kararları | günlük; ledger:73; §4 |
 | `O0`–`O5`; `O2-a`/`O2-b`; `T1`–`T5`, `L`, `M`, `RUN21`, `V` | 2026-11-13 orkestrasyon aşamaları (kullanıcının komut şablonundaki "Faz 0–5") ve iş birimleri; proje fazı değildir | §2.6; §11; aşağıdaki not |
 | `Pencere N` | `ORCHESTRATION_PLAN.md` fazı (Pencere 0, 1, 2 …); ClaudeQB fazı değildir | `ORCHESTRATION_PLAN.md` §1 |
+| `W1`–`W6`, `T3`, `I1`, `REV`, `SEC`; Ek A `REL`, `TRAP`, `G`/`D`/`V`/`E` | `ORCHESTRATION_PLAN.md`'nin görev ve olgu kimlikleri; risk `R1`–`R12`, karar `K1`–`K9`, kontrol listesi `C-NN` ile karışmasın diye seçildi (`R21` → `RUN21` ile aynı gerekçe) | `ORCHESTRATION_PLAN.md` §3 |
 | durum sözlüğü | `planned`, `ready`, `ready_with_warnings`, `in_progress`, `implemented`, `verified`, `blocked`, `superseded`. Bileşik değer parser'ı bozar | ledger:97 |
 
 **"Faz" adının üç anlamı (2026-11-13 adlandırma denetimi):**
@@ -990,4 +991,5 @@ Ek not: `docs/pre-rental-plan.md`'deki "Step 1–4" o planın kendi sırasıdır
   - Geçitler: doğrulayıcı ve self-test taban ile aynı (yukarıda).
 - **Belgeler:** `ORCHESTRATION_PLAN.md` (C0 ile eklendi); `NEXT_PROMPT.md` Pencere 1'i gösterecek şekilde güncellendi; bu belge §2, §3.2, §4, §6, §7 ve §10'da güncellendi.
 - **Kapanış:** C0 (`ORCHESTRATION_PLAN.md`, bu günlük ve `NEXT_PROMPT.md`'yi taşıyan commit) işlendi; `git log --diff-filter=A -- ORCHESTRATION_PLAN.md` ile bulunur. Sonraki pencere: Pencere 1 — IMPL-96 uygulaması (`ORCHESTRATION_PLAN.md` §5).
+- **Takip commit'i (inceleme sonrası):** `NEXT_PROMPT.md` §4.1 ve §8 plana hizalandı (`:101` için yalnız düzeltme notu; "yalnız ekleme" kuralının tek istisnası `Updated At`; R-identity-check atfı). İnceleme görevleri `R1`/`R2` → `REV`/`SEC`, Ek A olguları `R1`/`A1` → `REL`/`TRAP` oldu (risk ve self-test kimlikleriyle çakışıyordu). Commit: `Window 0 follow-up: align handoff with plan, rename review IDs`.
 - **Sonraki giriş için şablon:** `YYYY-MM-DD — koşu kimliği — yapılan — ölçüm — bekleyen kararlar`. Aynı anda §2, §3.2 ve §4 de güncellenir.

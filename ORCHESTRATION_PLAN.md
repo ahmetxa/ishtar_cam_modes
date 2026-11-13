@@ -19,7 +19,7 @@ Durum sözlüğü: `pending`, `in_progress`, `done`, `blocked`.
 
 | Pencere | Faz | Kapsam | Önkoşul | Durum | Commit / kanıt |
 |---|---|---|---|---|---|
-| 0 | Keşif, plan, sözleşme | O0 keşif, O1 plan (onaylandı), K8 = A (dal yeniden kuruldu), bu dosya, NEXT_PROMPT ve PROJECT_LOG güncellemesi | — | done | `70946ff`, `03b0898`, `775b321`; C0 `Window 0: orchestration plan, K8 redaction, handoff for window 1` (`git log --diff-filter=A -- ORCHESTRATION_PLAN.md`) |
+| 0 | Keşif, plan, sözleşme | O0 keşif, O1 plan (onaylandı), K8 = A (dal yeniden kuruldu), bu dosya, NEXT_PROMPT ve PROJECT_LOG güncellemesi | — | done | `70946ff`, `03b0898`, `775b321`; C0 `Window 0: orchestration plan, K8 redaction, handoff for window 1` (`git log --diff-filter=A -- ORCHESTRATION_PLAN.md`); inceleme sonrası takip commit'i `Window 0 follow-up: align handoff with plan, rename review IDs` |
 | 1 | IMPL-96 uygulaması | Ledger IMPL-96 (§4–§8, `DEC-27`…`DEC-32`); README ve UNTRACKED kaymaları (T2); iki `-o` satırı (T3); inceleme; C1 | Pencere 0 | pending | |
 | 2 | Kapanış ve yayın | PROJECT_LOG bayat satırları (W5); NEXT_PROMPT'u koşu 21'e hazırlama (W6); push öncesi güvenlik incelemesi; `main` FF; push; silinecek depoların ölçümü | Pencere 1; push kararı | pending | |
 | 3 | Planlama koşusu 21 | Step 1 + Step 2: Faz 7/8 emekli; K7 = (a) için faz ve alt planlar; önce K9 ve kapsam soruları | Pencere 2 | pending | |
@@ -48,6 +48,7 @@ Durum sözlüğü: `pending`, `in_progress`, `done`, `blocked`.
 - **Orkestratör (ana oturum):** plan, dağıtım, entegrasyon, doğrulama ve commit. Sıcak noktalar yalnız onundur: `Planner-docs/Planing-Ledger.md`, `Main-Planing.md`, `Sub-Planing-Index.md`, `Sub-Planing-Audit.md`, `Project-Ontology.md`; `CHANGELOG.md`; sürüm yerleri (`ishtar-cam-modes/module.prop`, `customize.sh`); üretilen `docs/release-manifest.md`; `.gitignore`, `.gitattributes`; `snapshots/` (kanıt, düzeltilmez); bu dosya; tüm git işlemleri.
 - **Alt ajanlar:** Görev metni kendi kendine yeter (hedef dosya yolları, değişiklik, kabul kriteri, yasak alanlar). Ajan yalnız sahip olduğu dosyaya yazar; başka bir dosyada sorun görürse düzeltmez, raporlar. Doğrulayıcı, test ya da format çalıştırmaz. Dönüşte şu blok zorunludur: `status`, `changed_files`, `acceptance` (kriter / karşılandı mı / kanıt), `contract_deviations`, `open_issues`. Sıcak noktalar için yalnız taslak üretir (`local://…`).
 - Aynı anda en fazla 4 uygulama ajanı çalışır. `task` aracında `isolated` ve `outputSchema` yok; yalıtım ayrık dosya sahipliğiyle sağlanır. `librarian` ve `designer` ajanları bu ortamda yok.
+- **Adlandırma:** Görev kimlikleri (`W1`–`W6`, `T3`, `I1`, `REV`, `SEC`) ve Ek A olgu kimlikleri (`G`, `K4`, `D`, `V`, `REL`, `T3`, `TRAP`, `M1`, `E`) yalnız bu plana aittir. Main-Planing risk kimlikleri `R1`–`R12`, kararlar `K1`–`K9` ve `DEC-NN`, kontrol listesi `C-NN`, ClaudeQB `Faz n.m` / `Fn.m-NN` ile karışmasın diye böyle seçildi (önceki oturumun `R21` → `RUN21` düzeltmesiyle aynı gerekçe).
 
 **Geçitler** (faz sonunda bir kez, orkestratör):
 - `py -3 C:/Users/ahmet/.claude/plugins/cache/claudeqb/claudeqb/0.2.1/skills/claudeqb/scripts/validate_planner_docs.py --root . --mode all` → `error_count=0`, `warning_count=1` (`step4_has_nonblocking_warnings=P2:1,P3:9`), `p0_findings=0`, `p1_findings=0`, `subplan_count=42`, `secret_findings=0`. Koşu 21 alt plan sayısını, 12. denetim de bulgu sayılarını değiştirir; yeni baseline o fazda yazılır.
@@ -91,9 +92,9 @@ Durum sözlüğü: `pending`, `in_progress`, `done`, `blocked`.
 | W4 | task `UntrackedDrift` | `UNTRACKED-BY-DESIGN.md`: §5.1'deki W4 tablosu | `UNTRACKED-BY-DESIGN.md` | W3 ile aynı |
 | T3 | orkestratör | `-o snapshots/<…>` → `-o <…>` | `docs/release-checklist.md:165`, `docs/agc-12mp-configuration.md:202` | Yalnız bu iki satır |
 | I1 | orkestratör | W1 ve W2 taslaklarını ledger'a `edit` ile uygula | `Planner-docs/Planing-Ledger.md` | CRLF=LF, NUL=0; satır sayısı 644 + eklenenler; değişen satırlarda difflib yalnız ekleme gösterir (istisna: beş §4 satırının `Updated At` hücresi); doğrulayıcı baseline'da; `--word-diff` yalnız beklenen değişiklikleri gösterir |
-| R1 ∥ R2 | reviewer ∥ security-reviewer | C1 adayı diff: olgu doğruluğu (Ek A, snapshot'lar), biçim, kapsam taşması; sır, kimlik, sunucu adresi | salt-okur | P0/P1 yok. Varsa ledger'ı orkestratör, diğer dosyaları düzeltici task düzeltir; geçitler yeniden çalışır |
+| REV ∥ SEC | reviewer ∥ security-reviewer | C1 adayı diff: olgu doğruluğu (Ek A, snapshot'lar), biçim, kapsam taşması; sır, kimlik, sunucu adresi | salt-okur | P0/P1 yok. Varsa ledger'ı orkestratör, diğer dosyaları düzeltici task düzeltir; geçitler yeniden çalışır |
 
-**Sıra:** W1 ∥ W2 ∥ W3 ∥ W4 (ve T3) → I1 → geçitler → R1 ∥ R2 → düzeltmeler → kapanış.
+**Sıra:** W1 ∥ W2 ∥ W3 ∥ W4 (ve T3) → I1 → geçitler → REV ∥ SEC → düzeltmeler → kapanış.
 **Kapanış (§0.4):** tek commit C1 `IMPL-96: repository move, ROM-build retirement, HyperOS 4 baseline`: ledger, `README.md`, `UNTRACKED-BY-DESIGN.md`, `docs/release-checklist.md`, `docs/agc-12mp-configuration.md`, bu dosya (§1'de Pencere 1 `done`, C1 başlığıyla), `PROJECT_LOG.md` (§11'e kısa girdi) ve Pencere 2 için yeniden yazılan `NEXT_PROMPT.md`. Onayla commit edilir.
 
 ### 5.1 W3 ve W4 hedef tabloları
@@ -105,11 +106,11 @@ Yerler alıntılanan metinle bulunur (satır numaraları 2026-11-13 ağacına ai
 | Yer | Şu an | Hedef | Kaynak |
 |---|---|---|---|
 | :3-5 | "… and an AOSPA Android 16 track." | Cümle kalır; eklenir: Android 16 izi 2026-11-13'te bırakıldı (`DEC-28`); telefon HyperOS 4'te ve projenin hiçbir modülü kurulu değil | A.1 DEC-28; D1, D7 |
-| :18 | "Source at v2.1 / versionCode 12." | "Source at v2.2 / versionCode 13." | R1 |
+| :18 | "Source at v2.1 / versionCode 12." | "Source at v2.2 / versionCode 13." | REL |
 | :19 | "Standalone module symlinking `aon_front.pb` into `/vendor`." | Modül `/vendor/lib64/camera`'yı kopyalar, `aon_front.pb`'yi ekler ve dizini bind-mount eder; dosya zaten varsa çıkar (HyperOS 4 bunu kendisi sağlıyor) | E3, D6 |
 | :20 | "two smali sources, the experimental HAL patch table, and the reproduction recipe" | Gerçek içerik | E4 |
 | :24-30 Documentation | Kök belgeler için satır yok; `docs/` satırı iki dosya sayıyor | `PROJECT_LOG.md`, `NEXT_PROMPT.md`, `ORCHESTRATION_PLAN.md` (Türkçe süreklilik belgeleri) ve `CHANGELOG.md` (modül sürüm notları) satırları; `docs/` = 18 belge (biçim, prosedür, kanıt, runbook) | E5 |
-| :75-81 sürüm tablosu | v2.1 "Most recent, and currently installed on device `dc27e5d0`…" | v2.1 → v2.2 ile aşıldı. Tablo altına: `dist/` (`*.zip` ile dışlanır) `scripts/build-release.py` çıktılarını tutar: v2.2 (AOSPA A15'e IMPL-81 ile kuruldu) ve kökteki v2.1 zip'inden farklı bir IMPL-76 v2.1 derlemesi; HyperOS 4'te proje modülü kurulu değil | R1, E6, D7 |
+| :75-81 sürüm tablosu | v2.1 "Most recent, and currently installed on device `dc27e5d0`…" | v2.1 → v2.2 ile aşıldı. Tablo altına: `dist/` (`*.zip` ile dışlanır) `scripts/build-release.py` çıktılarını tutar: v2.2 (AOSPA A15'e IMPL-81 ile kuruldu) ve kökteki v2.1 zip'inden farklı bir IMPL-76 v2.1 derlemesi; HyperOS 4'te proje modülü kurulu değil | REL, E6, D7 |
 | :142 | "`scripts/` … `smoke.sh`, the read-only device state snapshot." | `build-release.py` (deterministik sürüm derleyici, `--self-test`) eklenir | ModuleMap; V3 |
 | :143 | "`<UTC yyyymmdd-HHMM>__<subplan>__<label>.txt`" | Ad, makinenin yerel saatini taşır (UTC+3); başlıktaki `taken` satırı UTC'dir | E7 |
 | :144 | "`common_clone.log`, `kernel_clone.log` … clone logs, 32 and 86 bytes." | Satır kaldırılır (2026-11-13'te silindi, K4; içerik `PROJECT_LOG.md` §2.1'de alıntılı) | K4, E11 |
@@ -139,9 +140,9 @@ Yerler alıntılanan metinle bulunur (satır numaraları 2026-11-13 ağacına ai
 |---|---|---|---|---|
 | W5 | task `ProjectLogUpdate` | PROJECT_LOG bayat ifadeleri (alıntıyla bulunur; satır numarası verilmez): §1 "**2026-11-13 kullanıcı beyanı (ölçülmedi):**" → ölçüldü (`70946ff`), 2026-11-13'te gözlendi; §2.3 "(yamasız APK'da bu anahtar yok)" → anahtar prefs dosyasında yok; §3.5 "`origin/main`'den sonraki dört commit push edilmedi", "*(push edilmedi)*", "*(HEAD, push edilmedi)*" → yazım anındaki push durumu ve commit listesi (`7fa0a51`, `70946ff`, `03b0898`, `775b321`, C0, C1); §4 "**Açık kararlar (2026-11-13):**" ve DEC-07/DEC-08 satırlarındaki "**AÇIK**" → konusuz (`DEC-28`); §8 tablosunda IMPL-96 ile çözülen satırlar (11. denetim "outstanding", "47 commit, 225 dosya, remote yok", "Telefon AOSPA A15 + KernelSU Next … ölçülmedi", README/UNTRACKED, `release-checklist.md:165`); §9 R8 "Dosyalar farklıysa … ölçülmedi" → HAL farklı, sensör aynı (ölçüldü), K9 karar verir; `docs/pre-rental-plan.md:N` ve `docs/build-environment.md:N` atıfları `03b0898`'in eklediği 8 satırlık not yüzünden +8 kaymış. §2, §3.2 (IMPL-96 tamamlandı), §4 (`DEC-27`…`DEC-32` ledger'da). Eski §11 girdilerine dokunulmaz | `PROJECT_LOG.md` | Türkçe, LF; ledger ile çelişki yok; kimlik değeri yok |
 | W6 | task `HandoffRewrite` | NEXT_PROMPT'u Pencere 3 (koşu 21) için yeniden yaz: K9 ve §7'deki kapsam soruları, koşu 21 tuzakları | `NEXT_PROMPT.md` | Türkçe, LF |
-| R2 | security-reviewer | Push'un göndereceği her şey: `origin/main..integrate/impl-96` (`7fa0a51` dahil). Sır, seri numarası, sunucu adresi; Ek A.5'teki kimlik kontrolü | salt-okur | Bulgu yok |
+| SEC | security-reviewer | Push'un göndereceği her şey: `origin/main..integrate/impl-96` (`7fa0a51` dahil). Sır, seri numarası, sunucu adresi; Ek A.5'teki kimlik kontrolü | salt-okur | Bulgu yok |
 
-**Sıra ve onaylar (her biri ayrı):** W5 ∥ W6 → R2 → C2 `Window 2: project log sweep and handoff for planning run 21` (W5, W6 ve bu dosya; belgeler push'u "C2'den hemen sonra, onayla" diye yazar ve sonucun bir sonraki pencerenin açılışında `git ls-remote origin` ile doğrulanacağını belirtir) → `main`'in `integrate/impl-96`'ya fast-forward edilmesi → `git push origin main integrate/impl-96` → `git ls-remote origin` ile hash karşılaştırması (sonuç sohbette raporlanır, Pencere 3'ün kaydına girer).
+**Sıra ve onaylar (her biri ayrı):** W5 ∥ W6 → SEC → C2 `Window 2: project log sweep and handoff for planning run 21` (W5, W6 ve bu dosya; belgeler push'u "C2'den hemen sonra, onayla" diye yazar ve sonucun bir sonraki pencerenin açılışında `git ls-remote origin` ile doğrulanacağını belirtir) → `main`'in `integrate/impl-96`'ya fast-forward edilmesi → `git push origin main integrate/impl-96` → `git ls-remote origin` ile hash karşılaştırması (sonuç sohbette raporlanır, Pencere 3'ün kaydına girer).
 **Silinecek depolar:** `gh api` ile ölçülür. Silinmişse PROJECT_LOG'a yazılır; ledger'daki `DEC-30` yürütme notu ledger'a yazan bir sonraki koşuda (koşu 21) eklenir.
 
 ## 7. Pencere 3 — Planlama koşusu 21 (Step 1 + Step 2)
@@ -249,9 +250,9 @@ Single source of facts for every IMPL-96 writer (ledger drafters, README/UNTRACK
 | V1 | Validator `--mode all` | `error_count=0`, `warning_count=1` (`step4_has_nonblocking_warnings=P2:1,P3:9`), `p0_findings=0`, `p1_findings=0`, `subplan_count=42`, `secret_findings=0` | 2026-11-13 (also after the rebuild) |
 | V2 | Validator `--mode step4 --strict` | Fails only on `strict_warning=step4_has_nonblocking_warnings=P2:1,P3:9` (expected baseline) | 2026-11-13 |
 | V3 | Self-test | `SELF-TEST: PASS`; VAL-BUILD2 sha256 `407fb9be180d96ff0fc6d409d27ad35d4b3de10e0ea3dea8e53a1daee33cb2e0`; A1–A3 PASS | 2026-11-13 |
-| R1 | Release | `ishtar-cam-modes` v2.2 / versionCode 13; `dist/ishtar-cam-modes-v2.2.zip` md5 `e95789572311cc95266d3ab4045cdcba` | md5sum, 2026-11-13 |
+| REL | Release | `ishtar-cam-modes` v2.2 / versionCode 13; `dist/ishtar-cam-modes-v2.2.zip` md5 `e95789572311cc95266d3ab4045cdcba` | md5sum, 2026-11-13 |
 | T3 | `smoke.sh -o` path bug | `docs/release-checklist.md:165` and `docs/agc-12mp-configuration.md:202` pass `snapshots/…`; `smoke.sh` prepends `snapshots/` itself (`:38`, `:284`); correct form at `docs/release-checklist.md:414` | 2026-11-13 |
-| A1 | Trap clearing | No procedure in `docs/agc-12mp-configuration.md`; the only one is `docs/phase3-preconditions.md:71-119` (no backup step, truncate-first ordering, AOSPA owner and SELinux label hard-coded) | 2026-11-13 |
+| TRAP | Trap clearing | No procedure in `docs/agc-12mp-configuration.md`; the only one is `docs/phase3-preconditions.md:71-119` (no backup step, truncate-first ordering, AOSPA owner and SELinux label hard-coded) | 2026-11-13 |
 | M1 | Module on HyperOS 4 (code reading, not measured) | Sensor guard passes (`EXPECT_MD5`), so the sensor layer would mount; the HAL guard (`post-fs-data.sh:101-107`) fails closed and skips the HAL layer; `setmode.sh:52-58`, `:79-83` use AOSPA camera-provider service names not measured on HyperOS 4; tile long-press needs `com.rifsxd.ksunext` (`WebUiActivity.java:15`) | ModuleMap scout [INFERENCE] |
 | E1 | Faz 1.6 | `Planner-docs/Faz-1-Plans/Faz1.6-workspace-readme-and-refs-index.md` is `verified`, updated 2026-08-30 | ledger :71 |
 | E2 | DEC-05 | "**Closed clean, 2026-08-24 (IMPL-02).**" No keystore entry in any of the five archives; no rotation or withdrawal needed | ledger :576 |
