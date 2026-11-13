@@ -1,5 +1,13 @@
 # Pre-Rental Plan — from the verified staging to the `Faz7.2` rental decision
 
+> **Historical as of 2026-11-13.** The user abandoned the plan to build an
+> AOSPA ROM for `ishtar`. The phone now runs HyperOS 4 (`OS4.0.0.44.WMACNXM`,
+> Android 17), measured read-only in
+> `snapshots/20261113-1819__IMPL96__hyperos4-readonly-probe.txt`. Step 4 will
+> not run, and nothing was ever rented. The rest of this file is unchanged and
+> stays as the record of what was planned; the ledger records the decision in
+> `IMPL-96`.
+
 Written 2026-09-13, after `IMPL-93`. This is an operator plan, not a ClaudeQB
 artifact: it orders the work that should happen before the first build-server
 rental and says which fresh session does each part. The sub-plans, the audit and

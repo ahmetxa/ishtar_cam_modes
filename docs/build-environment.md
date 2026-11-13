@@ -1,5 +1,13 @@
 # Build Environment — AOSPA `beryl` for `ishtar` on a rented server
 
+> **Historical as of 2026-11-13.** The user abandoned the plan to build an
+> AOSPA ROM for `ishtar`. The phone now runs HyperOS 4 (`OS4.0.0.44.WMACNXM`,
+> Android 17), measured read-only in
+> `snapshots/20261113-1819__IMPL96__hyperos4-readonly-probe.txt`. This runbook
+> will not be executed, and nothing was ever rented under it. The rest of this
+> file is unchanged and stays as the record of the planned `Faz7.2` session;
+> the ledger records the decision in `IMPL-96`.
+
 The rental runbook for Main-Planing Phase 7. `Faz7.1` wrote it (`IMPL-91`,
 2026-09-11); `Faz7.2` executes it in one paid session, from provisioning to
 teardown, without re-planning.
