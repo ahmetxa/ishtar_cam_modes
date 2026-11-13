@@ -3,120 +3,102 @@
 > Step 3 audit — ClaudeQB. Body language: English (default contract).
 > The project's user-facing documents and module interface remain Turkish and English; that convention is unchanged.
 >
-> **This is the tenth audit (2026-09-13).** It supersedes the ninth audit (2026-09-11) and is step 3 of `docs/pre-rental-plan.md`. Since the ninth audit, four things happened:
+> **This is the eleventh audit (2026-09-14).** It supersedes the tenth audit (2026-09-13) and is step 3c of `docs/pre-rental-plan.md`. Since the tenth audit:
 >
-> - `IMPL-91` verified `Faz7.1` and wrote `docs/build-environment.md`.
-> - `IMPL-92` ran `Faz8.1`'s static half.
-> - `IMPL-93` verified `Faz8.2`.
-> - Planning run 19 amended `Faz7.2`, `Faz7.3`, `Faz8.1`, `Faz8.3`, index sections 4d, 5 and 7, and the ledger.
+> - `IMPL-94` ran `F7.2-01`'s gate once (not passed) and repaired the runbook for `AUDIT-FIX-52`, `-53` and `-54`, including the section 10 symlink path.
+> - `DEC-26` moved the rental from Hetzner to Scaleway. `IMPL-95` re-targeted `docs/build-environment.md` to Scaleway POP2-32C-128G.
+> - Planning run 20 (bounded Step 2 amendment) re-targeted `Faz7.2` to the runbook's values. It edited only `Faz7.2` and the ledger.
 >
-> **This audit exists because run 19's ledger row and index paragraph both say `Faz7.2`, `Faz7.3` and `Faz8.3` may not enter the Step 4 queue until Step 3 has read the amendment.**
+> **This audit exists because the tenth audit graded Hetzner text that a rental can no longer follow.** Ledger section 7's `DEC-26` input and section 4's `Faz7.2` row say `Faz7.2` does not enter a paid session before this audit.
 >
-> **Active snapshots: `SNAP-2026-09-10-MAIN` and `SNAP-2026-09-10-SUBPLANS`. The sub-plan set is 42.** Run 19 cut no snapshot. By the precedent of planning runs 13 to 15 that is correct: the amendment was bounded, and no phase was re-decomposed.
+> **Active snapshots: `SNAP-2026-09-10-MAIN` and `SNAP-2026-09-10-SUBPLANS`. The sub-plan set is 42.** Run 20 cut no snapshot, by the precedent of runs 13 to 15 and 19. That is correct: one sub-plan was amended, no phase was re-decomposed, and no work item changed.
 
 ## 1. Audit Summary
 
 **Overall audit status: PASS_WITH_WARNINGS.**
 
-**Run 19 discharged every finding it was sent to fix, in the sections Step 4 is graded against.** Eight are resolved:
+**Run 20's amendment of `Faz7.2` matches the re-targeted runbook on every value checked.** Section 8 has the value-by-value table. Covered:
 
-- `AUDIT-FIX-43`: billing and deletion semantics.
-- `AUDIT-FIX-44`: install artifacts retrieved before teardown.
-- `AUDIT-FIX-45`: data format and the re-established return path.
-- `AUDIT-FIX-46`: sensor adaptation routed like re-derivation.
-- `AUDIT-FIX-47`: scratch outside the workspace, and the static-half boundary.
-- `AUDIT-FIX-48`: the index's line-ending sentence.
-- `AUDIT-FIX-49`: the `IMPL-89` annotation, and both Android 15 candidates named.
-- `AUDIT-FIX-51`: init service names, and "switch has no effect" as a failure signal.
+- the instance type;
+- the three Block volumes and their mounts;
+- the flexible IPv4;
+- Ubuntu 22.04 and its 24.04 fallback;
+- the 10-hour ceiling, the hour-8 rule and started-hour counting;
+- no retry after an out-of-memory kill;
+- section 5's four manual checks;
+- section 12's eight teardown steps and four zero counts;
+- `/android/beryl` and `~/out-pkg`.
 
-`AUDIT-FIX-50`'s sub-plan half is resolved. Its document half is open, narrowed to `docs/release-checklist.md` and owned by `F8.3-08`. No P0 or P1 is open.
+No live Hetzner fact is left in `Faz7.2`. Its four Hetzner mentions are all amendment history (lines 7, 9, 11 and 18). The work-item count is 10 before and after run 20, and the heading set is identical.
 
-**`Faz7.2` now matches the runbook and GitHub, and this audit measured that rather than reading it from the plan.**
+**Closed this run, because the runbook carries each repair (measured):**
 
-- **Manifest.** `ahmetxa/android_local_manifests` `main` is `22283d8a866d042e02336fcb4698253ac6bf9c3b`. Its tree is `README.md`, `check.py`, `ishtar-beryl.xml` and `tests/`. `ishtar-beryl.xml` carries 13 `project` lines, 14 `remove-project` lines (13 barista entries, plus one path pinned from another source), and `clone-depth="1"` on the three blob repositories.
-- **Repositories.** Both `ahmetxa` repositories read `private=false`, and the device tree's `beryl` branch is `d48816f`.
-- **Runbook section 5, run live today in this audit's scratchpad as written.** It exited 0 with "pre-rental checks passed": every pin resolved, and the known-bad cases produced exactly `14 element(s) failed`.
-- **Base manifest.** `AOSPA/manifest` `beryl` is still `7dfc0650…`, last committed 2026-05-24.
-- **Build command.** `./rom-build.sh ishtar -z` is real. `AOSPA/manifest` `aospa.xml:120` links `vendor/aospa` `build.sh` to `rom-build.sh`. `build.sh` defaults `BUILD_TYPE="userdebug"`, and `-z` runs `ota_from_target_files` and `img_from_target_files` from `$OUT/obj/PACKAGING/target_files_intermediates/aospa_$DEVICE-target_files.zip` into `aospa-$AOSPA_VERSION.zip` and `aospa-$AOSPA_VERSION-image.zip` at the source root. That is exactly runbook sections 1, 9 and 11.
-- **Credentials.** Under `DEC-25` the server needs none: the plan's scope, `F7.2-03`, `F7.2-09` step 7 and `VAL-TEARDOWN` all say so.
+- `AUDIT-FIX-52`: runbook section 4, lines 135–138, now gives a sync failure matching a sync-path detector its fix, counted against the same 2 attempts. That agrees with `F7.2-04`, so the precedence clash is gone.
+- `AUDIT-FIX-53`: runbook section 5, lines 186–190, reads `AOSPA/manifest` `beryl` and stops before renting if it moved. Measured today: still `7dfc0650…`, dated 2026-05-24.
+- `AUDIT-FIX-54`: in section 10, a failed `repo manifest -r` is recorded and the block continues (lines 473–480). Section 11's copy loop logs each missing file to `retrieval.txt` and continues (lines 556–571). The operator rule for both sections is at lines 523–526.
 
-**Both user rulings recorded in run 19 are sound.**
+**Three new P3 findings. None needs a new decision, and none contradicts the runbook.**
 
-- **The fix rule** is a server edit, recorded in `fixes.diff`, landed on GitHub after the session. It keeps push approvals off the billing clock. It is also not lossy: `fixes.diff` lives in `~/evidence`, which runbook section 10 packs into the retrieved `evidence.tar.gz`, and `F7.2-10` routes it through `check.py` and the user's push before any second rental.
-- **The symlink ruling** holds against the build system itself, not only against the project's documents. AOSPA `tools/extract-utils` `beryl` `extract_utils/makefiles.py` `write_symlink_package` splits the `SYMLINK=` value into partition and location, and emits `install_symlink` with `installed_location` and `symlink_target = '/' + file.dst`. For `refs/a16_ishtar/proprietary-files.txt:1037` that is partition `vendor`, location `lib64/camera/aon_front.pb`, and target `/odm/lib64/camera/aon_front.pb`. Runbook section 10 lines 282–285 still test the `odm` path and would print "NOT a symlink" on a correct build. The runbook is still uncorrected, which is correct: that edit is `F7.2-01`'s, in Step 4.
+- **`AUDIT-FIX-55`: stale symlink-correction wording.** `IMPL-94` already moved runbook section 10's test to `$OUT/vendor/lib64/camera/aon_front.pb` (lines 485–488). `Faz7.2` still tells `F7.2-01` to make that correction before renting, in section 4 line 79, `F7.2-01` lines 222–223, `VAL-GATE`, `VAL-DOCS`, the contract table, the section 11 risk and section 12.
+  - Section 6 line 196 is worse than stale: it says in present tense that the runbook tests the `odm` path, which is now false.
+  - It fails safe. The runbook wins on disagreement, and "correct odm to vendor" has nothing left to change. On the rental day the correction becomes a verification.
+- **`AUDIT-FIX-56`: the plan half of `-52`, carried.** `Faz7.2` section 8 line 292 and `VAL-SYNC` line 307 still grade `manifest-resolved.xml` against the 13 pins "at `22283d8`", not "at `22283d8` as amended by `fixes.diff`". The ledger's `DEC-25` item (3) still lacks the sync-path exception, a disagreement `IMPL-94` recorded.
+- **`AUDIT-FIX-57`: the carried Hetzner wording is routed correctly, but the list is incomplete.** Run 20, ledger section 7 and pre-rental step 3b route `Main-Planing.md` lines 75, 211 and 265 and `Project-Comprehension.md` `EV-20` to the next Step 1 amendment with `AUDIT-FIX-41` and `-42`. This audit confirmed those four lines. It also found three more live statements of Hetzner as the build host:
+  - `Project-Comprehension.md` `CQ-13` (line 25);
+  - `Project-Ontology.md` invariant 11 (line 429, "Hetzner Cloud server — Ubuntu 22.04 LTS on a CCX53");
+  - `docs/reverse-engineering-toolchain.md` line 220.
 
-**Of the three recorded readings, two are sound as written and one is sound but collides with a precedence sentence.**
+  `Faz7.1` line 5 and index line 10 are history and need nothing.
 
-- **`F7.3-01` writing re-establishment steps when AOSPA is silent: sound.** It costs a written procedure, and `F7.3-07` executes it only if `/data` was actually formatted.
-- **PC-17 graded on the two mount counts: correct, and it corrects the ninth audit's own wording.** `docs/release-checklist.md:248` defines PC-17 as `hal.mount.count` and `sensor.mount.count`, and lines 286–287 say those fields were never defective.
-- **`F7.2-04` applying the deferred-items fixes to the two sync-path detectors: the right reading.** Otherwise two rows of the runbook's own table are dead text. **But runbook section 4 literally says "Sync failure … stop", and `Faz7.2` section 1 says that where the plan and the runbook disagree, "Step 4 follows the runbook".** A rental-day session holds two instructions that contradict each other. That is new finding `AUDIT-FIX-52` (P3), repairable in the same pre-rental runbook edit as the symlink test.
+**Most important finding: `AUDIT-FIX-55` (P3).** It is the only point where the plan misstates the current runbook, and a rental-day session reads it first. No P0 or P1 is open. The only open P2 is the carried `AUDIT-FIX-22`.
 
-**Most important finding: `AUDIT-FIX-52` (P3), the sync-failure precedence clash above.** No P2 is new. The only open P2 is the carried `AUDIT-FIX-22`.
+**Most important remediation action:** on the rental day, treat `F7.2-01`'s symlink step as a **verification**, not an edit. Confirm that runbook lines 485–488 name `vendor/lib64/camera/aon_front.pb` and report the `readlink` target. Run `bash -n` on the section 10 block. Cite `IMPL-94` as the edit. Grade `VAL-SYNC` against `22283d8` as amended by `fixes.diff` (`-56`). Reword both in a later bounded amendment, not before the rental.
 
-**Most important remediation action:** in `F7.2-01`, before renting, make the runbook agree with the plan in one reviewed edit. Correct the section 10 symlink path, add the sync-path exception to section 4 (`-52`), and add a free base-pin read to section 5 (`-53`). Then run `bash -n` on the touched blocks and stop for the user's rental approval.
-
-**Step 2 output is usable for Step 4.** **Queue head: `Planner-docs/Faz-7-Plans/Faz7.2-first-aospa-build.md`, starting at `F7.2-01`.** The queue behind it is `Faz7.3`, `Faz8.1`'s agreement half, then `Faz8.3`.
+**Step 2 output is usable for Step 4.** **Queue head: `Planner-docs/Faz-7-Plans/Faz7.2-first-aospa-build.md`, starting at `F7.2-01`.** Behind it: `Faz7.3`, `Faz8.1`'s agreement half, then `Faz8.3`.
 
 ## 2. Reviewed Sources
 
 **Files inspected.**
 
-- **Planning run 19's four sub-plans.** `Planner-docs/Faz-7-Plans/Faz7.2-first-aospa-build.md`, `Faz7.3-flash-boot-and-aon-verification.md`, `Planner-docs/Faz-8-Plans/Faz8.1-android16-camera-blob-comparison.md` and `Faz8.3-camera-modes-on-android16-build.md` were each read in full. Sections 4, 7, 8, 9 and 13 were checked finding by finding against the ninth audit's required actions and against the repository.
-- **`Planner-docs/Sub-Planing-Index.md`.** Run 19's `git diff` was read: section 4d, section 5's new deferred item, the line-357 correction, and the tenth re-plan paragraph.
-- **`Planner-docs/Planing-Ledger.md` (CRLF, long lines), through a truncating UTF-8 extractor.** Read: the section headings; the section 2 run 19 row, including its readings; rows `IMPL-89` (with the run-19 annotation), `IMPL-91`, `IMPL-92` and `IMPL-93`; the whole section 4 matrix by status column; the section 3 snapshot registry; and the `DEC-07`, `DEC-08`, `DEC-22` and `DEC-25` rows.
-- **The ninth `Planner-docs/Sub-Planing-Audit.md`**, read in full before overwriting, so that finding IDs continue from `AUDIT-FIX-51`.
-- **`docs/build-environment.md`, read in full.** It is the rental runbook, and `Faz7.2` defers to it.
-- **`docs/pre-rental-plan.md`**, the operator plan whose step 3 this is.
-- **Repository evidence re-measured this run:**
-  - `refs/a16_ishtar/proprietary-files.txt:1035-1039` and `device_ishtar/proprietary-files.txt:1031`;
-  - `refs/a16_ishtar` HEAD `df05661`;
-  - `refs/a16_sm8550/BoardConfigCommon.mk`: `odm` in `AB_OTA_PARTITIONS` (line 16), and `TARGET_COPY_OUT_ODM := odm` (line 120);
-  - `docs/aon-verification.md` lines 186, 217–218 and 239;
-  - `docs/release-checklist.md` lines 135, 148, 176, 248, 277–297 and 318;
-  - `scripts/smoke.sh` lines 81, 94, 128 and 130;
-  - `ishtar-cam-modes/setmode.sh` lines 52–58, 79–83 and 110–114;
-  - `Main-Planing.md` lines 22, 61, 277 and 288;
-  - `Faz1.3` line 9, and `Faz3.8` lines 120 and 163.
-- **Supporting files.** `Planner-docs/Project-Ontology.md`: a byte-level control-character scan and `IMPL-52`/`-53`/`-54` counts. `Planner-docs/Project-Comprehension.md`: `IMPL-52`/`-53`/`-54` counts.
+- `Planner-docs/Faz-7-Plans/Faz7.2-first-aospa-build.md`, read in full. Its structure was also compared with `HEAD` (`587e3b5`): the work-item count and the heading list are unchanged.
+- `docs/build-environment.md`, read in full. It is the re-targeted runbook. It is unchanged since `587e3b5`.
+- `docs/pre-rental-plan.md`, read in full.
+- `Planner-docs/Planing-Ledger.md` (CRLF), through a line extractor:
+  - section 2 row 20;
+  - section 4's `Faz7.2` row, plus status counts over all 42 matrix rows;
+  - section 5 rows `IMPL-94` and `IMPL-95`;
+  - section 7's `DEC-26` replanning input;
+  - section 8 rows `DEC-22`, `DEC-25` and `DEC-26`;
+  - pipe counts on the edited rows, and the headings of the section 2 and section 4 tables.
+- The tenth `Planner-docs/Sub-Planing-Audit.md`, read in full before overwriting, so finding IDs continue from `AUDIT-FIX-54`.
+- `Planner-docs/Main-Planing.md` lines 75, 211 and 265. `Planner-docs/Project-Comprehension.md` lines 25 (`CQ-13`) and 51 (`EV-20`). `Planner-docs/Project-Ontology.md` line 429. `Planner-docs/Faz-7-Plans/Faz7.1-github-input-staging.md` line 5. `Planner-docs/Sub-Planing-Index.md` line 10. `docs/reverse-engineering-toolchain.md` lines 214–224.
+- `snapshots/`: listed only. `20260913-2140__IMPL94__faz72-rental-gate.txt` and `20260914-1434__DEC26__scaleway-handover.txt` both exist.
 
-**Folders inspected.** `Planner-docs/`, all nine `Faz-<n>-Plans/` folders, `docs/`, and the repository through `git`.
+**Folders inspected.** `Planner-docs/`, all nine `Faz-<n>-Plans/` folders, `docs/`, and `snapshots/` (listing only).
 
 **Important commands run.**
 
-- `git status --short`, `git log --oneline -4`, `git rev-list --left-right --count origin/main...main` (0 behind, 2 ahead), and `git diff --stat` in two scopes:
-  - the working tree: run 19 is **uncommitted**, six files;
-  - `097d687..HEAD` on `Planner-docs/`: empty, so `d3993de` touched no planner file.
-- `git diff --stat HEAD` on `Main-Planing.md`, `Project-Ontology.md`, `Project-Comprehension.md`, `Faz7.1` and `Faz8.2`: all unchanged.
-- The bundled validator at the installed plugin path, in `--mode step3-preflight --strict` and `--mode step2 --strict` before writing, and in `--mode step3 --strict` and `--mode step4 --strict` after. `python` is 3.14.7.
-- A Python structure checker over all 42 sub-plans. It checks:
-  - the filename regex, and folder/filename/H1 agreement;
-  - the 13 headings in order;
-  - the shortest section body;
-  - placeholder tokens;
-  - the Implementation Contract header and path safety;
-  - control bytes and CRLF;
-  - per-phase numbering contiguity;
-  - index references in both directions;
-  - the line endings of the seven top-level planner files.
-- **Runbook section 5's scripted block, executed verbatim** in this session's scratchpad (`TMPDIR` pointed there), with `GH` set to the WinGet `gh.exe`. Exit 0.
-- Read-only `gh api` calls:
-  - `ahmetxa/android_local_manifests`: commits, visibility, the tree at `22283d8`, and the raw `README.md`, `ishtar-beryl.xml` and `check.py`;
-  - `ahmetxa/android_device_xiaomi_ishtar`: visibility and the `beryl` head;
-  - `AOSPA/manifest`: `beryl` commits, the tree, and raw `default.xml` and `aospa.xml`;
-  - `AOSPA/android_vendor_aospa` `beryl`: raw `build.sh`;
-  - `AOSPA/android_tools_extract-utils` `beryl`: the tree, a `SYMLINK` scan of its `.py` files, and `extract_utils/makefiles.py` lines 590–640.
-
-  No write, and no clone into the workspace.
+- `git status --short`, `git diff --stat`, and `git diff --stat HEAD` on `Main-Planing.md`, `Sub-Planing-Index.md`, `Project-Ontology.md`, `Project-Comprehension.md` and `docs/build-environment.md`. All five are unchanged. The working tree holds run 20's three uncommitted files (`Faz7.2`, the ledger, `docs/pre-rental-plan.md`) and the untracked `devir-teslim-promptu.md`.
+- The bundled validator at the installed plugin path, run with `python` 3.14.7 (`python3` resolves to the Windows Store stub):
+  - before writing: `--mode step3-preflight --strict`, which passed with `error_count=0`, `warning_count=0`, `secret_findings=0`, `subplan_count=42`, `index_reference_count=42`, `phase_folder_count=9` and `main_phase_count=9`;
+  - after writing: `--mode step3 --strict` and `--mode step4 --strict` (section 15).
+- A heading check over all 42 sub-plans: 13 required headings each.
+- **`bash -n` on all ten fenced `bash` blocks of the runbook**, extracted to this session's scratchpad and deleted afterwards. All ten pass, and every block's first line is `set -euo pipefail`.
+- Read-only `gh api` calls with the WinGet `gh.exe`:
+  - `AOSPA/manifest` `beryl`: `7dfc0650e27ec43b1d5cedf5e74213cf8667f2c2`, 2026-05-24;
+  - `ahmetxa/android_local_manifests` `main`: `22283d8a866d042e02336fcb4698253ac6bf9c3b`;
+  - both `ahmetxa` repositories: `private=false`.
+- `grep` for Hetzner, CCX53 and Primary IP across `Planner-docs/` and `docs/`, and for pre-Scaleway paths (`cd ~/beryl`) in the queued sub-plans. None in the queued sub-plans.
 
 **Things not verified.**
 
-- **The 38 sub-plans run 19 did not touch were not re-read for content.** `git diff --stat` shows `Faz7.1` and `Faz8.2` unchanged since the ninth audit read them. Both are now `verified` (`IMPL-91`, `IMPL-93`), and their measurements were taken as reported. The other 36 carry earlier audits' assessments. All 42 passed the structure checker.
-- **Whether `repo manifest -r` aborts on a partially synced tree** (`AUDIT-FIX-54`). This was reasoned from `repo`'s behaviour, not run.
-- **AOSPA's data-format requirement, the firmware `beryl` needs, the vendor repository in the `vauxite` beans, and the Android 16 init service names.** Each belongs to the work item that names it.
+- **Runbook section 5 was not executed this run.** The tenth audit and `IMPL-94` each ran it with exit 0. This audit re-read its three GitHub inputs instead (above). On the rental day the section is re-run as written.
+- **Scaleway facts.** Quotas, identity validation, whether Ubuntu 22.04 is offered for the type, prices at creation, and how the guest exposes a volume ID. All are rental-day checks. Runbook section 3's quotes and links were read as written, not re-fetched.
+- **The section 7 volume block (`pick`, `check_id`, `fstab`) has never run.** It only passes `bash -n`. `Faz7.2` section 11 states this as a risk.
+- **Content of the 41 sub-plans run 20 did not touch.** Structure passed on all 42. Content assessments of the other 41 stand from the tenth audit, and `git status` shows none of them changed.
 - **Device state.** No `adb` command was run.
-- **Hetzner Console state.** Limits, the SSH key and prices are the user's checks in `F7.2-01`.
 
-No secret value was read or recorded. `secret_findings=0` in every validator mode run.
+No secret value was read or recorded.
 
 ## 3. Main Phase Coverage Analysis
 
@@ -128,48 +110,33 @@ No secret value was read or recorded. `secret_findings=0` in every validator mod
 | 4 | Minimal correct HAL patch | Planner-docs/Faz-4-Plans/ | Yes | 7 | OK | `Faz4.2`–`4.5` `verified`; `Faz4.1`, `Faz4.7` `superseded`; `Faz4.6` `DEFERRED`. |
 | 5 | Mode-0 12-bit composition | Planner-docs/Faz-5-Plans/ | Yes | 3 | OK | All three `verified`. |
 | 6 | AON fix upstreaming | Planner-docs/Faz-6-Plans/ | Yes | 2 | OK | `Faz6.2` `verified`; `Faz6.1` `implemented`, effect verification owned by `Faz7.3` `F7.3-08`. |
-| 7 | Android 16 build environment | Planner-docs/Faz-7-Plans/ | Yes | 3 | OK | `Faz7.1` `verified` (`IMPL-91`). `Faz7.2` (paid build) and `Faz7.3` (flash and boot) amended by run 19 and queued. |
-| 8 | Camera work on Android 16 + kernel LTS | Planner-docs/Faz-8-Plans/ | Yes | 3 | OK | `Faz8.1` `implemented` (static half, `IMPL-92`: both layers carry-over on static values). `Faz8.2` `verified` (`IMPL-93`, `DEC-08` recommendation defer). `Faz8.3` queued. **The ninth audit's WARNING is lifted:** index section 5 now defers sensor adaptation beside HAL re-derivation, and `Faz8.1`/`Faz8.3` block on anything but carry-over, so no acceptance branch is referenced without an owner. The deliberately undecomposed branches (re-derivation, kernel merge) stay routed to `DEC-07`/`DEC-08`. |
+| 7 | Android 16 build environment | Planner-docs/Faz-7-Plans/ | Yes | 3 | OK | `Faz7.1` `verified` (`IMPL-91`). `Faz7.2` re-targeted to Scaleway by run 20 and queued; `Faz7.3` queued. The phase objective and acceptance signal name "a rented VDS", not a provider, so `DEC-26` changes no phase meaning. |
+| 8 | Camera work on Android 16 + kernel LTS | Planner-docs/Faz-8-Plans/ | Yes | 3 | OK | `Faz8.1` `implemented` (static half, `IMPL-92`). `Faz8.2` `verified` (`IMPL-93`). `Faz8.3` queued. Undecomposed branches stay routed to `DEC-07`/`DEC-08`. |
 | 9 | Release engineering | Planner-docs/Faz-9-Plans/ | Yes | 3 | OK | All three `verified`. |
 
 The validator reports `main_phase_count=9` and `phase_folder_count=9`. There is no missing phase and no extra folder. Per-phase counts, measured this run: **6, 4, 11, 7, 3, 2, 3, 3, 3 — total 42.**
 
 ## 4. Sub-Plan File Inventory
 
-Structure was checked programmatically on **all 42** files. Every H1 matches `# Faz <phase>.<sub> — ` and agrees with its folder and filename. Content was assessed this run for the four files run 19 amended. `Faz7.1` and `Faz8.2` are unchanged since the ninth audit's content read and are now verified. The other 36 carry earlier assessments.
+Structure was checked on **all 42** files: every one carries the 13 required headings, and the validator agrees on filename, folder and H1. Content was assessed this run only for `Faz7.2`, the one file run 20 changed.
 
 **Planner-docs/Faz-7-Plans/** (3 files).
 
-- `Faz7.1-github-input-staging.md` — `# Faz 7.1 — GitHub Input Staging and Pre-Rental Readiness`. Phase match OK, structure OK. **`verified` by `IMPL-91`.** Its outputs were re-measured on GitHub this run: manifest `22283d8`, public repositories, `check.py` resolving, and the negative cases failing 14. Content not re-assessed; unchanged.
-- `Faz7.2-first-aospa-build.md` — `# Faz 7.2 — First AOSPA beryl Build on a Rented VDS`. Phase match OK, structure OK. **Content: strong, and now executable against the runbook.**
-  - **Section 1** records four gone premises, the runbook's precedence, the two user rulings, and that no work item was added or removed. The last is true: `F7.2-01` to `F7.2-10` are unchanged in number.
-  - **Section 6's values match GitHub and the runbook, measured this run:** `22283d8`, 13 pins, the base `7dfc0650…`, `rom-build.sh`, the section 11 table, and the `;SYMLINK=` lines 1037 and 1031.
-  - **Sections 7, 8, 9 and 13 carry `AUDIT-FIX-43`** (deletion, never shutdown, and the Primary IP) **and `-44`** (every section 11 artifact with sha256 at both ends, or its extraction source recorded) **as criteria, not advice.**
-  - **Notes.** `AUDIT-FIX-52`: sync-failure precedence, and `VAL-SYNC` against a `fixes.diff`-amended pin set. `AUDIT-FIX-53`: base pin not read before renting. `AUDIT-FIX-54`: the runbook's fail-fast blocks versus "recorded, not fatal".
-- `Faz7.3-flash-boot-and-aon-verification.md` — `# Faz 7.3 — Flash, Boot and AON Verification on the Device`. Phase match OK, structure OK. **Content: strong.**
-  - `F7.3-01` records the data requirement both ways, with sources, and writes the four re-establishment steps when a format is required or the requirement is unsettled.
-  - `F7.3-02` states the wipe.
-  - `F7.3-07` and its criterion grade against the re-established fields, by name: `agc.pref_48m = 0`, `agc.pref_resolution = full`, `agc.photo_size.back.derived = 4096x3072` and `prefs.trap.armed = 0`. A field "the format erased does not pass as an explained difference".
-  - Install artifacts are taken from runbook section 11, not re-researched.
-  - **Notes.** `AUDIT-FIX-37`: `Faz7.3` writes `Project-Comprehension.md`. One wording gap, carried in section 12 rather than raised as a finding: `F7.3-02` says "Where a format is required, state plainly …", but section 8 also covers the unsettled case. The go/no-go should state the possible wipe whenever `F7.3-01` wrote re-establishment steps.
+- `Faz7.1-github-input-staging.md` — `# Faz 7.1 — GitHub Input Staging and Pre-Rental Readiness`. Phase match OK, structure OK. **`verified`** (`IMPL-91`). Its outputs were re-read on GitHub this run: `22283d8`, and both repositories public. Line 5's Hetzner mention quotes the Phase 7 text of its time. It is history.
+- `Faz7.2-first-aospa-build.md` — `# Faz 7.2 — First AOSPA beryl Build on a Rented VDS`. Phase match OK, structure OK. **Content: strong, and executable against the Scaleway runbook.**
+  - **Section 1.** The run 20 note lists eight re-targeted facts, each matching the runbook (section 8 below). It states "no work item was added or removed", which holds: 10 before, 10 after. It routes the carried Hetzner wording, and names this audit as the gate.
+  - **Sections 2–4, 7, 8, 9, 10, 12 and 13.** Every provider value is re-read from the runbook rather than paraphrased from `DEC-26`. `F7.2-09`'s eight steps map one-to-one onto runbook section 12's eight steps.
+  - **Section 11** gains three sound provider risks: account or quota, volume picking and unmounted `out`, and out-of-memory. The volume-block risk states honestly that the block has "never run".
+  - **Notes.** `AUDIT-FIX-55`: stale "correct before renting" wording, and section 6's false present-tense claim. `AUDIT-FIX-56`: `VAL-SYNC` and the resolved-manifest criterion lack the `fixes.diff` basis.
+- `Faz7.3-flash-boot-and-aon-verification.md` — `# Faz 7.3 — Flash, Boot and AON Verification on the Device`. Phase match OK, structure OK. **Content: strong** (tenth audit). Unchanged since then. It consumes runbook section 11's artifact table, and `IMPL-95` did not change that table's rows. No provider fact appears. **Notes.** `AUDIT-FIX-37`, plus the carried `F7.3-02` wording gap (section 12).
 
 **Planner-docs/Faz-8-Plans/** (3 files).
 
-- `Faz8.1-android16-camera-blob-comparison.md` — `# Faz 8.1 — Android 16 Camera Blob Comparison and Carry-Over Decision`. Phase match OK, structure OK. **Content: strong.**
-  - Adaptation is routed like re-derivation (`F8.1-08`/`-09`), and `Faz8.3` can consume only carry-over.
-  - Scratch is outside the workspace and deleted at `F8.1-05`, with `VAL-CLEAN` at two points.
-  - `F8.1-04` names `xiaomi-8550/…ishtar` `vauxite` and `ThankYouMario/…ishtar` `vauxite`, and decides from the `vauxite` beans.
-  - `IMPL-92` is recorded "as written", and section 1 states that the amendment changes text, not the record. This is the right way to amend a partly executed plan.
-  - **Notes.** `AUDIT-FIX-22`: `F8.1-10` writes the ontology.
-- `Faz8.2-kernel-lts-merge-scoping.md` — `# Faz 8.2 — Kernel LTS Merge Scoping`. Phase match OK, structure OK. **`verified` by `IMPL-93`.** Unchanged since the ninth audit; not re-assessed.
-- `Faz8.3-camera-modes-on-android16-build.md` — `# Faz 8.3 — Camera Modes on the Android 16 Build`. Phase match OK, structure OK. **Content: strong.**
-  - The gate requires carry-over on both layers.
-  - `F8.3-05` and `VAL-RESTART` list the Android 16 init service names against `setmode.sh`'s three, and count "a mode switch with no effect" beside black preview. This matches `setmode.sh:52-58` and `:110-114` as measured.
-  - PC-04 uses the single-dump probe, with the substitute as a cross-check. The trap reading uses `prefs.trap.armed`, and PC-17 the two mount counts.
-  - `F8.3-08` corrects the checklist labels in the same edit as the evidence record.
-  - **Notes.** `AUDIT-FIX-50`: document half, owned by `F8.3-08`.
+- `Faz8.1-android16-camera-blob-comparison.md` — `# Faz 8.1 — Android 16 Camera Blob Comparison and Carry-Over Decision`. Phase match OK, structure OK. **Content: strong** (tenth audit). Unchanged. **Notes.** `AUDIT-FIX-22`, since `F8.1-10` writes the ontology. Consider folding `-57`'s invariant 11 there only if a Step 1 amendment has not yet run; see section 13.
+- `Faz8.2-kernel-lts-merge-scoping.md` — `# Faz 8.2 — Kernel LTS Merge Scoping`. Phase match OK, structure OK. **`verified`** (`IMPL-93`). Unchanged.
+- `Faz8.3-camera-modes-on-android16-build.md` — `# Faz 8.3 — Camera Modes on the Android 16 Build`. Phase match OK, structure OK. **Content: strong** (tenth audit). Unchanged. **Notes.** `AUDIT-FIX-50`.
 
-**All other phase folders** (`Faz-1-Plans` 6, `Faz-2-Plans` 4, `Faz-3-Plans` 11, `Faz-4-Plans` 7, `Faz-5-Plans` 3, `Faz-6-Plans` 2, `Faz-9-Plans` 3). Every file passes on filename, phase match, section structure and Implementation Contract, with no thin or placeholder section. Content status comes from the ledger (section 12). Carried residues: `Faz1.3` (`AUDIT-FIX-25`, accepted) and `Faz3.8` (`AUDIT-FIX-33`, accepted).
+**All other phase folders** (`Faz-1-Plans` 6, `Faz-2-Plans` 4, `Faz-3-Plans` 11, `Faz-4-Plans` 7, `Faz-5-Plans` 3, `Faz-6-Plans` 2, `Faz-9-Plans` 3) pass on filename, phase match and section structure, and are unchanged since the tenth audit. Carried residues: `Faz1.3` (`AUDIT-FIX-25`, accepted) and `Faz3.8` (`AUDIT-FIX-33`, accepted).
 
 ## 5. Naming and Sequencing Check
 
@@ -177,183 +144,146 @@ Structure was checked programmatically on **all 42** files. Every H1 matches `# 
 
 - **Folder naming:** all nine match `Faz-<n>-Plans/`.
 - **Filename naming:** all 42 match `Faz<phase>.<sub>-<ascii-kebab-slug>.md`, with no spaces, no non-ASCII characters and no duplicates.
-- **Numbering:** contiguous from 1 in every phase, measured. Run 19 created, deleted and renamed nothing.
-- **Agreement:** folder, filename and H1 agree in all 42.
-- **Order:** the phase order matches `Main-Planing.md` section 6. Execution order within Phases 7 and 8 differs from numbering by design, per index amendment 4d. `Faz8.1`'s static half ran before `Faz7.2`, as `IMPL-92`. Index 4d now defines that half exactly as `Faz8.1` section 10 does (`F8.1-01`–`05` plus `08`/`09` on static values), so the boundary slip of `AUDIT-FIX-47` is closed.
+- **Numbering:** contiguous in every phase. Run 20 created, deleted and renamed nothing.
+- **Agreement:** folder, filename and H1 agree in all 42 (validator).
+- **Order:** the phase order matches `Main-Planing.md`. Execution order within Phases 7 and 8 differs from numbering by design, per index amendment 4d, unchanged.
 
 ## 6. Index Consistency Check
 
-- **Missing, broken or unindexed references: none.** All 42 are referenced, in both directions, and `index_reference_count=42`.
+- **Missing, broken or unindexed references: none.** `index_reference_count=42`.
 - **Phase count:** nine in the index, the master plan and the folders.
-- **Coverage claims: honest.** The ninth audit's one byte-level error is corrected at line 357. The old sentence is struck through, and the correction reads "all 42 sub-plans and this index are LF-only". Measured this run, that holds: all 42 sub-plans, the index, the ontology, the comprehension file and the audit are LF, while `Main-Planing.md`, `Planing-Ledger.md` and `Autopsy.md` are CRLF.
-- **Execution order: plausible.** Step 2 of amendment 4d records `IMPL-92`, and step 6 now reads "only when both layers are carry-over". The sequencing paragraph adds that a sensor adaptation label also blocks `Faz8.3`. Section 5 gains the matching deferred item, which notes that `IMPL-92` found the sensor unchanged on static values.
-- **Run 19's paragraph is accurate against what this audit measured:**
-  - files and sections written;
-  - no snapshot cut;
-  - two rulings and three readings;
-  - findings left untouched;
-  - what was not verified;
-  - validator results.
-
-  One small imprecision, not a finding: it lists `-50`'s document half as "routed to `F8.3-08`", and `F8.3-08` does now carry it (section 7, and the contract table's `docs/release-checklist.md` row).
-- **Carried residue.** The index's three-field description of `Faz3.8` is unchanged (`AUDIT-FIX-33`, accepted). Run 19's diff did not touch it.
+- **Index not edited by run 20. That is the right call.** Its only provider mention, line 10, is run 18's re-plan banner, which records the `DEC-24` decision of its time. The index states no live instance, disk, IP or teardown value that `Faz7.2` or the runbook must agree with.
+- **Execution order: plausible and unchanged.** `Faz7.2` → `Faz7.3` → `Faz8.1` agreement half → `Faz8.3`.
+- **Carried residue.** The three-field description of `Faz3.8` (`AUDIT-FIX-33`, accepted).
 
 ## 7. Required Section Structure Check
 
-Checked programmatically on **all 42** sub-plans, not sampled.
+Checked on **all 42** sub-plans, not sampled.
 
-- **Missing, duplicated or out-of-order sections: none.** Every file carries the thirteen required headings in order.
-- **Empty sections: none.** The shortest section body across all 42 is 175 characters (`Faz6.1` section 2), unchanged. Run 19's four files are all above that.
-- **Placeholder sections: none.** There is no `TODO`, `TBD`, `FIXME` or `XXX` token.
+- **Missing, duplicated or out-of-order sections: none.** Every file carries the thirteen required headings. For `Faz7.2`, the full heading list (`#` lines) is byte-identical between `HEAD` and the working tree.
+- **Empty or placeholder sections: none.** The validator reports `warning_count=0` in strict preflight.
 - **Title, filename and folder: all 42 agree.**
-- **Implementation Contract tables:** present in all 42, with repo-relative paths and no absolute or `..` path. Run 19's tables:
-  - **`Faz7.2`** marks `docs/build-environment.md` `modified`, for the `F7.2-01` correction and post-session deviations, and `.gitignore` `existing` with the reason no `*.img` rule is needed.
-  - **`Faz7.3`** adds `docs/build-environment.md`, `docs/release-manifest.md` and `docs/agc-12mp-configuration.md` as `existing`.
-  - **`Faz8.3`** marks `docs/release-checklist.md` `modified` for `F8.3-08`.
-
-  **Each named edit has a matching work item, and each work item's edit is in its table.**
-- **Control characters and encoding: none in any sub-plan.** All 42 are valid UTF-8 and LF-only.
-
-`--mode step2 --strict` and `--mode step3-preflight --strict` both report `error_count=0`, `warning_count=0`, `subplan_count=42`, `index_reference_count=42`, `phase_folder_count=9`, `main_phase_count=9` and `secret_findings=0`.
+- **Implementation Contract tables: present in all 42.** `Faz7.2`'s table still has repo-relative paths only. Its `docs/build-environment.md` row reads `modified`, justified by "`F7.2-01` corrects section 10's built-symlink path before renting". That purpose is now stale (`AUDIT-FIX-55`). The `modified` state is still correct, because post-session deviations are recorded in the runbook.
+- **Encoding:** `Faz7.2` is UTF-8, LF. The ledger stays CRLF (`file`). The rows run 20 edited keep their table's pipe counts: section 2 row 20 has 6, like its header; section 4's `Faz7.2` row has 10, like its header.
 
 ## 8. Content Quality and Implementability Analysis
 
-**Discharge check, required action by required action, in sections 4, 7, 8, 9 and 13.**
+**Value-by-value grading of run 20's amendment against the re-targeted runbook.**
 
-| Finding | Required action (ninth audit) | Where run 19 put it | Verdict |
+| Value | Runbook (section, line) | `Faz7.2` (section / item, line) | Verdict |
 |---|---|---|---|
-| `AUDIT-FIX-43` | Billing and deletion semantics sourced and used by teardown and budget | Runbook section 3 (`IMPL-91`); `Faz7.2` section 4 teardown bullets, `F7.2-09` steps 2–5 and 7, section 8 "deleted, not shut down … zero Primary IPs", `VAL-TEARDOWN`, section 13 first bullet | resolved |
-| `AUDIT-FIX-44` | Every install artifact named and retrieved with sha256 before deletion, or extraction recorded | Runbook section 11 table; `F7.2-08` (assertions, optional target-files, "not retrieved: name each … with the package"), section 8 criterion, `VAL-RETRIEVE`, section 13 `Faz7.3` bullet; `Faz7.3` section 6 table, `F7.3-02`/`-03` | resolved |
-| `AUDIT-FIX-45` | Data requirement both ways; re-establishment path; wipe stated at go/no-go; restore graded on re-established state | `F7.3-01` (steps 1–4), `F7.3-02`, `F7.3-07`, section 8 restore criterion with named fields, `VAL-PREFLASH`, `VAL-RESTORE`, section 13 third bullet | resolved |
-| `AUDIT-FIX-46` | Adaptation routed like re-derivation; gates require sensor carry-over; index section 5 defers adaptation | `F8.1-08` "Only carry-over is a label `Faz8.3` can consume", `F8.1-09` adaptation branch, `Faz8.1` section 8 and 13; `F8.3-01`, `Faz8.3` section 8 first criterion, section 13 last bullet; index section 5 | resolved |
-| `AUDIT-FIX-47` | Scratch outside the workspace, deleted at end of static half; index 4d boundary aligned | `Faz8.1` section 4, 5, `F8.1-01`, `F8.1-05` deletion, `F8.1-10`, section 8 last criterion, `VAL-CLEAN` at two points, section 13 last bullet; index 4d step 2 | resolved |
-| `AUDIT-FIX-48` | Index line-ending sentence corrected to LF | Index line 357, struck and corrected | resolved |
-| `AUDIT-FIX-49` | `IMPL-89` annotated; both candidates named in `F8.1-04` | Ledger line 517 "[corrected by `IMPL-90`; annotated 2026-09-13 by planning run 19 …]"; `F8.1-04`, `Faz8.1` section 4, 6, 8 | resolved |
-| `AUDIT-FIX-50` | PC-17 on `prefs.trap.armed`, PC-04 on repaired probe; checklist labels updated by Step 4 | `F8.3-06`, `Faz8.3` section 8, `VAL-CHECKLIST`, risk row; `F8.3-08` labels edit. **PC-17 corrected to the mount counts** (see section 9) | sub-plan half resolved; document half open, owned by `F8.3-08` |
-| `AUDIT-FIX-51` | `VAL-RESTART` lists `init.svc.*`; "switch has no effect" is a failure | `F8.3-05`, `VAL-RESTART`, `Faz8.3` section 8 invariant-3 criterion, section 11 first risk, section 6 | resolved |
-
-**The amendment style is good.** Each file opens with a dated note naming its drivers and says whether a work item was added (none was). `Faz8.1` states plainly that the executed record stands and only the text changes. `Faz7.2` gives the runbook precedence and says what to do on disagreement: follow the runbook and record it. That sentence is what makes `AUDIT-FIX-52` visible.
+| Instance type POP2-32C-128G, 32 vCPU, 128 GiB, Block only | s1 l22, s2 l34–35, s6 l214 | s1 l9; s4 l81; `F7.2-02` l226; s10 l351; s12 l385 | match |
+| Boot 40 GB 5K; `ishtar-src` 310 GB 5K at `/android`; `ishtar-out` 260 GB 15K at `/android/beryl/out` | s1 l23, s6 l217–219, s7 l262–266 | s1 l10; s4 l82, l89; `F7.2-02` l227, l236; s10 l351 | match |
+| Volumes picked by size, cross-checked against the Console ID, `mkfs` only where `blkid` finds none | s7 l268–271, l278–330 | s4 l88; `F7.2-02` l235; s11 l370 | match |
+| Flexible IPv4 kept at creation, deleted at teardown | s3 l98–104, s6 l220–221, s12 step 4 | s1 l11; s4 l83, l111; `F7.2-09` step 4; `VAL-TEARDOWN` | match |
+| Ubuntu 22.04; 24.04 fallback with persistent `sysctl` | s1 l21, s6 l214–216, s7 l246–251 | s1 l12; s4 l81, l87; `F7.2-02` l231, l234; s11 l369 | match |
+| 10 h ceiling over every billed resource; every started hour counts whole; hour-8 retrieve and tear down | s3 l71–73, s4 l126–132, l146–147 | s1 l13; s2 l44; s3 l66; `F7.2-06` l250; `F7.2-09` step 6; s11 l367 | match |
+| Out-of-memory kill not retried: stop, retrieve, tear down, replanning input | s4 l144–145, s9 l459–460 | s1 l13; s3 l65; s4 l99; `F7.2-06`; s8 l295; `VAL-COMPILE`; s11 l371 | match |
+| Section 5 scripted block (manifest pin, `check.py` both ways, visibility, base pin) | s5 l170–192 | s4 l74; `F7.2-01` l216 | match |
+| Section 5 manual checks: identity-validated quota for the type and 610 GB; SSH key in the Project; output directory; window | s5 l196–207 | s1 l15; s4 l75–78; `F7.2-01` steps 1–4; s8 l287; s11 l369 | match (four of four) |
+| Section 12 teardown: Instance deleted, never powered off or standby; each Block volume deleted; flexible IP deleted; no snapshot or image; zero counts; last deletion time; rounded-up hours; no credential; `ssh-keygen -R` | s12 steps 1–8 | `F7.2-09` steps 1–8; s4 l108–113; s8 l298; `VAL-TEARDOWN`; s13 l413 | match (eight of eight; four zero counts) |
+| `/android/beryl` as the tree; `mountpoint` check before sync and build | s7 l338–339, s8 l390–391, s9 l426–427 | s1 l16; s4 l94–96; `F7.2-04`; `F7.2-06`; s8 l289 | match |
+| `~/out-pkg` → `/android/pkg` on the source volume; `retrieval.txt`; `SHA256SUMS` | s7 l341, s11 l553–572 | s1 l16; s4 l90, l107; `F7.2-08` l262 | match |
+| `disk.txt` sizes of `.repo`, the tree and `out` | s8 l408–413, s9 l433–437, s13 | s4 l94, l97; `F7.2-04`; `F7.2-06`; `F7.2-10`; s12 l406 | match |
+| Section 13 ledger row contents, incl. Ubuntu release and zero counts | s13 | `F7.2-10` l282; s12 l398–407 | match |
+| Section 3 quotes used in the plan | s3 l74–75, l93–94, l102 | s3 l70; s6 l157–163; s11 l368 | verbatim |
 
 **Implementability of the queue head.**
 
-- **`F7.2-01` is a free, well-bounded slice.** Its first command was already run by this audit and passes today. Its correction is one test path plus one echo string.
-- **The paid slices `F7.2-02`–`09` map one-to-one onto runbook sections 6–12.** The stopping rule — at most 2 manifest-class attempts, and hour 8 means retrieve and delete — is stated in sections 3, 7 and 11.
-- **The fastest signal is well chosen:** a completed sync at the two pinned commits.
+- **`F7.2-01` is free and bounded.** The section 5 block, four Console or host checks, a re-read of runbook section 4, and a stop for rental approval. The symlink "correction" is now a read-back plus `bash -n` (`AUDIT-FIX-55`).
+- **The paid items `F7.2-02`–`10` map one-to-one onto runbook sections 6–13.** The provider-sensitive parts are fully specified, with no improvisation left: volume choice, the mount guard, deletion of each billed resource, and zero counts.
+- **Fastest signal unchanged:** a completed sync at the two pinned commits, both re-read on GitHub today.
 
-**Three precision gaps remain in `Faz7.2` and its runbook.** None changes the design, and each is cheapest to close in `F7.2-01`, before money is spent.
+**Residual precision gaps.** Both are P3 and fail safe, and neither needs a pre-rental edit.
 
-1. **`AUDIT-FIX-52`: sync-failure precedence.**
-   - Runbook section 4's bullet "Sync failure (`repo sync`, or barista's …): stop" contradicts its own table, whose shallow-sync and `vendor/xiaomi/camera` rows name sync failures with a fix.
-   - `F7.2-04` resolves this toward the table, counted against the 2 attempts, while `Faz7.2` section 1 says the runbook wins on disagreement.
-   - `VAL-SYNC` and the section 8 criterion also compare `manifest-resolved.xml` against the 13 pins "at `22283d8`". After a permitted fix — for example deleting `clone-depth`, or the `vendor/xiaomi/camera` lines — the right reference is `22283d8` as amended by `fixes.diff`.
-2. **`AUDIT-FIX-53`: base pin read too late.** The base `7dfc0650…` is first asserted in section 8, after the server bills. Section 5 does not read it. It has not moved since 2026-05-24, but checking it costs one free `gh api` call on the day.
-3. **`AUDIT-FIX-54`: fail-fast blocks versus "recorded, not fatal".** Runbook sections 10 and 11 run under `set -euo pipefail`, but both the runbook and `F7.2-07`/`-08` promise that a missing file is recorded, not fatal. Two lines would abort anyway:
-   - **Section 10's first command, `repo manifest -r`.** It plausibly fails on a tree where `repo sync` stopped partway. The block would then exit before `build-evidence.txt`, the log tails and `evidence.tar.gz` exist, which are the evidence `F7.2-05` requires "whatever the build outcome".
-   - **Section 11's `cp "$OUT/$i.img"` loop** stops on the first absent image, before `SHA256SUMS` is written, where `F7.2-08` expects that absence to be recorded.
+1. **`AUDIT-FIX-55`.** A session that follows `F7.2-01` literally searches for an `odm` test that no longer exists. The runbook-precedence sentence at section 1 line 27 makes the runbook win. Section 6 line 196's present-tense claim should not be read as evidence.
+2. **`AUDIT-FIX-56`.** After a permitted fix — removing `clone-depth`, deleting the `vendor/xiaomi/camera` lines, or deleting the `display-drivers` pin — `manifest-resolved.xml` legitimately differs from `22283d8`'s 13 pins. `VAL-SYNC` must use `22283d8` plus `fixes.diff` as its reference, or it reports a false failure.
 
-**Vibecoding and fresh-session quality.** Slices are small and ordered cheapest-failure-first. Token risk is banded, medium rising to high on repeated build failure, with the mitigation named: per-stage status lines, never whole logs. Subagents are marked not recommended in all four files, with reasons: one stateful server, and one device. Each queued file states outcome, validation, boundaries and stop conditions.
+**Vibecoding and fresh-session quality.** The slices are ordered cheapest failure first. Token risk is banded medium, rising to high on repeated failure, with the mitigation named. Subagents: not recommended, with a reason (one stateful remote resource). Outcome, validation, boundaries and stop conditions are all stated.
 
 ## 9. Scope Drift and Architectural Consistency Analysis
 
-**No scope drift.** Run 19 added no phase, no sub-plan and no work item. `Main-Planing.md`, `Project-Ontology.md`, `Project-Comprehension.md`, `Faz7.1` and `Faz8.2` are unchanged (`git diff --stat HEAD`). No snapshot was cut, by the precedent of runs 13 to 15, and the ledger states that decision explicitly.
+**No scope drift.**
 
-**Judgement of the two user rulings.**
+- Run 20 amended one sub-plan within the step 3b mandate: the provider facts in `Faz7.2`, plus the ledger.
+- No phase, sub-plan, work item, objective or acceptance signal changed.
+- `Main-Planing.md`, the index, the ontology, the comprehension file and the runbook are unchanged against `HEAD`.
+- Phase 7's signal names "a rented VDS". A provider change is therefore a sub-plan fact, not a master-plan change, and the no-snapshot decision is consistent with that.
 
-1. **Fix rule (server edit → `fixes.diff` → GitHub after the session): sound.**
-   - It replaces a rule that would have spent the user's push approval, and minutes of billed time, in the middle of a paid session.
-   - Reproducibility is preserved. The build's inputs are `22283d8` plus a retrieved diff, the ledger row records both (runbook section 13, `F7.2-10`), and the diff is re-checked with `check.py` before it lands.
-   - `Faz7.2` section 5 excludes pushing during the session, and section 8 grades it ("no fix was pushed during the session").
-   - One consequence the plan already covers: the runbook's manifest commit must be updated after the diff lands (`F7.2-10`).
-2. **Section 10 symlink test: sound, verified at the build-system level.**
-   - `AOSPA/android_tools_extract-utils` `beryl` `makefiles.py` `write_symlink_package` emits an `install_symlink` module on the partition named by the value's first path segment (`vendor`), at `installed_location` `lib64/camera/aon_front.pb`, pointing at `/` plus the blob's destination (`/odm/lib64/camera/aon_front.pb`).
-   - `TARGET_COPY_OUT_ODM := odm` confirms that `$OUT/odm/…` is the regular file.
-   - `docs/aon-verification.md:217-218` expects exactly this on the device.
-   - The runbook's lines 282–285 still test the `odm` path. `F7.2-01`'s correction is right, and `bash -n` on the edited block is the correct gate.
-   - **Recommended in `F7.2-01`: change the `else` message too, so it names the `vendor` path, and record the expected `readlink` value (`/odm/lib64/camera/aon_front.pb`) in the gate record.** That way a wrong target is not read as a pass.
+**`DEC-26` is carried faithfully.**
 
-**Judgement of the three recorded readings.**
+- (a) 22.04 with the fallback; (b) and (d) POP2-32C-128G, with the ceiling and hour-8 rule kept and no out-of-memory retry; (c) delete everything. Each lands in `Faz7.2` sections 1, 3, 4, 5, 7, 8 and 11.
+- Section 5 excludes keeping any volume and creating any snapshot or extra volume. That matches runbook sections 3, 6 and 12.
 
-1. **`F7.2-04` (deferred-items fixes for the two sync-path detectors): the correct reading, but not yet consistent with the precedence sentence.**
-   - Read literally, the runbook forbids the fixes its own table lists for sync failures.
-   - The manifest `README.md` item 7 names the shallow-sync fallback as a sync-time remedy, and a failed `vendor/xiaomi/camera` sync can only surface at sync time.
-   - The attempts stay capped at 2, and hour 8 still bounds the cost.
-   - The residual problem is documentary (`AUDIT-FIX-52`, P3): make the runbook say it.
-2. **`F7.3-01` (re-establishment steps when AOSPA's documentation is silent): sound.** Unsettled evidence is treated as the worse case for a written plan and the better case for execution: steps are written, and run only if `/data` was actually formatted. `Faz7.3`'s section 8 criterion states this. The only gap is `F7.3-02`'s wording (section 4 above).
-3. **PC-17 graded on the mount counts, with the trap reading on `prefs.trap.armed`: correct, and it corrects this audit series.**
-   - `docs/release-checklist.md:248` defines PC-17 as "`hal.mount.count` and `sensor.mount.count` must each read …", and lines 286–287 say those two fields are computed separately from the trap probe that was defective.
-   - The ninth audit's required action ("grade PC-17 on `prefs.trap.armed`") conflated the row with the probe it shares a block with.
-   - Run 19 checked the checklist instead of copying the audit, which is what the pre-rental plan's rule required ("checked against the repository before it is written").
+**The worse-case teardown design is sound and carried.** The Block Storage FAQ and the Instance API text disagree on whether `terminate` deletes Block volumes, and the flexible IP survives `terminate`. So `F7.2-09` deletes each resource by name and grades on zero counts, not on the Console dialog.
 
-**Ontology consistency.** `beryl` is a branch throughout. Invariant 10 underlies `Faz7.2`'s post-build md5 read, `Faz7.3`'s on-device read and `Faz8.1`'s agreement half. Invariant 3 underlies `F8.3-05`. *Stock* is kept distinct in `Faz7.3` and `Faz8.1`.
+**Ledger continuity: good, with one recorded disagreement still open.**
 
-**Planning-ledger continuity: good, and the one unreconciled contradiction is closed.**
+- Row 20 matches the diff.
+- Section 4's `Faz7.2` next action already says the symlink correction is "already in the runbook since `IMPL-94`". So the ledger is ahead of the sub-plan text (`AUDIT-FIX-55`).
+- Section 7's `DEC-26` input records the Step 2 discharge and leaves this audit outstanding.
+- `IMPL-94` recorded that `DEC-25` item (3) lacks the sync-path exception the runbook now carries. `DEC-26` did not amend item (3), so the record still disagrees with the runbook (`AUDIT-FIX-56`). The runbook is operative, and the disagreement is documentary.
 
-- **`AUDIT-FIX-49`.** `IMPL-89`'s row now carries the correction inline, and `IMPL-90` and `IMPL-92` agree with it.
-- **Matrix status labels are honest and consistent with the repository.**
-  - `Faz7.1` and `Faz8.2` are `verified`.
-  - `Faz8.1` is `implemented`, with the agreement half named as pending.
-  - `Faz7.2`, `Faz7.3` and `Faz8.3` are `planned`, each waiting on this audit.
-  - `Faz6.1` stays `implemented` until `Faz7.3`.
-- **Section 4's next actions for `Faz7.2` match `docs/pre-rental-plan.md` step 4.**
+**Carried Hetzner wording (`AUDIT-FIX-57`).**
 
-**Master plan residues outside any run's mandate: unchanged** (`AUDIT-FIX-41`, `-42`). Lines 22, 61, 277 and 288 read exactly as the ninth audit quoted them. No queued row reads those lines; each quotes the corrected Phase 7/8 text.
+- **Confirmed routed to the next Step 1 amendment with `AUDIT-FIX-41` and `-42`**, in three places: `Faz7.2` section 1 line 18, ledger section 7's `DEC-26` input, and `docs/pre-rental-plan.md` step 3b. The routed lines were checked:
+  - `Main-Planing.md` line 75 ("a rented Hetzner VDS");
+  - line 211 (the same);
+  - line 265 (R9 mitigation, "a rented Hetzner VDS");
+  - `Project-Comprehension.md` `EV-20` ("rented Hetzner Cloud server (Ubuntu 22.04 LTS, CCX53)").
+- **The routing list misses three live statements of the same fact:**
+  - `Project-Comprehension.md` `CQ-13`, line 25 ("Ubuntu 22.04 LTS, Hetzner CCX53");
+  - `Project-Ontology.md` invariant 11, line 429;
+  - `docs/reverse-engineering-toolchain.md` line 220.
+- No queued work item reads any of them. Each is a statement of the host, not a procedure. They are routed with the same amendment, not a new decision.
+
+**Ontology consistency.** `beryl` stays a branch throughout. Invariant 10 underlies `F7.2-07`'s post-build md5 read. Invariant 11 is the stale host statement above: its constraint (no Windows build, a rented Linux server deleted after each session) still holds, and only the provider and type are out of date.
 
 ## 10. Readiness Realism
 
-**No overclaim was found in run 19's text.**
+**No overclaim in run 20's text.**
 
-- **`Faz7.2`** calls the outcome "built, partial or blocked", keeps post-build md5s "as facts, not conclusions", and says the section 11 table is what "the install needs" — not that the build will produce it. The optional target-files archive is labelled optional.
-- **`Faz7.3`** keeps camera enumeration a fact, not a pass condition. Its restore criterion is now attainable in both cases, preserved or re-established.
-- **`Faz8.1`** separates what `IMPL-92` measured ("carry-over on static values") from what still waits (the agreement half). No section calls the classification closed.
-- **`Faz8.3`** states that md5 agreement proves only input identity.
-
-**Status labels match evidence.** The ledger keeps `Faz8.1` at `implemented`, not `verified`, because `F8.1-06`/`-07` have not run. That is the correct reading of a half-executed sub-plan.
+- `Faz7.2` says the section 7 volume block "has passed `bash -n` but has never run", and puts its first run on the rented Instance. This audit confirmed `bash -n` on all ten blocks.
+- The billing quotes carry their uncertainty: "No page says whether a started hour bills whole, so every started hour counts". So do the two disagreeing deletion statements.
+- Prices are not asserted in `Faz7.2`. The runbook defers them to the Console at creation.
+- The outcome is still "built, partial or blocked", and md5s are "facts, not conclusions".
 
 **Local versus live is drawn correctly.**
 
-- **Local:** runbook section 5, which this audit ran. It is repeatable on the day and is not a rental-readiness claim by itself; the Console checks remain the user's.
-- **Live:** the rented server, and then the device.
+- **Local and free:** runbook section 5 and the four manual checks.
+- **Live and paid:** sections 6–12.
+- The Console checks are the user's. Neither this audit nor any plan text claims them.
 
-**One realism note on the pre-rental gate (`AUDIT-FIX-53`).** Section 5 passing proves the local manifest resolves. It does not prove that `repo init` will land on `7dfc0650…`, which is what section 8 asserts on a billed server.
+**Stale-readiness note (`AUDIT-FIX-55`).** `F7.2-01`'s output still lists "the section 10 correction with its `bash -n` result" as something the gate produces. That result already exists in `IMPL-94`'s gate record. On the rental day it is a read-back, not new work, and must not be reported as a fresh edit.
 
 ## 11. Security and Governance Findings
 
 - **Secret safety: clean.**
-  - `secret_findings=0` in every validator mode.
-  - No token, password, private key or server address appears in any planner file.
-  - `DEC-25` removes the server credential entirely, and `Faz7.2` excludes any token or deploy key.
-  - The runbook keeps the address in `read -r BUILD_HOST`, and removes it at teardown with `ssh-keygen -R` and `unset`.
-  - Runbook section 10's credential-URL check and token scan run before copying, and `VAL-SEC`'s host scan is file-name-only.
-  - The ninth audit's residual note about tokens in clone URLs no longer applies: no token exists.
-- **Least privilege: improved.** There is no GitHub credential on the server at all. The only secrets involved are the user's Hetzner session and SSH private key, and both stay on the host.
-- **Command execution safety.**
-  - Every runbook block starts with `set -euo pipefail`.
-  - The unchecked barista exit status is caught by a log grep (section 9).
-  - `repo` is installed with a GPG signature check (section 7).
-  - The build runs as `builder`, not root.
-  - **The one weakness is the inverse of the `IMPL-90` defect class:** fail-fast lines where the plan wants best-effort evidence (`AUDIT-FIX-54`). It fails safe for correctness, but it can cost evidence.
-- **Artifact integrity: good.** sha256 is checked at both ends, and teardown is gated on `sha256sum -c`. `F7.3-03` flashes only verified artifacts, and `Faz8.3` checks the archive sha256 before a root-privileged install. `Faz8.1` scratch is outside the workspace.
-- **Blob redistribution: held.** Outputs go to `~/Documents/Projeler/ishtar-builds/`, outside every repository, and `VAL-RETRIEVE` reads `git status`. Nothing is published (`ARC-04`).
-- **Approval gates: complete.** They are the Console checks, renting, deletion, a post-session push of `fixes.diff`, the flash, firmware, the stay-or-restore choice, root, install, captures and `DEC-07`.
-- **Irreversible operations.**
-  - Server deletion is gated on verified retrieval.
-  - The whole-system flash is gated on a written return path that includes re-establishment after a format.
-  - The billing semantics the ninth audit found missing are now sourced (runbook section 3).
-- **Ontology writes into a NUL-bearing file (`AUDIT-FIX-22`).** This is still true: 7 control bytes, 2 NUL. `IMPL-91` edited the file byte-preservingly: the offsets moved by +216 and the count is unchanged. `F8.1-10` is now the only queued writer.
-- **Audit boundary.** No P1 was found, and this audit repaired nothing. All findings are routed.
+  - `secret_findings=0` in every validator mode run.
+  - No token, password, private key, server address or volume ID appears in any planner file.
+  - `Faz7.2` keeps the address in the shell and the volume IDs on paper or in the shell. Start records carry no address, key or volume ID.
+  - `DEC-25` keeps the server credential-free. Runbook section 10's credential-URL check and token scan run before copying.
+- **Least privilege.** The server holds no GitHub credential. The only sensitive items are the user's Scaleway session and SSH private key, which stay on the host. The public key is Project-scoped, and `F7.2-01` checks that.
+- **Destructive operations on the rented disks.** `mkfs` is gated on `blkid` finding no filesystem, volumes are chosen by size with an ID cross-check, and the block stops on an ambiguous match. These are the right controls for a block that has never run.
+- **Cost controls.** Deletion of each billed resource, zero counts, and hour 8. Powering off is explicitly not teardown. A leftover volume or flexible IP is a named risk with a zero-count detector. The 610 GB quota and the identity check are free and happen before renting.
+- **Command execution safety.** Every block starts with `set -euo pipefail` (all ten measured). Sections 10 and 11 record and continue, with an operator rule, which closes `AUDIT-FIX-54`. The barista exit-status grep and the base-pin checks on both sides are unchanged.
+- **Artifact integrity and blob redistribution.** sha256 is checked at both ends, and teardown is gated on it. Outputs stay under `~/Documents/Projeler/ishtar-builds/`, outside every repository (`ARC-04`).
+- **Approval gates.** The rental approval after `F7.2-01`, Console deletion, and any post-session push of `fixes.diff`.
+- **Ontology writes into a NUL-bearing file (`AUDIT-FIX-22`).** Still open. Any `-57` edit to invariant 11 must be byte-preserving and diffed.
+- **Audit boundary.** No P0 or P1 was found, and this audit repaired nothing.
 
 ## 12. Step 4 Readiness Assessment
 
-**Conventions.** Dependency state follows the nine previous audits:
+**Conventions.** Dependency state follows the ten previous audits:
 
 - `independent` means no upstream dependency.
 - `satisfied` means every upstream dependency is complete in the repository, or is produced by an earlier row of this queue.
 
-Queued rows appear in execution order. `Faz8.1` appears once, after `Faz7.3`. Its `F8.1-06` may run as soon as `Faz7.2` has recorded the post-build md5s, and `F8.1-07` after `Faz7.3`.
+Queued rows appear in execution order.
 
-**What changed since the ninth audit.** `Faz7.1` (`IMPL-91`) and `Faz8.2` (`IMPL-93`) are `verified`, so both move to `COMPLETE`. `Faz8.1`'s static half is done (`IMPL-92`), so its row stays queued for the agreement half. `Faz7.2`, `Faz7.3` and `Faz8.3` were amended by run 19, read by this audit, and stay queued.
+**What changed since the tenth audit.** `Faz7.2` was amended by run 20 and re-read by this audit. Its findings change from `-52`/`-53`/`-54` (resolved) to `-55`/`-56`. No other row's status changed.
 
-**Counts, measured from the ledger matrix:**
+**Counts, measured from the ledger matrix.** 34 `verified`, 3 `implemented`, 3 `planned` and 2 `superseded`, which gives:
 
 | Category | Rows |
 |---|---|
@@ -364,22 +294,23 @@ Queued rows appear in execution order. `Faz8.1` appears once, after `Faz7.3`. It
 | NEEDS_REPAIR | 0 |
 | **Total** | **42** |
 
-**Why no row is `NEEDS_REPAIR`.** The test is whether a Step 4 run can be graded correctly against the file as written.
+**Why `Faz7.2` is not `NEEDS_REPAIR`.** The test is whether a Step 4 run can be graded correctly against the file as written, with the runbook precedence sentence it carries.
 
-- `AUDIT-FIX-52`, `-53` and `-54` all fall inside `F7.2-01`'s pre-rental runbook edit. The sub-plan already lists `docs/build-environment.md` as `modified`. Each fails safe if left unfixed: the session stops rather than proceeding wrongly.
-- `AUDIT-FIX-50` and `-37` name edits that the owning rows already schedule.
+- `AUDIT-FIX-55` asks for an edit that is already in the runbook. It becomes a verification, and fails safe.
+- `AUDIT-FIX-56` is a grading reference the session can apply from this row.
+- Neither changes a paid step.
 
 | Sub-Plan Path | Status | Finding IDs | Dependency State | Reason | Required Repair |
 |---|---|---|---|---|---|
-| Planner-docs/Faz-7-Plans/Faz7.2-first-aospa-build.md | READY_WITH_WARNINGS | AUDIT-FIX-52, AUDIT-FIX-53, AUDIT-FIX-54 | satisfied | **Queue head.** `Faz7.1` verified (`IMPL-91`); manifest `22283d8`, public repositories, `check.py` and the 14-failure negative case re-measured by this audit, and runbook section 5 run live with exit 0. Base `7dfc0650…` unchanged since 2026-05-24. `Faz6.1`'s entry is in the pinned fork `d48816f`. Amended by run 19; `AUDIT-FIX-43` and `-44` resolved in sections 4, 7, 8, 9 and 13. A Step 4 session stops after `F7.2-01` for the user's rental approval, by design. | **`F7.2-01`, before renting, in one edit of `docs/build-environment.md` followed by `bash -n` on each touched block:** (1) section 10 symlink test to `$OUT/vendor/lib64/camera/aon_front.pb`, including the `else` message, keeping `readlink`; record `/odm/lib64/camera/aon_front.pb` as the expected target. (2) Section 4: add that a sync failure matching a sync-path detector in the table (shallow sync of a `vendor/xiaomi/*` blob repository, or `vendor/xiaomi/camera`) gets its listed fix, counted against the 2 attempts, so the runbook agrees with `F7.2-04` (`AUDIT-FIX-52`). (3) Section 5: add a read-only comparison of `AOSPA/manifest` `beryl` HEAD with `7dfc0650e27ec43b1d5cedf5e74213cf8667f2c2`; a moved base is a stop before renting (`AUDIT-FIX-53`). (4) Either make section 10's `repo manifest -r` and section 11's image copies record-and-continue, or carry the operator rule that a non-zero exit in sections 10 or 11 means record the failing line, run the remaining lines by hand, and never skip retrieval of what exists or teardown (`AUDIT-FIX-54`). Grade `VAL-SYNC` and the resolved-manifest criterion against `22283d8` as amended by `fixes.diff`. Then the four Console checks, `DEC-25` and runbook section 4 re-read, and **stop for the user's rental approval**. |
-| Planner-docs/Faz-7-Plans/Faz7.3-flash-boot-and-aon-verification.md | READY_WITH_WARNINGS | AUDIT-FIX-37 | satisfied | The user's flash of the daily device. Depends on `Faz7.2`'s retrieved section 11 artifacts with sha256 and its AON step 1 result, the row above. `Faz8.1`'s static result is available (`IMPL-92`). Amended by run 19; `AUDIT-FIX-45` resolved. | At `F7.3-02`, state the possible wipe whenever `F7.3-01` wrote re-establishment steps, including when AOSPA's documentation left the requirement unsettled, not only when a format is confirmed required. `F7.3-08` writes `Project-Comprehension.md`: fold in the `IMPL-52`/`-53`/`-54` derivation-mechanism evidence entry while there (`AUDIT-FIX-37`). Do not start in the `Faz7.2` session. |
-| Planner-docs/Faz-8-Plans/Faz8.1-android16-camera-blob-comparison.md | READY_WITH_WARNINGS | AUDIT-FIX-22 | satisfied | Agreement half only: `F8.1-06` after `Faz7.2`, `F8.1-07` after `Faz7.3`, then `F8.1-10`. Static half done (`IMPL-92`: both layers carry-over on static values; scratch deleted). Amended by run 19; `AUDIT-FIX-46`, `-47`, `-49` resolved. | Do not repeat `F8.1-01`–`05`, `08` or `09`; they are recorded. Compare `Faz7.2`'s `build-evidence.txt` md5s and sizes with `IMPL-92`'s values, then `Faz7.3`'s on-device values; record a missing leg as not reached with its reason. `F8.1-10` edits `Project-Ontology.md`, which contains NUL bytes: edit byte-preservingly and diff the file afterwards (`AUDIT-FIX-22`). |
-| Planner-docs/Faz-8-Plans/Faz8.3-camera-modes-on-android16-build.md | READY_WITH_WARNINGS | AUDIT-FIX-50 | satisfied | The functional test on the carry-over path. Depends on `Faz8.1`'s carry-over on both layers with three-way agreement and on `Faz7.3`'s device on the `beryl` build, both earlier in this queue. Archive, manifest and checklist verified (`Faz9.1`, `Faz9.2`). Amended by run 19; `AUDIT-FIX-46` and `-51` resolved, `-50`'s sub-plan half resolved. | At `F8.3-08`, in the same edit as the evidence record, point `docs/release-checklist.md` section 3's `C-04`/`C-17` labels (lines 135, 148) and PC-04's "DEFECTIVE via smoke.sh" comment (line 176) at section 4's repair notes (`AUDIT-FIX-50`). Grade PC-17 on the two mount counts and take the trap reading from `prefs.trap.armed`. |
+| Planner-docs/Faz-7-Plans/Faz7.2-first-aospa-build.md | READY_WITH_WARNINGS | AUDIT-FIX-55, AUDIT-FIX-56 | satisfied | **Queue head.** `Faz7.1` verified (`IMPL-91`). Re-read on GitHub today: `22283d8`, both repositories public, base `7dfc0650…` unchanged since 2026-05-24. `DEC-22`, `DEC-25` and `DEC-26` answered. Runbook re-targeted by `IMPL-95`, all ten blocks pass `bash -n`. Run 20 re-targeted this file, and every provider value matches the runbook (section 8). `AUDIT-FIX-52`, `-53` and `-54` resolved in the runbook. A Step 4 session stops after `F7.2-01` for the user's rental approval, by design. | No pre-rental edit. **On the rental day:** (1) run runbook section 5 as written; (2) treat `F7.2-01`'s symlink step as a verification, not an edit: read back runbook section 10 lines 485–488 (`$OUT/vendor/lib64/camera/aon_front.pb`, `readlink` kept, expected target `/odm/lib64/camera/aon_front.pb`), run `bash -n` on that block, and cite `IMPL-94` as the edit; ignore section 6 line 196's present-tense claim (`AUDIT-FIX-55`); (3) the four Scaleway manual checks of runbook section 5; (4) re-read runbook section 4, which carries the sync-path exception `DEC-25` item (3) lacks; (5) stop for rental approval. **In the paid session:** grade `VAL-SYNC` and the resolved-manifest criterion against `22283d8` as amended by `fixes.diff`, and record that basis in the ledger row (`AUDIT-FIX-56`). **Later bounded amendment, not before the rental:** reword `-55`'s lines to past tense and `-56`'s two lines to the amended basis. |
+| Planner-docs/Faz-7-Plans/Faz7.3-flash-boot-and-aon-verification.md | READY_WITH_WARNINGS | AUDIT-FIX-37 | satisfied | The user's flash of the daily device. Depends on `Faz7.2`'s retrieved section 11 artifacts with sha256 and its AON step 1 result, the row above. `Faz8.1`'s static result is available (`IMPL-92`). Unchanged since the tenth audit; runbook section 11's artifact table unchanged by `IMPL-95`. | At `F7.3-02`, state the possible wipe whenever `F7.3-01` wrote re-establishment steps, including when AOSPA's documentation left the requirement unsettled. `F7.3-08` writes `Project-Comprehension.md`: fold in the `IMPL-52`/`-53`/`-54` derivation-mechanism evidence entry (`AUDIT-FIX-37`). If no Step 1 amendment has run by then, `CQ-13` and `EV-20`'s host wording (`AUDIT-FIX-57`) may be corrected in the same byte-careful edit. Do not start in the `Faz7.2` session. |
+| Planner-docs/Faz-8-Plans/Faz8.1-android16-camera-blob-comparison.md | READY_WITH_WARNINGS | AUDIT-FIX-22 | satisfied | Agreement half only: `F8.1-06` after `Faz7.2`, `F8.1-07` after `Faz7.3`, then `F8.1-10`. Static half done (`IMPL-92`). Unchanged since the tenth audit. | Do not repeat `F8.1-01`–`05`, `08` or `09`. Compare `Faz7.2`'s `build-evidence.txt` md5s and sizes with `IMPL-92`'s values, then `Faz7.3`'s on-device values; record a missing leg as not reached with its reason. `F8.1-10` edits `Project-Ontology.md`, which contains NUL bytes: edit byte-preservingly and diff the file afterwards (`AUDIT-FIX-22`). |
+| Planner-docs/Faz-8-Plans/Faz8.3-camera-modes-on-android16-build.md | READY_WITH_WARNINGS | AUDIT-FIX-50 | satisfied | The functional test on the carry-over path. Depends on `Faz8.1`'s carry-over on both layers with three-way agreement and on `Faz7.3`'s device on the `beryl` build, both earlier in this queue. Unchanged since the tenth audit. | At `F8.3-08`, in the same edit as the evidence record, point `docs/release-checklist.md` section 3's `C-04`/`C-17` labels (lines 135, 148) and PC-04's "DEFECTIVE via smoke.sh" comment (line 176) at section 4's repair notes (`AUDIT-FIX-50`). Grade PC-17 on the two mount counts and take the trap reading from `prefs.trap.armed`. |
 | Planner-docs/Faz-4-Plans/Faz4.6-raw-payload-geometry-diagnosis.md | DEFERRED | none | blocked | **Not queued.** Host-side half `implemented`. `F4.6-07` was gated on the superseded `Faz4.1`; `DEC-19` keeps `FIND-3.5-01` and `FIND-4.5-02` as knowledge. | Completing it would be a new user decision and a new sub-plan. |
 | Planner-docs/Faz-4-Plans/Faz4.1-fullres-dimension-guard.md | SUPERSEDED | none | independent | `superseded` 2026-09-03 by `DEC-14`. | **Do not revive it.** |
 | Planner-docs/Faz-4-Plans/Faz4.7-ultra-high-resolution-sensor-mode.md | SUPERSEDED | none | independent | `superseded` 2026-09-03 by `DEC-14`. | **Do not revive it as project work.** |
-| Planner-docs/Faz-7-Plans/Faz7.1-github-input-staging.md | COMPLETE | none | satisfied | **New to COMPLETE.** `IMPL-91`: all ten acceptance criteria met; `docs/build-environment.md` written; `DEC-22` and `DEC-25` answered. Its outputs re-measured on GitHub by this audit. | none. Its transition is `Faz7.2`'s `F7.2-01`. |
-| Planner-docs/Faz-8-Plans/Faz8.2-kernel-lts-merge-scoping.md | COMPLETE | none | satisfied | **New to COMPLETE.** `IMPL-93`: all ten acceptance criteria met without a merge, build, checkout or rental; `DEC-08` recommendation defer. | none. A merge would be a new decision under `DEC-08`. |
+| Planner-docs/Faz-7-Plans/Faz7.1-github-input-staging.md | COMPLETE | none | satisfied | `IMPL-91`: all ten acceptance criteria met. Its outputs re-read on GitHub by this audit. Line 5's Hetzner mention is history. | none. Its transition is `Faz7.2`'s `F7.2-01`. |
+| Planner-docs/Faz-8-Plans/Faz8.2-kernel-lts-merge-scoping.md | COMPLETE | none | satisfied | `IMPL-93`: all ten acceptance criteria met without a merge, build, checkout or rental; `DEC-08` recommendation defer. | none. A merge would be a new decision under `DEC-08`. |
 | Planner-docs/Faz-6-Plans/Faz6.1-symlink-entry-in-device-trees.md | COMPLETE | none | satisfied | `IMPL-03`. The edit is in both trees and in the pinned fork (`d48816f`). Ledger status stays `implemented` because the effect is unverified; **`Faz7.3` `F7.3-08` owns that verification**, so the row is not queued in its own right. | none. Do not report it `verified` before `Faz7.3` step 3 passes. |
 | Planner-docs/Faz-1-Plans/Faz1.1-version-control-bootstrap.md | COMPLETE | none | satisfied | `IMPL-01`; `DEC-01` answered (private remote `ahmetxa/ishtar`). | none. |
 | Planner-docs/Faz-1-Plans/Faz1.2-signing-key-containment.md | COMPLETE | none | satisfied | `IMPL-02`; `DEC-10` answered. | none. |
@@ -420,94 +351,87 @@ Queued rows appear in execution order. `Faz8.1` appears once, after `Faz7.3`. It
 
 **Human stop gates are built into the queue and are not blockers:**
 
-- `Faz7.2`: the rental approval after `F7.2-01`, deletion in the Console, and any post-session push of `fixes.diff`.
+- `Faz7.2`: the rental approval after `F7.2-01`, Console deletion, and any post-session push of `fixes.diff`.
 - `Faz7.3`: the go/no-go, the firmware approval, and the stay-or-restore choice.
 - `Faz8.1`: `DEC-07`.
 - `Faz8.3`: root, and the final enable state.
 
-**Workspace precondition, for the user, not a finding.** Planning run 19 is uncommitted (six planner files), and this audit adds a seventh. A Step 4 run contract stops on an unrelated dirty worktree. These changes are the plan the Step 4 session executes, so they are related, but committing them locally first gives the rental session a clean baseline. Whether to commit is the user's call, per `docs/pre-rental-plan.md` steps 2 and 3.
+**Workspace precondition, for the user, not a finding.** Run 20 is uncommitted: `Faz7.2`, the ledger and `docs/pre-rental-plan.md`. This audit adds a fourth file. A Step 4 run contract stops on an unrelated dirty worktree. These files are the plan the rental session executes, so they are related, but a local commit first gives that session a clean baseline. Whether to commit is the user's call.
 
 ## 13. Priority Fix List
 
-**No P0 or P1 finding is open.** The register now holds 54 findings: three are new this run (`AUDIT-FIX-52` … `-54`), and fifty-one are carried.
-
-**Changed this run.** Eight were resolved: `-43`, `-44`, `-45`, `-46`, `-47`, `-48`, `-49` and `-51`. `-50` was narrowed to its document half.
+**No P0 or P1 finding is open.** The register holds 57 findings. Three are new this run (`AUDIT-FIX-55` … `-57`), and three were resolved this run (`-52`, `-53`, `-54`).
 
 **Ten remain active:**
 
 | Group | Findings |
 |---|---|
 | P2 open | `-22` |
-| P3 open | `-37`, `-41`, `-42`, `-50`, `-52`, `-53`, `-54` |
+| P3 open | `-37`, `-41`, `-42`, `-50`, `-55`, `-56`, `-57` |
 | P3 accepted | `-25`, `-33` |
 
-Findings resolved or marked `not_applicable` before the ninth audit are not re-listed row by row; nothing since has touched their subject matter.
+Findings resolved or marked `not_applicable` before the tenth audit are not re-listed row by row; nothing since has touched their subject matter.
 
 | Finding ID | Severity | Status | Affected Files | Issue | Required Action |
 |---|---|---|---|---|---|
-| AUDIT-FIX-22 | P2 | open | Planner-docs/Project-Ontology.md | Carried and re-measured. Still **7** control bytes below 0x20, including **2 NUL**, now at byte offsets 42806, 42869, 42932, 42989, 42990, 42991 and 43113 (+216 from the ninth audit, because `IMPL-91`'s `F7.1-12` edit lengthened text above them; the count is unchanged, so that edit was byte-preserving). Content search on the file still fails silently. **Queued writer now:** `F8.1-10` only. | Unchanged: replace the `Escape` column's raw bytes with the project's octal `printf '%b'` convention in a bounded amendment of that one table, then confirm the file reappears in `rg -l InitializeScalerStaticCaps`. Until then, Step 4 edits to this file must be byte-preserving and diffed, and no escape may be transcribed from that column. |
-| AUDIT-FIX-52 | P3 | open | Planner-docs/Faz-7-Plans/Faz7.2-first-aospa-build.md, docs/build-environment.md | **New.** Runbook section 4 says "Sync failure (`repo sync`, or barista's …): stop", while its own deferred-items table gives sync-time fixes for the shallow sync of the blob repositories and for `vendor/xiaomi/camera`. `F7.2-04` reads the table as allowing those fixes, counted against the 2 attempts — the right reading — but `Faz7.2` section 1 says "Where this file and the runbook disagree, Step 4 follows the runbook", so a rental-day session holds two contradicting instructions. Separately, `VAL-SYNC` and the section 8 criterion compare `manifest-resolved.xml` against the 13 pins "at `22283d8`", which a permitted fix (a removed `clone-depth`, deleted `vendor/xiaomi/camera` lines, or a deleted `display-drivers` pin) legitimately changes. | In `F7.2-01`'s pre-rental runbook edit, add the sync-path exception to section 4's sync-failure bullet so the runbook agrees with `F7.2-04`. Grade `VAL-SYNC` against `22283d8` as amended by `fixes.diff`, and record that basis in the ledger row. At a later bounded amendment, reword `Faz7.2` section 8's resolved-manifest criterion the same way. |
-| AUDIT-FIX-53 | P3 | open | Planner-docs/Faz-7-Plans/Faz7.2-first-aospa-build.md, docs/build-environment.md | **New.** The base pin `AOSPA/manifest` `beryl` = `7dfc0650e27ec43b1d5cedf5e74213cf8667f2c2` is first asserted in runbook section 8, on a billed server; section 5's free block does not read it. Measured today it has not moved since 2026-05-24, but a move between now and the rental day would stop the session after the clock starts. | In `F7.2-01`, add one read-only check to section 5 — `AOSPA/manifest` `beryl` HEAD equals the pinned commit, via the WinGet `gh.exe` — and treat a mismatch as a stop before renting, routed to the user. `bash -n` the block. |
-| AUDIT-FIX-54 | P3 | open | docs/build-environment.md, Planner-docs/Faz-7-Plans/Faz7.2-first-aospa-build.md | **New.** Runbook sections 10 and 11 run under `set -euo pipefail`, while the runbook and `F7.2-07`/`-08` say a missing file is "recorded, not fatal". Section 10's first command, `repo manifest -r`, plausibly fails on a partially synced tree (not measured) and would exit before `build-evidence.txt`, the log tails and `evidence.tar.gz` exist — the evidence `F7.2-05` needs "whatever the build outcome". Section 11's `cp "$OUT/$i.img"` loop stops at the first absent image, before `SHA256SUMS`, where `F7.2-08` expects the absence to be recorded. | Either, in `F7.2-01`, make those lines record-and-continue (for example, a failed `repo manifest -r` writes a marker file, and a missing image is logged and skipped), with `bash -n` afterwards; or carry the operator rule into the session: a non-zero exit in sections 10 or 11 means record the failing line, run the remaining lines by hand, retrieve what exists, and never skip teardown. |
-| AUDIT-FIX-50 | P3 | open | docs/release-checklist.md | Carried, **narrowed to its document half.** Run 19 resolved the sub-plan half: `F8.3-06`, the criterion and `VAL-CHECKLIST` use `prefs.trap.armed` and the single-dump probe, and PC-17 is correctly graded on the two mount counts, which corrects the ninth audit's wording. `docs/release-checklist.md` still labels `C-04` with `FIND-3.10-01` (line 135) and `C-17` with `FIND-3.7-02` (line 148), and PC-04 still reads "DEFECTIVE via smoke.sh" (line 176). | `F8.3-08` owns it: in the same edit as the v2.2-on-`beryl` evidence record, point those labels and the comment at section 4's repair notes. |
-| AUDIT-FIX-37 | P3 | open | Planner-docs/Project-Comprehension.md | Carried. `Project-Comprehension.md` still cites `IMPL-52`, `-53` and `-54` zero times; `Project-Ontology.md` cites them 2, 1 and 2 times. `F7.1-12` (`IMPL-91`) wrote the comprehension file without folding the entry in, so the remaining natural owner is `Faz7.3` `F7.3-08` (`TRACE-13`, `ARC-06`). | Add the derivation mechanism as an evidence entry when `F7.3-08` writes the file. |
-| AUDIT-FIX-41 | P3 | open | Planner-docs/Main-Planing.md | Carried, unchanged at line 277: section 8's step 5 still says "the preference is `pref_camera_picturesize_back_key` and the app exposes it as an ordinary settings menu item". No queued row reads it; Phase 3 is closed. | At the next deliberate Step 1 amendment, rewrite step 5 to the measured configuration (`pref_48m_key=0`, `pref_camera_resolution=full`, read the derived key back) and mark it done under `DEC-21`. |
-| AUDIT-FIX-42 | P3 | open | Planner-docs/Main-Planing.md | Carried, unchanged: line 22 "a third (Android 16 / beryl) has not started", line 61 "Android 16 / AOSPA `beryl` port", line 288 "Do not expand yet. Phases 7, 8, and 9. G is blocked on host-environment work the user must perform". Each is now further from the facts, since `Faz7.1` and `Faz8.2` are verified. | At the same Step 1 amendment, reword all three to `DEC-24` and the branch reading of `beryl`, and mark section 9's paragraph discharged. Do not cut a snapshot for these alone. |
+| AUDIT-FIX-22 | P2 | open | Planner-docs/Project-Ontology.md | Carried. 7 control bytes below 0x20, including 2 NUL, in the `Escape` column (tenth audit: offsets 42806–43113). Content search on the file fails silently. The ontology is unchanged since then (`git diff --stat HEAD` empty). **Queued writer:** `F8.1-10`. `AUDIT-FIX-57` adds a second reason to edit the file (invariant 11). | Unchanged: replace the `Escape` column's raw bytes with the project's octal `printf '%b'` convention in a bounded amendment of that one table, then confirm the file reappears in `rg -l InitializeScalerStaticCaps`. Until then, every edit to this file must be byte-preserving and diffed, and no escape may be transcribed from that column. |
+| AUDIT-FIX-55 | P3 | open | Planner-docs/Faz-7-Plans/Faz7.2-first-aospa-build.md | **New.** `IMPL-94` already changed runbook section 10's built-symlink test to `$OUT/vendor/lib64/camera/aon_front.pb` (runbook lines 485–488). `Faz7.2` still plans that edit as future work: section 4 line 79; `F7.2-01` lines 222–223 ("Before renting, correct … from `$OUT/odm/…`"); `F7.2-07` line 253; `VAL-GATE` line 306; `VAL-DOCS` line 320; contract-table line 330; the section 11 risk at line 374; section 12 line 389. Section 6 line 196 says in present tense that the runbook tests `[ -L "$OUT/odm/lib64/camera/aon_front.pb" ]`, which is now false. Section 1 line 18 names the `-52`/`-53`/`-54` repairs as unchanged but not the symlink correction. Run 20's mandate was provider facts, so this is carried staleness, not a run 20 error. It fails safe: the runbook wins on disagreement, and the edit has nothing left to change. | **Rental day:** perform `F7.2-01`'s symlink step as a verification. Read back runbook lines 485–488 and the expected `readlink` target `/odm/lib64/camera/aon_front.pb`, run `bash -n` on the section 10 block, and record "correction made by `IMPL-94`, verified" in the gate record. Do not re-edit the runbook. **Later bounded Step 2 amendment, after the rental:** reword the listed lines to past tense, citing `IMPL-94`, and correct section 6 line 196. |
+| AUDIT-FIX-56 | P3 | open | Planner-docs/Faz-7-Plans/Faz7.2-first-aospa-build.md, Planner-docs/Planing-Ledger.md | **New, the carried plan half of `AUDIT-FIX-52`.** `Faz7.2` section 8 line 292 and `VAL-SYNC` line 307 compare `manifest-resolved.xml` against the 13 pins of `ishtar-beryl.xml` "at `22283d8`". A permitted fix — a removed `clone-depth`, deleted `vendor/xiaomi/camera` lines, or a deleted `display-drivers` pin — legitimately changes that set, so a correct session would grade itself failed. Separately, ledger `DEC-25` item (3) still reads "a sync failure stops the session" without the sync-path exception now in runbook section 4. `IMPL-94` recorded that disagreement, and `DEC-26` did not amend item (3). | **Paid session:** grade `VAL-SYNC` and the resolved-manifest criterion against `22283d8` as amended by `fixes.diff`, and state that basis in the section 13 ledger row. **At the next ledger edit:** annotate `DEC-25` item (3) with the runbook section 4 exception (`IMPL-94`, `AUDIT-FIX-52`). **Later bounded amendment:** reword lines 292 and 307 the same way. |
+| AUDIT-FIX-57 | P3 | open | Planner-docs/Main-Planing.md, Planner-docs/Project-Comprehension.md, Planner-docs/Project-Ontology.md, docs/reverse-engineering-toolchain.md | **New, registered so the carried `DEC-26` wording stays visible.** Confirmed routed by run 20, ledger section 7 and pre-rental step 3b to the next Step 1 amendment with `-41` and `-42`: `Main-Planing.md` lines 75, 211 and 265 ("a rented Hetzner VDS", R9) and `Project-Comprehension.md` `EV-20` ("Hetzner Cloud server (Ubuntu 22.04 LTS, CCX53)"). **Measured this run, the list misses three live statements of the same host fact:** `Project-Comprehension.md` `CQ-13` line 25; `Project-Ontology.md` invariant 11 line 429 ("Hetzner Cloud server — Ubuntu 22.04 LTS on a CCX53, 32 vCPU / 128 GB / 600 GB NVMe"); `docs/reverse-engineering-toolchain.md` line 220. Not live: `Faz7.1` line 5 and index line 10 (history). No queued work item reads any of them; no phase meaning changes. | At the next deliberate Step 1 amendment, together with `-41` and `-42`: reword all seven to "a rented Scaleway POP2-32C-128G (`DEC-26`)", or to a provider-neutral "rented VDS" with `DEC-26` cited. Do not cut a snapshot for these alone. Edit `Project-Ontology.md` byte-preservingly (`-22`). If `Faz7.3` `F7.3-08` or `Faz8.1` `F8.1-10` writes the comprehension or ontology file first, it may fold its lines in then. The toolchain doc line goes in the same change set as a docs-only edit. |
+| AUDIT-FIX-50 | P3 | open | docs/release-checklist.md | Carried, document half. `docs/release-checklist.md` still labels `C-04` with `FIND-3.10-01` (line 135) and `C-17` with `FIND-3.7-02` (line 148), and PC-04 still reads "DEFECTIVE via smoke.sh" (line 176). The sub-plan half was resolved by run 19. | `F8.3-08` owns it: in the same edit as the v2.2-on-`beryl` evidence record, point those labels and the comment at section 4's repair notes. |
+| AUDIT-FIX-37 | P3 | open | Planner-docs/Project-Comprehension.md | Carried. `Project-Comprehension.md` still cites `IMPL-52`, `-53` and `-54` zero times (file unchanged since the tenth audit). The remaining natural owner is `Faz7.3` `F7.3-08` (`TRACE-13`, `ARC-06`). | Add the derivation mechanism as an evidence entry when `F7.3-08` writes the file. |
+| AUDIT-FIX-41 | P3 | open | Planner-docs/Main-Planing.md | Carried, unchanged: section 8's step 5 still describes `pref_camera_picturesize_back_key` as an ordinary settings item. No queued row reads it; Phase 3 is closed. | At the next deliberate Step 1 amendment, rewrite step 5 to the measured configuration (`pref_48m_key=0`, `pref_camera_resolution=full`, read the derived key back) and mark it done under `DEC-21`. |
+| AUDIT-FIX-42 | P3 | open | Planner-docs/Main-Planing.md | Carried, unchanged: line 22 "a third (Android 16 / beryl) has not started", line 61 "Android 16 / AOSPA `beryl` port", line 288 "Do not expand yet … G is blocked on host-environment work the user must perform". | At the same Step 1 amendment, together with `-41` and `-57`: reword all three to `DEC-24`/`DEC-26` and the branch reading of `beryl`, and mark section 9's paragraph discharged. Do not cut a snapshot for these alone. |
 | AUDIT-FIX-33 | P3 | accepted | Planner-docs/Faz-3-Plans/Faz3.8-agc-state-in-smoke-script.md, Planner-docs/Sub-Planing-Index.md | Carried. `Faz3.8` lines 120 and 163 and the index still describe three fields; the sub-plan is `verified` at four (`IMPL-55`, `IMPL-56`). | No repair required; accepted and kept visible. |
 | AUDIT-FIX-25 | P3 | accepted | Planner-docs/Faz-1-Plans/Faz1.3-patch-table-format-contract.md | Carried, unchanged at line 9: "Faz 4.1 narrows the RAW emission …". | No repair required; `Faz1.3` is COMPLETE. |
-| AUDIT-FIX-43 | P2 | resolved | Planner-docs/Faz-7-Plans/Faz7.1-github-input-staging.md, Planner-docs/Faz-7-Plans/Faz7.2-first-aospa-build.md | Teardown and budget rested on billing semantics nobody had read. | **Resolved.** `IMPL-91` wrote runbook section 3 from Hetzner's billing FAQ ("until you delete them, independent of their state"; Primary IPs, snapshots and backups bill separately), and `DEC-25` cites it. Run 19 carries it in `Faz7.2` section 4, `F7.2-09`, section 8, `VAL-TEARDOWN` and section 13. |
-| AUDIT-FIX-44 | P2 | resolved | Planner-docs/Faz-7-Plans/Faz7.1-github-input-staging.md, Planner-docs/Faz-7-Plans/Faz7.2-first-aospa-build.md, Planner-docs/Faz-7-Plans/Faz7.3-flash-boot-and-aon-verification.md | The retrieval list was not tied to the install method, and the server was deleted before `Faz7.3` learned what flashing needs. | **Resolved.** Runbook section 11 names every artifact and the method that consumes it; `build.sh -z`'s outputs were verified by this audit. `F7.2-08`, its criterion, `VAL-RETRIEVE` and section 13 retrieve each one with sha256 or record its extraction source before deletion; `Faz7.3` section 6 and `F7.3-02`/`-03` choose from that list. |
-| AUDIT-FIX-45 | P2 | resolved | Planner-docs/Faz-7-Plans/Faz7.3-flash-boot-and-aon-verification.md | The return path assumed a whole-system flash preserves `/data`. | **Resolved.** `F7.3-01` records the requirement both ways with sources, and writes re-rooting, the v2.2 reinstall against `docs/release-manifest.md`, `docs/agc-12mp-configuration.md` section 2 and a `prefs.trap.armed` audit when a format is required or the requirement is unsettled. `F7.3-02` states the wipe; `F7.3-07`, its criterion and `VAL-RESTORE` grade the re-established fields by name. |
-| AUDIT-FIX-46 | P2 | resolved | Planner-docs/Faz-8-Plans/Faz8.1-android16-camera-blob-comparison.md, Planner-docs/Faz-8-Plans/Faz8.3-camera-modes-on-android16-build.md, Planner-docs/Sub-Planing-Index.md | Gates accepted a "completed adaptation" that no sub-plan performs. | **Resolved.** `F8.1-08` ("Only carry-over is a label `Faz8.3` can consume"), `F8.1-09`'s adaptation branch, `Faz8.1` section 13, `F8.3-01`, `Faz8.3` sections 8 and 13, and index section 5's new deferred item. `IMPL-92` found the sensor unchanged on static values, so the branch is currently latent. |
-| AUDIT-FIX-47 | P3 | resolved | Planner-docs/Faz-8-Plans/Faz8.1-android16-camera-blob-comparison.md, Planner-docs/Sub-Planing-Index.md | Unspecified scratch deleted too late; index 4d's static-half boundary disagreed with `Faz8.1` section 10. | **Resolved.** Scratch is outside the workspace and deleted at `F8.1-05`, with `VAL-CLEAN` at two points; `IMPL-92` had already done so. Index 4d step 2 now uses `Faz8.1` section 10's boundary. |
-| AUDIT-FIX-48 | P3 | resolved | Planner-docs/Sub-Planing-Index.md | Index claimed CRLF sub-plans. | **Resolved** at line 357: the claim is struck and corrected to LF, which this audit's byte scan confirms. |
-| AUDIT-FIX-49 | P3 | resolved | Planner-docs/Planing-Ledger.md, Planner-docs/Faz-8-Plans/Faz8.1-android16-camera-blob-comparison.md | `IMPL-89` contradicted `IMPL-90`; `F8.1-04` named no Android 15 candidate. | **Resolved.** Ledger line 517 carries "[corrected by `IMPL-90`; annotated 2026-09-13 by planning run 19 …]"; `F8.1-04` and `Faz8.1` sections 4, 6 and 8 name both candidates and decide from the `vauxite` beans. |
-| AUDIT-FIX-51 | P3 | resolved | Planner-docs/Faz-8-Plans/Faz8.3-camera-modes-on-android16-build.md | The restart detector did not list init service names, and missed "switch has no effect". | **Resolved.** `F8.3-05`, `VAL-RESTART`, `Faz8.3` section 8 and the first section 11 risk, consistent with `setmode.sh:52-58` and `:110-114` as measured. |
+| AUDIT-FIX-52 | P3 | resolved | docs/build-environment.md, Planner-docs/Faz-7-Plans/Faz7.2-first-aospa-build.md | Runbook section 4 said "Sync failure … stop" while its table gave sync-path fixes, and `Faz7.2` gave the runbook precedence. | **Resolved in the runbook.** `IMPL-94` added the exception at section 4 lines 135–138, and `IMPL-95` kept it: a sync failure matching the shallow-sync or `vendor/xiaomi/camera` detector gets its fix, counted against the same 2 attempts. It now agrees with `F7.2-04`, so the precedence clash is gone. The plan-side grading basis is carried as `AUDIT-FIX-56`. |
+| AUDIT-FIX-53 | P3 | resolved | docs/build-environment.md, Planner-docs/Faz-7-Plans/Faz7.2-first-aospa-build.md | The base pin was first asserted on a billed server. | **Resolved in the runbook.** Section 5 lines 186–190 compare `AOSPA/manifest` `beryl` with `7dfc0650…` and exit before renting on a move. `Faz7.2` section 4 line 74 lists it in the gate. The block passes `bash -n`, and the base read `7dfc0650…` (2026-05-24) today. |
+| AUDIT-FIX-54 | P3 | resolved | docs/build-environment.md, Planner-docs/Faz-7-Plans/Faz7.2-first-aospa-build.md | Fail-fast lines in sections 10 and 11 contradicted "recorded, not fatal". | **Resolved in the runbook.** In section 10, a failed `repo manifest -r` is written to `manifest-resolved.err` and the block continues (lines 473–480). In section 11, each missing or failed copy is logged to `retrieval.txt`, counts are asserted without aborting, and `SHA256SUMS` is always written (lines 556–572). The operator rule for both sections is at lines 523–526. `F7.2-08` names `retrieval.txt` and cites `-54`. Both blocks pass `bash -n`; `IMPL-94` dry-ran both in a scratch directory. |
 
-**Finding status consistency.** Ten findings are active: one P2 open, seven P3 open, and two P3 accepted. No P0 or P1 is open, so Step 4 is unblocked. The status is `PASS_WITH_WARNINGS`, not `PASS`, because those ten are open or accepted and must stay visible during implementation.
+**Finding status consistency.** Ten findings are active: one P2 open, seven P3 open, and two P3 accepted. No P0 or P1 is open, so Step 4 is unblocked. The status is `PASS_WITH_WARNINGS`, not `PASS`, because those ten must stay visible during implementation.
 
 **Project findings versus audit findings.** `FIND-3.5-01` and `FIND-4.5-02` are P1 **project** findings, which `DEC-19` keeps as knowledge. They are not audit findings and do not gate Step 4.
 
-**Validator behaviour, stated so it is not misread.** `--mode step3 --strict` and `--mode step4 --strict` report `validation_status=failed` with one error, `strict_warning=step4_has_nonblocking_warnings`. That is `--strict` promoting the non-blocking P2/P3 warning into an error, which every `PASS_WITH_WARNINGS` audit gets. **It is not a structural defect.** The gating facts are `p0_findings=0` and `p1_findings=0`.
+**Validator behaviour, stated so it is not misread.** On a `PASS_WITH_WARNINGS` audit, `--mode step3 --strict` and `--mode step4 --strict` report one error, `strict_warning=step4_has_nonblocking_warnings`: `--strict` promotes the non-blocking P2/P3 warning. **It is not a structural defect.** The gating facts are `p0_findings=0` and `p1_findings=0`.
 
 ## 14. Recommended Next Command / Prompt
 
-**Step 4 may begin.** The status is `PASS_WITH_WARNINGS`, no P0 or P1 is open, and only P2/P3 findings remain, so the Step 4 prompt is printed. Per `docs/pre-rental-plan.md` step 4, it is limited to `Faz7.2`. Part A is `F7.2-01`, including the section 10 correction and the three runbook repairs this audit adds. The session then stops for the user's rental approval.
+**Step 4 may begin.** The status is `PASS_WITH_WARNINGS`, no P0 or P1 is open, and only P2/P3 findings remain, so the Step 4 prompt is printed. Per `docs/pre-rental-plan.md` step 4 it is limited to `Faz7.2`. Part A is `F7.2-01` on the Scaleway runbook, with no pre-rental runbook edit, and then a stop for the user's rental approval.
 
-**Before starting it, the user decides** whether to commit planning run 19 and this audit locally, so the rental session starts from a clean tree, and chooses a day with the full 10-hour window free. **Two optional user choices, at any checkpoint:** a push to the private `origin` as an off-machine copy, and what to do with `devir-teslim-promptu.md`.
+**Before starting it, the user decides** whether to commit run 20 and this audit locally, so the rental session starts from a clean tree, and chooses a day with the full 10-hour window free. Optional at any checkpoint: a push to the private `origin`, and what to do with `devir-teslim-promptu.md`.
 
-**One supporting action, not a precondition:** at the next deliberate Step 1 amendment, fold in `AUDIT-FIX-41` and `-42`, without cutting a snapshot for them alone.
+**Supporting action, not a precondition:** at the next deliberate Step 1 amendment, fold in `AUDIT-FIX-41`, `-42` and `-57`.
 
 ```text
 /claudeqb:claudeqb Read and return the exact canonical handoff from references/handoffs/run-step4.md, then execute it.
 
-Context: step 4 of docs/pre-rental-plan.md, the rental-day session. Read that file first, then git status. The tenth Step 3 audit (2026-09-13) is PASS_WITH_WARNINGS with no open P0 or P1; queue state READY. This session is LIMITED to Planner-docs/Faz-7-Plans/Faz7.2-first-aospa-build.md. Do not start Faz7.3, Faz8.1's agreement half or Faz8.3. Keep the ten active findings visible: AUDIT-FIX-22, -25, -33, -37, -41, -42, -50, -52, -53, -54; this session owns -52, -53 and -54. docs/build-environment.md is the operative runbook: where it and the sub-plan disagree, follow the runbook and record the disagreement, except where the audit's Faz7.2 row says to edit the runbook first.
+Context: step 4 of docs/pre-rental-plan.md, the rental-day session, on Scaleway (DEC-26). Read that file first, then git status. The eleventh Step 3 audit (2026-09-14) is PASS_WITH_WARNINGS with no open P0 or P1; queue state READY. This session is LIMITED to Planner-docs/Faz-7-Plans/Faz7.2-first-aospa-build.md. Do not start Faz7.3, Faz8.1's agreement half or Faz8.3. Keep the ten active findings visible: AUDIT-FIX-22, -25, -33, -37, -41, -42, -50, -55, -56, -57; this session owns -55's verification and -56's grading basis. docs/build-environment.md is the operative runbook: where it and the sub-plan disagree, follow the runbook and record the disagreement.
 
-Part A (free, host only): F7.2-01. (1) Run runbook section 5's scripted block exactly as written in Git Bash, with GH=C:/Users/ahmet/AppData/Local/Microsoft/WinGet/Packages/GitHub.cli_Microsoft.Winget.Source_8wekyb3d8bbwe/bin/gh.exe, python not python3, and TMPDIR outside the workspace; record the exit status and the "pre-rental checks passed" line. (2) In one edit of docs/build-environment.md: section 10's built-symlink test and its else message change from $OUT/odm/lib64/camera/aon_front.pb to $OUT/vendor/lib64/camera/aon_front.pb, readlink kept, with expected target /odm/lib64/camera/aon_front.pb (AOSPA extract-utils install_symlink, refs/a16_ishtar/proprietary-files.txt:1037); section 4 gains the exception that a sync failure matching a sync-path detector in its table (shallow sync of a vendor/xiaomi/* blob repository, or vendor/xiaomi/camera) gets its listed fix, counted against the 2 attempts (AUDIT-FIX-52); section 5 gains a read-only check that AOSPA/manifest beryl HEAD equals 7dfc0650e27ec43b1d5cedf5e74213cf8667f2c2, a mismatch being a stop before renting (AUDIT-FIX-53); either make section 10's repo manifest -r and section 11's image copies record-and-continue, or record the operator rule that a non-zero exit there means record the failing line, run the rest by hand, retrieve what exists and never skip teardown (AUDIT-FIX-54). Run bash -n on every touched block, run the new section 5 check, read the edit back, and show me the diff. (3) Ask me for the four manual checks and record my answers: the Hetzner Console Limits tab allows one CCX53; my public SSH key is present; ~/Documents/Projeler/ishtar-builds/ exists outside every repository; the 10-hour ceiling fits today. (4) Re-read DEC-25 and runbook section 4 and state the stopping rule back in five lines. Write the gate record under snapshots/ (text only, no address, no key) and a short ledger row for the gate.
+Part A (free, host only): F7.2-01. (1) Run runbook section 5's scripted block exactly as written in Git Bash, with GH=C:/Users/ahmet/AppData/Local/Microsoft/WinGet/Packages/GitHub.cli_Microsoft.Winget.Source_8wekyb3d8bbwe/bin/gh.exe, python not python3, and TMPDIR outside the workspace; record the exit status and the "pre-rental checks passed" line (it includes the AOSPA/manifest beryl base-pin check). (2) Do NOT edit the runbook before renting. The section 10 symlink correction was made by IMPL-94: read back runbook section 10's test ($OUT/vendor/lib64/camera/aon_front.pb, readlink kept, expected target /odm/lib64/camera/aon_front.pb), run bash -n on that block, and record "made by IMPL-94, verified" (AUDIT-FIX-55; ignore Faz7.2 section 6's present-tense odm claim). (3) Ask me for runbook section 5's four manual checks and record my answers: Scaleway Organization quotas show identity validated, POP2-32C-128G quota at least 1, and Block Storage total size allowing 610 GB; my public ed25519 SSH key is in the Project the Instance will be created in; ~/Documents/Projeler/ishtar-builds/ exists outside every repository; the 10-hour ceiling fits today. (4) Re-read DEC-25 as amended by DEC-26 and runbook section 4, and state the stopping rule back in six lines: sync failure stops except the sync-path detectors; at most 2 manifest-class fix attempts; out-of-memory kill is a stop with no retry; hour 8 retrieve and tear down; 10 h ceiling over every billed resource with every started hour counted whole; teardown whatever the outcome. Write the gate record under snapshots/ (text only, no address, no key, no volume ID) and a short ledger row for the gate.
 
 Then STOP and ask for my explicit rental approval. Without it, end the session with the gate result recorded.
 
-Part B (paid, only after my approval in this session): runbook sections 6 to 13 in order, as F7.2-02 to F7.2-10. Record per stage only start and end time (UTC), exit status, error class and the last lines of a failing log; never whole logs. Fixes are server edits to .repo/local_manifests/ishtar-beryl.xml recorded in ~/evidence/fixes.diff, at most 2, manifest-class only, never pushed during the session. Grade VAL-SYNC against 22283d8 as amended by fixes.diff. At hour 8, retrieve what exists and tear down. Do not tear down until sha256sum -c passes for every retrieved file. Teardown deletes the server and every Primary IP (never shut down), confirms zero servers, zero Primary IPs, and no volume, snapshot or backup, and records elapsed hours against the 10-hour ceiling, whatever the build outcome. Write the runbook section 13 ledger row, the Phase 8 readiness statement and the ledger section 7 viability check.
+Part B (paid, only after my approval in this session): runbook sections 6 to 13 in order, as F7.2-02 to F7.2-10. POP2-32C-128G, Ubuntu 22.04 (24.04 only as the DEC-22 fallback, noted in the timeline), system volume Block 5K 40 GB, ishtar-src 5K 310 GB, ishtar-out 15K 260 GB, flexible IPv4 kept, no snapshot, image or backup. Volume IDs and the address stay in the shell or on paper. Section 7's volume block has never run: read its output before continuing, and stop on any "stop" line. Record per stage only start and end time (UTC), exit status, error class and the last lines of a failing log; never whole logs. Fixes are server edits to .repo/local_manifests/ishtar-beryl.xml recorded in ~/evidence/fixes.diff, at most 2, manifest-class only, never pushed during the session. Grade VAL-SYNC and the resolved-manifest criterion against 22283d8 as amended by fixes.diff, and say so in the ledger row (AUDIT-FIX-56). At hour 8, retrieve what exists and tear down. Do not tear down until sha256sum -c passes for every retrieved file. Teardown per runbook section 12: delete the Instance (never power off or standby), then delete every Block volume by name (system, ishtar-src, ishtar-out), then any flexible IP; confirm zero Instances, zero volumes, zero flexible IPs and zero snapshots in the Project and zone; record the last deletion time and elapsed hours rounded up against the 10-hour ceiling, whatever the build outcome. Write the runbook section 13 ledger row (with the Ubuntu release, disk.txt sizes and the four zero counts), the Phase 8 readiness statement and the ledger section 7 viability check.
 
-Rules: no token, key, password or server address written anywhere; no device command; no push and no commit without asking me; do not touch devir-teslim-promptu.md. Work in small verified slices and do not load other sub-plans.
+Rules: no token, key, password, server address or volume ID written anywhere; no device command; no push and no commit without asking me; do not touch devir-teslim-promptu.md. Work in small verified slices and do not load other sub-plans.
 ```
 
 **Token and queue reminder.**
 
-- **Part A is cheap:** one scripted block, one reviewed runbook edit, and four questions.
+- **Part A is cheap:** one scripted block, one read-back, and four questions.
 - **Part B is where token and money risk both peak.** Keep the stopping rule in the session's own context, and read only exit status, stage, error class and log tails.
-- **After `Faz7.2`, the queue continues in fresh sessions:** `F8.1-06` can run from `Faz7.2`'s evidence, then `Faz7.3` (the flash, on a separate day), `F8.1-07`, `F8.1-10`, and `Faz8.3`.
+- **After `Faz7.2`, the queue continues in fresh sessions:** `F8.1-06` from `Faz7.2`'s evidence, then `Faz7.3` (the flash, on a separate day), `F8.1-07`, `F8.1-10`, and `Faz8.3`.
 
 Do not run the prompt from this audit session.
 
 ## 15. Audit Result
 
 - **Final status: PASS_WITH_WARNINGS.**
-  - **Coverage:** nine main phases, nine phase folders and 42 sub-plan files, all structurally compliant, with zero structural problems measured across all 42.
-  - **Validators:** `--mode step2 --strict` and `--mode step3-preflight --strict` both pass, with `error_count=0`, `warning_count=0`, `secret_findings=0`, `subplan_count=42` and `index_reference_count=42`.
-  - **Findings:** ten active (one P2 open, seven P3 open, two P3 accepted), none P0 or P1. Eight resolved this run, and three new, all P3.
+  - **Coverage:** nine main phases, nine phase folders and 42 sub-plan files, all structurally compliant.
+  - **Validators:** `--mode step3-preflight --strict` passed before writing (`error_count=0`, `warning_count=0`, `secret_findings=0`, `subplan_count=42`). `--mode step3 --strict` and `--mode step4 --strict` were run after writing, with the expected `strict_warning` described in section 13.
+  - **Findings:** ten active (one P2 open, seven P3 open, two P3 accepted), none P0 or P1. Three resolved this run (`-52`, `-53`, `-54`), and three new, all P3 (`-55`, `-56`, `-57`).
   - **Queue:** READY, with four rows headed by `Faz7.2`.
-- **Confidence: high** on structure, coverage, index consistency, every finding's discharge, and every GitHub or build-system fact this audit asserts: the manifest, visibility, the base pin, `rom-build.sh`, `-z` outputs and `install_symlink` semantics, each measured this run. Runbook section 5 was executed, not only read. **Medium** on `AUDIT-FIX-54`'s first clause, which reasons about `repo manifest -r` on a partial tree without running it. **Not assessed for content this run:** the 38 sub-plans run 19 did not touch, on which earlier audits' assessments stand.
-- **Only `Planner-docs/Sub-Planing-Audit.md` was modified by this run.** No sub-plan, index, ledger, master plan, ontology, comprehension file, runbook or source file was written. Section 5's clone and `check.py` run went to this session's scratchpad, outside the workspace. No device command, no rental, no GitHub write, no commit and no push.
-- **Unexpected modifications: none detected.** The other entries in `git status` were present before this audit began: the six planner files of planning run 19 (uncommitted), and the untracked `devir-teslim-promptu.md`, which was not touched.
-- **Step 4 can safely begin**, limited to `Planner-docs/Faz-7-Plans/Faz7.2-first-aospa-build.md`. Part A is `F7.2-01`, including the section 10 correction and the `AUDIT-FIX-52`/`-53`/`-54` runbook repairs. The session then stops for the user's rental approval.
+- **Confidence: high** on the value-by-value match of `Faz7.2` against the runbook, the closure of `-52`/`-53`/`-54` in the runbook text, `bash -n` on all ten blocks, the GitHub pins and visibility read today, structure, and coverage. **Medium** on the runbook's Scaleway-side assumptions, which only the rental day can confirm: 22.04 availability, the quota, and how a volume ID shows in the guest. **Not assessed for content this run:** the 41 sub-plans run 20 did not touch, on which the tenth audit's assessments stand.
+- **Only `Planner-docs/Sub-Planing-Audit.md` was modified by this audit.** No sub-plan, index, ledger, master plan, ontology, comprehension file, runbook or source file was written. The runbook blocks were extracted to this session's scratchpad for `bash -n` and deleted. No device command, no rental, no GitHub write, no commit and no push.
+- **Unexpected modifications: none detected.** The other entries in `git status` were present before this audit began: run 20's three uncommitted files, and the untracked `devir-teslim-promptu.md`, which was not touched.
+- **Step 4 can safely begin**, limited to `Planner-docs/Faz-7-Plans/Faz7.2-first-aospa-build.md`. Part A is `F7.2-01`, with the symlink step as a verification and no pre-rental runbook edit. The session then stops for the user's rental approval.

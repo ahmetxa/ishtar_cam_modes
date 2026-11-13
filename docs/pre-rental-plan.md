@@ -26,11 +26,11 @@ anywhere.
 | `Faz7.1` GitHub input staging | verified | `IMPL-91`; manifest `22283d8`, both repositories public (`DEC-25`); runbook `docs/build-environment.md` |
 | `Faz8.1` static half | done, sub-plan `implemented` | `IMPL-92`; both camera layers carry-over at vendor pin `f92e7a9` |
 | `Faz8.2` kernel scoping | verified | `IMPL-93`; `DEC-08` recommendation defer |
-| Tenth Step 3 audit | `PASS_WITH_WARNINGS`, no P0/P1, queue head `Faz7.2` | `Planner-docs/Sub-Planing-Audit.md`; 10 active P2/P3 findings. It graded the Hetzner text, so it no longer covers a rental |
+| Eleventh Step 3 audit (step 3c, 2026-09-14) | `PASS_WITH_WARNINGS`, no P0/P1, queue READY, head `Faz7.2` | `Planner-docs/Sub-Planing-Audit.md`; supersedes the tenth. Run 20's `Faz7.2` matches the Scaleway runbook value by value. `AUDIT-FIX-52`, `-53`, `-54` resolved in the runbook; new P3 `-55` (stale "correct the symlink test" wording: a verification on the day), `-56` (`VAL-SYNC` graded against `22283d8` plus `fixes.diff`), `-57` (Hetzner wording, three more lines found). 10 active P2/P3 findings |
 | `Faz7.2` rental-day gate | run 2026-09-13, not passed | `IMPL-94`: section 5 exited 0, and `AUDIT-FIX-52`, `-53` and `-54` are repaired in the runbook. The 10-hour window did not fit that day, and the limit and SSH key checks were not yet done |
-| Rental provider | Scaleway **POP2-32C-128G**, `DEC-26` answered 2026-09-14 (step 3a) | `IMPL-95`: runbook `docs/build-environment.md` re-targeted on sourced Scaleway semantics; Ubuntu 22.04, 10 h ceiling with hour-8 rule, delete everything, no retry after an out-of-memory kill. `Faz7.2` still describes a Hetzner CCX53 (step 3b) |
+| Rental provider | Scaleway **POP2-32C-128G**, `DEC-26` answered 2026-09-14 (step 3a) | `IMPL-95`: runbook `docs/build-environment.md` re-targeted on sourced Scaleway semantics; Ubuntu 22.04, 10 h ceiling with hour-8 rule, delete everything, no retry after an out-of-memory kill. `Faz7.2` re-targeted to the runbook's values by planning run 20 (step 3b) and audited by the eleventh audit (step 3c). Next: step 4, the rental day |
 | `Faz7.3`, `Faz8.3` | queued behind `Faz7.2` | amended by run 19, audited by the tenth audit |
-| Workspace | last commit `f724b64` (run 19, the tenth audit, `IMPL-94`, the `DEC-26` records); not pushed | uncommitted: step 3a (`IMPL-95`: the runbook, the ledger, this file). `devir-teslim-promptu.md` untracked (stale 2026-09-09 handoff, the user's call) |
+| Workspace | last commit `587e3b5` (step 3a, `IMPL-95`); not pushed | uncommitted: step 3b (planning run 20: `Faz7.2`, the ledger, this file) and step 3c (the audit, this file). A local commit before step 4 gives the rental session a clean tree; the user's call. `devir-teslim-promptu.md` untracked (stale 2026-09-09 handoff, the user's call) |
 
 ## 2. Why these steps, in this order
 
@@ -178,8 +178,19 @@ before any rental.
 - Out of scope: the `Faz7.2` text (step 3b), every other Planner-docs file, and
   any rental.
 
-#### Step 3b — Bounded Step 2 amendment (planning run 20)
+#### Step 3b — Bounded Step 2 amendment (planning run 20, done 2026-09-14)
 
+- **Done.** Step 3a was first committed locally as `587e3b5`, with the user's approval.
+  - `Faz7.2`: an amendment note in section 1, then sections 2–13 wherever a provider fact appears, each value re-read from the
+    runbook. It now names POP2-32C-128G, the three Block volumes, the flexible IPv4, Ubuntu 22.04 with the 24.04 fallback, the
+    10 h ceiling with the hour-8 rule, and no retry after an out-of-memory kill.
+  - `F7.2-01` follows runbook section 5, `F7.2-09` and `VAL-TEARDOWN` follow section 12, and `F7.2-08` stages in `~/out-pkg`.
+    Three provider risks were added; no work item was added or removed.
+  - Index: not edited. Its provider mentions are the history of runs 17 and 18.
+  - Ledger: run 20 row in section 2. Section 4's `Faz7.2` blocker and next action now point at the eleventh audit (the user's
+    ruling). Section 6 names Scaleway, and section 7's `DEC-26` input records the discharge.
+  - Validators: `--mode step2 --strict` and `--mode step3-preflight --strict` give `error_count=0`, `warning_count=0`,
+    `secret_findings=0`, `subplan_count=42`. Not committed.
 - Session: fresh. The Step 2 rules and byte rules above, bounded to `Faz7.2`
   plus the index and ledger where they state a live provider fact.
 - Replace the CCX53, the Hetzner Console, the Primary IP and 128 GB with the
@@ -191,8 +202,27 @@ before any rental.
   `AUDIT-FIX-41` and `-42`.
 - Gates: as Step 2.
 
-#### Step 3c — Eleventh Step 3 audit
+#### Step 3c — Eleventh Step 3 audit (done 2026-09-14)
 
+- **Done.** `PASS_WITH_WARNINGS`, no P0 or P1, queue READY, head `Faz7.2` at `F7.2-01`. Only
+  `Planner-docs/Sub-Planing-Audit.md` was written; not committed.
+  - Run 20's `Faz7.2` matches runbook `docs/build-environment.md` on every graded value: POP2-32C-128G, the three Block
+    volumes, the flexible IPv4, Ubuntu 22.04 with the 24.04 fallback, the 10 h ceiling with the hour-8 rule, no
+    out-of-memory retry, section 5's four manual checks, section 12's eight steps and four zero counts,
+    `/android/beryl` and `~/out-pkg`. Ten work items before and after; no live Hetzner fact left.
+  - Closed, because the runbook carries each repair: `AUDIT-FIX-52` (section 4 sync-path exception), `-53`
+    (section 5 base-pin check; the base still read `7dfc0650…` today), `-54` (sections 10 and 11 record and continue,
+    plus the operator rule). All ten runbook blocks pass `bash -n`.
+  - New, all P3, none needs a decision: `-55`, where `F7.2-01`, section 11 and five more places still say "correct
+    the symlink test before renting", and section 6 wrongly says the runbook tests the `odm` path, although
+    `IMPL-94` made the correction. On the rental day it is a read-back plus `bash -n`, not an edit. `-56`, where
+    `VAL-SYNC` and the resolved-manifest criterion must use `22283d8` as amended by `fixes.diff`, and `DEC-25` item
+    (3) lacks the runbook's sync-path exception. `-57`, where the Hetzner wording routed to the next Step 1
+    amendment is confirmed, but misses `Project-Comprehension.md` `CQ-13`, `Project-Ontology.md` invariant 11 and
+    `docs/reverse-engineering-toolchain.md` line 220.
+  - Validators: `--mode step3-preflight --strict` passed; `--mode step3 --strict` and `--mode step4 --strict` give
+    `p0_findings=0`, `p1_findings=0`, `secret_findings=0`, `subplan_count=42`, `execution_queue_state=READY`, with the
+    expected strict promotion of the P2/P3 warning.
 - Session: fresh, the canonical `references/handoffs/run-step3.md` handoff.
 - Focus: the step 3b amendment read against the re-targeted runbook; close
   `AUDIT-FIX-52`, `-53` and `-54` if the runbook carries their repairs; rebuild
