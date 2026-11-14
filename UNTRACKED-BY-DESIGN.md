@@ -33,7 +33,7 @@ scan had previously timed out.
 | `agc-50mp-yama/` | <0.1 MiB | 4 | Yes |
 | `ishtar-aon-fix/` | <0.1 MiB | 3 | Yes |
 
-**Total workspace: approximately 7.3 GiB.** The tracked set was 84 files at Faz 1.1 (2026-08-24); it was 350 files on 2026-11-13 (measured for `IMPL-96`).
+**Total workspace: approximately 7.3 GiB.** The tracked set was 86 files at the Faz 1.1 commit `ff6934e` (2026-08-24, `IMPL-01`); it was 350 files on 2026-11-13 (measured for `IMPL-96`).
 
 `kernel_clone.log` held the line `fatal: destination path 'kernel_ishtar' already exists and is not an empty directory.`;
 `common_clone.log` held only `Cloning into 'common_sm8550'...`. Neither log explains why `common_sm8550/` holds 153 files rather than a full kernel tree. This is recorded as an observation, not repaired here. Both logs were never tracked and were deleted on 2026-11-13; their content is quoted in `PROJECT_LOG.md` section 2.1.

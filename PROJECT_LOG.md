@@ -1,18 +1,18 @@
 # PROJECT_LOG — ishtar
 
-> Durum tarihi **2026-11-13** · özet belge; kanonik kaynak `Planner-docs/Planing-Ledger.md`. Çelişkide önce depo, sonra ledger geçerlidir ve bu belge onlara göre düzeltilir. · Nasıl güncellenir: her koşunun (IMPL, planlama koşusu, denetim) sonunda önce ledger yazılır. Sonra burada §2'nin ilgili satırları güncellenir; §3.2'ye (IMPL ise), §4'e (karar varsa) ve §11'e birer satır eklenir. Çıkarımlar `[ÇIKARIM]` ile işaretlidir.
+> Durum tarihi **2026-11-14** · özet belge; kanonik kaynak `Planner-docs/Planing-Ledger.md`. Çelişkide önce depo, sonra ledger geçerlidir ve bu belge onlara göre düzeltilir. · Nasıl güncellenir: her koşunun (IMPL, planlama koşusu, denetim) sonunda önce ledger yazılır. Sonra burada §2'nin ilgili satırları güncellenir; §3.2'ye (IMPL ise), §4'e (karar varsa) ve §11'e birer satır eklenir. Çıkarımlar `[ÇIKARIM]` ile işaretlidir.
 >
-> Kaynak kısaltmaları: `L:n` ledger satırı · `AUD` `Planner-docs/Sub-Planing-Audit.md` · `IDX` `Planner-docs/Sub-Planing-Index.md` · `MP` `Planner-docs/Main-Planing.md` · `BE` `docs/build-environment.md` · `PRP` `docs/pre-rental-plan.md` · `DEV` `docs/rom-build-device-notes.md` · `RC` `docs/release-checklist.md` · `CFG` `docs/agc-12mp-configuration.md` · `J` `50MP-Entegrasyon-Plani.md` · `CL` `CHANGELOG.md` · `Ö13` bu oturumun 2026-11-13 ölçümü (git, doğrulayıcı, self-test) · `snap X` `snapshots/X__*` dosyaları.
+> Kaynak kısaltmaları: `L:n` ledger satırı · `AUD` `Planner-docs/Sub-Planing-Audit.md` · `IDX` `Planner-docs/Sub-Planing-Index.md` · `MP` `Planner-docs/Main-Planing.md` · `BE` `docs/build-environment.md` · `PRP` `docs/pre-rental-plan.md` · `DEV` `docs/rom-build-device-notes.md` · `RC` `docs/release-checklist.md` · `CFG` `docs/agc-12mp-configuration.md` · `J` `50MP-Entegrasyon-Plani.md` · `CL` `CHANGELOG.md` · `Ö13` 2026-11-13 oturumunun ölçümü (git, doğrulayıcı, self-test) · `snap X` `snapshots/X__*` dosyaları.
 
 ## 1. Proje kimliği ve kapsam
 
-Bu proje, kullanıcının kendi Xiaomi 13 Ultra'sının kamerasını root modülleri ve yapılandırılmış bir kamera uygulamasıyla özelleştirir. Cihaz: `ishtar`, model `2304FPN6DC`, SM8550 / `kalama`, adb seri `dc27e5d0`. Bu belgedeki ölçümlerin hepsi telefonda AOSPA Vauxite (Android 15) ve KernelSU Next varken yapıldı (DEV §2-3). **2026-11-13 kullanıcı beyanı (ölçülmedi):** telefon artık Çinli bir geliştiricinin HyperOS 4 portunu (kernel 5.15.215) çalıştırıyor ve ROM derleme fikri bırakıldı (§2.3, §2.5). Planlama ClaudeQB disipliniyle yürür (§3.3).
+Bu proje, kullanıcının kendi Xiaomi 13 Ultra'sının kamerasını root modülleri ve yapılandırılmış bir kamera uygulamasıyla özelleştirir. Cihaz: `ishtar`, model `2304FPN6DC`, SM8550 / `kalama`, adb seri `dc27e5d0`. Bu belgedeki 2026-11-13'ten önceki ölçümler telefonda AOSPA Vauxite (Android 15) ve KernelSU Next varken yapıldı (DEV §2-3). 2026-11-13'te telefonda HyperOS 4 gözlendi ve aynı gün salt-okur ölçüldü (`70946ff`, §2.3; ROM, kernel 5.15.215 ve KernelSU dahil). **2026-11-13 kullanıcı beyanı:** telefondaki HyperOS 4, Çinli bir geliştiricinin portudur; ROM derleme fikri kullanıcı kararıyla bırakıldı (`DEC-28`; §2.3, §2.5). Planlama ClaudeQB disipliniyle yürür (§3.3).
 
 **Teslimatlar:**
 - `ishtar-cam-modes` **v2.2 / versionCode 13**. İki katmanı var: sensör modu katmanı (`stock`, DCG/LN varyantları) ve HAL katmanı `50mp`; ikincisi 8192x6144'ü standart Camera2 listesine ekler. Ayrıca 4 QS kutucuğu, WebUI ve Action düğmesi içerir (`ishtar-cam-modes/module.prop:3-4`; CL).
 - `ishtar-aon-fix` **v1.1 / versionCode 2**: `aon_front.pb`'yi `/vendor/lib64/camera` üzerine bind-mount eder. Ayrı modül olarak kalır (`DEC-04`).
-- Yapılandırılmış AGC (yamalı AGC 8.4.300 V9.6, `ce65f862c990e2acc02be356f75a7122`): `pref_48m_key=0` + `pref_camera_resolution=full` ile `50mp` altında 12.58 MP'de sabittir. Aynı HAL durumunda Open Camera 50.33 MP çeker (CFG; L:638).
-- Android 16 girdi depoları: `ahmetxa/android_local_manifests` (`22283d8`) ve `ahmetxa/android_device_xiaomi_ishtar` (`beryl` `d48816f`). İkisi de herkese açık; henüz hiç derlenmedi (L:99, L:520).
+- Yapılandırılmış AGC (yamalı AGC 8.4.300 V9.6, `ce65f862c990e2acc02be356f75a7122`): `pref_48m_key=0` + `pref_camera_resolution=full` ile `50mp` altında 12.58 MP'de sabittir. Aynı HAL durumunda Open Camera 50.33 MP çeker (CFG; L:647).
+- Android 16 girdi depoları: `ahmetxa/android_local_manifests` (`22283d8`) ve `ahmetxa/android_device_xiaomi_ishtar` (`beryl` `d48816f`). İkisi de herkese açık; hiç derlenmedi (L:99, L:520). Derleme 2026-11-13'te bırakıldı (`DEC-28`); iki depo silinecek (`DEC-30`) ve 2026-11-14T13:45:22Z ölçümünde ikisi de hâlâ duruyor.
 
 **Yöntem: disassemble + offset tablosu + bind-mount.**
 - *Disassemble:* `camera.qcom.so` (27,268,688 B) capstone/pyelftools ile betikle çözülür; AGC APK'sı smali ile. Adresler yalnız `Project-Ontology.md` adres defterinde tutulur.
@@ -40,31 +40,31 @@ Bu proje, kullanıcının kendi Xiaomi 13 Ultra'sının kamerasını root modül
 
 Emekliye ayrılan hedef: AGC'de uçtan uca 50 MP (`DEC-14`, 2026-09-03; §5).
 
-## 2. Şu an neredeyiz (2026-11-13)
+## 2. Şu an neredeyiz (2026-11-14)
 
 ### 2.1 Git ve depo
-- **Dal ve commit'ler (2026-11-13 oturum sonu):** `main` 63 commit: ilk `ff6934e` (2026-08-24), `587e3b5` (IMPL-95, 2026-09-14) ve `7fa0a51` (planlama koşusu 20 + 11. denetim, değiştirilmeden). `integrate/impl-96` dalı `7fa0a51` üzerine yeniden kuruldu: `70946ff` (HyperOS 4 kanıtı; probe satır 42, 190, 191 redakte), `03b0898` (tarihsel notlar, cihaz notları), `775b321` (oturum belgeleri), sonra C0 (`ORCHESTRATION_PLAN.md`'yi ekleyen commit). Eski hash'lerin eşlemesi §11'dedir; eski hash'ler yalnız yedek bundle'da ve yerel reflog'da. Etiket yok. Tüm commit'ler tek kimlikle (GitHub `ahmetxa`). (Ö13)
-- **Remote:** `origin` = `https://github.com/ahmetxa/ishtar_cam_modes.git`, özel depo (kullanıcı kararı 2026-11-13; `DEC-27` atandı; ledger'a Pencere 1'de yazılır).
+- **Dal ve commit'ler (2026-11-14):** `main` 63 commit: ilk `ff6934e` (2026-08-24), `587e3b5` (IMPL-95, 2026-09-14) ve `7fa0a51` (planlama koşusu 20 + 11. denetim, değiştirilmeden). `integrate/impl-96` dalı `7fa0a51` üzerine yeniden kuruldu: `70946ff` (HyperOS 4 kanıtı; probe satır 42, 190, 191 redakte), `03b0898` (tarihsel notlar, cihaz notları), `775b321` (oturum belgeleri), sonra C0 `b603516` (`ORCHESTRATION_PLAN.md`'yi ekleyen commit), takip commit'i `c2abd46`, C1 (`IMPL-96: repository move, ROM-build retirement, HyperOS 4 baseline`) ve Pencere 2 aşama commit'leri (`Window 2 O0-O1: approved plan, discovery facts, stage-per-session loop`, `Window 2 O2: contract for the project log sweep and the run 21 handoff`); dal 71 commit (2026-11-14 ölçümü). Eski hash'lerin eşlemesi §11'dedir; eski hash'ler yalnız yedek bundle'da ve yerel reflog'da. Etiket yok. Tüm commit'ler tek kimlikle (GitHub `ahmetxa`). (Ö13)
+- **Remote:** `origin` = `https://github.com/ahmetxa/ishtar_cam_modes.git`, özel depo (kullanıcı kararı 2026-11-13; `DEC-27`, ledger §8 `:605`).
   - 62 commit `git push` ile hash'leri değişmeden gönderildi: `git ls-remote origin` → `main` = `587e3b5`; kök `ff6934e` GitHub API'de aynı hash ve tarihle; `private=true`, varsayılan dal `main` (Ö13).
-  - `7fa0a51` ve `integrate/impl-96` dalı push edilmedi. Push Pencere 2'de karara bağlanır; yalnız açık refspec: `git push origin main integrate/impl-96`.
+  - `7fa0a51` ve `integrate/impl-96` dalı push edilmedi (2026-11-14 ölçümü: `origin/main..HEAD` 9 commit). Push `2 · O5`'te, C2'den sonra ayrı onayla yapılır (plan §0 adım 5); push'tan sonraki güncelleme Pencere 3 açılışında (`ORCHESTRATION_PLAN.md` §7). Yalnız açık refspec: `git push origin main integrate/impl-96`.
   - Eski `ishtar-eski` remote'u (`ahmetxa/ishtar`) 2026-11-13'te yerelden kaldırıldı. Tek dalı `main@f8a05ca` yerel `main`'in atası; içeriğinin tamamı yeni depoda.
 - **Silinecek GitHub depoları (K5/K6, kullanıcı kararı 2026-11-13):** `ahmetxa/ishtar`, `ahmetxa/android_local_manifests`, `ahmetxa/android_device_xiaomi_ishtar`. Silme yapılmadı: `gh` belirtecinde `delete_repo` yetkisi yok, silmeyi kullanıcı yapar. Hiçbirinde release, tag ya da açık issue yoktu. İki açık deponun ayna yedeği `C:/Users/ahmet/Documents/Projeler/ishtar-arsiv/` altında: `android_local_manifests.git` (`main@22283d8`) ve `android_device_xiaomi_ishtar.git` (`beryl@d48816f`, `vauxite@713784c`); ikisinde de `git fsck` temiz.
-  - Ölçüm (2026-11-13, `gh api`): üç depo da hâlâ var.
+  - Ölçüm (2026-11-14T13:45:22Z, `gh api`): üç depo da hâlâ var (200); önceki ölçümler 2026-11-14T07:23:21Z ve 10:03:48Z'de, üçü de 200. I2a yeniden ölçer.
 - **Boyut (Ö13):**
-  - 344 izlenen dosya.
+  - 350 izlenen dosya (2026-11-14).
   - `size-pack` 17.86 MiB, ayrıca 74.38 MiB gevşek nesne (343 adet).
   - Tüm geçmişteki blob toplamı 109.7 MiB. En büyük blob 16.04 MiB (`snapshots/20260905-2034__Faz4.4__F4403-opencamera-capture-ORIGINAL.jpg`); 50 MiB üstü blob yok.
   - Hiçbir `.bin/.so/.apk/.zip/.keystore` dosyası hiç izlenmedi.
 - **Bütünlük ve satır sonları:** `git fsck --no-dangling` temiz. `.gitattributes` varsayılan olarak `* -text` kullanır; `*.sh *.prop *.patch mode lang` için LF zorlanır.
-- **Commit durumu (2026-11-13):**
-  1. Planlama koşusu 20 ve 11. denetimin dört dosyası (`Faz7.2`, ledger, `Sub-Planing-Audit.md`, `docs/pre-rental-plan.md`) değiştirilmeden `7fa0a51` olarak `main`'e işlendi. İçerik: `DEC-26` ile `Faz7.2`'nin Scaleway'e yeniden hedeflenmesi ve 11. Step 3 denetimi (`PASS_WITH_WARNINGS`, P0/P1 yok, kuyruk başı `Faz7.2`/`F7.2-01`). Kuyruk 2026-11-13'ten beri geçersiz: ROM derleme bırakıldı (§2.5). Ledger 11. denetimi hâlâ "outstanding" sayıyor; düzeltmesi IMPL-96'da.
-  2. `docs/rom-build-device-notes.md` (2026-09-20, AOSPA A15 salt-okur cihaz oturumu) §10 ekiyle `03b0898`'da işlendi; IMPL satırı hâlâ yok (IMPL-96).
+- **Commit durumu (2026-11-14):**
+  1. Planlama koşusu 20 ve 11. denetimin dört dosyası (`Faz7.2`, ledger, `Sub-Planing-Audit.md`, `docs/pre-rental-plan.md`) değiştirilmeden `7fa0a51` olarak `main`'e işlendi. İçerik: `DEC-26` ile `Faz7.2`'nin Scaleway'e yeniden hedeflenmesi ve 11. Step 3 denetimi (`PASS_WITH_WARNINGS`, P0/P1 yok, kuyruk başı `Faz7.2`/`F7.2-01`). Kuyruk 2026-11-13'ten beri geçersiz: ROM derleme bırakıldı (§2.5). Ledger 11. denetimi için IMPL-96 notları yazıldı (ledger `:100`, `:552`, `:554`, `:556`, `:558`); notsuz kalanlar `:51`, `:57`–`:60`, `:589` (§8 `:802`).
+  2. `docs/rom-build-device-notes.md` (2026-09-20, AOSPA A15 salt-okur cihaz oturumu) §10 ekiyle `03b0898`'da işlendi; IMPL-96 satırının (4). maddesi kaydediyor (ledger `:525`).
   3. `devir-teslim-promptu.md` 2026-11-13'te kullanıcı kararıyla silindi (K4); yerini `NEXT_PROMPT.md` aldı.
-  4. Oturum belgelerinin ilk sürümü `775b321` olarak `integrate/impl-96` dalına işlendi; son sürüm C0'dadır.
-  5. C0 (`ORCHESTRATION_PLAN.md`, bu günlük ve `NEXT_PROMPT.md`'yi taşıyan commit) işlendi; `git log --diff-filter=A -- ORCHESTRATION_PLAN.md` ile bulunur.
+  4. Oturum belgelerinin ilk sürümü `775b321` olarak `integrate/impl-96` dalına işlendi; sonraki sürümleri `c2abd46`, C1 ve Pencere 2 aşama commit'lerindedir.
+  5. C0 `b603516` (`ORCHESTRATION_PLAN.md`, bu günlük ve `NEXT_PROMPT.md`'yi taşıyan commit) işlendi; `git log --diff-filter=A -- ORCHESTRATION_PLAN.md` ile bulunur. Bu günlüğün ve `NEXT_PROMPT.md`'nin sonraki sürümleri `c2abd46`, C1 ve Pencere 2 aşama commit'lerinde.
 - **Silinenler (2026-11-13, K4):** kökteki boş `UsersahmetAppDataLocalTempaon-smoke/` dizini ve `.gitignore:48` (`*.log`) nedeniyle hiç izlenmemiş üç log: `install.log` (izlenen `snapshots/20260831-1603__faz2.2__install-transcript-v2.1.txt` ile satır satır aynıydı), `common_clone.log` (tek satır: `Cloning into 'common_sm8550'...`), `kernel_clone.log` (tek satır: `fatal: destination path 'kernel_ishtar' already exists and is not an empty directory.`).
 - **K8 (probe kimlikleri, 2026-11-13):** Commit edilmiş ama push edilmemiş probe anlık görüntüsündeki cihaz tanımlayıcıları redakte edildi ve dal `integrate/impl-96` `main` üzerinde yeniden kuruldu (§11). Redaksiyonsuz uç yalnız `../ishtar-arsiv/impl-96-unredacted.bundle` içinde (repo dışı; 77.094 B; sha256 `b9fa9c5cd5d0ae78f9f051ab62ecbfc2d9b2fa2fecd33f40247ef88bf58f6cd3`; `git bundle verify` geçti; önkoşul `7fa0a51`). R-identity-check (`git log --all -p`; yalnız sayım): `persist.sys.miui.sno` ve `ro.ril.miui.imei0`/`imei1` satırları `<redacted>` olmalı, Luhn geçen 15 haneli sayı olmamalı; son sonuç: tüm ref'lerde 0 eşleşme. Adlandırılmış yedek dal açılmadı.
-- Ledger §6'nın depo paragrafı (47 commit, 225 dosya, remote yok) bayattır (§8).
+- Ledger §6'nın depo paragrafı (47 commit, 225 dosya, remote yok) kısmen düzeldi: ledger `:528`'deki IMPL-96 notu remote'u ve commit sayılarını yazıyor, dosya sayısını yazmıyor (§8 `:803`).
 
 ### 2.2 Sürüm ve paket
 - **Güncel paket:** `ishtar-cam-modes` v2.2 / versionCode 13, arşiv `dist/ishtar-cam-modes-v2.2.zip`. Bilgiler `docs/release-manifest.md`'den:
@@ -80,7 +80,7 @@ Emekliye ayrılan hedef: AGC'de uçtan uca 50 MP (`DEC-14`, 2026-09-03; §5).
 - **Kontrol listesi (RC §7, 2026-09-09):** 18 yetenek. 9 pass; 2 waived (C-02, C-03); 7 pending (C-01, C-04, C-05, C-09, C-11, C-12, C-17); 0 fail.
   - Ledger L:106'daki "C-05/09/11/12/13 pending" listesi bayat: C-13 IMPL-88 ile pass oldu.
 - **AON modülü:** `ishtar-aon-fix` v1.1 / versionCode 2.
-- **`Kullanim.txt`:** `ishtar-cam-modes/Kullanim.txt` zip'in içinde dağıtılıyor ve hâlâ v1.9 kılavuzu (13 bayat ifade; hiçbiri AGC'nin 50 MP çektiğini iddia etmiyor). Dosyayı düzenlemek, cihazda kurulu v2.2 ile bayt-özdeşliği bozar; K1=(b) gereği bir sonraki sürümde düzeltilecek (§4).
+- **`Kullanim.txt`:** `ishtar-cam-modes/Kullanim.txt` zip'in içinde dağıtılıyor ve hâlâ v1.9 kılavuzu (13 bayat ifade; hiçbiri AGC'nin 50 MP çektiğini iddia etmiyor). Dosyayı düzenlemek, yayımlanan v2.2 ile bayt-özdeşliği bozar; K1=(b) gereği bir sonraki sürümde düzeltilecek (§4). *(2026-11-14 notu: bayt-özdeşliği gerekçesi yayımlanan v2.2 zip'i için geçerli (`DEC-29`); v2.2 AOSPA A15'te kuruluydu (IMPL-81), HyperOS 4'te proje modülleri kurulu değil.)*
 
 ### 2.3 Cihaz
 **2026-11-13 ölçümü (HyperOS 4, salt-okunur, yalnız `dc27e5d0`):** `snapshots/20261113-1819__IMPL96__hyperos4-readonly-probe.txt` ve `snapshots/20261113-1821__IMPL96__hyperos4-smoke-baseline.txt` (commit `70946ff`).
@@ -95,13 +95,13 @@ Emekliye ayrılan hedef: AGC'de uçtan uca 50 MP (`DEC-14`, 2026-09-03; §5).
   - Kamera dosyalarında bind mount yok.
 - **Kameralar:** 13 aygıt (hal0…hal12), ana arka kamera hal0. hal0'ın standart akış yapılandırmaları her biçimde 4096x3072'de bitiyor. `ULTRA_HIGH_RESOLUTION_SENSOR` yeteneği ve maksimum çözünürlük etiketleri hiçbir aygıtta yok. `8192 6144` yalnız üreticiye özel etiketlerde (`xiaomi.scaler.*`, `org.codeaurora.qcamera3.quadra_cfa.*`, `org.quic.*`) ve eskimiş `android.scaler.availableRawSizes`'ta geçiyor. Yani standart Camera2 uygulamaları ana kamerada en fazla 12,58 MP görüyor.
 - **Uygulamalar:** AGC `org.codeaurora.snapcam` 8.4.300.414775575.18 kurulu; APK md5 `fa4066eb3bf82cc097906fd108073500`, depodaki **yamasız** `AGC8.4.300_V9.6_snap.apk` ile aynı (yamalı `ce65f862…` değil). Open Camera (`com.xiaomi.module.evaluation` 1.55) ve Xiaomi kamerası (`com.android.camera` 6.4.000380.1) kurulu; kutucuk uygulaması `com.ishtar.cammodes` yok. AGC ve Open Camera'nın `lastUpdateTime` değeri 2026-09-20.
-- **AGC tercihleri (smoke):** `prefs.trap.armed = 10`: 12 tuzak anahtarının 10'u 37 değerinde. AOSPA'da bu durum kökteki `.agc` dosyalarının içe aktarılmasıyla oluşuyordu. `agc.pref_48m = absent` (yamasız APK'da bu anahtar yok). `agc.pref_resolution = full` → türetilen arka boyut 4096x3072 (12,58 MP). AGC'nin bu durumda temiz çekip çekmediği ölçülmedi.
+- **AGC tercihleri (smoke):** `prefs.trap.armed = 10`: 12 tuzak anahtarının 10'u 37 değerinde. AOSPA'da bu durum kökteki `.agc` dosyalarının içe aktarılmasıyla oluşuyordu. `agc.pref_48m = absent` (anahtar prefs dosyasında yok; APK'da olup olmadığı ölçülmedi). `agc.pref_resolution = full` → türetilen arka boyut 4096x3072 (12,58 MP). AGC'nin bu durumda temiz çekip çekmediği ölçülmedi.
 - **smoke.sh sınırı:** `sensor.*` ve `hal.*` alanları sabitlerini kurulu modülden okuyor; modül yokken geçersiz (`d41d8cd9…` boş girdinin md5'i).
 - **Kod okuması:** `ishtar-cam-modes/post-fs-data.sh`, sensör md5'i `EXPECT_MD5` (:35-51) ya da HAL md5'i `HAL_STOCK_MD5` (:101-107) tutmazsa hiçbir şey mount etmez. Modül bugünkü hâliyle kurulursa sensör katmanı korumadan geçer, 50MP katmanı kapalı kalır [ÇIKARIM: işlevsel test yapılmadı].
 
 Aşağıdaki her şey (2026-09-20 ölçümü, kanonik yapılandırma, son ölçümler, `F3.11-09`) önceki ROM'a, AOSPA A15'e aittir.
 
-**2026-09-20 ölçümü** (DEV; salt-okur adb; ledger'a işlenmedi):
+**2026-09-20 ölçümü** (DEV; salt-okur adb; ledger'da IMPL-96 satırının (4). maddesi, `:525`):
 - **ROM:** AOSPA `Vauxite Unofficial`, Android 15 (SDK 35, `AQ3A.250604.001`, güvenlik yaması 2025-06-05).
 - **Kernel:** `5.15.178-android13-8-g7b195d4db1e7`. Bu yalnız karşılaştırma tabanıdır, A16 derlemesinin girdisi değildir.
 - **Bölümler ve güvenlik:** A/B (aktif slot `_a`), Virtual A/B, AVB 1.3, FBE, SELinux Enforcing. `/data`'da 405 G boş.
@@ -124,12 +124,12 @@ Aşağıdaki her şey (2026-09-20 ölçümü, kanonik yapılandırma, son ölç�
 - Stok Kamera videosu: 4K 59.88 fps, 1080p 60.06 fps (IMPL-88).
 - Open Camera videosu ~30 fps; bu, seçili moddan bağımsız.
 
-**Kanonik iddia `F3.11-09`** (aynen; kanonik kopyası CFG §10'da, ledger'da L:638):
+**Kanonik iddia `F3.11-09`** (aynen; kanonik kopyası CFG §10'da, ledger'da L:647):
 
 > On a Xiaomi 13 Ultra running the `50mp` module mode with the shipped `fullres` HAL `fe0245a4720fb07b01d96deef47f5569` and the stock sensor `9e4d0fe1a8bf2eb4146c9917a0ac2c4c`, Google Camera `ce65f862c990e2acc02be356f75a7122` configured with `pref_48m_key=0` and `pref_camera_resolution=full` captures a clean 12.58 MP photograph — black fraction below `0.01` by the `IMPL-40` method — and that configuration survived AGC cold start, camera-stack restart, QuickSettings mode switch and device reboot with zero field changes (`IMPL-61`, four axes, no failures).
 
-- **Kanıtlama:** `scripts/smoke.sh -o <snapshot>` şu alanları vermeli: `agc.pref_48m=0`, `agc.pref_resolution=full`, `agc.photo_size.back.derived=4096x3072`. Ardından siyah oranı < 0.01 olan bir çekim gerekir (L:640).
-- **Kapsam:** yalnız arka kamera, tek cihaz, yalnız 12.58 MP (L:642).
+- **Kanıtlama:** `scripts/smoke.sh -o <snapshot>` şu alanları vermeli: `agc.pref_48m=0`, `agc.pref_resolution=full`, `agc.photo_size.back.derived=4096x3072`. Ardından siyah oranı < 0.01 olan bir çekim gerekir (L:649).
+- **Kapsam:** yalnız arka kamera, tek cihaz, yalnız 12.58 MP (L:651).
 - **Açık cihaz konuları (§5):**
   - FIND-3.10-02: tuzak anahtarlarını yeniden kuran yol hâlâ bilinmiyor.
   - FIND-9.1-04: modül güncellemesi `mode` dosyasını kaybediyor.
@@ -144,7 +144,7 @@ Aşağıdaki her şey (2026-09-20 ölçümü, kanonik yapılandırma, son ölç�
   - 2 `superseded`: `Faz4.1`, `Faz4.7`
   - Sayım ledger §4'ten, 2026-11-13'te yapıldı.
 - Etkin snapshot'lar: `SNAP-2026-09-10-MAIN`, `SNAP-2026-09-10-SUBPLANS`.
-- Ledger §5'te IMPL-01 … IMPL-95 kayıtlı; IMPL-18/19/20/22 için ayrıca anlatı blokları var.
+- Ledger §5'te IMPL-01 … IMPL-95 kayıtlı; IMPL-96 de kayıtlı (`:525`); IMPL-18/19/20/22 için ayrıca anlatı blokları var.
 
 | Alt plan | Durum | Engel → sıradaki eylem | Kaynak |
 |---|---|---|---|
@@ -162,8 +162,8 @@ Aşağıdaki her şey (2026-09-20 ölçümü, kanonik yapılandırma, son ölç�
   - P2 açık: `AUDIT-FIX-22`
   - P3 açık: `-37`, `-41`, `-42`, `-50`, `-55`, `-56`, `-57`
   - P3 kabul edilmiş: `-25`, `-33`
-- **Sıradaki numaralar:** `IMPL-96`, planlama koşusu 21, 12. denetim. `DEC-27`…`DEC-32` ayrıldı (Pencere 1'de ledger'a yazılacak); sonraki boş numara `DEC-33`.
-- **Açık kararlar:** K1–K8 yanıtlı (K7 = (a) → `DEC-32`; K8 = A → `DEC-31`, yürütüldü). K9 (50MP HAL yeniden türetmesi) ve push açık. Konusuz altı karar (`DEC-07`, `DEC-08`, `DEC-22`, `DEC-24`, `DEC-25`, `DEC-26`) `DEC-28` ile kapanır (ROM derleme bırakıldı; Pencere 1'de ledger'a işlenecek). `DEC-09` koşullu; ancak tetiklenirse gündeme gelir. Diğer tüm DEC'ler yanıtlandı.
+- **Sıradaki numaralar:** `IMPL-97`, planlama koşusu 21, 12. denetim. `DEC-27`…`DEC-32` ledger'da (`:605`–`:610`); sonraki boş numara `DEC-33`.
+- **Açık kararlar:** K1–K8 yanıtlı (K7 = (a) → `DEC-32`; K8 = A → `DEC-31`, yürütüldü). K9 (50MP HAL yeniden türetmesi) ve push açık. Konusuz altı karar (`DEC-07`, `DEC-08`, `DEC-22`, `DEC-24`, `DEC-25`, `DEC-26`) `DEC-28` ile kapanır (ROM derleme bırakıldı; konusuz notları ledger'da `:582`, `:583`, `:599`, `:601`, `:603`, `:604`). `DEC-09` koşullu; ancak tetiklenirse gündeme gelir. Diğer tüm DEC'ler yanıtlandı.
 - **Doğrulayıcı (Ö13):** depoda değil, ClaudeQB eklentisinin içinde duruyor. `py -3` (CPython 3.14.10) ile çalıştırılır.
   - Komut: `py -3 C:/Users/ahmet/.claude/plugins/cache/claudeqb/claudeqb/0.2.1/skills/claudeqb/scripts/validate_planner_docs.py --root . --mode all`
   - Sonuç: `error_count=0`, `warning_count=1` (`step4_has_nonblocking_warnings=P2:1,P3:9`), `p0_findings=0`, `p1_findings=0`, `subplan_count=42`, `secret_findings=0`. HEAD ağacında da aynı.
@@ -171,9 +171,9 @@ Aşağıdaki her şey (2026-09-20 ölçümü, kanonik yapılandırma, son ölç�
   - 2026-09-09 devrindeki "0 uyarı / 0 hata" tabanı yanlıştır.
 
 ### 2.5 Faz 7/8 cephesi
-**2026-11-13: ROM derleme fikri bırakıldı (kullanıcı kararı, K2).** Telefon HyperOS 4 portuna geçtiği için Faz 7/8'in amacı (kiralık sunucuda AOSPA `beryl` derlemesi, Android 16 kamera işi, kernel LTS) ortadan kalktı; kiralama hiç yapılmadı. Ledger §7'deki duran tetikleyici "vendor blobs change through a system update" de ateşlendi. Resmî kapanış planlama koşusu 21'de (Step 1 değişikliği), kayıt `IMPL-96`'da (`DEC-28` atandı; ledger'a Pencere 1'de yazılır). Bu bölümün geri kalanı tarihsel kayıttır.
+**2026-11-13: ROM derleme fikri bırakıldı (kullanıcı kararı, K2).** Telefon HyperOS 4 portuna geçtiği için Faz 7/8'in amacı (kiralık sunucuda AOSPA `beryl` derlemesi, Android 16 kamera işi, kernel LTS) ortadan kalktı; kiralama hiç yapılmadı. Ledger §7'deki duran tetikleyici "vendor blobs change through a system update" de ateşlendi. Resmî kapanış planlama koşusu 21'de (Step 1 değişikliği), kayıt `IMPL-96`'da (`DEC-28`; ledger `:606`; §7 üst girdisi `:550`). Bu bölümün geri kalanı tarihsel kayıttır.
 
-**Derleme ortamı kararının geçmişi** (L:549, L:598-601):
+**Derleme ortamı kararının geçmişi** (L:552, L:601-604):
 1. WSL2 planı (IMPL-86, 2026-09-07).
 2. `DEC-24` (2026-09-10): WSL2 bırakıldı; girdiler önce GitHub'a konacak, derleme kiralık bir sunucuda yapılacak.
 3. `DEC-25` (2026-09-11): Hetzner CCX53; 10 saat tavan ve 8. saat kuralı; en çok 2 manifest-sınıfı düzeltme; sunucu kapatılmaz, silinir; iki derleme deposu herkese açık.
@@ -214,10 +214,10 @@ Aşağıdaki her şey (2026-09-20 ölçümü, kanonik yapılandırma, son ölç�
   - `AUDIT-FIX-55`: symlink adımında yalnız geri okuma + `bash -n` yapılır.
   - `-56`: VAL-SYNC, `22283d8` + `fixes.diff`'e göre değerlendirilir.
 - **Hiçbir şey kiralanmadı; henüz hiç Android 16 artefaktı üretilmedi.**
-- Sıra: Part A (ücretsiz) → DUR → kullanıcı onayı → Part B (runbook §6–13; sonuç ne olursa olsun söküm) (PRP:231-246).
+- Sıra: Part A (ücretsiz) → DUR → kullanıcı onayı → Part B (runbook §6–13; sonuç ne olursa olsun söküm) (PRP:239-254).
 
 **Faz 8:**
-- `Faz8.1` statik yarı (IMPL-92): `f92e7a9`'da HAL md5 stok `c3fa63a8…` (27268688 B) ile, sensör md5 `9e4d0fe1…` ile aynı. İki katman da statik değerleriyle taşınıyor. `DEC-07` açık.
+- `Faz8.1` statik yarı (IMPL-92): `f92e7a9`'da HAL md5 stok `c3fa63a8…` (27268688 B) ile, sensör md5 `9e4d0fe1…` ile aynı. İki katman da statik değerleriyle taşınıyor. `DEC-07` açık *(2026-11-14 notu: 2026-11-13'ten beri konusuz (`DEC-28`); `:174` bölümün kalanını tarihsel sayar.)*
 - `Faz8.2` (IMPL-93) verified: hedef `android13-5.15-2026-06_r4`; 4472 / 3798 yalnız-hedef commit. Deneme birleştirmesinde 1 / 16 çakışma çıktı, hiçbiri kamera sürücüsünde değil. `DEC-08` için öneri: ertelemek.
 - `Faz8.3` planned.
 
@@ -286,12 +286,12 @@ Durumlar ledger §4'ten, hedef ve sonuçlar MP §6'dan alındı (MP:131-241; AUD
 - `Faz5.3` exclusion-rule-disposition — verified (IMPL-17).
 
 **Faz 6 — AON düzeltmesini cihaz ağacına taşı.** Hedef: `ishtar-aon-fix` ihtiyacını cihaz ağacındaki bir düzeltmeyle ortadan kaldırmak. Sonuç: `;SYMLINK=` satırı iki ağaca eklendi; modül ayrı kalıyor (`DEC-04`). Durum: 1 verified, 1 implemented.
-- `Faz6.1` symlink-entry-in-device-trees — implemented (IMPL-03); etkisi `Faz7.3`'te doğrulanacak.
+- `Faz6.1` symlink-entry-in-device-trees — implemented (IMPL-03); etkisi `Faz7.3`'te doğrulanacak. *(2026-11-14 notu: `Faz7.3` 2026-11-13'ten beri amaçsız (`DEC-28`); durum `implemented` kalıyor.)*
 - `Faz6.2` aon-module-disposition — verified (IMPL-72, 75): `docs/aon-verification.md`; FIND-6.2-03.
 
-**Faz 7 — Android 16 derleme ortamı.** Hedef: AOSPA `beryl` derlemesini en düşük kira maliyetiyle almak. Sonuç: girdiler GitHub'da, runbook hazır; henüz kiralama yapılmadı. Durum: 1 verified, 2 planned.
+**Faz 7 — Android 16 derleme ortamı.** Hedef: AOSPA `beryl` derlemesini en düşük kira maliyetiyle almak. Sonuç: girdiler GitHub'da, runbook hazır; kiralama hiç yapılmadı; ROM derleme 2026-11-13'te bırakıldı (`DEC-28`). Durum: 1 verified, 2 planned.
 - `Faz7.1` github-input-staging — verified (IMPL-86, 89, 90, 91). Run 18 (2026-09-10) ile kaldırılan `Faz7.1-wsl2-provisioning.md`'nin yerini aldı.
-- `Faz7.2` first-aospa-build — planned; run 18'de yerinde yeniden yazıldı; kuyruğun başında.
+- `Faz7.2` first-aospa-build — planned; run 18'de yerinde yeniden yazıldı; 11. denetimin kuyruğunun başındaydı; bu kuyruk 2026-11-13'ten beri geçersiz (`DEC-28`).
 - `Faz7.3` flash-boot-and-aon-verification — planned; run 18'de eklendi.
 
 **Faz 8 — Android 16'da kamera ve kernel LTS.** Hedef: kamera işini `beryl` blob'larında sürdürmek ve kerneli güncel LTS'e taşımak. Sonuç: statik taşıma doğrulandı; kernel birleştirmesi için öneri "ertele". Durum: 1 verified, 1 implemented, 1 planned.
@@ -339,7 +339,7 @@ Ledger §5'teki her koşu için bir satır var ve satırlar numara sırasındad�
 | IMPL-28 | 2026-09-01 | Faz4.5 | ilk active-array etiketi canlı uygulandı | md5 tuttu; FIND-4.5-01; DUR: harness kapısı geri dönüşü engelledi | L:354; snap 20260901-1742 |
 | IMPL-29 | 2026-09-01 | Faz4.5 | kullanıcı elle geri aldı; ikinci etiket tek başına denendi | md5 tuttu; iki geri dönüş de bayt-özdeş | L:355; snap 20260901-1756…1759 |
 | IMPL-30 | 2026-09-01 | Faz4.5 | yedi kelimelik yığın + `pref_48m_key=1`, AGC çekimi | 50.3 MP ama %75 siyah; FIND-4.5-02 (P1); `DEC-13` | L:356; snap 20260901-1811 |
-| IMPL-31 | 2026-09-01 | Faz4.6 | orijinal JPEG'lerde host tarafı geometri teşhisi (öncesinde `4897a9b`) | yarım genişlikteki veri tam genişlikte rastere yazılmış; FIND-4.5-02 "kapandı" diye kaydedildi (sonra yeniden açıldı, `DEC-19` ile bilgi olarak tutuluyor) | L:357, L:632 |
+| IMPL-31 | 2026-09-01 | Faz4.6 | orijinal JPEG'lerde host tarafı geometri teşhisi (öncesinde `4897a9b`) | yarım genişlikteki veri tam genişlikte rastere yazılmış; FIND-4.5-02 "kapandı" diye kaydedildi (sonra yeniden açıldı, `DEC-19` ile bilgi olarak tutuluyor) | L:357, L:641 |
 | IMPL-32 | 2026-09-01 | ledger, Ontology, Comprehension | sözlük normalizasyonu | doğrulayıcı uyarısı 11→0; AUDIT-FIX-11/14/15/16 giderildi | L:359 |
 | IMPL-33 | 2026-09-02 | Faz4.6 | yedi kelimelik yığında canlı ölçüm | stok kamera 8192x6144'te temiz, yani hata AGC'nin Gcam yolunda; stride loglarda görünmüyor | L:358; snap 20260902-1355…1420 |
 | IMPL-34 | 2026-09-02 | Faz4.1 | host yarısı: kamera başına hedefler yamadan önce yazıldı, koruma tasarlandı | tamam; canlı adım kullanıcıya bırakıldı; yinelenen bir koşu numarası düzeltildi | L:460 |
@@ -404,7 +404,7 @@ Ledger §5'teki her koşu için bir satır var ve satırlar numara sırasındad�
 | IMPL-93 | 2026-09-13 | Faz8.2 | kernel LTS kapsamı, yalnız blobless klonlarla | verified; 1 / 16 çakışma, hiçbiri kamera sürücüsünde değil; `DEC-08`: ertele | L:522 |
 | IMPL-94 | 2026-09-13 | Faz7.2 | `F7.2-01` kapısı; runbook'ta `AUDIT-FIX-52/53/54`; symlink testi `vendor/` yoluna taşındı | kapı GEÇMEDİ (10 saatlik pencere yok, diğer kontroller açık); §5 exit 0; kiralama yok | L:523; snap 20260913-2140 |
 | IMPL-95 | 2026-09-14 | Faz7.2 runbook'u (PRP adım 3a) | önceki set `f724b64` olarak commit'lendi; `DEC-26` yanıtlandı; BE Scaleway'e taşındı | POP2-32C-128G, 3 volume, sıfıra söküm; `bash -n` 10/10; commit `587e3b5`; kiralama ve push yok | L:524; snap 20260914-1434 |
-| IMPL-96 (devam ediyor) | 2026-11-13 | depo, kayıt işleri ve HyperOS 4 taban ölçümü | Depo taşıma; K4 silinenleri; `7fa0a51`; HyperOS 4 salt-okunur ölçümü (`70946ff`; probe satır 42, 190, 191 redakte); tarihsel notlar ve cihaz notları (`03b0898`); oturum belgeleri (`775b321`); K8 bundle. Ledger satırı Pencere 1'de yazılacak: `DEC-27`…`DEC-32` (`ORCHESTRATION_PLAN.md` §5) | O2 onaylandı; K7 = (a), K8 = A; ledger satırı yazılmadı | §2.6, §11 |
+| IMPL-96 | 2026-11-13 | depo, kayıt işleri ve HyperOS 4 taban ölçümü | Depo taşıma; K4 silinenleri; `7fa0a51`; HyperOS 4 salt-okunur ölçümü (`70946ff`; probe satır 42, 190, 191 redakte); tarihsel notlar ve cihaz notları (`03b0898`); oturum belgeleri (`775b321`); K8 bundle. Ledger satırı ve `DEC-27`…`DEC-32` Pencere 1'de yazıldı (`ORCHESTRATION_PLAN.md` §5) | K7 = (a), K8 = A; IMPL-96 kaydı yazıldı, commit C1 (`IMPL-96: repository move, ROM-build retirement, HyperOS 4 baseline`); push `2 · O5`'te, depo silme `DEC-30` bekliyor | L:525; C1; snap 20261113-1819, -1821 |
 
 ### 3.3 Planlama koşuları ve denetimler
 ClaudeQB adımları:
@@ -414,7 +414,7 @@ ClaudeQB adımları:
 - **Step 3 (Third-Planner):** denetim. Yalnız `Sub-Planing-Audit.md`'yi yazar; her denetim bir öncekinin yerine geçer.
 - **Step 4:** uygulama; ledger §5'e bir IMPL satırı yazılır.
 
-`Main-Planing.md`'yi düzenlemek §7'deki yeniden planlama tetikleyicisidir: önce snapshot kesilir, sonra Step 2, sonra Step 3 yapılır. Alt plan yaratmayan ya da silmeyen sınırlı bir değişiklik snapshot kesmez (run 13–15, 19 ve 20 emsali). Yeni ya da değişmiş bir alt plan, bir denetim onu okumadan Step 4 kuyruğuna girmez (L:559, L:609; AUD:14).
+`Main-Planing.md`'yi düzenlemek §7'deki yeniden planlama tetikleyicisidir: önce snapshot kesilir, sonra Step 2, sonra Step 3 yapılır. Alt plan yaratmayan ya da silmeyen sınırlı bir değişiklik snapshot kesmez (run 13–15, 19 ve 20 emsali). Yeni ya da değişmiş bir alt plan, bir denetim onu okumadan Step 4 kuyruğuna girmez (L:562, L:618; AUD:14).
 
 | Koşu | Adım | Tarih | Ne yapıldı → sonuç | Kaynak |
 |---|---|---|---|---|
@@ -437,7 +437,7 @@ ClaudeQB adımları:
 | 17 | Step 1 değişikliği | 2026-09-10 | `DEC-24` ve `beryl` düzeltmesi: Faz 7 artık GitHub'da hazırlanmış girdilerle kiralık sunucuda; Faz 8 Android 16 blob'ları + kernel LTS; `SNAP-2026-09-10-MAIN` | L:38 |
 | 18 | Step 2 | 2026-09-10 | Faz 7/8 yeniden planı: `Faz7.1`–`7.3`, `Faz8.1`–`8.3`; 40→42; `SNAP-2026-09-10-SUBPLANS` | L:39 |
 | 19 | Step 2, sınırlı | 2026-09-13 | `Faz7.2/7.3/8.1/8.3` runbook'la uzlaştırıldı; `AUDIT-FIX-43…49`, `-51` ve `-50`'nin alt plan yarısı kapandı; kullanıcı kuralları: düzeltmeler `fixes.diff`'e, symlink testi `vendor` yolunda | L:40 |
-| 20 | Step 2, sınırlı | 2026-09-14 | `DEC-26`: `Faz7.2` Scaleway'e taşındı; snapshot kesilmedi; commit edilmedi | L:41 |
+| 20 | Step 2, sınırlı | 2026-09-14 | `DEC-26`: `Faz7.2` Scaleway'e taşındı; snapshot kesilmedi; commit edilmedi *(2026-11-14 notu: 2026-11-13'te `7fa0a51`'de değiştirilmeden commit edildi.)* | L:41 |
 
 **Step 3 denetimleri.** Ledger §2'de yalnız run 5, 9 ve 11'in kendi denetim satırı var; diğer denetimlerin satırı yok. Kaynakta açıkça geçmeyen sıra numaraları ve tarihler `[ÇIKARIM]` ile işaretlidir.
 
@@ -451,9 +451,9 @@ ClaudeQB adımları:
 | 6. | 2026-09-04 | run 12'den sonra | PASS_WITH_WARNINGS, P0/P1 yok; `AUDIT-FIX-26` ve diğerleri run 13'e devredildi | IDX:8; L:32 |
 | 7. | 2026-09-05 | run 13'ten sonra | genel hüküm kayıtta yok; `Faz3.10` NEEDS_REPAIR (`AUDIT-FIX-31/32/34/36`) → run 14–15 | L:34, L:36 |
 | 8. | 2026-09-05 [ÇIKARIM] | run 15'ten sonra; 16 satırlık kuyruk | hüküm kayıtta yok [ÇIKARIM: IMPL-69 sırasında okunan etkin denetim PASS_WITH_WARNINGS, P0/P1 yok, kuyruk READY] | L:37, L:496, L:515 |
-| 9. | 2026-09-10…11 [ÇIKARIM] | run 17–18'den sonra Faz 7/8; `AUDIT-FIX-43…51` | hüküm kayıtta yok; 2026-09-13'te `097d687` ile commit'lendi | PRP:41, PRP:62; L:40 |
-| 10. | 2026-09-13 | PRP adım 3; run 19'un değişikliği | PASS_WITH_WARNINGS, P0/P1 yok; `Faz7.2` READY_WITH_WARNINGS (o sırada Hetzner metniyle) | PRP:105; AUD:6 |
-| 11. | 2026-09-14 | PRP adım 3c; run 20 (`DEC-26`) | PASS_WITH_WARNINGS, P0/P1 yok; kuyruk READY, başında `Faz7.2`/`F7.2-01`; `-52/53/54` kapandı, `-55/56/57` yeni açıldı; commit edilmedi | AUD:6, AUD:18, AUD:363 |
+| 9. | 2026-09-10…11 [ÇIKARIM] | run 17–18'den sonra Faz 7/8; `AUDIT-FIX-43…51` | hüküm kayıtta yok; 2026-09-13'te `097d687` ile commit'lendi | PRP:49, PRP:70; L:40 |
+| 10. | 2026-09-13 | PRP adım 3; run 19'un değişikliği | PASS_WITH_WARNINGS, P0/P1 yok; `Faz7.2` READY_WITH_WARNINGS (o sırada Hetzner metniyle) | PRP:113; AUD:6 |
+| 11. | 2026-09-14 | PRP adım 3c; run 20 (`DEC-26`) | PASS_WITH_WARNINGS, P0/P1 yok; kuyruk READY, başında `Faz7.2`/`F7.2-01`; `-52/53/54` kapandı, `-55/56/57` yeni açıldı; commit edilmedi *(2026-11-14 notu: 2026-11-13'te `7fa0a51`'de değiştirilmeden commit edildi; denetimin kuyruğu 2026-11-13'ten beri geçersiz (`DEC-28`).)* | AUD:6, AUD:18, AUD:363 |
 
 ### 3.4 ClaudeQB öncesi tarih
 ClaudeQB'den önceki ölçüm günlüğü Türkçe `50MP-Entegrasyon-Plani.md` dosyasıdır ve Faz 1–12'yi kapsar. Faz 10 ("Android 16 / beryl hazırlığı", J:96-102) yalnız planlandı: bulgu bölümü yok, tamamlanmadı; WSL2 ve ~300 GB disk gerektiği için bloke kaldı. Android 16 kapsamı ClaudeQB'nin Faz 7/8'ine taşındı; 2026-11-13'te ROM derleme fikri tamamen bırakıldı (§2.5). 2026-09-06'da Faz9.3, AGC tavanıyla ilgili aşılmış bölümleri silmeden "AŞILMIŞ" diye işaretledi. O tarihten beri sürüm geçmişinin sahibi `CHANGELOG.md`'dir (J:11-18; CL:3-13).
@@ -491,7 +491,7 @@ Günlük kararları (J:1328-1342):
 | v2.2 | 13 | 2026-09-06 (karar ve kurulum) | AGC metni dört yüzeyde 12.58 MP olarak düzeltildi; `tiles` çıktısı (`takma_ad`); açıklama 1741 karakterden 1119'a indi; sürüm geçmişi CHANGELOG'a taşındı |
 
 ### 3.5 Commit geçmişi
-Dal `main`'deki 62 commit eskiden yeniye sıralı. Konu satırları `git log --reverse` çıktısından aynen alındı (Ö13); satır sonundaki italik parantezler sonradan eklenmiş nottur. `origin/main`'den sonraki dört commit push edilmedi (§2.1).
+Liste `integrate/impl-96` dalının commit'leridir, eskiden yeniye sıralı; 2026-11-14 ölçümündeki uca kadar 71 commit: ilk 62'si `origin/main`'de (`587e3b5`'e kadar), `7fa0a51` yerel `main`'in ucu (63. commit), sonraki sekizi yalnız dalda. Konu satırları `git log --reverse` çıktısından aynen alındı (Ö13; `587e3b5`'ten sonrakiler 2026-11-14 ölçümünden); satır sonundaki italik parantezler sonradan eklenmiş nottur. `origin/main`'den sonraki dokuz commit push edilmedi (2026-11-14 ölçümü; §2.1).
 
 **2026-08-24 (4)**
 - `ff6934e` Initial commit: put the ishtar workspace under version control
@@ -571,67 +571,86 @@ Dal `main`'deki 62 commit eskiden yeniye sıralı. Konu satırları `git log --r
 
 **2026-09-10 (2)**
 - `130185d` IMPL-87/88: Kamera-Teyit re-check and the PC-13 60 fps re-measurement
-- `f8a05ca` IMPL-89: record user rulings DEC-16/21/23/24, add DEC-01, arm the Phase 7/8 re-plan *(origin/main)*
+- `f8a05ca` IMPL-89: record user rulings DEC-16/21/23/24, add DEC-01, arm the Phase 7/8 re-plan *(origin/main)* *(2026-11-14 notu: eski remote'un (`ahmetxa/ishtar`) `main` ucuydu; o remote 2026-11-13'te yerelden kaldırıldı.)*
 
 **2026-09-13 (2)**
-- `097d687` Planning runs 17-18, ninth audit, IMPL-91/92/93: Android 16 front up to the rental gate *(push edilmedi)*
-- `d3993de` Pre-rental plan: checkpoint, bounded amendment, tenth audit, rental-day gate *(push edilmedi)*
+- `097d687` Planning runs 17-18, ninth audit, IMPL-91/92/93: Android 16 front up to the rental gate
+- `d3993de` Pre-rental plan: checkpoint, bounded amendment, tenth audit, rental-day gate
 
 **2026-09-14 (2)**
-- `f724b64` Planning run 19, tenth audit, IMPL-94 rental gate, DEC-26 Scaleway handover *(push edilmedi)*
-- `587e3b5` IMPL-95: DEC-26 answered, runbook re-targeted to Scaleway POP2-32C-128G *(HEAD, push edilmedi)*
+- `f724b64` Planning run 19, tenth audit, IMPL-94 rental gate, DEC-26 Scaleway handover
+- `587e3b5` IMPL-95: DEC-26 answered, runbook re-targeted to Scaleway POP2-32C-128G *(origin/main)*
 
-## 4. Kararlar (DEC-01 … DEC-26)
+**2026-11-13 (6)**
+- `7fa0a51` Planning run 20 and eleventh audit: Faz7.2 re-targeted to Scaleway (DEC-26) *(main)*
+- `70946ff` IMPL-96 evidence: read-only HyperOS 4 baseline on dc27e5d0
+- `03b0898` Mark the AOSPA ROM-build records historical (2026-11-13)
+- `775b321` Session 2026-11-13: project log and handoff prompt
+- `b603516` Window 0: orchestration plan, K8 redaction, handoff for window 1
+- `c2abd46` Window 0 follow-up: align handoff with plan, rename review IDs
 
-Kanonik kaynak `Planner-docs/Planing-Ledger.md` §8'dir (satır :569–:601; satır sırası numara sırasında değil: DEC-10, DEC-05'ten sonra; DEC-01, DEC-24'ten sonra geliyor). Bu tablo bir özettir. `Kaynak` sütunundaki `ledger:N`, `Planner-docs/Planing-Ledger.md:N` demektir.
+**2026-11-14 (3)**
+- C1: IMPL-96: repository move, ROM-build retirement, HyperOS 4 baseline
+- 2 · O0+O1: Window 2 O0-O1: approved plan, discovery facts, stage-per-session loop
+- 2 · O2: Window 2 O2: contract for the project log sweep and the run 21 handoff
 
-**Açık kararlar (2026-11-13):** `DEC-07` (kullanıcının; `F8.1-06` + `F8.1-07` ile Faz8.3'ün işlevsel sonucunu bekliyor), `DEC-08` (kullanıcının; Faz 7 kanıtını bekliyor; doğrulanmamış kernel-upstream iddiası bu kararı etkileyebilir, bkz. §9) ve `DEC-09` (koşullu; yalnızca tetiklenirse gündeme gelir). Kalan 23 kararın hepsi yanıtlandı ya da kapandı (fact sheet D2).
+## 4. Kararlar (DEC-01 … DEC-32)
+
+Kanonik kaynak `Planner-docs/Planing-Ledger.md` §8'dir (başlık :572, satırlar :576–:610; satır sırası numara sırasında değil: DEC-10, DEC-05'ten sonra; DEC-01, DEC-24'ten sonra geliyor). Bu tablo bir özettir. `Kaynak` sütunundaki `ledger:N`, `Planner-docs/Planing-Ledger.md:N` demektir.
+
+**Açık kararlar (2026-11-14):** `DEC-09` (koşullu; yalnızca tetiklenirse gündeme gelir) ve K9 (kullanıcının; 50MP HAL yeniden türetmesi; henüz DEC numarası yok). `DEC-07` ve `DEC-08` 2026-11-13'ten beri konusuz (`DEC-28`); `DEC-08`'i etkileyebilecek doğrulanmamış kernel-upstream iddiası da 2026-11-13'te düştü (K3; bkz. §9). Kalan 31 kararın hepsi yanıtlandı, kapandı ya da konusuz kaldı (ledger:576–:610).
 
 | id | tarih (açıldı → yanıt) | soru | hüküm | durum | kaynak |
 |---|---|---|---|---|---|
-| **DEC-07** | – → **AÇIK** (IMPL-92 ile 2026-09-11'de güncellendi) | Android 16 bloblarında kamera yeniden türetmesine bağlanılsın mı? | Statik temel: iki katmanda da carry-over (IMPL-92, vendor pin `f92e7a9`) | **AÇIK** (kullanıcı); `F8.1-06`/`-07` sonrası kapanır | ledger:579 |
-| **DEC-08** | 2026-09-13 öneri → **AÇIK** | Kernel LTS merge'üne bağlanılsın mı? | IMPL-93 önerisi: ertele. Merge gerekli değil; 1 / 16 çakışma, hiçbiri kamera sürücüsünde değil | **AÇIK** (kullanıcı); Faz 7'ye bağlı | ledger:580 |
-| **DEC-09** | – → **AÇIK (koşullu)** | Size-list bucket eşiğini geçen bir duration değeri isteniyor mu? | – (Faz4.2 hiçbir değer uygulamadı, tetik hiç ateşlenmedi [ÇIKARIM]) | **AÇIK**, yalnızca tetiklenirse | ledger:581 |
-| DEC-01 | 2026-08-24 → 2026-09-10 | Çalışma alanı deposuna remote eklensin mi? | Private `ahmetxa/ishtar`; `main` `f8a05ca`'da push edildi (IMPL-90) | yanıtlandı | ledger:599 |
-| DEC-02 | → 2026-09-06 | `tiles hide` onarılsın mı, kaldırılsın mı, etiketlensin mi? | Dördüncü seçenek seçildi: seçenek kalıyor, FIND-2.4-01 metinleri düzeltildi (IMPL-75). AOSPA Launcher3 `pm disable`'ı yok saydığı için onarım mümkün değil | yanıtlandı | ledger:573 |
-| DEC-03 | → 2026-08-31 | Faz 5 önceliğini koruyor mu? | Evet; Faz5.1/5.2 Faz 3/4'ün önüne alındı (Index §4a) | yanıtlandı | ledger:574 |
-| DEC-04 | → 2026-09-06 | AON modülü cam-modes ile birleştirilsin mi? | Ayrı kalıyor (IMPL-75). Girdilerinden biri FIND-6.2-03 ile zayıfladı | yanıtlandı | ledger:575 |
-| DEC-05 | 2026-08-24 → 2026-08-24 | Yayımlanmış arşivlerde keystore var mı? | 5 arşivin hiçbirinde yok (IMPL-02) | temiz kapandı | ledger:576 |
-| DEC-06 | → 2026-08-31 | Faz 3 yazım-yeri arama bütçesi? | 15 aday site / en çok 2 oturum (IMPL-16) | kapandı | ledger:578 |
-| DEC-10 | 2026-08-24 → 2026-09-06 | `tile-app/build.sh` içindeki düz metin imzalama varsayılanı | Debug anahtarı olarak kabul; `KS`/`KS_PASS`/`KS_ALIAS` ortam değişkenleriyle geçersiz kılınabiliyor (IMPL-80); keystore hiçbir arşive girmiyor (A1). Değer bu belgeye yazılmaz | yanıtlandı | ledger:577 |
-| DEC-11 | 2026-09-01 → 2026-09-01 | Faz4.1'in format-32 (RAW_SENSOR) kriteri | Faz4.1 içinde eklenecek, daraltmadan ayrı raporlanacaktı | yanıtlandı; boşa düştü (Faz4.1 superseded) | ledger:582 |
-| DEC-12 | 2026-09-01 → 2026-09-01 | Active-array yükseltmesi nerede yapılsın? | Faz4.1'den önce yeni alt plan → Faz4.5 (IMPL-27…30) | uygulandı | ledger:583 |
-| DEC-13 | 2026-09-01 → 2026-09-01 | QTI vendor tag'i word patch dışı yollarla da kovalansın mı? | (a) Bırakılsın; stride hipotezi izlensin → Faz4.6. EV-45 ölçümle doğruladı | yanıtlandı | ledger:584 |
-| DEC-14 | 2026-09-03 → 2026-09-03 | AGC 50 MP hedefi korunsun mu? | **RETIRE.** Yeni hedef "AGC stable at 12.6 MP under 50 MP". 2026-09-05'te FIND-3.10-03'ten sonra yeniden teyit edildi. Yeniden açmak için iki duvardan birine dair yeni kanıt gerekir | yanıtlandı (run 8) | ledger:586 |
-| DEC-15 | 2026-09-03 → 2026-09-04 | Faz 3 referans HAL tabanı | Gönderilen `fullres`, `fe0245a4720fb07b01d96deef47f5569` | yanıtlandı (run 12–13) | ledger:588 |
-| DEC-16 | 2026-09-04 → 2026-09-10 | Step 3 kendi P1'ini onarabilir mi? | Evet, dar okumayla (IMPL-89) | yanıtlandı | ledger:590 |
-| DEC-17 | 2026-09-04 → 2026-09-04 | Faz3.7 `pref_48m_key`'e yazabilir mi? | Evet, ama önce Step 2 üzerinden | yanıtlandı (run 12) | ledger:591 |
-| DEC-18 | 2026-09-04 → 2026-09-04 | `pref_48m_key` 1'e geri dönsün mü, 0 benimsensin mi? | **0 benimsendi**; prefs md5 `e3ed08f72025c4dbfbdea6be057873d7`, yedek kayıtlı | yanıtlandı | ledger:592 |
-| DEC-19 | 2026-09-05 → 2026-09-06 | FIND-3.5-01 / FIND-4.5-02 ne olacak? | Bilgi olarak tutulsun; ne kapatılsın ne yeniden açılsın | yanıtlandı | ledger:593 |
-| DEC-20 | 2026-09-05 → 2026-09-06 | `scripts/smoke.sh`'i kim onarır? | Onarıldı (IMPL-80): `prefs.trap.armed`, `prefs.trap.values`, tek dump'lı `probe_main_rows()` | yanıtlandı | ledger:594 |
-| DEC-21 | 2026-09-05 → 2026-09-10 | Faz3.9/3.10'daki altı sapma | Faz 3 başarılı sayıldı; (1)–(5) önemsiz; (6) IMPL-85 ile kapandı | yanıtlandı | ledger:595 |
-| DEC-22 | 2026-09-07 → 2026-09-11 | Derleme dağıtımı | Ubuntu 22.04 LTS; yedek 24.04 + `kernel.apparmor_restrict_unprivileged_userns=0`. Başlıkta hâlâ WSL2 yazıyor | yanıtlandı; DEC-26(a) ile korundu | ledger:596 |
-| DEC-23 | 2026-09-09 → 2026-09-10 | IMPL-88'deki kare hızı kuralı sapması kabul edilsin mi? | Kabul edildi; FIND-9.2-07 çözüldü | yanıtlandı; C-13'ün kapsamı (tek mod, tek uygulama) açık | ledger:597 |
-| DEC-24 | 2026-09-10 → 2026-09-10 | Faz 7 nerede derlenecek? | WSL2 yok; girdileri önceden GitHub'a hazırlanmış kiralık VDS | yanıtlandı (sağlayıcı DEC-26 ile değişti) | ledger:598 |
-| DEC-25 | 2026-09-11 → 2026-09-11 | Bütçe, durma kuralı, sunucu, repo erişimi | CCX53; 10 sa tavan + 8. saat kuralı; ≤2 manifest-sınıfı düzeltme; kapatma değil silme; manifest ve device repoları public; sunucuda kimlik bilgisi yok | yanıtlandı; (1) ve (4) DEC-26 ile değişti; (3)'te sync-path istisnası eksik (AUDIT-FIX-56) | ledger:600 |
-| DEC-26 | 2026-09-14 → 2026-09-14 | Hetzner engelinden sonra Scaleway kiralaması | POP2-32C-128G (Instance EUR 1.18/sa, tümü yaklaşık EUR 1.28/sa); Ubuntu 22.04 (+yedek); 10 sa / 8. saat kuralı kalıyor, yaklaşık EUR 12.8 + KDV; OOM'da yeniden deneme yok; her şey silinir; disk 40 GB 5K, `ishtar-src` 310 GB 5K `/android`, `ishtar-out` 260 GB 15K `/android/beryl/out`; ccache kapalı; `OUT_DIR` yok | yanıtlandı (IMPL-95) | ledger:601; `docs/build-environment.md:118-130` |
+| DEC-07 | – → **AÇIK** (IMPL-92 ile 2026-09-11'de güncellendi) → konusuz 2026-11-13 | Android 16 bloblarında kamera yeniden türetmesine bağlanılsın mı? | Statik temel: iki katmanda da carry-over (IMPL-92, vendor pin `f92e7a9`) | konusuz (`DEC-28`, 2026-11-13) | ledger:582 |
+| DEC-08 | 2026-09-13 öneri → **AÇIK** → konusuz 2026-11-13 | Kernel LTS merge'üne bağlanılsın mı? | IMPL-93 önerisi: ertele. Merge gerekli değil; 1 / 16 çakışma, hiçbiri kamera sürücüsünde değil | konusuz (`DEC-28`, 2026-11-13) | ledger:583 |
+| **DEC-09** | – → **AÇIK (koşullu)** | Size-list bucket eşiğini geçen bir duration değeri isteniyor mu? | – (Faz4.2 hiçbir değer uygulamadı, tetik hiç ateşlenmedi [ÇIKARIM]) | **AÇIK**, yalnızca tetiklenirse | ledger:584 |
+| DEC-01 | 2026-08-24 → 2026-09-10 | Çalışma alanı deposuna remote eklensin mi? | Private `ahmetxa/ishtar`; `main` `f8a05ca`'da push edildi (IMPL-90) *(2026-11-14 notu: 2026-11-13'te depo özel `ahmetxa/ishtar_cam_modes`'a taşındı (`DEC-27`); eski depo silinecek (`DEC-30`))* | yanıtlandı | ledger:602 |
+| DEC-02 | → 2026-09-06 | `tiles hide` onarılsın mı, kaldırılsın mı, etiketlensin mi? | Dördüncü seçenek seçildi: seçenek kalıyor, FIND-2.4-01 metinleri düzeltildi (IMPL-75). AOSPA Launcher3 `pm disable`'ı yok saydığı için onarım mümkün değil | yanıtlandı | ledger:576 |
+| DEC-03 | → 2026-08-31 | Faz 5 önceliğini koruyor mu? | Evet; Faz5.1/5.2 Faz 3/4'ün önüne alındı (Index §4a) | yanıtlandı | ledger:577 |
+| DEC-04 | → 2026-09-06 | AON modülü cam-modes ile birleştirilsin mi? | Ayrı kalıyor (IMPL-75). Girdilerinden biri FIND-6.2-03 ile zayıfladı | yanıtlandı | ledger:578 |
+| DEC-05 | 2026-08-24 → 2026-08-24 | Yayımlanmış arşivlerde keystore var mı? | 5 arşivin hiçbirinde yok (IMPL-02) | temiz kapandı | ledger:579 |
+| DEC-06 | → 2026-08-31 | Faz 3 yazım-yeri arama bütçesi? | 15 aday site / en çok 2 oturum (IMPL-16) | kapandı | ledger:581 |
+| DEC-10 | 2026-08-24 → 2026-09-06 | `tile-app/build.sh` içindeki düz metin imzalama varsayılanı | Debug anahtarı olarak kabul; `KS`/`KS_PASS`/`KS_ALIAS` ortam değişkenleriyle geçersiz kılınabiliyor (IMPL-80); keystore hiçbir arşive girmiyor (A1). Değer bu belgeye yazılmaz | yanıtlandı | ledger:580 |
+| DEC-11 | 2026-09-01 → 2026-09-01 | Faz4.1'in format-32 (RAW_SENSOR) kriteri | Faz4.1 içinde eklenecek, daraltmadan ayrı raporlanacaktı | yanıtlandı; boşa düştü (Faz4.1 superseded) | ledger:585 |
+| DEC-12 | 2026-09-01 → 2026-09-01 | Active-array yükseltmesi nerede yapılsın? | Faz4.1'den önce yeni alt plan → Faz4.5 (IMPL-27…30) | uygulandı | ledger:586 |
+| DEC-13 | 2026-09-01 → 2026-09-01 | QTI vendor tag'i word patch dışı yollarla da kovalansın mı? | (a) Bırakılsın; stride hipotezi izlensin → Faz4.6. EV-45 ölçümle doğruladı | yanıtlandı | ledger:587 |
+| DEC-14 | 2026-09-03 → 2026-09-03 | AGC 50 MP hedefi korunsun mu? | **RETIRE.** Yeni hedef "AGC stable at 12.6 MP under 50 MP". 2026-09-05'te FIND-3.10-03'ten sonra yeniden teyit edildi. Yeniden açmak için iki duvardan birine dair yeni kanıt gerekir | yanıtlandı (run 8) | ledger:589 |
+| DEC-15 | 2026-09-03 → 2026-09-04 | Faz 3 referans HAL tabanı | Gönderilen `fullres`, `fe0245a4720fb07b01d96deef47f5569` | yanıtlandı (run 12–13) | ledger:591 |
+| DEC-16 | 2026-09-04 → 2026-09-10 | Step 3 kendi P1'ini onarabilir mi? | Evet, dar okumayla (IMPL-89) | yanıtlandı | ledger:593 |
+| DEC-17 | 2026-09-04 → 2026-09-04 | Faz3.7 `pref_48m_key`'e yazabilir mi? | Evet, ama önce Step 2 üzerinden | yanıtlandı (run 12) | ledger:594 |
+| DEC-18 | 2026-09-04 → 2026-09-04 | `pref_48m_key` 1'e geri dönsün mü, 0 benimsensin mi? | **0 benimsendi**; prefs md5 `e3ed08f72025c4dbfbdea6be057873d7`, yedek kayıtlı | yanıtlandı | ledger:595 |
+| DEC-19 | 2026-09-05 → 2026-09-06 | FIND-3.5-01 / FIND-4.5-02 ne olacak? | Bilgi olarak tutulsun; ne kapatılsın ne yeniden açılsın | yanıtlandı | ledger:596 |
+| DEC-20 | 2026-09-05 → 2026-09-06 | `scripts/smoke.sh`'i kim onarır? | Onarıldı (IMPL-80): `prefs.trap.armed`, `prefs.trap.values`, tek dump'lı `probe_main_rows()` | yanıtlandı | ledger:597 |
+| DEC-21 | 2026-09-05 → 2026-09-10 | Faz3.9/3.10'daki altı sapma | Faz 3 başarılı sayıldı; (1)–(5) önemsiz; (6) IMPL-85 ile kapandı | yanıtlandı | ledger:598 |
+| DEC-22 | 2026-09-07 → 2026-09-11 | Derleme dağıtımı | Ubuntu 22.04 LTS; yedek 24.04 + `kernel.apparmor_restrict_unprivileged_userns=0`. Başlıkta hâlâ WSL2 yazıyor | yanıtlandı; DEC-26(a) ile korundu; 2026-11-13'ten beri konusuz (`DEC-28`) | ledger:599 |
+| DEC-23 | 2026-09-09 → 2026-09-10 | IMPL-88'deki kare hızı kuralı sapması kabul edilsin mi? | Kabul edildi; FIND-9.2-07 çözüldü | yanıtlandı; C-13'ün kapsamı (tek mod, tek uygulama) açık | ledger:600 |
+| DEC-24 | 2026-09-10 → 2026-09-10 | Faz 7 nerede derlenecek? | WSL2 yok; girdileri önceden GitHub'a hazırlanmış kiralık VDS | yanıtlandı (sağlayıcı DEC-26 ile değişti); 2026-11-13'ten beri konusuz (`DEC-28`) | ledger:601 |
+| DEC-25 | 2026-09-11 → 2026-09-11 | Bütçe, durma kuralı, sunucu, repo erişimi | CCX53; 10 sa tavan + 8. saat kuralı; ≤2 manifest-sınıfı düzeltme; kapatma değil silme; manifest ve device repoları public; sunucuda kimlik bilgisi yok | yanıtlandı; (1) ve (4) DEC-26 ile değişti; (3)'te sync-path istisnası eksik (AUDIT-FIX-56); 2026-11-13'ten beri konusuz (`DEC-28`) | ledger:603 |
+| DEC-26 | 2026-09-14 → 2026-09-14 | Hetzner engelinden sonra Scaleway kiralaması | POP2-32C-128G (Instance EUR 1.18/sa, tümü yaklaşık EUR 1.28/sa); Ubuntu 22.04 (+yedek); 10 sa / 8. saat kuralı kalıyor, yaklaşık EUR 12.8 + KDV; OOM'da yeniden deneme yok; her şey silinir; disk 40 GB 5K, `ishtar-src` 310 GB 5K `/android`, `ishtar-out` 260 GB 15K `/android/beryl/out`; ccache kapalı; `OUT_DIR` yok | yanıtlandı (IMPL-95); 2026-11-13'ten beri konusuz (`DEC-28`) | ledger:604; `docs/build-environment.md:126-138` |
+| DEC-27 | 2026-11-13 → 2026-11-13 | Projenin geçmişi GitHub'da nerede duracak? | `origin` = özel `ahmetxa/ishtar_cam_modes`; 62 commit aynı hash'lerle push edildi. `DEC-01`'in deposunun (`ahmetxa/ishtar`) yerine geçer, özel remote kararının değil | yanıtlandı | ledger:605 |
+| DEC-28 | 2026-11-13 → 2026-11-13 | Telefonda artık HyperOS 4 çalıştığına göre ROM derlemesi (Faz 7 ve 8) sürsün mü? | ROM derleme bırakıldı. Telefonda HyperOS 4 (`OS4.0.0.44.WMACNXM`) çalışıyor, 2026-11-13'te gözlendi (ROM'un derleme tarihi 2026-09-23; `/data/adb/modules` 2026-10-26 tarihli, yani gözlemden önce kurulmuş). Faz 7 ve 8 amacını yitirir; resmî emeklilik planlama koşusu 21'de. `DEC-07`, `DEC-08`, `DEC-22`, `DEC-24`, `DEC-25` ve `DEC-26` konusuz kalır | yanıtlandı | ledger:606 |
+| DEC-29 | 2026-11-13 → 2026-11-13 | `Kullanim.txt` v2.2'de mi, sonraki sürümde mi düzeltilsin? | v2.2'de gönderildiği gibi kalır; sonraki sürümde düzeltilir (K1 = b) | yanıtlandı | ledger:607 |
+| DEC-30 | 2026-11-13 → 2026-11-13 | ROM derleme için açılan üç GitHub deposu silinsin mi? | Üçü de silinir (K5 + K6): `ahmetxa/ishtar`, `ahmetxa/android_local_manifests`, `ahmetxa/android_device_xiaomi_ishtar`. Halka açık ikisinin aynaları `../ishtar-arsiv/` altında; yürütme `gh api` ile ölçülür (404 = silindi) | yanıtlandı; silmeyi kullanıcı yapar; 2026-11-14T13:45:22Z `gh api` ölçümünde üç depo da hâlâ duruyor | ledger:608 |
+| DEC-31 | 2026-11-13 → 2026-11-13 | Commit edilmiş ama push edilmemiş probe anlık görüntüsündeki cihaz tanımlayıcıları redakte edilsin ve geçmiş yeniden kurulsun mu? | K8 = A: tanımlayıcılar (iki IMEI anahtarı ve `persist.sys.miui.sno` değerleri) yerinde redakte edildi; push edilmemiş üç commit, herhangi bir push'tan önce yeniden kuruldu. Geçmişi yeniden yazmama kuralının kayıtlı tek istisnası (ledger satırları commit hash'lerini anar); eski hash'leri anan ledger satırı yoktu. Redaksiyonsuz özgün kopya depo dışında, doğrulanmış bir bundle'da | yanıtlandı ve yürütüldü | ledger:609 |
+| DEC-32 | 2026-11-13 → 2026-11-13 | Modül HyperOS 4'te hangi yolu izleyecek? | K7 = (a): modül HyperOS 4'e uyarlanır. Kapsamı (50MP HAL yeniden türetmesi = K9, kutucuk/WebUI zinciri, AGC tuzakları, v2.3) planlama koşusu 21 belirler | yanıtlandı | ledger:610 |
 
-**Oturum kararları (2026-11-13).** Bu numaralar atandı; ledger'a IMPL-96 ile (Pencere 1) yazılacak. Atanan numaralar: `DEC-27` depo taşıma, `DEC-28` ROM derlemenin bırakılması ve HyperOS 4, `DEC-29` K1, `DEC-30` K5+K6, `DEC-31` K8, `DEC-32` K7. Sonraki boş numara `DEC-33`.
+**Oturum kararları (2026-11-13).** Bu numaralar atandı; ledger'a IMPL-96 ile (Pencere 1) yazıldı (`:605`–`:610`). Atanan numaralar: `DEC-27` depo taşıma, `DEC-28` ROM derlemenin bırakılması ve HyperOS 4, `DEC-29` K1, `DEC-30` K5+K6, `DEC-31` K8, `DEC-32` K7. Sonraki boş numara `DEC-33`.
 
 | id | soru | yanıt / durum (öneri kalın) |
 |---|---|---|
-| K1 | `ishtar-cam-modes/Kullanim.txt` (v1.9 kılavuzu, zip içinde) | **Yanıtlandı (b):** bir sonraki sürümde düzeltilecek (`DEC-29` atandı; ledger'a Pencere 1'de yazılır) |
-| K2 | Planlama koşusu 21'in zamanı (Main-Planing Hetzner→Scaleway, EV-20, AUDIT-FIX-41/42/57) | **Yanıtlandı, kapsam değişti:** ROM derleme fikri bırakıldı; telefon HyperOS 4 portunda (kernel 5.15.215). Koşu 21 artık Faz 7/8'i emekliye ayırır (`DEC-28` atandı; ledger'a Pencere 1'de yazılır) |
+| K1 | `ishtar-cam-modes/Kullanim.txt` (v1.9 kılavuzu, zip içinde) | **Yanıtlandı (b):** bir sonraki sürümde düzeltilecek (`DEC-29` atandı; ledger'a Pencere 1'de yazıldı, `:607`) |
+| K2 | Planlama koşusu 21'in zamanı (Main-Planing Hetzner→Scaleway, EV-20, AUDIT-FIX-41/42/57) | **Yanıtlandı, kapsam değişti:** ROM derleme fikri bırakıldı; telefon HyperOS 4 portunda (kernel 5.15.215). Koşu 21 artık Faz 7/8'i emekliye ayırır (`DEC-28` atandı; ledger'a Pencere 1'de yazıldı, `:606`) |
 | K3 | T5: kernel-upstream iddiasının salt-okur doğrulaması | **Düştü:** kullanıcıya göre gereksiz; telefon zaten 5.15.215 kernelli portta |
 | K4 | `devir-teslim-promptu.md`, boş `UsersahmetAppDataLocalTempaon-smoke/` ve gereksiz eski loglar | **Uygulandı (2026-11-13):** beş öğe silindi (§2.1) |
-| K5 | Eski özel depo `ahmetxa/ishtar` | **Yanıtlandı: sil.** Kullanıcı: depo ROM derleme fikri için açılmıştı. Tek dalı `main@f8a05ca` yerel `main`'in atası; içeriğin tamamı yeni depoda; release, tag ya da issue yok. `gh` belirtecinde `delete_repo` yok; silmeyi kullanıcı yapar (`DEC-30` atandı; ledger'a Pencere 1'de yazılır) |
-| K6 | Halka açık ROM depoları `ahmetxa/android_local_manifests`, `ahmetxa/android_device_xiaomi_ishtar` | **Yanıtlandı: sil** (derleme alınmayacak). Önce ayna yedek alındı: `C:/Users/ahmet/Documents/Projeler/ishtar-arsiv/` (§2.1). Silmeyi kullanıcı yapar (`DEC-30` atandı; ledger'a Pencere 1'de yazılır) |
-| K7 | HyperOS 4'te projenin yönü | **Yanıtlandı: (a)** modülü HyperOS 4'e uyarla (`DEC-32`, Pencere 1'de yazılacak). Seçenekler: (a) modülleri HyperOS 4'e uyarla: sensör katmanı aynı blob üzerinde; 50MP katmanı yeni HAL'de baştan tersine mühendislik ister; kutucuk/WebUI zinciri KernelSU Next'e bağlı. (b) Yalnız AGC'yi sürdür: şu an yamasız V9.6, tuzaklar kurulu (10), 12,58 MP türetiliyor. (c) AOSPA dönemini kapat. Kaynak: `ORCHESTRATION_PLAN.md` §2 |
+| K5 | Eski özel depo `ahmetxa/ishtar` | **Yanıtlandı: sil.** Kullanıcı: depo ROM derleme fikri için açılmıştı. Tek dalı `main@f8a05ca` yerel `main`'in atası; içeriğin tamamı yeni depoda; release, tag ya da issue yok. `gh` belirtecinde `delete_repo` yok; silmeyi kullanıcı yapar (`DEC-30` atandı; ledger'a Pencere 1'de yazıldı, `:608`) |
+| K6 | Halka açık ROM depoları `ahmetxa/android_local_manifests`, `ahmetxa/android_device_xiaomi_ishtar` | **Yanıtlandı: sil** (derleme alınmayacak). Önce ayna yedek alındı: `C:/Users/ahmet/Documents/Projeler/ishtar-arsiv/` (§2.1). Silmeyi kullanıcı yapar (`DEC-30` atandı; ledger'a Pencere 1'de yazıldı, `:608`) |
+| K7 | HyperOS 4'te projenin yönü | **Yanıtlandı: (a)** modülü HyperOS 4'e uyarla (`DEC-32`, ledger'a Pencere 1'de yazıldı, `:610`). Seçenekler: (a) modülleri HyperOS 4'e uyarla: sensör katmanı aynı blob üzerinde; 50MP katmanı yeni HAL'de baştan tersine mühendislik ister; kutucuk/WebUI zinciri KernelSU Next'e bağlı. (b) Yalnız AGC'yi sürdür: şu an yamasız V9.6, tuzaklar kurulu (10), 12,58 MP türetiliyor. (c) AOSPA dönemini kapat. Kaynak: `ORCHESTRATION_PLAN.md` §2 |
 | K8 | Probe snapshot'ındaki cihaz kimlikleri (push öncesi) | **Yanıtlandı: A** (redaksiyon, `DEC-31`); dal yeniden kuruldu (`70946ff`, `03b0898`, `775b321`; eşleme §11); **yürütüldü**. Redaksiyonsuz uç yalnız depo dışı bundle'da (§11) |
-| Konusuz | ROM derlemeye bağlı altı karar | `DEC-07`, `DEC-08`, `DEC-22`, `DEC-24`, `DEC-25`, `DEC-26`: `DEC-28` ile konusu kalmadı; ledger'a Pencere 1'de işlenecek |
+| Konusuz | ROM derlemeye bağlı altı karar | `DEC-07`, `DEC-08`, `DEC-22`, `DEC-24`, `DEC-25`, `DEC-26`: `DEC-28` ile konusu kalmadı; ledger'a Pencere 1'de işlendi (IMPL-96; konusuz notları `:582`, `:583`, `:599`, `:601`, `:603`, `:604`) |
 | K9 | 50MP HAL katmanının HyperOS 4 HAL'inde (`2a955e68…`) yeniden türetilmesi | **Açık.** Pencere 3'ün başında sorulur |
-| O2 | Depo hijyeni ve IMPL-96 kurulumu | **Onaylandı (2026-11-13):** `7fa0a51`, `integrate/impl-96`, `70946ff`, `03b0898`, `775b321`; ledger satırı Pencere 1'de |
-| Push | `7fa0a51` ve `integrate/impl-96` dalı | **Açık.** Pencere 2'de sorulur; yalnız açık refspec |
+| O2 | Depo hijyeni ve IMPL-96 kurulumu | **Onaylandı (2026-11-13):** `7fa0a51`, `integrate/impl-96`, `70946ff`, `03b0898`, `775b321`; ledger satırı Pencere 1'de yazıldı (`:525`) |
+| Push | `7fa0a51` ve `integrate/impl-96` dalı | **Açık.** Pencere 2'de sorulur: `2 · O5`'te, C2'den sonra, ayrı onayla (`ORCHESTRATION_PLAN.md` §0 adım 5); yalnız açık refspec |
 
 ## 5. Bulgular, kanıtlanmış sınırlar, emekliye ayrılan hedefler
 
@@ -639,7 +658,7 @@ Kanonik kaynak `Planner-docs/Planing-Ledger.md` §8'dir (satır :569–:601; sat
 
 | sonuç | durum | kaynak |
 |---|---|---|
-| Kanonik iddia F3.11-09: rear kamera, AGC 12.58 MP, temiz (black < 0.01), 4 eksende sağ kaldı | kapsamı dar (tek cihaz, rear, 12.58 MP); metni §2.3'te | ledger:638–:642; `docs/agc-12mp-configuration.md:530-541` |
+| Kanonik iddia F3.11-09: rear kamera, AGC 12.58 MP, temiz (black < 0.01), 4 eksende sağ kaldı | kapsamı dar (tek cihaz, rear, 12.58 MP); metni §2.3'te | ledger:647–:651; `docs/agc-12mp-configuration.md:530-541` |
 | VAL-AGC: aynı HAL durumunda AGC 12.58 MP ve Open Camera 50.33 MP birlikte temiz | PASS; dağıtılabilirlik ölçütü | `docs/patch-validation-phase4.md:234-243` |
 | Stok kamera: rear 12.58 MP, 1080p60, 4K60; ön kamera 31.96 MP, 1080p60 (4K sunulmuyor) | invariant 5 stok kamerada sağlanıyor | `docs/patch-validation-phase4.md:265-295` |
 | PC-13: stok Camera ile 4K 59.88 fps, 1080p 60.06 fps; Open Camera mod fark etmeksizin ~30 fps | pass (IMPL-88); kapsamı DEC-23'e bağlı | `docs/release-checklist.md:551` |
@@ -653,20 +672,20 @@ Kanonik kaynak `Planner-docs/Planing-Ledger.md` §8'dir (satır :569–:601; sat
 
 ### 5.2 Kanıtlanmış sınırlar ve negatif sonuçlar
 
-- **AGC 50 MP'yi kapatan duvarlar (DEC-14):** maksimum çözünürlük akış tablosu statik değil, çalışma zamanında hesaplanıyor (IMPL-47/51). Binary'de eklemeli kod için ≥16 B boşluk yok (IMPL-50). RAW satırlarını daraltmak AGC'nin açılmasını engelliyor: iki ayrı bisection aşamasında 3/3 (IMPL-49/50). Yeniden açmak için bu duvarlardan birine dair yeni kanıt gerekir (ledger:586).
-- **FIND-3.5-01 / FIND-4.5-02:** AGC'nin tam çözünürlük kareleri geometrik olarak bozuk. İki bağımsız hata var: binned readout ve eksik stride uyarlaması (IMPL-46). DEC-19 gereği bilgi olarak tutuluyor (ledger:632).
+- **AGC 50 MP'yi kapatan duvarlar (DEC-14):** maksimum çözünürlük akış tablosu statik değil, çalışma zamanında hesaplanıyor (IMPL-47/51). Binary'de eklemeli kod için ≥16 B boşluk yok (IMPL-50). RAW satırlarını daraltmak AGC'nin açılmasını engelliyor: iki ayrı bisection aşamasında 3/3 (IMPL-49/50). Yeniden açmak için bu duvarlardan birine dair yeni kanıt gerekir (ledger:589).
+- **FIND-3.5-01 / FIND-4.5-02:** AGC'nin tam çözünürlük kareleri geometrik olarak bozuk. İki bağımsız hata var: binned readout ve eksik stride uyarlaması (IMPL-46). DEC-19 gereği bilgi olarak tutuluyor (ledger:641).
 - **Çürütülen öncüller:** vendor tag nedeni (EV-45, DEC-13); "Invalid mesh" ve SABRE neden değil; `tempBinning` ipucu tutmadı; CamX log maskeleri etkisiz (IMPL-41/42). Bu yollara yeniden oturum harcanmaz (`docs/raw-geometry-diagnosis.md`, extract XDocsTechA2).
 - **Faz 4:** Faz4.2'nin öncülü yanlıştı; duration satırları zaten tam. 6 RAW stall satırı yamanamıyor; kamera 11/12'de duration tablosu yok (FIND-4.2-01/-02). Faz4.3 hiçbir şeyi birleştirmedi; kanonik tablo değişmedi (ledger:88–:89).
 - **Cihaz ve ROM:** `ln2`/`ln4` AGC'yi açılışta çökertiyor (FIND-2.3-02). AGC videosu stokta bile siyah (FIND-2.3-03). `dcgB`, AGC dışı uygulamalarda provider'ı düşürüyor (FIND-3.4-02). `tiles hide` modül içinden onarılamıyor (OQ-11/H-05). AON mount doğru çalışıyor ama NCS provider'ları stok modda da yok, yani sorun ROM'un bir özelliği (FIND-6.2-03; pozitif baseline yok). Yerinde güncelleme `mode` dosyasını kaybediyor (FIND-9.1-04, CONFIRMED, açık).
 - **Araç çıkmazları (bir daha denenmeyecek):** radare2/rabin2 300 saniyede çıktı vermiyor; apktool smali stub'ları; smali indirmesi 404/403 (`docs/reverse-engineering-toolchain.md:87-105`).
 - **Kiralama:** Hetzner'in yeni hesap limiti CCX53'ü engelledi (IMPL-94), bu da DEC-26'ya yol açtı.
-- **Ölçülmüş istisna:** FIND-3.10-03'te pinlenmemiş AGC tek oturumda iki kez temiz 50.33 MP çekti. Açıklanamadı. Bir yetenek iddiası değildir ve DEC-14 geçerliliğini koruyor (ledger:629).
+- **Ölçülmüş istisna:** FIND-3.10-03'te pinlenmemiş AGC tek oturumda iki kez temiz 50.33 MP çekti. Açıklanamadı. Bir yetenek iddiası değildir ve DEC-14 geçerliliğini koruyor (ledger:638).
 
 ### 5.3 Emekliye ayrılan hedefler, superseded ve kaldırılan alt planlar
 
 | öğe | tarih | ölçülmüş neden | kaynak |
 |---|---|---|---|
-| "50 MP end-to-end in AGC" hedefi | 2026-09-03 | §5.2'deki duvarlar; yerine "AGC stable at 12.6 MP under 50 MP" geldi | ledger:586 |
+| "50 MP end-to-end in AGC" hedefi | 2026-09-03 | §5.2'deki duvarlar; yerine "AGC stable at 12.6 MP under 50 MP" geldi | ledger:589 |
 | `Faz4.1` (superseded) | 2026-09-03 | Sayım hedefleri tuttu ama F4.1-07 FAIL: AGC 3/3 çöktü (guard'sız varyant da). F4.1-05b UNMET (kod boşluğu yok). Diriltilmez | ledger:87; `Planner-docs/Sub-Planing-Audit.md:310` |
 | `Faz4.7` (superseded) | 2026-09-03 | Max-res tablo, Faz4.1'in hedefiyle aynı döngüde kuruluyor. Düzeltme, boş yeri olmayan binary'de kod değiştirmeyi gerektirir. Soru yalnızca emekliye ayrılan hedef için önemliydi | ledger:93 |
 | `Faz4.6` (implemented / audit'te DEFERRED) | 2026-09-03 | F4.6-07 Faz4.1'e bağlı, erişilemez. Tamamlamak için yeni karar ve alt plan gerekir | ledger:92; `Planner-docs/Sub-Planing-Audit.md:309` |
@@ -674,7 +693,7 @@ Kanonik kaynak `Planner-docs/Planing-Ledger.md` §8'dir (satır :569–:601; sat
 | Kaldırıldı: `Faz8.1-beryl-port-sizing.md` | 2026-09-10 (run 18) | `beryl` ikinci bir cihaz değil, AOSPA'nın Android 16 dalı | aynı |
 | Katman dışlamasının kaldırılması (Kararlar #4) | 2026-08-31 | DCG için kanıtlandı; fayda yok, yalnızca DCG denendi, kaldırmak durum modelini değiştirir → RETAIN | ledger:96 |
 | Günlükteki Faz 12 "kalan iş" | 2026-09-03 | DEC-14 | `50MP-Entegrasyon-Plani.md:1305-1316` |
-| WSL2 ve Hetzner | 2026-09-10 / 2026-09-14 | DEC-24, DEC-26 | ledger:598, :601 |
+| WSL2 ve Hetzner | 2026-09-10 / 2026-09-14 | DEC-24, DEC-26 | ledger:601, :604 |
 
 ### 5.4 Açık bulgular ve bilinen sınırlar
 
@@ -688,11 +707,11 @@ Kanonik kaynak `Planner-docs/Planing-Ledger.md` §8'dir (satır :569–:601; sat
   - Blob'lar `.gitignore`'da olduğu için temiz bir checkout arşivi byte-özdeş üretemiyor (FIND-9.1-02).
   - Kurtarma runbook'u bozuk cihazda gösterilmedi; F9.2-04 yalnızca eski-mod tespitini test etti.
   - AGC'nin açtığı HAL id'si ölçülmedi (OQ-17); OQ-12 kısmi; DNG probu erişilemez (OQ-02/H-03); LN birleşimi denenmedi (H-04).
-  - HAL yama tablosunun HyperOS 4'te geçerliliği ölçülmedi (Android 16 derlemesi bırakıldı; Faz8.1'in uzlaşma yarısı yapılmayacak).
+  - HAL yama tablosu HyperOS 4'te hiç denenmedi (Android 16 derlemesi bırakıldı; Faz8.1'in uzlaşma yarısı yapılmayacak). HyperOS 4'teki HAL (`camera.qcom.so` md5 `2a955e68…`, 2026-11-13'te ölçüldü) tablonun kilitli olduğu AOSPA A15 stok HAL'inden (`HAL_STOCK_MD5` `c3fa63a8…`) farklı; modülün HAL koruması (`ishtar-cam-modes/post-fs-data.sh:101-107`) bu yüzden kapalı başarısız olur (fail-closed) ve HAL katmanını atlar [ÇIKARIM]. Yeniden türetme K9'a bağlı (açık).
 
 ## 6. Kanıt dizini
 
-`snapshots/` dizininde 207 dosya var: 170 `.txt`, 27 `.jpg`, 4 `.png`, 6 `.xml`. `snapshots/raw/` boş (2026-11-13 ölçümü, `local://snapshot-index.md`). Adlandırma: `YYYYMMDD-HHMM__<bağlam>__<etiket>`. Saat konusunda çelişki var: README:143 ve Faz3.7:71 UTC diyor, ölçülen örnek yerel host saati gösteriyor (`docs/agc-12mp-configuration.md:555` vs `:570`).
+`snapshots/` dizininde 207 dosya var: 170 `.txt`, 27 `.jpg`, 4 `.png`, 6 `.xml`. `snapshots/raw/` boş (2026-11-13 ölçümü, `local://snapshot-index.md`). *(2026-11-14 notu: iki IMPL96 snapshot'ı 2026-11-13'te eklendi (`70946ff`); aynı günkü ad taramasında zaman damgalı `.txt` adı 172.)* Adlandırma: `YYYYMMDD-HHMM__<bağlam>__<etiket>`. Saat: addaki saati operatör `smoke.sh -o` ile yazar ve bu saat güvenilir değildir: başlık saatine kimi dosyada UTC, kimisinde UTC+3 (yerel host saati) olarak uyuyor (yerel saat örneği: `docs/agc-12mp-configuration.md:555` vs `:570`). Başlıktaki `taken` satırı UTC'dir ve esastır (2026-11-13 ad ve başlık taraması). README C1'de düzeldi (README:153); Faz3.7:71 hâlâ UTC diyor (`ORCHESTRATION_PLAN.md` §10, koşu 21).
 
 | etiket | sayı | tarih aralığı | neyi kanıtlıyor |
 |---|---|---|---|
@@ -729,24 +748,24 @@ Kanonik kaynak `Planner-docs/Planing-Ledger.md` §8'dir (satır :569–:601; sat
 - `20260906-2059__Faz6.2__aon-providers-STOCKMODE.txt`.
 - `20260909-1726__kamerateyit__PC13-fps-analysis.txt`.
 
-**En yeni bracket'lar:** cihazdaki son bracket'lar kamerateyit A (2026-09-08 19:35), B (20:30) ve C'dir (2026-09-09 17:04). C, A ile 161 satırın tamamında eşleşiyor (ledger:516–:517). Sonraki üç kayıt (IMPL89/IMPL94/DEC26) cihaz bracket'ı değil, metin kaydıdır. 2026-09-20 cihaz taramasının (`docs/rom-build-device-notes.md`) snapshot'ı da IMPL satırı da yok.
+**En yeni bracket'lar:** cihazdaki son bracket'lar kamerateyit A (2026-09-08 19:35), B (20:30) ve C'dir (2026-09-09 17:04). C, A ile 161 satırın tamamında eşleşiyor (ledger:516–:517). Sonraki üç kayıt (IMPL89/IMPL94/DEC26) cihaz bracket'ı değil, metin kaydıdır. *(2026-11-14 notu: daha yeni kayıt 2026-11-13 tarihli iki IMPL96 snapshot'ıdır (`70946ff`); salt-okur HyperOS 4 tabanıdır, bracket değildir.)* 2026-09-20 cihaz taramasının (`docs/rom-build-device-notes.md`) snapshot'ı yok; IMPL-96 satırının (4). maddesi kaydediyor (ledger:525).
 
 ## 7. Belge haritası
 
 | belge | rol | son güncelleme / durum |
 |---|---|---|
-| `Planner-docs/Planing-Ledger.md` | Kanonik süreklilik kaydı (Ledger v2): koşular, matris, IMPL, durum, tetikler, DEC | 2026-09-14 (run 20, commit edilmedi); CRLF; §6/§7'de bayat satırlar (§8) |
+| `Planner-docs/Planing-Ledger.md` | Kanonik süreklilik kaydı (Ledger v2): koşular, matris, IMPL, durum, tetikler, DEC | son değişiklik C1 (IMPL-96); run 20 2026-11-13'te `7fa0a51`'de commit edildi; CRLF; §6/§7'de bayat satırlar kısmen notlu (§8) |
 | `Planner-docs/Main-Planing.md` | Step 1 ana plan: 9 faz, R1–R12 | 2026-09-10 (`SNAP-2026-09-10-MAIN`); CRLF; Hetzner satırları bayat; Faz 7/8 2026-11-13'ten beri amaçsız (koşu 21) |
 | `Planner-docs/Sub-Planing-Index.md` | Step 2 dizini: 42 alt plan, sıra, 4a–4d | 2026-09-13 (run 19); LF |
-| `Planner-docs/Sub-Planing-Audit.md` | 11. Step 3 denetimi: PASS_WITH_WARNINGS, 57 bulgu | 2026-09-14; commit edilmedi; kuyruğu ve §14 kiralama promptu 2026-11-13'ten beri geçersiz |
+| `Planner-docs/Sub-Planing-Audit.md` | 11. Step 3 denetimi: PASS_WITH_WARNINGS, 57 bulgu | 2026-09-14; 2026-11-13'te `7fa0a51`'de commit edildi; kuyruğu ve §14 kiralama promptu 2026-11-13'ten beri geçersiz |
 | `Planner-docs/Project-Ontology.md` | Sözlük, invariant 1–11, OQ-01…17, adres defteri | 2026-09-13 (IMPL-93); 2 NUL bayt (AUDIT-FIX-22) |
 | `Planner-docs/Project-Comprehension.md` | CQ/EV/TRACE/ARC/QAS; hipotez durumu yalnızca §8'de | ~2026-09-11 (CQ-13) |
 | `Planner-docs/Autopsy.md` | Step 1.5 başlangıç otopsisi, P0–P3 | 2026-08-23; tarihsel |
 | `Planner-docs/Faz-<n>-Plans/*.md` (42) | Alt planlar; durumları ledger §4'te, dosyalarda değil | en geç 2026-09-14 (Faz7.2) |
 | `docs/build-environment.md` | Faz 7 kiralama runbook'u §1–13 | 2026-09-11 (IMPL-91), Scaleway'e 2026-09-14 (IMPL-95); **2026-11-13'ten beri tarihsel** (ROM derleme bırakıldı) |
-| `docs/pre-rental-plan.md` | Kiralama öncesi operatör planı, adım 1–4; devir belgesi değil | 2026-09-14; değiştirildi ama commit edilmedi; **2026-11-13'ten beri tarihsel** |
-| `docs/rom-build-device-notes.md` | Salt-okur cihaz/ROM taraması (AOSPA A15), yalnızca ekleme yapılır | 2026-09-20; **izlenmiyor**; hiçbir yerden referans yok; IMPL satırı yok; telefon sonradan HyperOS 4 portuna geçti |
-| `docs/release-checklist.md` | Faz9.2: C-01…C-18 / PC-01…PC-18, VAL-INSTALL | son tarihli giriş 2026-09-09; §7 geride; :165 yol hatası |
+| `docs/pre-rental-plan.md` | Kiralama öncesi operatör planı, adım 1–4; devir belgesi değil | 2026-09-14; değiştirildi, 2026-11-13'te `7fa0a51`'de commit edildi; `03b0898` başına 8 satırlık tarihsel not ekledi; **2026-11-13'ten beri tarihsel** |
+| `docs/rom-build-device-notes.md` | Salt-okur cihaz/ROM taraması (AOSPA A15), yalnızca ekleme yapılır | 2026-09-20; `03b0898`'den beri izleniyor; IMPL-96 satırının (4). maddesi kaydediyor (ledger:525); telefonun sonradan HyperOS 4 portuna geçtiği 2026-11-13'te gözlendi |
+| `docs/release-checklist.md` | Faz9.2: C-01…C-18 / PC-01…PC-18, VAL-INSTALL | son tarihli giriş 2026-09-09; §7 geride; :165 yol hatası C1'de düzeldi (T3) |
 | `docs/release-manifest.md` | v2.2 için üretilmiş digest manifesti | elle düzenlenmez; test dışı her build üzerine yazar |
 | `docs/recovery-runbook.md` | Kurtarma senaryoları A–D | 2026-09-01 (IMPL-19) |
 | `docs/reverse-engineering-toolchain.md` | Host araç zinciri, çıkmazlar, self-check | 2026-08-30; §7 2026-09-11; :22-25 ve :220 bayat |
@@ -767,8 +786,8 @@ Kanonik kaynak `Planner-docs/Planing-Ledger.md` §8'dir (satır :569–:601; sat
 | `UNTRACKED-BY-DESIGN.md` | Faz1.1 dışlama kaydı | 2026-08-24; bayat (remote yok diyor) |
 | `ishtar-cam-modes/Kullanim.txt` | Kullanıcı kılavuzu, zip'in içinde | v1.9 içeriği; 13 bayat ifade (K1) |
 | `devir-teslim-promptu.md` | Eski devir promptu | 2026-09-09; **2026-11-13'te silindi** (K4); yerini NEXT_PROMPT.md aldı |
-| `PROJECT_LOG.md` | Bu belge: proje günlüğü özeti | 2026-11-13; ilk sürüm `775b321`, son sürüm C0'da (`git log --diff-filter=A -- ORCHESTRATION_PLAN.md`) |
-| `NEXT_PROMPT.md` | Yeni oturum için yapıştırılacak prompt | 2026-11-13; ilk sürüm `775b321`, son sürüm C0'da (`git log --diff-filter=A -- ORCHESTRATION_PLAN.md`) |
+| `PROJECT_LOG.md` | Bu belge: proje günlüğü özeti | 2026-11-14; ilk sürüm `775b321`, sonraki sürümler `b603516` (C0), `c2abd46`, C1 ve Pencere 2 aşama commit'lerinde |
+| `NEXT_PROMPT.md` | Yeni oturum için yapıştırılacak prompt | 2026-11-14; ilk sürüm `775b321`, sonraki sürümler `b603516` (C0), `c2abd46`, C1 ve Pencere 2 aşama commit'lerinde |
 | `ORCHESTRATION_PLAN.md` | Pencere planı: fazlar, kararlar, geçitler, sözleşme (Ek A) | 2026-11-13; C0 ile eklendi (`git log --diff-filter=A -- ORCHESTRATION_PLAN.md`); Pencere 1 girişi |
 | `../ishtar-arsiv/impl-96-unredacted.bundle` (repo dışı) | Redaksiyon öncesi `integrate/impl-96` ucu (K8); yalnız yedek | 2026-11-13; 77.094 B; `git bundle verify` geçti |
 
@@ -778,27 +797,27 @@ Birleşik ve tekilleştirilmiş liste. Kanıtlar extract'lardan alındı; satır
 
 | dosya:satır | ne diyor | güncel gerçek | kanıt |
 |---|---|---|---|
-| `Planner-docs/Planing-Ledger.md:100`, `:549` | 11. denetim "outstanding" | Denetim yapıldı (2026-09-14, PASS_WITH_WARNINGS); commit edilmedi | `Planner-docs/Sub-Planing-Audit.md:6,18` |
+| `Planner-docs/Planing-Ledger.md:100`, `:552` | 11. denetim "outstanding" | **Çözüldü (IMPL-96; ledger `:100`, `:552`):** denetim yapıldı (2026-09-14, PASS_WITH_WARNINGS) ve 2026-11-13'te `7fa0a51`'de commit edildi | `Planner-docs/Sub-Planing-Audit.md:6,18` |
 | `Planner-docs/Planing-Ledger.md:101` | Faz7.3 10. denetimi bekliyor | 10. ve 11. denetim yapıldı (RWW) | `Planner-docs/Sub-Planing-Audit.md:306` |
-| `Planner-docs/Planing-Ledger.md:51`, `:551` (ayrıca `:57–:60`, `:553`, `:555`, `:586`) | Step 3 yeniden denetimi "outstanding" | 5.–11. denetimler yapıldı | ledger:29; Audit:6 |
-| `Planner-docs/Planing-Ledger.md:527` | 47 commit, 225 dosya, remote yok | 62 commit, 344 izlenen dosya, `origin` var, 4 commit ileride | fact sheet D1 |
-| `Planner-docs/Planing-Ledger.md:529`, `:531`, `:533` | Modül v2.1/12; cihaz v2.1/stock; canlı HAL stok | v2.2/13, mod `50mp`, HAL `fe0245a4…` (2026-09-20 ölçümü) | `docs/rom-build-device-notes.md`; ledger:105 |
-| `Planner-docs/Planing-Ledger.md:537`, `:541`, `:543`, `:19` | Önkoşullar 3/4; capstone yok; OQ'lar açık; host'ta Python yok | Faz 3 kapandı; araçlar 2026-09-01'de kuruldu; OQ'lar yanıtlandı; CPython var | ledger:76, :86 |
-| `Planner-docs/Planing-Ledger.md:596`, `:598`, `:600` | Hetzner CCX53, ~EUR 8.6, Primary IP; DEC-22 başlığında WSL2 | Scaleway POP2-32C-128G, ~EUR 12.8, flexible IP | ledger:601 |
-| `Planner-docs/Planing-Ledger.md:600` | DEC-25 (3): "sync hatası oturumu durdurur" | Runbook'taki sync-path istisnası eksik (AUDIT-FIX-56) | Audit:379 |
+| `Planner-docs/Planing-Ledger.md:51`, `:554` (ayrıca `:57–:60`, `:556`, `:558`, `:589`) | Step 3 yeniden denetimi "outstanding" | **Kısmen çözüldü (IMPL-96):** 5.–11. denetimler yapıldı; eski `:551`, `:553`, `:555` artık `:554`, `:556`, `:558` ve notlu; `:51`, `:57`–`:60` ve `:589` notsuz (`ORCHESTRATION_PLAN.md` §10, koşu 21) | ledger:29; Audit:6 |
+| `Planner-docs/Planing-Ledger.md:528` | 47 commit, 225 dosya, remote yok | **Kısmen çözüldü (IMPL-96, ledger `:528`):** not remote'u ve commit sayılarını yazıyor, dosya sayısını değil. `origin/main` 62 commit (`587e3b5`), yerel `main` 63 (`7fa0a51`), `integrate/impl-96` 71; 350 izlenen dosya; `origin` var, dal 9 commit ileride ve hiçbiri push edilmedi (2026-11-14 ölçümü) | fact sheet D1 |
+| `Planner-docs/Planing-Ledger.md:530`, `:532`, `:534` | Modül v2.1/12; cihaz v2.1/stock; canlı HAL stok | **Kısmen çözüldü (IMPL-96):** `:530` ve `:532` notlu, `:534` notsuz. 2026-11-13'ten beri telefon HyperOS 4'te, proje modülü kurulu değil, HAL `2a955e68…`; v2.2/13, mod `50mp`, HAL `fe0245a4…` (2026-09-20 ölçümü) AOSPA A15 dönemine ait | `docs/rom-build-device-notes.md`; ledger:105 |
+| `Planner-docs/Planing-Ledger.md:538`, `:542`, `:544`, `:19` | Önkoşullar 3/4; capstone yok; OQ'lar açık; host'ta Python yok | Faz 3 kapandı; araçlar 2026-09-01'de kuruldu; OQ'lar yanıtlandı; CPython var | ledger:76, :86 |
+| `Planner-docs/Planing-Ledger.md:599`, `:601`, `:603` | Hetzner CCX53, ~EUR 8.6, Primary IP; DEC-22 başlığında WSL2 | Scaleway POP2-32C-128G, ~EUR 12.8, flexible IP | ledger:604 |
+| `Planner-docs/Planing-Ledger.md:603` | DEC-25 (3): "sync hatası oturumu durdurur" | Runbook'taki sync-path istisnası eksik (AUDIT-FIX-56) | Audit:379 |
 | `Planner-docs/Planing-Ledger.md:106` | Checklist §7'de C-05/09/11/12/13 bekliyor | 7 bekleyen: C-01, C-04, C-05, C-09, C-11, C-12, C-17. C-13 pass | `docs/release-checklist.md:551,558` |
-| `Planner-docs/Planing-Ledger.md:575` | "four NCS providers" yok | **çelişki:** `docs/aon-verification.md` §8.2 aperture ve face-scene'in yok olduğunu, ToF'un çalıştığını, OIS'e kanıt bulunmadığını söylüyor | `docs/aon-verification.md:302-327` |
-| `Planner-docs/Planing-Ledger.md:66`, `:88`, `:89`, `:92`, `:97` | DEC-01 açık; Faz4.2 "verified'ın altında bırakıldı"; F4.6-07 Faz4.1'e bağlı; `device_ishtar` edit'i commit edilmedi | DEC-01 yanıtlandı; Faz4.2 kapatıldı; Faz4.1 superseded; `713784c` push edildi | ledger:599, :87, :598 |
-| `Planner-docs/Planing-Ledger.md:489`, `:582`, `:583`, `:633` | DEC-19/20/21 açık; DEC-11/12 eylemleri borç; Faz5.3 "planned" | Hepsi yanıtlandı; run 4 işledi; Faz5.3 verified | ledger:593–:595, :20, :96 |
+| `Planner-docs/Planing-Ledger.md:578` | "four NCS providers" yok | **çelişki:** `docs/aon-verification.md` §8.2 aperture ve face-scene'in yok olduğunu, ToF'un çalıştığını, OIS'e kanıt bulunmadığını söylüyor | `docs/aon-verification.md:302-327` |
+| `Planner-docs/Planing-Ledger.md:66`, `:88`, `:89`, `:92`, `:97` | DEC-01 açık; Faz4.2 "verified'ın altında bırakıldı"; F4.6-07 Faz4.1'e bağlı; `device_ishtar` edit'i commit edilmedi | DEC-01 yanıtlandı; Faz4.2 kapatıldı; Faz4.1 superseded; `713784c` push edildi | ledger:602, :87, :601 |
+| `Planner-docs/Planing-Ledger.md:489`, `:585`, `:586`, `:642` | DEC-19/20/21 açık; DEC-11/12 eylemleri borç; Faz5.3 "planned" | Hepsi yanıtlandı; run 4 işledi; Faz5.3 verified | ledger:596–:598, :20, :96 |
 | `Planner-docs/Planing-Ledger.md:358-359`, `:493`, `:495`, `:503-504`, `:516-517` | §5 biçimi | IMPL-33, IMPL-32'den önce; kapanış pipe'ı eksik; tabloda boş satırlar; Türkçe satırlar | extract XLedgerImplA/B |
 | `Planner-docs/Main-Planing.md:75`, `:211`, `:265` | "rented Hetzner VDS" (R9) | DEC-26: Scaleway (AUDIT-FIX-57) | Audit:380 |
 | `Planner-docs/Main-Planing.md:22`, `:61`, `:73`, `:288` | Android 16 başlamadı; "beryl port"; Faz 7–9'u açma | 7.1/8.2 verified; beryl bir dal; hepsi ayrıştırıldı (AUDIT-FIX-42) | Audit:384 |
-| `Planner-docs/Main-Planing.md:12`, `:18`, `:57`, `:59`, `:63`, `:65`, `:69`, `:145`, `:159`, `:247`, `:257`, `:259` | v2.1 hiç flash edilmedi; git, smoke ve README yok; HAL `ce419bc9…`; `pref_48m_key=0` denenmedi | Hepsi aşıldı; v2.2 kurulu; taban `fe0245a4…`; Faz3.7 verified | Audit:63,321,322; Index:252 |
+| `Planner-docs/Main-Planing.md:12`, `:18`, `:57`, `:59`, `:63`, `:65`, `:69`, `:145`, `:159`, `:247`, `:257`, `:259` | v2.1 hiç flash edilmedi; git, smoke ve README yok; HAL `ce419bc9…`; `pref_48m_key=0` denenmedi | Hepsi aşıldı; v2.2 kurulu; taban `fe0245a4…`; Faz3.7 verified *(2026-11-14 notu: v2.2 AOSPA A15'te kuruluydu; 2026-11-13'ten beri HyperOS 4'te proje modülü kurulu değil)* | Audit:63,321,322; Index:252 |
 | `Planner-docs/Main-Planing.md:175`, `:181`, `:279` vs `:177` | Duration satırları "eklensin" vs "iş gerekmiyor" | Dosya kendisiyle çelişiyor; Faz4.2 tamam | Audit:336 |
 | `Planner-docs/Main-Planing.md:199`, `:219`, `:267`, `:273-282`, `:276`, `:277`, `:292` | SYMLINK sıfır; DEC-22 ve dört karar açık; 10 sonraki adım; adım 5 picturesize anahtarı | Giriş eklendi; kararlar yanıtlandı; adımlar tamam; pin `pref_48m_key=0` (AUDIT-FIX-41) | Audit:314–336,383 |
 | `Planner-docs/Sub-Planing-Index.md:6`, `:8`, `:10`, `:65` | `SNAP-2026-09-03`, set 40, Faz 7/8 denetlenmedi; EV-20 "F7.1-12'ye dek" | `-09-10-SUBPLANS`, 42 plan, denetlendi; kayıtlar bu kez Hetzner diyor | Audit:14,318 |
 | `Planner-docs/Sub-Planing-Index.md:146`, `:147`, `:389` | Salt-okur sunucu kimliği; düzeltmeler önce GitHub'a; F7.2-01 runbook'u düzeltir | Kimlik bilgisi yok (DEC-25); `fixes.diff` kuralı; IMPL-94 düzeltti | Audit:265,378,414 |
-| `Planner-docs/Sub-Planing-Index.md:106`, `:115-125`, `:184`, `:240`, `:319`, `:347` | 3 alan; Faz 4 sırası; kuyruk 4b; Python yok; DEC-16 açık | 4 alan (`-33` kabul edildi); hepsi verified; Audit §12; Python var; DEC-16 yanıtlandı | Audit:350,385; ledger:590 |
+| `Planner-docs/Sub-Planing-Index.md:106`, `:115-125`, `:184`, `:240`, `:319`, `:347` | 3 alan; Faz 4 sırası; kuyruk 4b; Python yok; DEC-16 açık | 4 alan (`-33` kabul edildi); hepsi verified; Audit §12; Python var; DEC-16 yanıtlandı | Audit:350,385; ledger:593 |
 | `Planner-docs/Project-Ontology.md:429`; `Planner-docs/Project-Comprehension.md:25`, `:51` | Inv. 11, CQ-13, EV-20: Hetzner CCX53 | Scaleway (AUDIT-FIX-57) | Audit:380 |
 | `Planner-docs/Project-Comprehension.md:122`, `:125`, `:149`, `:75` | VAL-INSTALL yapılmadı; F9.2-04 bekliyor; EV-44 "five-word" | VAL-INSTALL PASS (IMPL-81); F9.2-04 PASS (yalnızca eski mod); seven-word | `docs/release-checklist.md:425-469`; `docs/raw-geometry-diagnosis.md:288-313` |
 | `Planner-docs/Faz-7-Plans/Faz7.2-first-aospa-build.md:18`, `:63`, `:79`, `:196`, `:222-223`, `:292`, `:307`, `:341` | 11. denetimi bekliyor; istisnasız sync durdurur; odm yolu "kiralamadan önce düzeltilecek"; 22283d8'e göre notlanır | Denetim yapıldı; istisna var; IMPL-94 düzeltti (AUDIT-FIX-55); `22283d8` + `fixes.diff` (`-56`) | Audit:305,378,379 |
@@ -806,27 +825,27 @@ Birleşik ve tekilleştirilmiş liste. Kanıtlar extract'lardan alındı; satır
 | `Planner-docs/Faz-8-Plans/Faz8.2-kernel-lts-merge-scoping.md:28`, `:61` | Kernel yolları belirsiz, ölçülmedi | 5.15.185/189 ölçüldü; CSIPHY/CSID ağaç dışında | ledger:103 |
 | `Planner-docs/Faz-9-Plans/Faz9.1-reproducible-release-build.md:69`, `:128`; `Faz9.2-release-verification-checklist.md:60` | Kökte 4 arşiv; `build-release.sh` öneriliyor; 13 iddia | v2.2 `dist/` içinde; `.py`; 18 yetenek | glob; ledger:106 |
 | `Planner-docs/Faz-4-Plans/Faz4.1-fullres-dimension-guard.md:141`; `Faz4.5-active-array-raise.md:172-174`; `Faz4.6-raw-payload-geometry-diagnosis.md:9,193,242`; `Faz4.7-ultra-high-resolution-sensor-mode.md:145-147` | Bloklu / sıradaki iş | Dosyalarda durum işareti yok; Faz4.1/4.7 superseded | ledger:87–:93 |
-| `Planner-docs/Faz-3-Plans/Faz3.1-preference-trap-clearance.md:68`; `Faz3.7-agc-photo-size-pin.md:77`, `:87`; `Faz3.10-pin-stickiness-matrix.md:103`; `Faz3.11-phase-closure-and-configuration-record.md:19`, `:81` | On trap anahtarı, isimle denetim; AGC kendi kurmaz; tek restart; F3.10 NEEDS_REPAIR; DEC-19 bekliyor | On iki anahtar, değerle denetim; 2 anahtar 0'da kuruluyor; iki soğuk başlatma; verified; yanıtlandı | ledger:85, :624, :630, :632 |
-| `Planner-docs/Faz-1-Plans/Faz1.1-version-control-bootstrap.md:5`, `:27`; `Faz1.4-toolchain-procedure-record.md:56`; `Planner-docs/Faz-6-Plans/Faz6.1-symlink-entry-in-device-trees.md:54`; `Faz6.2-aon-module-disposition.md:21` | git yok; remote açık; Python yok; SYMLINK 0; modül çalışıyor | Plan zamanının öncülleri, tarih olarak okunur | ledger:60, :66, :69, :97, :575 |
-| `docs/pre-rental-plan.md:32`, `:233-234`, `:252-253` | 7.3/8.3 10. denetimde; adım 4 "3a–3c'yi bekliyor"; run 19'u commit et | 11. denetim; 3a–3c tamam; `f724b64`'te commit edildi | PRP:31,122,181,205 |
-| `docs/release-checklist.md:165` | `smoke.sh -o snapshots/<…>` | smoke.sh zaten `snapshots/` ekliyor, sonuç `snapshots/snapshots/…` olur; doğru biçim :414'te | `scripts/smoke.sh:284` |
+| `Planner-docs/Faz-3-Plans/Faz3.1-preference-trap-clearance.md:68`; `Faz3.7-agc-photo-size-pin.md:77`, `:87`; `Faz3.10-pin-stickiness-matrix.md:103`; `Faz3.11-phase-closure-and-configuration-record.md:19`, `:81` | On trap anahtarı, isimle denetim; AGC kendi kurmaz; tek restart; F3.10 NEEDS_REPAIR; DEC-19 bekliyor | On iki anahtar, değerle denetim; 2 anahtar 0'da kuruluyor; iki soğuk başlatma; verified; yanıtlandı | ledger:85, :633, :639, :641 |
+| `Planner-docs/Faz-1-Plans/Faz1.1-version-control-bootstrap.md:5`, `:27`; `Faz1.4-toolchain-procedure-record.md:56`; `Planner-docs/Faz-6-Plans/Faz6.1-symlink-entry-in-device-trees.md:54`; `Faz6.2-aon-module-disposition.md:21` | git yok; remote açık; Python yok; SYMLINK 0; modül çalışıyor | Plan zamanının öncülleri, tarih olarak okunur | ledger:60, :66, :69, :97, :578 |
+| `docs/pre-rental-plan.md:40`, `:241-242`, `:260-261` | 7.3/8.3 10. denetimde; adım 4 "3a–3c'yi bekliyor"; run 19'u commit et | 11. denetim; 3a–3c tamam; `f724b64`'te commit edildi | PRP:39,130,189,213 |
+| `docs/release-checklist.md:165` | `smoke.sh -o snapshots/<…>` | **Çözüldü (C1, T3):** `:165` artık `:414`'teki doğru biçimi kullanıyor. Eski biçimde smoke.sh zaten `snapshots/` eklediği için hedef `snapshots/snapshots/…` olurdu; o dizin olmadığından dosya yazılmaz, betik yine `stored:` basar [ÇIKARIM] | `scripts/smoke.sh:284` |
 | `docs/release-checklist.md:9-13`, `:135-154`, `:176`, `:248-251`, `:365-366`, `:421`, `:473`, `:501`, `:620-627` | F9.2-04 çalışmadı; dedektörler kusurlu; onarım cihazda denenmedi; "eight" bekleyen; DEC-20 açık | PASS (IMPL-81); IMPL-80 onardı (AUDIT-FIX-50'nin belge yarısı bekliyor); 7 bekleyen | `docs/release-checklist.md:267-271,425,551` |
 | `docs/release-checklist.md:521` vs `:533` | v2.2 "built … IMPL-80" vs "IMPL-77" | **çelişki**, çözülmedi | extract XDocsOps |
 | `docs/recovery-runbook.md:238-239`, `:246-247` | ARC-11 `documented`; "F9.2-04 çalışana kadar" | **çelişki:** `docs/release-checklist.md:623-624` `convergent` diyor; F9.2-04 yalnızca eski-mod testi yaptı | extract XDocsOps |
-| `docs/reverse-engineering-toolchain.md:22-25`, `:219-220`; `devir-teslim-promptu.md:247` | py 3.14.7; capstone yok; `python` çalışır; Hetzner | Araçlar kuruldu; 2026-11-13 kabuğunda `python` ve `python3` Store stub'ı, `py -3` = 3.14.10; Scaleway | fact sheet D3; ledger:76 |
-| `docs/regression-v2.1.md:4`, `:30`, `:569-572`, `:613` | v2.1; trap kurulu; FIND sahipleri "Phase 3" | v2.2; değerler 0, zararsız; Faz5.3 (FIND-9.2-04) | ledger:633–:634 |
-| `docs/phase3-preconditions.md:173`, `:199-237`; `docs/agc-12mp-configuration.md:377-381`, `:423-426`, `:511` | Araçlar bekleniyor; bütçe kapısı önde; FIND-3.7-02/3.10-01 açık; ön kamera ölçülmedi | Kapandı (IMPL-80); stok kameranın önü ölçüldü, AGC'nin önü ölçülmedi | ledger:625, :627; `docs/patch-validation-phase4.md:265-299` |
+| `docs/reverse-engineering-toolchain.md:22-25`, `:219-220`; `devir-teslim-promptu.md:247` | py 3.14.7; capstone yok; `python` çalışır; Hetzner | **Kısmen çözüldü (K4):** `devir-teslim-promptu.md` 2026-11-13'te silindi; `docs/reverse-engineering-toolchain.md` satırları açık. Araçlar kuruldu; 2026-11-13 kabuğunda `python` ve `python3` Store stub'ı, `py -3` = 3.14.10; Scaleway | fact sheet D3; ledger:76 |
+| `docs/regression-v2.1.md:4`, `:30`, `:569-572`, `:613` | v2.1; trap kurulu; FIND sahipleri "Phase 3" | v2.2; değerler 0, zararsız; Faz5.3 (FIND-9.2-04) | ledger:642–:643 |
+| `docs/phase3-preconditions.md:173`, `:199-237`; `docs/agc-12mp-configuration.md:377-381`, `:423-426`, `:511` | Araçlar bekleniyor; bütçe kapısı önde; FIND-3.7-02/3.10-01 açık; ön kamera ölçülmedi | Kapandı (IMPL-80); stok kameranın önü ölçüldü, AGC'nin önü ölçülmedi | ledger:634, :636; `docs/patch-validation-phase4.md:265-299` |
 | `docs/aon-verification.md:248-266`, `:334-338`, `:364-366`; `docs/consumer-survey.md:76-77`, `:86-88` | Faz7.2 atfı yok; stok mod takibi yapılmadı; FIND-3.4-01 konsolidasyonla geçer; dcgB+OC denenmedi | Faz7.2 atıf yapıyor; takip 2026-09-06'da yapıldı; Faz 4 hiçbir şeyi birleştirmedi [ÇIKARIM]; R'de PASS | ledger:100, :510; `docs/regression-v2.1.md:351` |
-| `docs/raw-geometry-diagnosis.md:327`, `:2567`, `:2611`; `docs/mode0-12bit-candidate.md:3-4`, `:183`; `docs/faz41-predictions-impl49.md:33-47` | OC çalıştırılmadı; Faz4.1 bloklu; FIND açık; yalnızca host; P49-2 | OC `com.xiaomi.module.evaluation` olarak kurulu (FIND-4.4-02); superseded; DEC-19; cihazda çalıştı; P49-2 çürütüldü | `docs/patch-validation-phase4.md:485-491`; ledger:87, :632 |
+| `docs/raw-geometry-diagnosis.md:327`, `:2567`, `:2611`; `docs/mode0-12bit-candidate.md:3-4`, `:183`; `docs/faz41-predictions-impl49.md:33-47` | OC çalıştırılmadı; Faz4.1 bloklu; FIND açık; yalnızca host; P49-2 | OC `com.xiaomi.module.evaluation` olarak kurulu (FIND-4.4-02); superseded; DEC-19; cihazda çalıştı; P49-2 çürütüldü | `docs/patch-validation-phase4.md:485-491`; ledger:87, :641 |
 | `docs/rom-build-device-notes.md:79-84` | Kernel "upstreamed by third parties" | K3 düştü (2026-11-13): telefon zaten 5.15.215 kernelli HyperOS 4 portunda; [ÇIKARIM] iddia bu portu kastediyordu | §2.5; §11 |
-| `README.md:18`, `:19`, `:20`, `:77-78`, `:142`, `:143`, `:186` | v2.1/12; AON "symlinking"; 2 smali; v2.1 kurulu; scripts = smoke; UTC adlar; `snapshots/` dışlanmış | v2.2/13; kopyalama + bind mount (FIND-9.3-02); klasörde deneysel tablolar var; `dist/` v2.2 eksik; `build-release.py` var; `snapshots/` izleniyor (FIND-2.2-03) | `ishtar-cam-modes/module.prop:3-4`; `.gitignore` |
-| `UNTRACKED-BY-DESIGN.md:9-10`, `:33-41`, `:61`, `:89`, `:128-130` | Faz1.6 çalışmadı; 84 izlenen dosya; hata `common_clone.log`'da; DEC-05 bekliyor; local-only, DEC-01 açık | README var; 344 dosya; hata `kernel_clone.log`'da; temiz kapandı; `origin` var | fact sheet D1; ledger:576, :599 |
+| `README.md:18`, `:19`, `:20`, `:77-78`, `:142`, `:143`, `:186` | v2.1/12; AON "symlinking"; 2 smali; v2.1 kurulu; scripts = smoke; UTC adlar; `snapshots/` dışlanmış | **Çözüldü (C1):** v2.2/13; kopyalama + bind mount (FIND-9.3-02); klasörde deneysel tablolar var; `dist/` v2.2; `build-release.py` var; `snapshots/` izleniyor (FIND-2.2-03). Bugünkü yerler: `:18`–`:20` → `:20`–`:22`, `:77-78` → `:85-86` (ve yeni `dist/` paragrafı `:94`), `:142`–`:143` → `:152`–`:153`; `:186` (Exclusions) silindi | `ishtar-cam-modes/module.prop:3-4`; `.gitignore` |
+| `UNTRACKED-BY-DESIGN.md:9-10`, `:33-41`, `:61`, `:89`, `:128-130` | Faz1.6 çalışmadı; 84 izlenen dosya; hata `common_clone.log`'da; DEC-05 bekliyor; local-only, DEC-01 açık | **Çözüldü (C1):** README var; 350 dosya (2026-11-14 ölçümü); hata `kernel_clone.log`'daydı, log 2026-11-13'te silindi (K4), içeriği §2.1'de; temiz kapandı; `origin` var. Bugünkü yerler: `:9-10` aynı, `:33-41` → `:33-39`, `:61` → `:59`, `:89` → `:87-88`, `:128-130` → `:127-131` | fact sheet D1; ledger:579, :602 |
 | `ishtar-cam-modes/service.sh:9-12`; `50MP-Entegrasyon-Plani.md:1053-1055` | Launcher alias kendini gizler; Kullanim'a AGC metni, "GCam cannot" | v2.1'den beri görünür; Kullanim'da AGC metni yok, neden çürütüldü | `ishtar-cam-modes/Kullanim.txt:59-65`; `CHANGELOG.md:67-76` |
-| `devir-teslim-promptu.md` (2026-11-13'te silindi) | IMPL-88 sıradaki; baseline 0/0; 56 commit, remote yok; WSL2; validator depoda | IMPL-96; `--mode all` 1 uyarı (strict ile error); 62 commit, `origin`; ROM derleme bırakıldı; validator plugin'de | fact sheet D1–D3 |
+| `devir-teslim-promptu.md` (2026-11-13'te silindi) | IMPL-88 sıradaki; baseline 0/0; 56 commit, remote yok; WSL2; validator depoda | **Çözüldü (K4):** dosya 2026-11-13'te silindi. Sıradaki `IMPL-97`; `--mode all` 1 uyarı (strict ile error); `origin/main` 62, yerel `main` 63, `integrate/impl-96` 71 commit (2026-11-14 ölçümü), `origin`; ROM derleme bırakıldı; validator plugin'de | fact sheet D1–D3 |
 | `…/claudeqb/0.2.1/skills/claudeqb/SKILL.md:148` | Validator `python3` ile | Bu host'ta Store stub'ı; `py -3` kullanılır | fact sheet D3 |
-| `Planner-docs/Planing-Ledger.md:599` (`DEC-01`); `docs/pre-rental-plan.md:250` | Remote = özel `ahmetxa/ishtar`; push hedefi "private `origin` (`ahmetxa/ishtar`)" | 2026-11-13'ten beri `origin` = özel `ahmetxa/ishtar_cam_modes` (62 commit aynı hash'lerle); eski depo yerelde `ishtar-eski`; `DEC-27` IMPL-96'da kaydedilecek | §2.1; §11 |
-| `README.md:144`; `UNTRACKED-BY-DESIGN.md:38-41`, `:63` | `common_clone.log` ve `kernel_clone.log` kayıt olarak duruyor | 2026-11-13'te silindi (K4); içerikleri §2.1'de alıntılı (T2) | §11 |
-| `Planner-docs/Planing-Ledger.md` §6; `docs/rom-build-device-notes.md`; `docs/agc-12mp-configuration.md`; `F3.11-09` | Telefon AOSPA A15 + KernelSU Next | 2026-11-13 kullanıcı beyanı: HyperOS 4 portu, kernel 5.15.215; ölçülmedi | §2.3 |
+| `Planner-docs/Planing-Ledger.md:602` (`DEC-01`); `docs/pre-rental-plan.md:258` | Remote = özel `ahmetxa/ishtar`; push hedefi "private `origin` (`ahmetxa/ishtar`)" | **Çözüldü (IMPL-96; ledger `:602`, `:605`):** 2026-11-13'ten beri `origin` = özel `ahmetxa/ishtar_cam_modes` (62 commit aynı hash'lerle); eski deponun yerel remote'u (`ishtar-eski`) kaldırıldı, `ahmetxa/ishtar` silinecek (`DEC-30`); `DEC-27` kaydedildi, `DEC-01` notlu; `docs/pre-rental-plan.md` 2026-11-13'ten beri tarihsel (`03b0898`) | §2.1; §11 |
+| `README.md:144`; `UNTRACKED-BY-DESIGN.md:38-41`, `:63` | `common_clone.log` ve `kernel_clone.log` kayıt olarak duruyor | **Çözüldü (C1):** 2026-11-13'te silindi (K4); içerikleri §2.1'de alıntılı (T2); bugünkü yerler UNTRACKED `:38`–`:39`, `:61`; README satırı kaldırıldı | §11 |
+| `Planner-docs/Planing-Ledger.md` §6; `docs/rom-build-device-notes.md`; `docs/agc-12mp-configuration.md`; `F3.11-09` | Telefon AOSPA A15 + KernelSU Next | 2026-11-13 kullanıcı beyanı: HyperOS 4 portu, kernel 5.15.215; ölçüm: `OS4.0.0.44.WMACNXM`, kernel `5.15.215-KylinKernel-260925-Release`, KernelSU `4.3.0-r1`, KernelSU Next uygulaması yok (2026-11-13; `70946ff`; ledger §6 `:532`; DEV `:223`–`:244`) | §2.3 |
 | `Planner-docs/Main-Planing.md` Faz 7/8; `Planner-docs/Sub-Planing-Audit.md` §12, §14; `docs/build-environment.md`; `docs/pre-rental-plan.md` | ROM derleme ve kiralama planı | 2026-11-13: ROM derleme bırakıldı (K2); planlama koşusu 21 bekleniyor | §2.5 |
 
 **Küçük takipler:**
@@ -845,9 +864,9 @@ Birleşik ve tekilleştirilmiş liste. Kanıtlar extract'lardan alındı; satır
   12. `:214-215` stok kameranın çöktüğünü söylüyor (IMPL-70/88 bunu çürüttü).
   13. AGC 12.58 MP yapılandırması hiç anılmıyor.
   - Hiçbiri AGC'de 50 MP iddiasında bulunmuyor. Düzeltme kararı K1'e bağlı.
-- **README / UNTRACKED-BY-DESIGN:** v2.2, `dist/`, `docs/`, remote, CHANGELOG ve `snapshots/` izleme durumu güncellenmeli (T2). `candidates/*.bin` ignore kuralının gerekçesi UNTRACKED-BY-DESIGN'da yok (`.gitignore:58`).
-- **release-checklist:** §7 satırları ölçülmüş sonuçların gerisinde. IMPL-82/85 sonuçları aktarılmadı, VAL-MANUAL çalıştırılmadı, AUDIT-FIX-50'nin belge yarısı bekliyor, `:165` yol hatası düzeltilmeli (T3).
-- **Ledger:** IMPL-96'nın kapsamı §2.6'daki L biriminde: 11. denetim ve geçersiz kuyruk; §4 Faz 7/8 engel hücreleri; §6 depo ve cihaz paragrafları; §7'ye ROM derlemenin bırakılması ve "vendor blobs changed" girdileri; "outstanding" metinlerinin ve kernel iddiasının kapanışı; 2026-09-20 notları; K4 silinenleri.
+- **README / UNTRACKED-BY-DESIGN:** **Çözüldü (C1):** v2.2, `dist/`, `docs/`, remote, CHANGELOG ve `snapshots/` izleme durumu güncellendi (T2); remote cümlesi README `:38`'de. `candidates/*.bin` ignore kuralının gerekçesi artık UNTRACKED-BY-DESIGN `:71`'de (`.gitignore:58`).
+- **release-checklist:** §7 satırları ölçülmüş sonuçların gerisinde. IMPL-82/85 sonuçları aktarılmadı, VAL-MANUAL çalıştırılmadı, AUDIT-FIX-50'nin belge yarısı bekliyor; `:165` yol hatası C1'de düzeltildi (T3).
+- **Ledger:** IMPL-96 yazıldı (`:525`; §6 `:528`, `:530`, `:532`, §7 `:552`–`:558` ve §8 konusuz notları); kapsamı §2.6'daki L biriminde: 11. denetim ve geçersiz kuyruk; §4 Faz 7/8 engel hücreleri; §6 depo ve cihaz paragrafları; §7'ye ROM derlemenin bırakılması ve "vendor blobs changed" girdileri; "outstanding" metinlerinin ve kernel iddiasının kapanışı; 2026-09-20 notları; K4 silinenleri. Notsuz kalan "outstanding" metinleri (`:51`, `:57`–`:60`, `:589`) koşu 21'e kaldı (`ORCHESTRATION_PLAN.md` §10).
 - **AUDIT-FIX-22:** ontolojinin `Escape` sütunu ham kontrol baytları içeriyor ve bir arama aracı bunda sessizce başarısız oluyor. Değerlendirmesi `Planner-docs/Sub-Planing-Audit.md:377`'de.
 - **Kökteki boş dizin `UsersahmetAppDataLocalTempaon-smoke/`** (2026-09-09, bozulmuş bir Windows temp yolu): 2026-11-13'te silindi (K4).
 
@@ -860,32 +879,32 @@ Birleşik ve tekilleştirilmiş liste. Kanıtlar extract'lardan alındı; satır
 | R3 root yazımları yalnızca md5 ile korunuyor | yüksek | Yapısal olarak sürüyor; guard'lar kimliği doğruluyor, doğruluğu değil. HyperOS 4'te fail-closed: sensör ya da HAL md5'i tutmazsa mount yok (`ishtar-cam-modes/post-fs-data.sh:35-51`, `:101-107`) | MP:251 |
 | R4 AGC'de 50 MP | eskiden yüksek | "CLOSED as a risk, realised as an outcome"; yerini R12 aldı | MP:253 |
 | R5 otomatik doğrulama yok | yüksek | smoke + checklist + self-test var; yalnızca cihazda; tasarım gereği CI yok | MP:257 |
-| R6 release hiç flash edilmedi | orta | Çözüldü; v2.2 kurulu (VAL-INSTALL) | MP:259 |
+| R6 release hiç flash edilmedi | orta | Çözüldü; v2.2 kurulu (VAL-INSTALL) *(2026-11-14 notu: v2.2 AOSPA A15'te kuruluydu; HyperOS 4'te kurulu değil (2026-11-13 ölçümü).)* | MP:259 |
 | R7 bilgi tek belgede | orta | Ontoloji ve comprehension var ama kusurlu: NUL baytlar (`-22`), IMPL-52…54 eksik (`-37`), Hetzner metni (`-57`) | MP:261; Audit:377–382 |
-| R8 tek vendor bloba bağımlılık | orta | **Gerçekleşti:** telefon HyperOS 4 portuna geçti (2026-11-13). Dosyalar farklıysa 16 noktalı tablo ve sensör varyantları uymaz; ölçülmedi (`NEXT_PROMPT.md` §4.3) | MP:263 |
+| R8 tek vendor bloba bağımlılık | orta | **Gerçekleşti:** telefonun HyperOS 4 portuna geçtiği 2026-11-13'te gözlendi. Aynı günkü ölçüm (`70946ff`): HAL farklı (`2a955e68…`), sensör blobu aynı (`EXPECT_MD5`). 16 noktalı tablo AOSPA HAL'ine (`c3fa63a8…`) kilitli: modül kurulursa HAL guard'ı fail-closed davranıp HAL katmanını atlar, sensör katmanı mount olur [ÇIKARIM]. HAL katmanının yeniden türetilmesine K9 karar verir (`ORCHESTRATION_PLAN.md` §2, §7) | MP:263 |
 | R9 Windows derleyemiyor | orta | Konusuz: ROM derleme bırakıldı (K2, 2026-11-13); önce kiralık sunucu planlanmıştı (DEC-24→26) | MP:265 |
-| R10 RE'de token kullanımı | orta | Faz 3 yalnızca yapılandırma oldu; HyperOS 4'e uyarlama seçilirse (K7) yeniden tersine mühendislik gerekebilir | MP:267 |
+| R10 RE'de token kullanımı | orta | Faz 3 yalnızca yapılandırma oldu; HyperOS 4'e uyarlama seçildi (K7 = (a), `DEC-32`): 50MP katmanı için yeniden tersine mühendislik K9'a bağlı | MP:267 |
 | R11 karışık dil | düşük | Kabul edildi: kullanıcıya dönük TR/EN, planlama belgeleri EN | MP:269 |
 | R12 AGC'nin sessizce 50 MP'ye dönmesi | orta | Dedektörler var (IMPL-55/56, 60/61). Her AGC güncellemesi veya `.agc` import'u sonrası yeniden doğrulanmalı; FIND-3.10-02 rotası bilinmiyor | MP:255 |
 
 **Yeni riskler (2026-11-13):**
 - **N1 Kiralama maliyeti:** konusuz; kiralama hiç yapılmadı ve ROM derleme bırakıldı (K2). Kurallar `docs/build-environment.md` §3–§4 ve §12'de tarihsel olarak duruyor.
 - **N2 Kernel iddiası:** düştü (K3, 2026-11-13).
-- **N3 Uzak depolar:** `origin`'de 62 commit var; `7fa0a51` ve `integrate/impl-96` push edilmedi. ROM derleme fikri için açılan üç depo silinecek (K5/K6, silmeyi kullanıcı yapar); yedekler §2.1'de.
-- **N4 Ledger geride:** ledger bu oturumu (depo taşıma, ROM kararı, HyperOS 4 ölçümü, silinen dosyalar ve depolar) henüz anmıyor; IMPL-96 yazılana kadar §6, §7 ve §8 bayat.
-- **N5 HyperOS 4'te AGC ve uyarlama:** AGC tuzak anahtarları kurulu (`prefs.trap.armed = 10`) ve yamasız V9.6 APK yüklü. AOSPA'da bu tuzaklar gcam başlatmasını bozuyordu; HyperOS 4'teki etkisi ölçülmedi. Uyarlama seçilirse (K7-a) 50MP katmanı yeni HAL'de yeniden türetme ister (R10); kutucuk/WebUI zinciri KernelSU Next yöneticisine bağlı, bu ROM'da yok.
+- **N3 Uzak depolar:** `origin`'de 62 commit var; `7fa0a51` ve `integrate/impl-96` push edilmedi (2026-11-14 ölçümü; push edilmemiş 9 commit). Push `2 · O5`'te ayrı onayla yapılır; bu madde push'tan sonra Pencere 3 açılışında güncellenir (`ORCHESTRATION_PLAN.md` §7). ROM derleme fikri için açılan üç depo silinecek (K5/K6, silmeyi kullanıcı yapar); yedekler §2.1'de.
+- **N4 Ledger geride:** **Çözüldü (IMPL-96):** ledger bu oturumu (depo taşıma, ROM kararı, HyperOS 4 ölçümü, silinen dosyalar (K4) ve silinecek depolar (`DEC-30`)) IMPL-96 satırında anıyor (ledger:525); ledger §6, §7 ve §8'deki bayat satırlar kısmen notlu (§8).
+- **N5 HyperOS 4'te AGC ve uyarlama:** AGC tuzak anahtarları kurulu (`prefs.trap.armed = 10`) ve yamasız V9.6 APK yüklü. AOSPA'da bu tuzaklar gcam başlatmasını bozuyordu; HyperOS 4'teki etkisi ölçülmedi. Uyarlama seçildi (K7 = (a), `DEC-32`): 50MP katmanı yeni HAL'de yeniden türetme ister (R10); kutucuk/WebUI zinciri KernelSU Next yöneticisine bağlı, bu ROM'da yok.
 - **Diğer:**
-  - 2026-09-20 oturumunun kaydı yok (süreklilik boşluğu); IMPL-96 kaydeder.
+  - 2026-09-20 oturumunun kaydı yoktu (süreklilik boşluğu); IMPL-96 kaydetti (ledger:525, madde 4).
   - `gh` PATH'te yok (tam yolla çalışıyor; `delete_repo` yetkisi yok); `python` stub'ı; validator depoda değil.
 
 ## 10. Kimlik şeması ve sözlük
 
 | kimlik | anlam | nerede / sıradaki |
 |---|---|---|
-| `IMPL-NN` | Uygulama koşusu (Step 4); her koşu bir satır | ledger §5; sıradaki **IMPL-96** |
+| `IMPL-NN` | Uygulama koşusu (Step 4); her koşu bir satır | ledger §5; sıradaki **IMPL-97** |
 | planlama koşusu N | Step 1/2 (ve eski denetim) koşuları | ledger §2; sıradaki **21** |
 | N. denetim | Step 3 denetimi; yalnızca `Sub-Planing-Audit.md`'ye yazar, kendi koşu satırı yok | sıradaki **12.** |
-| `DEC-NN` | Kullanıcı kararı | ledger §8; sıradaki **DEC-33**; `DEC-27`…`DEC-32` 2026-11-13'te ayrıldı, ledger'a Pencere 1'de yazılacak |
+| `DEC-NN` | Kullanıcı kararı | ledger §8; sıradaki **DEC-33**; `DEC-27`…`DEC-32` 2026-11-13'te ayrıldı, ledger'a yazıldı (`:605`–`:610`) |
 | `FIND-x.y-NN` | Faz x.y'nin bulgusu; atamadan önce kullanılmadığı kontrol edilir | ledger, belgeler |
 | `AUDIT-FIX-NN` | Denetim kaydı maddesi, P0–P3 (şu ana dek 57) | Audit §13 |
 | `AUTOPSY-Pn-NN` | Otopsi öncelik bulguları | `Planner-docs/Autopsy.md` §13 |
@@ -920,7 +939,7 @@ Ek not: `docs/pre-rental-plan.md`'deki "Step 1–4" o planın kendi sırasıdır
 10. **Mod:** On değerden biri olan tek çalışma zamanı durumu (`$MODDIR/mode`).
 11. **Patch tablosu:** md5 korumalı ikili düzenleme listesi; kanonik ya da deneysel.
 12. **Sensör / HAL / uygulama katmanı:** sensör `.bin` mount'u / `camera.qcom.so` yaması / AGC smali yaması.
-13. **AGC:** Kullanılan Google Camera portu (8.4.300 V9.6, md5 `ce65f862…`).
+13. **AGC:** AOSPA döneminde kullanılan Google Camera portu (8.4.300 V9.6, md5 `ce65f862…`); HyperOS 4'te kurulu olan yamasız V9.6 (md5 `fa4066eb…`, 2026-11-13 ölçümü).
 14. **Open Camera:** `com.xiaomi.module.evaluation` adıyla kurulu, 50 MP referans uygulaması.
 15. **AON:** AON → CSS → NCS zinciri; `ishtar-aon-fix` buna yönelik.
 16. **Tile:** Birbirini dışlayan dört QuickSettings karosundan biri.
@@ -929,9 +948,9 @@ Ek not: `docs/pre-rental-plan.md`'deki "Step 1–4" o planın kendi sırasıdır
 19. **Pin:** `pref_48m_key=0` + `pref_camera_resolution=full` → `4096x3072`, ardından iki soğuk başlatma.
 20. **Black fraction:** IMPL-40 yöntemi; < 0.01 temiz, ~0.75 katlanmış.
 21. **Smoke bracket:** Her cihaz değişikliğinden önce ve sonra `scripts/smoke.sh -o`; karşılaştırılabilir bölge byte-özdeş olmalı.
-22. **barista:** AOSPA'nın proje karıştırıcısı; `lunch` çıkış durumunu yok sayar.
-23. **`fixes.diff`:** Sunucuda yapılan manifest düzeltmeleri; oturum içinde push edilmez.
-24. **Teardown:** Instance, 3 volume ve flexible IP silinir; dört sıfır sayımı.
+22. **barista:** AOSPA'nın proje karıştırıcısı; `lunch` çıkış durumunu yok sayar. *(2026-11-14 notu: Faz 7 işi; `DEC-28` ile 2026-11-13'ten beri tarihsel.)*
+23. **`fixes.diff`:** Sunucuda yapılan manifest düzeltmeleri; oturum içinde push edilmez. *(2026-11-14 notu: Faz 7 işi; `DEC-28` ile 2026-11-13'ten beri tarihsel.)*
+24. **Teardown:** Instance, 3 volume ve flexible IP silinir; dört sıfır sayımı. *(2026-11-14 notu: Faz 7 işi; `DEC-28` ile 2026-11-13'ten beri tarihsel.)*
 25. **ClaudeQB adımları:** Step 1 (ana plan), 1.5 (otopsi/ontoloji), 2 (alt planlar), 3 (denetim), 4 (uygulama); bounded amendment snapshot kesmez.
 
 ## 11. Oturum günlüğü
@@ -1044,3 +1063,25 @@ Ek not: `docs/pre-rental-plan.md`'deki "Step 1–4" o planın kendi sırasıdır
 - **Değişen dosyalar:** `ORCHESTRATION_PLAN.md` (§1, §3 Adlandırma, §6 durum satırı, §6.1, §6.2, §6.5 yeni, §7, §10, Ek A.6), `NEXT_PROMPT.md` (`2 · O3` için), bu girdi. Ledger, `Planner-docs/`, `docs/` ve bu dosyanın §1–§10'u dokunulmadı.
 - **Bekleyen:** Pencere 2 · `O3`–`O5` (plan §6.3); push kararı (`O5`); K9 ve öteki açılış soruları (Pencere 3); depo silme (kullanıcı; üçü de 2026-11-14'te duruyor).
 - **Kapanış:** `Window 2 O2: contract for the project log sweep and the run 21 handoff` (yerel commit; döngü kuralıyla onay sorulmadan). Push yok; `main` ileri sarılmadı. Sonraki oturum: Pencere 2 · O3 — Paralel uygulama (`ORCHESTRATION_PLAN.md` §6.3–§6.5).
+
+**2026-11-14: Pencere 2 · O3 (omp, altıncı pencere).** Kapsam: `ORCHESTRATION_PLAN.md` Pencere 2'nin paralel uygulama aşaması (W5 ∥ SEC-A1 ∥ SEC-A2 ∥ SEC-A3 ∥ REV-3). Bu girdi bir IMPL satırı değildir; ledger'a yazılmadı (Pencere 2 ledger'a yazmaz).
+
+- **Açılış ölçümleri (salt-okur):**
+  - Git: dal `integrate/impl-96`, uç `2 · O2` commit'i, ağaç temiz; dal 71, `main` 63 (`7fa0a51`), `origin/main` 62 (`587e3b5`) commit; push edilmemiş 9 commit; `git ls-remote origin` yalnız `HEAD` ve `refs/heads/main` = `587e3b5`; etiket yok; 350 izlenen dosya. Bu günlüğün 1–1012. satırları C1'den beri değişmemişti: envanterin satır numaraları geçerliydi.
+  - GitHub (`gh api`, 13:45:22Z): silinecek üç depo da hâlâ 200 (`ahmetxa/ishtar` özel, ikisi açık); `ishtar_cam_modes` özel.
+  - Değerler W5 başlamadan önce plan Ek A.6'ya yazıldı. Telefona komut gönderilmedi; cihaz olguları bu aşamada teyit edilmedi.
+- **Girdiler:** SEC-A1, SEC-A2, SEC-A3 ve REV-3 girdileri plan §6.4'teki komutlarla üretildi (69 KB, 321 KB, 654 KB ve 11 KB, 136 KB); SEC-A3'e ayrıca push edilmiş `587e3b5`'in üstverisi verildi.
+- **Güvenlik incelemeleri (salt-okur; push aralığının 9 commit'i, ara hâller dahil):**
+  - SEC-A1 (`snapshots/`, `docs/`, README, UNTRACKED) ve SEC-A2 (`Planner-docs/`): bulgu yok. Probe'un üç kimlik satırı `<redacted>`; Luhn adayı, başka cihaz serisi, sunucu adresi, MAC adresi ya da sır yok; IPv4 biçimli tek eşleşme bir sürüm dizgisi.
+  - SEC-A3 (bu günlük, `NEXT_PROMPT.md`, plan ve commit üstverisi): P0–P2 yok; commit yazarı ve işleyeni push edilmiş `587e3b5`'tekiyle aynı. Tek P3: belgelerdeki yerel yollar Windows kullanıcı adını içeriyor; depo özel, aynı yollar push edilmiş ağaçta da var ve komutlar için gerekli → orkestratör kabul etti, işlem yok (plan §10). Ayrıca plan Ek A.5 betiğinin bölünmüş 15 haneli sayıyı saymadığı gözlemi (plan §10).
+- **İçerik incelemesi (REV-3; C1 diff'inin ledger, README, UNTRACKED ve `docs/` kısmı):** P0/P1 yok; W1–W4 ve T3 hedefleri karşılanmış, ledger biçimi (CRLF, boru sayıları, yalnız ekleme) doğru. P2: `UNTRACKED-BY-DESIGN.md:36` Faz 1.1'deki izlenen dosya sayısını 84 diyordu; ledger (`:66`, `:113`) ve `git ls-tree -r --name-only ff6934e` 86 veriyor → düzeltici task satırı bu aşamada düzeltti (plan §6.1 karar 4; plan §5.1'deki W4 hedefi yanlıştı). P3: ledger `DEC-29`…`DEC-32` satırlarının "Raised by" hücresi → plan §10 (koşu 21).
+- **W5 (bu günlüğün §1–§10'u):**
+  - İlk deneme (tek `task` ajanı, 97 madde): ajanın 100K bağlamı taştı; ajan hedef satırları okumadan toplu bir düzenleme yaptı, Ek A'da olmayan içerik yazdı ve sözleşme dışı olarak git'i salt-okur çalıştırdı; sonra kendisi durup bildirdi. Orkestratör dosyayı `git checkout -- PROJECT_LOG.md` ile geri aldı. `task` aracında ajan başına model seçimi kapalı (`task.perCallModel: off`).
+  - İkinci deneme parçalarla yürüdü. P1 (başlık, §1–§2.5; 24 madde) bir `task` ajanıyla uygulandı. P5'i deneyen `task` ajanının bağlamı düzenlemeye başlamadan doldu ve ajan durduruldu (dosyaya dokunmadı). Kalan dört parça (P2 §3, P3 §4–§5, P4 §6–§7 ve §9–§10, P5 §8) geniş bağlamlı salt-okur ajanlara taslak olarak yazdırıldı. Orkestratör her taslağı betikle ayrıştırdı (yalnız hedef satırlar, boru sayıları, eklenen plan kimliği yok), kelime farkını okudu ve taslağı `edit` aracıyla uyguladı; uygulanan metin taslakla birebir aynı çıktı.
+  - P1'deki dokuz kusur P2 taslağıyla düzeltildi: günlüğe yazılmış plan olgu kimlikleri, belirsiz "§7" atfı, eksik commit başlıkları, eksik "(4). maddesi" ve atıf yeri. Eklemeler yüzünden kayan iki kendi satır atfı (§2.1 `:60` ve `:67` → §8 `:802`, `:803`) yeniden numaralandı.
+  - Sonuç: envanterin 97 maddesi karşılandı; 96'sı uygulandı, §2.6 maddesi gereği gibi dokunulmadı. §8'deki ledger atıf maddesinde dört satırın atfı `:524`'ün altında kaldığı için değişmedi. 162 satır eklendi, 143 satır çıktı; 19 satır yeni: §3.5'e iki grup (2026-11-13'te 6, 2026-11-14'te 3 commit) ve §4'e `DEC-27`…`DEC-32`. Başlık metni yalnız §2'de (tarih) ve §4'te (`DEC-32`) değişti. Ajanların envanter dışı gözlemleri (15 yer) dokunulmadı; plan §10'da.
+- **Doğrulama:** `git diff` yalnız `PROJECT_LOG.md`, `ORCHESTRATION_PLAN.md`, `NEXT_PROMPT.md` ve `UNTRACKED-BY-DESIGN.md`'yi gösteriyor. Bu günlüğün §2.6'sı ve (bu girdiye kadar) §11'i değişmedi; değişen satırların hepsi envanter satırlarında; günlük metnine plan olgu kimliği girmedi (betik). Dört dosya LF, CR 0, NUL 0; bütün tablolarda boru sayısı sabit. Kimlik taraması (plan Ek A.5; `git log --all -p` ve 350 dosya): `value_lines=6`, `NOT_REDACTED=0`, `LUHN15=0`, `prose_mentions=15` → geçti. Artış iki satırdan: §4'teki yeni `DEC-31` satırı (ağaç) ve `2 · O2` commit'i (geçmiş); karar 5a gereği hata değil. Doğrulayıcı ve self-test bu aşamada çalıştırılmadı (geçitler `2 · O4`'te).
+- **Çelişkiler (dosya kazandı):** kullanıcının genel orkestrasyon şablonu (tek oturumda Faz 0–5, yeni branch, `isolated`, `outputSchema`) bu aşamada dosyalara göre uygulanmadı. `NEXT_PROMPT.md`'nin "`UNTRACKED-BY-DESIGN.md` dokunulmamış" kabul cümlesi plan §6.1 karar 4 ile çelişiyordu; plan uygulandı (plan §10).
+- **Değişen dosyalar:** `PROJECT_LOG.md` (§1–§10, W5; bu girdi), `UNTRACKED-BY-DESIGN.md` (satır 36, REV-3 düzeltmesi), `ORCHESTRATION_PLAN.md` (§1, §6 durum satırı, §7'de push ve silme sonrası güncellenecek yerler, §10, Ek A.6'ya iki satır: bu aşamanın açılış ölçümü ve Faz 1.1 dosya sayısı), `NEXT_PROMPT.md` (`2 · O4` için). Ledger, `Planner-docs/`, `docs/` ve README dokunulmadı.
+- **Bekleyen:** Pencere 2 · `O4`–`O5` (plan §6.3); push kararı (`O5`); K9 ve öteki açılış soruları (Pencere 3); depo silme (kullanıcı; üçü de 2026-11-14'te duruyor).
+- **Kapanış:** `Window 2 O3: project log sweep and pre-push reviews` (yerel commit; döngü kuralıyla onay sorulmadan). Push yok; `main` ileri sarılmadı. Sonraki oturum: Pencere 2 · O4 — Entegrasyon ve geçitler (`ORCHESTRATION_PLAN.md` §6.3).
