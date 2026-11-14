@@ -1,17 +1,36 @@
 # ORCHESTRATION_PLAN — ishtar
 
 > **Onay:** kullanıcı, 2026-11-13 ("onay"). Kararlar: K8 = A, konusuz kapsamı = altı karar, K7 = (a).
-> **Kural:** Her yeni sohbet penceresi bu plandan **tek bir fazı** yürütür. Giriş noktası `NEXT_PROMPT.md`; ayrıntı, sözleşme ve durum bu dosyadadır.
+> **Onay 2:** kullanıcı, 2026-11-14 ("onaylıyorum"): Pencere 2 planı (§6) varsayılan kararlarla (§6.1); aşama başına oturum döngüsü, aşama sonunda sorulmadan devir ve yerel commit, beklenmedik durumda sade bir soru (§0).
+> **Kural:** Her yeni sohbet penceresi (oturum) bu plandan **tek bir aşamayı** yürütür (§0): bir fazın `O0`+`O1` aşamaları bir oturumda, `O2`, `O3`, `O4` ve `O5` her biri ayrı oturumda. Giriş noktası `NEXT_PROMPT.md`; ayrıntı, sözleşme ve durum bu dosyadadır.
 > **Öncelik:** Ölçüm ve kanonik dosyalar (ledger, `Planner-docs/`) bu plandan üstündür. Çelişki bulunursa §10'a yazılır ve kullanıcıya söylenir; plan sessizce uydurulmaz.
 
 ## 0. Pencere protokolü
 
-1. **Açılış:** `NEXT_PROMPT.md`'yi oku; `git status`, `git log --oneline -6`, `git branch -vv`. Bu dosyada §1'deki ilk `pending` fazı ve o fazın bölümünü oku. Önkoşul (önceki faz `done`, gerekli kullanıcı kararları) tutmuyorsa başlamadan kullanıcıya söyle.
-2. **Yürütme:** Yalnız o fazın görev tablosu. Orkestratör planlar, dağıtır, entegre eder, doğrular; alt ajan kuralları §3'te.
-3. **Doğrulama:** Fazın kabul kriterleri ve §3'teki geçitler. Kırmızı bir ağaçla kapanış yapılmaz.
-4. **Kapanış:** Pencerenin bütün dosyaları **tek kapanış commit'inde** gider: işin kendisi, bu dosyanın §1 satırı (`done` ve kanıt), `PROJECT_LOG.md` §11 girdisi (gerekirse §2, §3.2, §4) ve sıradaki faza göre yeniden yazılan `NEXT_PROMPT.md`. Bir commit kendi hash'ini taşıyamaz: §1'e commit **başlığı** yazılır, hash `git log --grep '<başlık>'` ile bulunur (C0 için `git log --diff-filter=A -- ORCHESTRATION_PLAN.md`). Diff kullanıcıya gösterilir, onayla commit edilir, yeni pencere önerilir.
-5. **Faz bir pencereye sığmazsa:** doğrulanmış bir noktada dur; §1'e `in_progress` ve kalan işi yaz; NEXT_PROMPT'u güncelle; onayla commit et.
-6. `local://` taslakları pencereler arasında **taşınmaz**. Bir taslak ya aynı pencerede tüketilir ya da depodaki bir dosyaya yazılır.
+**Terimler (2026-11-14).** *Pencere N*: §1'deki plan fazı (ad tarihseldir; başta her faz tek oturumdu). *Aşama*: bir fazın orkestrasyon adımı: `O0` keşif, `O1` plan (kullanıcı onayına kadar), `O2` kontrat, `O3` paralel uygulama, `O4` entegrasyon ve geçitler, `O5` son inceleme ve kapanış. *Oturum*: bir sohbet penceresi. Aşama kimliği `Pencere 2 · O2` (kısaca `2 · O2`) biçimindedir. Tek başına "Faz N" ClaudeQB proje fazıdır (§3, Adlandırma).
+
+**Döngü (kullanıcı kararı, 2026-11-14).** Her oturum tek bir aşamayı yürütür: `O0`+`O1` aynı oturumda (plan onayıyla biter); `O2`, `O3`, `O4` ve `O5` her biri ayrı oturumda. Fazın aşama ve görev tablosu o fazın bölümündedir (Pencere 2: §6.3). Aşama atlanmaz; oturum kendiliğinden sıradaki aşamaya geçmez.
+
+1. **Açılış:** `NEXT_PROMPT.md`'yi oku; `git status`, `git log --oneline -8`, `git branch -vv`. §1'deki ilk `pending` satırı (aşama satırları dahil) ve fazın bölümünü oku. Önkoşul tutmuyorsa (ağaç kirli, dal farklı, beklenmeyen commit, önceki aşama `done` değil) bu beklenmedik bir durumdur (adım 6). Kontroller tutarsa aşama ayrı bir "başla" onayı beklemeden yürütülür.
+2. **Yürütme:** yalnız o aşamanın görevleri. Orkestratör planlar, dağıtır, entegre eder, doğrular; alt ajan kuralları §3'te. Sonraki aşamaların ihtiyaç duyduğu her çıktı oturum bitmeden depodaki bir dosyaya yazılır (adım 8).
+3. **Doğrulama:** aşamanın kabul kriterleri; §3'teki geçitler fazın belirttiği aşamada (Pencere 2: `O4`, düzeltme olursa `O5`'te yeniden). Kırmızı bir ağaçla kapanış yapılmaz.
+4. **Kapanış (beklenmedik durum yoksa, sorulmadan):**
+   - §1'de aşama satırı `done` olur ve kapanış commit'ini **başlığıyla** anar. Hash yazılmaz: commit kendi hash'ini taşıyamaz; hash `git log --grep '<başlık>'` ile bulunur (C0 için `git log --diff-filter=A -- ORCHESTRATION_PLAN.md`).
+   - `PROJECT_LOG.md` §11'e oturum girdisi; Pencere 2'de `O4`'ten itibaren §2.6 da güncellenir.
+   - `NEXT_PROMPT.md` sıradaki aşama için yeniden yazılır; sıradaki aşama başka bir fazın `O0`'ıysa o fazın girişi olarak. Bu yazım döngünün parçasıdır, ayrıca sorulmaz.
+   - Değişen dosyalarda bayt ve boru kontrolü ile kimlik taraması (betik Ek A.5'te); ardından yerel kapanış commit'i onay sorulmadan atılır ve kullanıcıya `git show --stat` özeti verilir. Mesaj fazı ve aşamayı adlandırır.
+   - Kullanıcıya yeni pencere açıp `NEXT_PROMPT.md`'deki metni yapıştırması söylenir.
+5. **Onay kapıları (her zaman sorulur; beklenmedik durum sayılmaz):** `O1` sonunda plan onayı; `main`'in fast-forward'ı; her `git push`; cihaz eylemleri; AGC tercihlerine yazma. Depoları kullanıcı siler. Bu sorular kısa ve evet/hayır biçimindedir.
+6. **Beklenmedik durum:** kapanış yapılmaz, `NEXT_PROMPT.md` yeniden yazılmaz, commit atılmaz. Kullanıcıya sade, teknik terimden arındırılmış bir dille sorulur: ne oldu, neden önemli, iki ya da üç seçenek ve önerilen seçenek. Yanıta göre devam edilir; durum çözülünce kapanış adım 4 ile yapılır. Beklenmedik durum sayılanlar:
+   - açılış önkoşulunun tutmaması;
+   - bir geçidin taban değerden sapması ya da kırmızı kalması;
+   - ölçülen bir olgunun Ek A ya da planla çelişmesi (öngörülmüş değişiklikler, örneğin silinmesi beklenen bir deponun silinmiş olması, sayılmaz; yalnız kaydedilir);
+   - P0 ya da P1 inceleme veya güvenlik bulgusu; kapsamı, bir kararı ya da git geçmişini değiştirmeyi gerektiren her düzeltme;
+   - alt ajanın sahiplik dışına taşması, sözleşmeden sapması ya da işi bitirememesi, ve bunun aşama içinde giderilememesi;
+   - planda olmayan bir eylem ihtiyacı (cihaz, dosya ya da depo silme, geçmişi yeniden yazma, yeni kapsam);
+   - aşamayı durduran araç ya da ortam arızası (örneğin push kimlik doğrulaması).
+7. **Aşama bir oturuma sığmazsa:** doğrulanmış bir noktada dur; §1'de aşama satırına `in_progress` ve kalan işi yaz; `NEXT_PROMPT.md`'yi aynı aşamanın devamı için yaz; adım 4'teki gibi commit et.
+8. `local://` taslakları oturumlar arasında **taşınmaz**: bir taslak ya aynı oturumda tüketilir ya da depodaki bir dosyaya yazılır.
 
 ## 1. Durum tablosu
 
@@ -21,10 +40,17 @@ Durum sözlüğü: `pending`, `in_progress`, `done`, `blocked`.
 |---|---|---|---|---|---|
 | 0 | Keşif, plan, sözleşme | O0 keşif, O1 plan (onaylandı), K8 = A (dal yeniden kuruldu), bu dosya, NEXT_PROMPT ve PROJECT_LOG güncellemesi | — | done | `70946ff`, `03b0898`, `775b321`; C0 `Window 0: orchestration plan, K8 redaction, handoff for window 1` (`git log --diff-filter=A -- ORCHESTRATION_PLAN.md`); inceleme sonrası takip commit'i `Window 0 follow-up: align handoff with plan, rename review IDs` |
 | 1 | IMPL-96 uygulaması | Ledger IMPL-96 (§4–§8, `DEC-27`…`DEC-32`); README ve UNTRACKED kaymaları (T2); iki `-o` satırı (T3); inceleme; C1 | Pencere 0 | done | C1 `IMPL-96: repository move, ROM-build retirement, HyperOS 4 baseline` (`git log --grep 'IMPL-96: repository move'`); ledger 644 → 653 satır (21 satır yalnız ekleme, 9 yeni satır), geçitler taban değerde; bu dosyada §1, §3 (Adlandırma), §5.1 (W3 `:143` ve W4 `:61` hedefleri), §6 (W5, SEC ve sıra), §10, Ek A.2, A.4 notu ve A.5 (sıra) güncellendi; C1 kullanıcının gece talimatıyla, diff gösterilmeden atıldı (PROJECT_LOG §11) |
-| 2 | Kapanış ve yayın | PROJECT_LOG bayat satırları (W5); NEXT_PROMPT'u koşu 21'e hazırlama (W6); push öncesi güvenlik incelemesi; `main` FF; push; silinecek depoların ölçümü | Pencere 1; push kararı | pending | |
+| 2 | Kapanış ve yayın | PROJECT_LOG bayat satırları (W5); push öncesi güvenlik ve içerik incelemesi; NEXT_PROMPT'u koşu 21'e hazırlama (W6); `main` FF; push; silinecek depoların ölçümü. Aşamalar §6.3 | Pencere 1; push kararı | in_progress | aşama satırları aşağıda |
+| 2 · O0+O1 | Keşif ve plan | Üç scout; ölçümler (Ek A.6); keşif envanteri (§6.2); onaylı plan (§6); aşama döngüsü (§0) | Pencere 1 | done | `Window 2 O0-O1: approved plan, discovery facts, stage-per-session loop` (`git log --grep 'Window 2 O0-O1'`) |
+| 2 · O2 | Kontrat | K0 (§6.3) | 2 · O0+O1 | pending | |
+| 2 · O3 | Paralel uygulama | W5 ∥ SEC-A1 ∥ SEC-A2 ∥ SEC-A3 ∥ REV-3 | 2 · O2 | pending | |
+| 2 · O4 | Entegrasyon ve geçitler | I2a → GATE | 2 · O3 | pending | |
+| 2 · O5 | Son inceleme ve kapanış | W6 ∥ REV-1 → REV-2 ∥ SEC-B → FIX (gerekirse, sonra GATE) → I2b → C2 → FF (onay) → RID → PUSH (onay) → LSR | 2 · O4 | pending | |
 | 3 | Planlama koşusu 21 | Step 1 + Step 2: Faz 7/8 emekli; K7 = (a) için faz ve alt planlar; önce K9 ve kapsam soruları | Pencere 2 | pending | |
 | 4 | 12. denetim | Step 3 (`run-step3.md`) | Pencere 3 | pending | |
 | 5+ | K7 = (a) Step 4 dilimleri | 12. denetimin kuyruğu; pencere başına bir dilim | Pencere 4 | pending | |
+
+Her faz §0'daki aşamalarla yürür; bir fazın aşama satırları o fazın `O0`+`O1` oturumunda eklenir.
 
 ## 2. Kararlar (2026-11-13)
 
@@ -41,6 +67,8 @@ Durum sözlüğü: `pending`, `in_progress`, `done`, `blocked`.
 | K4 | Temizlik | Uygulandı (beş öğe, Ek A `K4`) | IMPL-96 satırı |
 | K9 | 50MP HAL katmanının HyperOS 4 HAL'inde (`2a955e68…`) yeniden türetilmesi | **Açık.** Pencere 3'ün başında sorulur | sonraki DEC |
 | Push | `main` ve `integrate/impl-96` | **Açık.** Pencere 2'de sorulur | — |
+| Pencere 2 planı | Görevler, sıra, kapsam | Onaylandı (2026-11-14, "onaylıyorum"); kararlar §6.1 | — |
+| Döngü | Oturum yapısı | Her aşama ayrı oturumda (`O0`+`O1` birlikte); kapanışta `NEXT_PROMPT.md` ve yerel commit sorulmadan; FF ve push ayrı onay; beklenmedik durumda sade soru (§0) | — |
 
 ## 3. Her pencerede geçerli kurallar
 
@@ -48,9 +76,9 @@ Durum sözlüğü: `pending`, `in_progress`, `done`, `blocked`.
 - **Orkestratör (ana oturum):** plan, dağıtım, entegrasyon, doğrulama ve commit. Sıcak noktalar yalnız onundur: `Planner-docs/Planing-Ledger.md`, `Main-Planing.md`, `Sub-Planing-Index.md`, `Sub-Planing-Audit.md`, `Project-Ontology.md`; `CHANGELOG.md`; sürüm yerleri (`ishtar-cam-modes/module.prop`, `customize.sh`); üretilen `docs/release-manifest.md`; `.gitignore`, `.gitattributes`; `snapshots/` (kanıt, düzeltilmez); bu dosya; tüm git işlemleri.
 - **Alt ajanlar:** Görev metni kendi kendine yeter (hedef dosya yolları, değişiklik, kabul kriteri, yasak alanlar). Ajan yalnız sahip olduğu dosyaya yazar; başka bir dosyada sorun görürse düzeltmez, raporlar. Doğrulayıcı, test ya da format çalıştırmaz. Dönüşte şu blok zorunludur: `status`, `changed_files`, `acceptance` (kriter / karşılandı mı / kanıt), `contract_deviations`, `open_issues`. Sıcak noktalar için yalnız taslak üretir (`local://…`).
 - Aynı anda en fazla 4 uygulama ajanı çalışır. `task` aracında `isolated` ve `outputSchema` yok; yalıtım ayrık dosya sahipliğiyle sağlanır. `librarian` ve `designer` ajanları bu ortamda yok.
-- **Adlandırma:** Görev kimlikleri (`W1`–`W6`, `T3`, `I1`, `REV`, `SEC`) ve Ek A olgu kimlikleri (`G`, `D`, `V`, `REL`, `T3`, `TRAP`, `M1`, `E`, `AUD11`, `OPN`) yalnız bu plana aittir. Main-Planing risk kimlikleri `R1`–`R12`, kararlar `K1`–`K9` ve `DEC-NN`, kontrol listesi `C-NN`, ClaudeQB `Faz n.m` / `Fn.m-NN` ile karışmasın diye böyle seçildi (önceki oturumun `R21` → `RUN21` düzeltmesiyle aynı gerekçe). Ek A'daki `K3` ve `K4` satırları ise karar etiketlerini bilerek yeniden kullanır; plana özgü değildir.
+- **Adlandırma:** Görev kimlikleri (`W1`–`W6`, `T3`, `I1`, `REV`, `SEC`; Pencere 2 için ayrıca `K0`, `SEC-A1`–`SEC-A3`, `SEC-B`, `REV-1`–`REV-3`, `I2a`, `I2b`, `GATE`, `FIX`, `RID`, `PUSH`, `LSR`), aşama kimlikleri `O0`–`O5` ve Ek A olgu kimlikleri (`G`, `D`, `V`, `REL`, `T3`, `TRAP`, `M1`, `E`, `AUD11`, `OPN`; A.6'da `OPN2`, `G4b`, `G8b`, `L653`, `LSH`, `SH8`, `CDATE`, `RID0`, `SEC0`, `SMK-O`) yalnız bu plana aittir. Main-Planing risk kimlikleri `R1`–`R12`, kararlar `K1`–`K9` ve `DEC-NN`, kontrol listesi `C-NN`, ClaudeQB `Faz n.m` / `Fn.m-NN` ile karışmasın diye böyle seçildi (önceki oturumun `R21` → `RUN21` düzeltmesiyle aynı gerekçe). Ek A'daki `K3` ve `K4` satırları ise karar etiketlerini bilerek yeniden kullanır; plana özgü değildir. `C1` ve `C2` faz kapanış commit'leridir; Pencere 2'nin aşama commit'leri başlıklarıyla anılır (§6.4).
 
-**Geçitler** (faz sonunda bir kez, orkestratör):
+**Geçitler** (fazın belirttiği aşamada bir kez, orkestratör; Pencere 2'de `O4`, düzeltme olursa `O5`'te yeniden):
 - `py -3 C:/Users/ahmet/.claude/plugins/cache/claudeqb/claudeqb/0.2.1/skills/claudeqb/scripts/validate_planner_docs.py --root . --mode all` → `error_count=0`, `warning_count=1` (`step4_has_nonblocking_warnings=P2:1,P3:9`), `p0_findings=0`, `p1_findings=0`, `subplan_count=42`, `secret_findings=0`. Koşu 21 alt plan sayısını, 12. denetim de bulgu sayılarını değiştirir; yeni baseline o fazda yazılır.
 - Aynı komut `--mode step4 --strict` ile: yalnız bilinen `strict_warning` hatası (baseline, regresyon değil).
 - `py -3 scripts/build-release.py --self-test` → `SELF-TEST: PASS`, VAL-BUILD2 sha256 `407fb9be180d96ff0fc6d409d27ad35d4b3de10e0ea3dea8e53a1daee33cb2e0`. Bayraksız çalıştırma `dist/` zip'ini ve `docs/release-manifest.md`'yi yeniden yazar; sürüm prosedürü dışında çalıştırılmaz.
@@ -60,7 +88,7 @@ Durum sözlüğü: `pending`, `in_progress`, `done`, `blocked`.
 
 **Gizlilik.** Probe snapshot'ının redaksiyondan önceki IMEI ve `persist.sys.miui.sno` değerleri hiçbir dosyaya, rapora ya da mesaja yazılmaz; kontroller maskeli yapılır. Redaksiyonsuz özgün yalnız depo dışındaki `../ishtar-arsiv/impl-96-unredacted.bundle`'da ve yerel reflog'da durur. Başka cihazların seri numaraları kayda geçmez.
 
-**Git.** Commit yalnız kullanıcı onayıyla ve fazı adlandıran mesajla atılır. Geçmiş yeniden yazılmaz; K8 tek kayıtlı istisnadır. Push yalnız açık refspec ile yapılır: `git push origin main integrate/impl-96`; `--all` ve `--mirror` asla. Push'tan sonra `git ls-remote origin` ile hash karşılaştırılır. Geçmiş GitHub MCP dosya araçlarıyla gönderilmez.
+**Git.** Aşama kapanış commit'i beklenmedik durum yoksa onay sorulmadan atılır (§0 adım 4; kullanıcı kararı, 2026-11-14); mesaj fazı ve aşamayı adlandırır. Başka her commit kullanıcı onayıyla atılır. `main`'in fast-forward'ı ve her push ayrı onay ister. Geçmiş yeniden yazılmaz; K8 tek kayıtlı istisnadır. Push yalnız açık refspec ile yapılır: `git push origin main integrate/impl-96`; `--all` ve `--mirror` asla. Push'tan sonra `git ls-remote origin` ile hash karşılaştırılır. Geçmiş GitHub MCP dosya araçlarıyla gönderilmez.
 
 **Cihaz.** Her adb komutu `platform-tools/adb.exe -s dc27e5d0` ile; betikler `ANDROID_SERIAL=dc27e5d0 MSYS_NO_PATHCONV=1` ile çalışır (`smoke.sh`'in `-s` seçeneği yok; `-o` yalnız ad alır). Ajan yalnız salt-okunur komut çalıştırır. Kurulum, mod değiştirme, deklanşör, izin diyaloğu gibi fiziksel eylemler kullanıcıdadır ve onay ister. Her cihaz değişikliği `smoke.sh` ile önce ve sonra ölçülür; yalnız `BEGIN COMPARABLE`…`END COMPARABLE` karşılaştırılır.
 
@@ -133,17 +161,170 @@ Yerler alıntılanan metinle bulunur (satır numaraları 2026-11-13 ağacına ai
 
 ## 6. Pencere 2 — Kapanış ve yayın
 
-**Hedef:** Oturum belgelerinin bayat satırlarını temizlemek, NEXT_PROMPT'u koşu 21'e hazırlamak, dalı yayınlamak.
+**Hedef:** Oturum belgelerinin bayat satırlarını temizlemek, push edilecek her şeyi incelemek, NEXT_PROMPT'u koşu 21'e hazırlamak, dalı yayınlamak.
 **Önkoşul:** Pencere 1 `done` (C1 var).
+**Durum:** `in_progress`. `O0`+`O1` 2026-11-14'te bitti: üç scout, ölçümler (Ek A.6), keşif envanteri (§6.2); kullanıcı planı varsayılan kararlarla onayladı ("onaylıyorum", 2026-11-14; §6.1). Kalan aşamalar §6.3'te, her biri ayrı oturumda (§0).
+**Sabitler:** Pencere 2 cihaza komut göndermez ve ledger'a yazmaz (`DEC-30` yürütme notu koşu 21'de). Ek A.4 çapaları Pencere 1'e aitti; ledger artık 653 satır (Ek A.6 `L653`, `LSH`).
 
-| # | Ajan | Hedef ve kapsam | Yazma yetkisi | Kabul kriteri |
-|---|---|---|---|---|
-| W5 | task `ProjectLogUpdate` | PROJECT_LOG bayat ifadeleri (alıntıyla bulunur; satır numarası verilmez): §1 "**2026-11-13 kullanıcı beyanı (ölçülmedi):**" → ölçüldü (`70946ff`), 2026-11-13'te gözlendi; §2.3 "(yamasız APK'da bu anahtar yok)" → anahtar prefs dosyasında yok; §3.5 "`origin/main`'den sonraki dört commit push edilmedi", "*(push edilmedi)*", "*(HEAD, push edilmedi)*" → yazım anındaki push durumu ve commit listesi (`7fa0a51`, `70946ff`, `03b0898`, `775b321`, C0, C0 takip commit'i, C1); §4 "**Açık kararlar (2026-11-13):**" ve DEC-07/DEC-08 satırlarındaki "**AÇIK**" → konusuz (`DEC-28`); §8 tablosunda IMPL-96 ile çözülen satırlar (11. denetim "outstanding", "47 commit, 225 dosya, remote yok", "Telefon AOSPA A15 + KernelSU Next … ölçülmedi", README/UNTRACKED, `release-checklist.md:165`); §9 R8 "Dosyalar farklıysa … ölçülmedi" → HAL farklı, sensör aynı (ölçüldü), K9 karar verir; `docs/pre-rental-plan.md:N` ve `docs/build-environment.md:N` atıfları `03b0898`'in eklediği 8 satırlık not yüzünden +8 kaymış. §2, §3.2 (IMPL-96 tamamlandı), §4 (`DEC-27`…`DEC-32` ledger'da). Eski §11 girdilerine dokunulmaz | `PROJECT_LOG.md` | Türkçe, LF; ledger ile çelişki yok; kimlik değeri yok |
-| W6 | task `HandoffRewrite` | NEXT_PROMPT'u Pencere 3 (koşu 21) için yeniden yaz: K9 ve §7'deki kapsam soruları, koşu 21 tuzakları | `NEXT_PROMPT.md` | Türkçe, LF |
-| SEC | security-reviewer | Push'un göndereceği her şey: `origin/main..integrate/impl-96` (`7fa0a51` dahil) ve C2'ye girecek, commit edilmemiş W5/W6 diff'i (`git diff HEAD`). Sır, seri numarası, sunucu adresi. Ek A.5'teki kimlik kontrolünü orkestratör C2 ve fast-forward'dan sonra, push'tan hemen önce çalıştırır | salt-okur | Bulgu yok |
+### 6.1 Kararlar (2026-11-14, kullanıcı onaylı)
 
-**Sıra ve onaylar (her biri ayrı):** W5 ∥ W6 → SEC (commit'li aralık ve `git diff HEAD`) → C2 `Window 2: project log sweep and handoff for planning run 21` (W5, W6 ve bu dosya; belgeler push'u "C2'den hemen sonra, onayla" diye yazar ve sonucun bir sonraki pencerenin açılışında `git ls-remote origin` ile doğrulanacağını belirtir) → `main`'in `integrate/impl-96`'ya fast-forward edilmesi → Ek A.5 kimlik kontrolü (tüm ref'ler, C2 dahil) → `git push origin main integrate/impl-96` → `git ls-remote origin` ile hash karşılaştırması (sonuç sohbette raporlanır, Pencere 3'ün kaydına girer).
-**Silinecek depolar:** `gh api` ile ölçülür. Silinmişse PROJECT_LOG'a yazılır; ledger'daki `DEC-30` yürütme notu ledger'a yazan bir sonraki koşuda (koşu 21) eklenir.
+| # | Konu | Karar |
+|---|---|---|
+| 1 | W5 kapsamı | (a) Geniş: plandaki W5 maddeleri ve aynı sınıftan, C1, `03b0898` ve Pencere 1'in sonucu yüzünden eskiyen her şey (§6.2). AOSPA dönemi anlatısı silinmez: şimdiki durum iddiası olan cümle düzeltilir, tarihsel cümleye tarihli not eklenir |
+| 2 | Plan §7 | (a) Koşu 21 tuzakları ve keşif düzeltmeleri §7'ye, yeni bulgular §10'a yazılır; yeni sorular Pencere 3'ün açılış sorularına eklenir (K0, `O2`) |
+| 3 | İnceleme düzeni | (a) SEC-A1–A3 ve REV-3 `O3`'te W5 ile paralel; REV-1, REV-2 ve SEC-B `O5`'te |
+| 4 | C1 bulguları (REV-3) | (a) Ledger bulguları §10'a (koşu 21); öteki dosyalardaki bulgular düzeltici task ile sonraki kapanış commit'ine; amend yok |
+| 5 | Kimlik kontrolünün yorumu | (a) Değer taşıyan satır (`[anahtar]: [değer]`, `anahtar=değer`, `anahtar: değer`) `<redacted>` olmalı; anahtarı yalnız düzyazıda anan satır sayılır ve raporlanır ama hata sayılmaz (Ek A.5) |
+| 6 | Sonuç cümleleri | Yalnız sonuç varken yazılır: I2a (`O4`) o anda bilinen olguları, I2b (`O5`; FIX ve GATE'ten sonra, C2'den hemen önce) geçit değerlerini ve SEC/REV hükümlerini yazar. I2b farkı ayrıca bayt/boru kontrolünden ve kimlik taramasından geçer (danışman notu, 2026-11-14) |
+| 7 | Aşama döngüsü | §0. `NEXT_PROMPT.md` her aşama sonunda yeniden yazıldığı için koşu 21 devri (W6) `O5`'e taşındı ve C2'ye girer |
+
+### 6.2 Keşif envanteri (`O0`, 2026-11-14, ağaç `9ee505f`)
+
+W5'in `PROJECT_LOG.md` iş listesi. Yerler alıntıyla bulunur; satır numaraları `9ee505f` ağacına aittir ve K0 (`O2`) betikle yeniden doğrular. Alıntılar “…” içindedir. Son sütundaki kimlikler Ek A.1, A.2 ve A.6'dadır. §2.6 ve §11'e W5 dokunmaz (§0 adım 4).
+
+| Yer | Şu an (alıntı) | Güncel olgu → hedef | Kaynak |
+|---|---|---|---|
+| §1 `:9` | “Bu belgedeki ölçümlerin hepsi telefonda AOSPA Vauxite (Android 15) ve KernelSU Next varken yapıldı”; “**2026-11-13 kullanıcı beyanı (ölçülmedi):**” | 2026-11-13'ten önceki ölçümler AOSPA A15'te; HyperOS 4 2026-11-13'te gözlendi ve aynı gün salt-okur ölçüldü (`70946ff`, §2.3). “Çinli bir geliştiricinin portu” kullanıcı beyanı olarak kalır | D1–D3, OPN |
+| §1 `:15` | “İkisi de herkese açık; henüz hiç derlenmedi” | Derleme bırakıldı (`DEC-28`); iki depo silinecek (`DEC-30`), 2026-11-14'te hâlâ duruyor | G8b |
+| §1, §2.3 `:14`, `:127`, `:131`, `:132` | “L:638”; “L:640”; “L:642” | `L:647`; `L:649`; `L:651` | LSH |
+| `:3`, §2 `:43` | “Durum tarihi **2026-11-13**”; “## 2. Şu an neredeyiz (2026-11-13)” | Yazım tarihi | — |
+| §2.1 `:46` | “sonra C0 (`ORCHESTRATION_PLAN.md`'yi ekleyen commit)” | C0 `b603516`, C0 takip commit'i `c2abd46`, C1 (başlıkla) ve Pencere 2 aşama commit'leri (başlıklarıyla); yazım anındaki commit sayıları | OPN2 |
+| §2.1 `:47` | “`DEC-27` atandı; ledger'a Pencere 1'de yazılır” | Ledger §8 `:605` | L653 |
+| §2.1 `:49` | “`7fa0a51` ve `integrate/impl-96` dalı push edilmedi. Push Pencere 2'de karara bağlanır” | Yazım anındaki push durumu; push `2 · O5`'te, ayrı onayla | G4b |
+| §2.1 `:52` | “Ölçüm (2026-11-13, `gh api`): üç depo da hâlâ var.” | 2026-11-14T07:23:21Z: üçü de 200 (I2a yeniden ölçer) | G8b |
+| §2.1 `:54` | “344 izlenen dosya.” | 350 | OPN2 |
+| §2.1 `:60` | “düzeltmesi IMPL-96'da.” | IMPL-96 notları yazıldı (ledger `:100`, `:552`, `:554`, `:556`, `:558`) | LSH |
+| §2.1 `:61` | “IMPL satırı hâlâ yok (IMPL-96)” | IMPL-96 satırının (4). maddesi kaydediyor (ledger `:525`) | L653 |
+| §2.1 `:63`, `:64` | “son sürüm C0'dadır”; “C0 (`ORCHESTRATION_PLAN.md`, bu günlük ve `NEXT_PROMPT.md`'yi taşıyan commit) işlendi” | Sonraki sürümler `c2abd46`, C1 ve Pencere 2 aşama commit'lerinde; C0 = `b603516` | OPN2 |
+| §2.1 `:67` | “(47 commit, 225 dosya, remote yok) bayattır (§8)” | IMPL-96 notuyla düzeltildi (ledger `:528`) | LSH |
+| §2.2 `:83` | “cihazda kurulu v2.2 ile bayt-özdeşliği bozar” | v2.2 AOSPA A15'te kuruluydu; HyperOS 4'te proje modülü kurulu değil | D7 |
+| §2.3 `:98` | “(yamasız APK'da bu anahtar yok)” | Anahtar prefs dosyasında yok; APK'da olup olmadığı ölçülmedi | D9; §10 |
+| §2.3 `:104` | “(DEV; salt-okur adb; ledger'a işlenmedi)” | IMPL-96 satırının (4). maddesi kaydediyor | L653 |
+| §2.4 `:147` | “Ledger §5'te IMPL-01 … IMPL-95 kayıtlı” | IMPL-96 de kayıtlı (`:525`) | L653 |
+| §2.4 `:165` | “**Sıradaki numaralar:** `IMPL-96`”; “(Pencere 1'de ledger'a yazılacak)” | Sıradaki `IMPL-97`; `DEC-27`…`DEC-32` ledger'da (`:605`–`:610`); sonraki `DEC-33` | L653 |
+| §2.4 `:166` | “Pencere 1'de ledger'a işlenecek” | Konusuz notları ledger'da (`:582`, `:583`, `:599`, `:601`, `:603`, `:604`) | LSH |
+| §2.5 `:174` | “(`DEC-28` atandı; ledger'a Pencere 1'de yazılır)” | Ledger `:606`; §7 üst girdisi `:550` | L653 |
+| §2.5 `:176` | “L:549”; “L:598-601” | `L:552`; `L:601-604` | LSH |
+| §2.5 `:217` | “(PRP:231-246)” | `PRP:239-254` | SH8 |
+| §2.5 `:220` | “`DEC-07` açık” | Tarihli not: 2026-11-13'ten beri konusuz (`DEC-28`); `:174` bölümün kalanını tarihsel sayar | A.1 |
+| §2.6 `:228`–`:240` | “### 2.6 Bu oturumun durumu (Pencere 0, 2026-11-13)” | W5 dokunmaz; orkestratör `O4`'ten itibaren (I2a) aşama kapanışlarında günceller | §0 |
+| §3.1 `:289` | “etkisi `Faz7.3`'te doğrulanacak” | Tarihli not: `Faz7.3` amaçsız (`DEC-28`) | AUD11 |
+| §3.1 `:292` | “henüz kiralama yapılmadı” | Kiralama hiç yapılmayacak (`DEC-28`) | A.1 |
+| §3.1 `:294` | “kuyruğun başında” | 11. denetimin kuyruğu 2026-11-13'ten beri geçersiz | AUD11 |
+| §3.2 `:407` | “IMPL-96 (devam ediyor)”; “Ledger satırı Pencere 1'de yazılacak”; “ledger satırı yazılmadı”; kanıt “§2.6, §11” | Tamamlandı; kanıt `L:525` ve C1 (başlıkla), IMPL-95 satırının biçiminde | L653 |
+| §3.3 `:440` | “`DEC-26`: `Faz7.2` Scaleway'e taşındı; snapshot kesilmedi; commit edilmedi” | `7fa0a51`'de commit edildi | G1 |
+| §3.3 `:454` | “PRP:41, PRP:62” | `PRP:49`, `PRP:70` | SH8 |
+| §3.3 `:455` | “PRP:105” | `PRP:113` | SH8 |
+| §3.3 `:456` | “`-52/53/54` kapandı, `-55/56/57` yeni açıldı; commit edilmedi” | `7fa0a51`'de commit edildi | G1 |
+| §3.5 `:494` | “Dal `main`'deki 62 commit”; “`origin/main`'den sonraki dört commit push edilmedi (§2.1)” | Liste `origin/main`'deki (`587e3b5`) 62 commit'tir (yerel `main` 63); ardından yazım anındaki push durumu | G4b |
+| §3.5 (yeni gruplar) | — | **2026-11-13 (6):** `7fa0a51`, `70946ff`, `03b0898`, `775b321`, `b603516`, `c2abd46`; **2026-11-14:** C1 (başlıkla) ve Pencere 2 aşama commit'leri (başlıklarıyla); konu satırları `git log --reverse` çıktısından | CDATE |
+| §3.5 `:574` | “*(origin/main)*” (`f8a05ca` satırı) | Tarihli not: eski remote'un (`ahmetxa/ishtar`) ucuydu | G6 |
+| §3.5 `:577`, `:578`, `:581` | “*(push edilmedi)*” | Not kalkar: `587e3b5`'e kadar hepsi push edildi | G4b |
+| §3.5 `:582` | “*(HEAD, push edilmedi)*” | “*(origin/main)*” | G4b |
+| §4 `:584` | “## 4. Kararlar (DEC-01 … DEC-26)” | `DEC-01 … DEC-32` | L653 |
+| §4 `:586` | “(satır :569–:601;” | §8 başlığı `:572`, satırlar `:576`–`:610` | L653 |
+| §4 `:588` | “**Açık kararlar (2026-11-13):**”; “Kalan 23 kararın hepsi yanıtlandı ya da kapandı” | Açık: `DEC-09` (koşullu) ve K9 (henüz DEC yok); `DEC-07`, `DEC-08` konusuz (`DEC-28`); kernel-upstream iddiası düştü (K3); toplam 32 karar | A.1, K3 |
+| §4 `:592`, `:593` | DEC-07 ve DEC-08 satırlarındaki “**AÇIK**” (ikişer) | Konusuz (`DEC-28`); ledger `:582`, `:583` | A.1 |
+| §4 `:592`–`:617` | `ledger:573`…`ledger:601` hücreleri | Her biri +3; örnek DEC-09 `:584`, DEC-01 `:602`, DEC-26 `:604` | LSH |
+| §4 `:595` | DEC-01 satırı | 2026-11-13 güncellemesi (`DEC-27`): depo `ahmetxa/ishtar_cam_modes`; ledger `:602` | A.1 |
+| §4 `:613`, `:615`–`:617` | DEC-22, DEC-24, DEC-25, DEC-26 durum hücreleri | Konusuz (`DEC-28`); `:617`'de `docs/build-environment.md:118-130` → `:126-138` | A.1, SH8 |
+| §4 (yeni satırlar) | — | `DEC-27`…`DEC-32` satırları (Ek A.1; ledger `:605`–`:610`) | A.1 |
+| §4 `:619` | “ledger'a IMPL-96 ile (Pencere 1) yazılacak” | Yazıldı (`:605`–`:610`) | L653 |
+| §4 `:623`, `:624`, `:627`, `:628`, `:629` | “ledger'a Pencere 1'de yazılır”; “Pencere 1'de yazılacak” | Yazıldı | L653 |
+| §4 `:631` | “ledger'a Pencere 1'de işlenecek” | İşlendi | LSH |
+| §4 `:633` | “ledger satırı Pencere 1'de” | Yazıldı (`:525`) | L653 |
+| §4 `:634` | “Pencere 2'de sorulur” | `2 · O5`'te, ayrı onayla | §6.4 |
+| §5.1 `:642` | “ledger:638–:642” | `:647`–`:651` | LSH |
+| §5.2 `:656`; §5.3 `:669` | “ledger:586” | `:589` | LSH |
+| §5.2 `:657` | “ledger:632” | `:641` | LSH |
+| §5.2 `:663` | “ledger:629” | `:638` | LSH |
+| §5.3 `:677` | “ledger:598, :601” | `:601`, `:604` | LSH |
+| §5.4 `:691` | “HAL yama tablosunun HyperOS 4'te geçerliliği ölçülmedi” | HyperOS 4 HAL'i farklı (`2a955e68…`, 2026-11-13'te ölçüldü): tablo uymaz ve HAL koruması kapalı başarısız olur [ÇIKARIM, M1]; yeniden türetme K9 | D4, M1 |
+| §6 `:695` | “README:143 ve Faz3.7:71 UTC diyor” | README C1'de düzeldi (`:153`); `Faz3.7:71` sürüyor (§10, koşu 21) | E7 |
+| §6 `:732` | “snapshot'ı da IMPL satırı da yok” | IMPL-96 satırı kaydediyor; snapshot yok | L653 |
+| §7 `:749` | “:165 yol hatası” | C1'de düzeldi (T3) | T3 |
+| §8 `:781` | “11. denetim "outstanding"”; “commit edilmedi” | Ledger `:100` ve `:552`'de IMPL-96 notları; `7fa0a51`'de commit edildi | LSH, G1 |
+| §8 `:783` | “Step 3 yeniden denetimi "outstanding"” | Kısmen çözüldü: eski `:551`, `:553`, `:555` artık `:554`, `:556`, `:558` ve notlu; `:51`, `:57`–`:60` ve `:589` notsuz (§10, koşu 21) | LSH |
+| §8 `:784` | “47 commit, 225 dosya, remote yok”; “62 commit, 344 izlenen dosya, `origin` var, 4 commit ileride” | Çözüldü (ledger `:528`); güncel: `origin/main` `587e3b5` (62), `main` 63, dal 69 ve aşama commit'leri, 350 dosya | OPN2, G4b |
+| §8 `:781`–`:793`, `:809`, `:810`, `:817`–`:820` | ledger satır atıfları | Kaymaya göre | LSH |
+| §8 `:795`, `:796`, `:804`, `:806` | UNTRACKED “`:61`” ve “`:63`” atıfları | C1 öncesi numara; içerikle yeniden eşlenir (UNTRACKED `:59`, `:61`) | C1 |
+| §8 `:811` | “`docs/pre-rental-plan.md:32`, `:233-234`, `:252-253`”; “PRP:31,122,181,205” | `:40`, `:241-242`, `:260-261`; `PRP:39,130,189,213` | SH8 |
+| §8 `:812` | “sonuç `snapshots/snapshots/…` olur” | Çözüldü (C1, T3); anlatı düzeltilir: dizin olmadığı için dosya yazılmaz, betik yine `stored:` basar [ÇIKARIM] | SMK-O |
+| §8 `:816` | “`devir-teslim-promptu.md:247`” | Dosya 2026-11-13'te silindi (K4) | K4 |
+| §8 `:822` | README satırı (“`README.md:18`, `:19`, `:20`, `:77-78`, `:142`, `:143`, `:186`”) | Çözüldü (C1): README `:20`, `:21`, `:22`, `:85-86`, `:94`, `:152`, `:153`; Exclusions satırı kaldırıldı | C1 |
+| §8 `:823` | UNTRACKED satırı; “344 dosya”; “ledger:576, :599” | Çözüldü (C1); 350; `:579`, `:602` | C1, LSH |
+| §8 `:827` | “`DEC-27` IMPL-96'da kaydedilecek”; “`pre-rental-plan.md:250`” | Kaydedildi (`:605`; DEC-01 `:602`); `:258` | L653, SH8 |
+| §8 `:828` | “`README.md:144`; `UNTRACKED-BY-DESIGN.md:38-41`, `:63`” | Çözüldü (C1): UNTRACKED `:38`–`:39`, `:61`; README satırı kaldırıldı | C1 |
+| §8 `:829` | “Telefon AOSPA A15 + KernelSU Next”; “kullanıcı beyanı: HyperOS 4 portu, kernel 5.15.215; ölçülmedi” | 2026-11-13'te ölçüldü (`70946ff`; ledger §6 `:532`; DEV `:223`–`:244`) | D1–D11 |
+| §8 `:848` | “**README / UNTRACKED-BY-DESIGN:**” maddesi (T2) | Çözüldü (C1) | C1 |
+| §8 `:849` | “`:165` yol hatası düzeltilmeli (T3)” | T3 C1'de düzeldi; maddenin geri kalanı sürer | T3 |
+| §8 `:850` | “IMPL-96'nın kapsamı §2.6'daki L biriminde” | Yapıldı (`:525` ve ledger §6–§8 notları) | L653 |
+| §9 `:863` | “Çözüldü; v2.2 kurulu (VAL-INSTALL)” | AOSPA A15'te kuruluydu; HyperOS 4'te kurulu değil | D7 |
+| §9 `:865` | “Dosyalar farklıysa 16 noktalı tablo ve sensör varyantları uymaz; ölçülmedi (`NEXT_PROMPT.md` §4.3)” | HAL farklı (`2a955e68…`), sensör aynı (`EXPECT_MD5`), 2026-11-13'te ölçüldü; K9 karar verir (plan §2, §7); NEXT_PROMPT bölüm atfı kalkar | D4, D5 |
+| §9 `:874` | “`origin`'de 62 commit var; `7fa0a51` ve `integrate/impl-96` push edilmedi.” | Yazım anındaki push durumu; push `2 · O5`'te | G4b |
+| §9 `:875` | “**N4 Ledger geride:**” | Çözüldü (IMPL-96) | L653 |
+| §9 `:878` | “2026-09-20 oturumunun kaydı yok (süreklilik boşluğu); IMPL-96 kaydeder.” | Kaydedildi (`:525`, madde 4) | L653 |
+| §10 `:885` | “sıradaki **IMPL-96**” | `IMPL-97` | L653 |
+| §10 `:888` | “ledger'a Pencere 1'de yazılacak” | Yazıldı (`:605`–`:610`) | L653 |
+| §10 `:923` | “md5 `ce65f862…`” | AOSPA dönemindeki yamalı derleme; HyperOS 4'te yamasız `fa4066eb…` | D9 |
+| §10 `:932`–`:934` | barista, `fixes.diff` ve Teardown maddeleri | Tarihli not: Faz 7 işi `DEC-28` ile tarihsel | A.1 |
+
+**`O2` girdileri** (K0 bunları §7'ye ve §10'a işler; kaynak `W6Window3Inputs` scout raporu, 2026-11-14):
+- **§7 düzeltmeleri:**
+  - `:159`'daki AUDIT-FIX eşlemesi: Hetzner satırlarını (`Main-Planing.md:75`, `:211`, `:265`) yalnız `AUDIT-FIX-57` kapsar (`Sub-Planing-Audit.md:380`); `-41` §8 adım 5'tir (`Main-Planing.md:277`; Audit `:383`), `-42` `:22`, `:61` ve `:288`'dir (Audit `:384`). "Emekli bölümlerle birlikte kapanır" yalnız `:211` için doğrudur; `:75` (§3) ve `:265` (R9) ayrı düzenleme ister.
+  - `AUDIT-FIX-57` ayrıca `Project-Comprehension.md` EV-20 (`:51`) ve CQ-13 (`:25`) ile `docs/reverse-engineering-toolchain.md:220`'yi kapsar. İlki §3'teki sıcak nokta listesinde yok; ikincisi `Planner-docs/` dışında, Step 1 ve Step 2'nin yazma sınırının ötesinde.
+  - Seçenek (ii) "Faz 7 ve 8 emekli" ile çelişir: Faz 8'in kamera yarısı sürerse Faz 8 ancak kısmen emekli olur; başlığı (`Main-Planing.md:221`) ve yol haritası satırı (`:126`) yeniden yazılır.
+  - Faz 6: ledger `:98` "VAL-BUILD still deferred to Phase 7 by design" diyor, Index `:177` doğrulamayı Faz 7'ye bağlıyor; §7 yalnız `Faz6.1`'i anıyor.
+  - ClaudeQB süreci: Step 1 için handoff dosyası yok (yalnız `run-step2.md`, `run-step3.md`, `run-step4.md`); Step 1 yalnız `Main-Planing.md`'yi yazar (`First-Planner.md:10-11`, `:363-364`); Step 2 `Main-Planing.md`'yi düzenleyemez (`Second-Planner.md:61`); ikisinin aynı oturumda yapılması kullanıcının açık isteğini gerektirir (`SKILL.md:11`, `workflow-quality.md:120`); `run-step2.md:27` tam ayrıştırma ister, koşu 21 ise sınırlıdır (koşu 12–15, 19, 20 emsali); `/claudeqb:claudeqb` komutunu Claude Code'da kullanıcı yazar (`SKILL.md:4`, `disable-model-invocation: true`); omp altında dosyalar mutlak yolla okunur, doğrulayıcı `py -3 <mutlak yol>` ile çalışır.
+- **§7 tuzakları (`validate_planner_docs.py`):**
+  - Yol haritasından Faz 7/8 satırını silmek ya da ilk hücreyi `~~7~~` yapmak `extra_phase_folder_without_main_phase` üretir (`:163`, `:1011-1013`); `--strict` bunu hataya çevirir (`:1286-1290`).
+  - `superseded` satırı dolu `Superseded By` ister (`:848-849`); ledger'daki ilgili §4 satırlarında bu hücre bugün `-`.
+  - Denetim durumu dosyadaki ilk `status:` eşleşmesinden okunur (`:1071-1078`); bugün `Sub-Planing-Audit.md:18`.
+  - Seçenek (i): klasörü olmayan yeni `10` yol haritası satırı `--strict` olmadan da hatadır (`missing_phase_folder`, `:1010`), ardından `phase_has_no_subplans` (`:1039`); Step 1 ile Step 2 arasında yalnız `--mode step1 --strict` anlamlıdır.
+  - H1 düzeni yalnız `—` ya da `-` kabul eder (`:165`; en dash `–` hatadır); dosya adı küçük harfli kebab-case olmalı (`:157`); uygulama sözleşmesinde `Validation Command IDs` `-` ya da `none` olamaz; 160 karakterden uzun `## 3.`/`## 7.` gövdeleri üç ya da daha çok dosyada tekrar ederse uyarı verir (`:1046-1049`; strict'te hata).
+  - Dosyası olmayan alt plana ledger §4 satırı `missing_ledger_subplan` üretir (`:830`): satırlar Step 2 dosyaları yazdıktan sonra eklenir. §4 tablosundaki boş satır sonraki satırların okunmasını sessizce durdurur (`:404-430`).
+  - `--mode step4 --strict` 11. denetimin geçersiz kuyruğuna karşı yine geçer: Pencere 4'ten önce Step 4 başlatılmaz.
+- **§10'a yeni bulgular:**
+  - §10'daki ledger satır atıfları ve Ek A.4 çapaları C1 öncesine göre numaralı; güncel karşılıkları `LSH` ile (örnek: `:575` → `:578`, `:582-583` → `:585-586`, `:586` → `:589`, `:633` → `:642`).
+  - `Main-Planing.md` ve Ontology değişmez 11 Hetzner'i hâlâ anıyor; bu, `DEC-26`'dan (Scaleway) beri zaten bayattı.
+
+### 6.3 Aşamalar ve görevler
+
+| Aşama | # | Ajan | Hedef ve kapsam | Yazma yetkisi | Kabul kriteri | Bağımlı |
+|---|---|---|---|---|---|---|
+| `O2` | K0 | orkestratör | Kontrat: (1) §6.2'deki her alıntıyı ve satır numarasını betikle doğrula, tutmayanı düzelt (alıntı hiç yoksa ya da iddia yanlışsa maddeyi gerekçesiyle çıkar); (2) W5'in yazım kurallarını yeni §6.5'e yaz (tarihli not biçimi, §8'de çözülen satırların işaretlenmesi, §3.5 grupları, §4'e eklenecek satırlar, atıf kuralları); (3) §6.2'deki `O2` girdilerini §7'ye (düzeltmeler, tuzaklar, yeni açılış soruları) ve §10'a işle; (4) Pencere 2 alt ajan ortak bağlamını §6.5'e yaz (olgu kaynakları, dil ve bayt kuralları, kimlik ve atıf kuralları, sahiplik, dönüş bloğu) | `ORCHESTRATION_PLAN.md` | LF, CR 0, NUL 0, tablo boruları sabit; her olgu Ek A'da ya da o oturumda ölçülmüş; ledger, `Planner-docs/`, `docs/` ve `PROJECT_LOG.md` §1–§10 dokunulmamış | `2 · O0+O1` |
+| `O3` | W5 | task `ProjectLogUpdate` | §6.2 envanteri, K0'ın yazdığı §6.5 kurallarıyla | `PROJECT_LOG.md` §1–§10 (§2.6 hariç) | Türkçe, LF, CR 0; kimlik değeri yok; ledger ile çelişki yok; değişen her cümlenin alıntı çapası tek; bölüm numaraları ve başlık sırası korunur; NEXT_PROMPT'a yalnız adıyla atıf; §2.6 ve §11'e dokunulmaz | K0 |
+| `O3` | SEC-A1 | security-reviewer | `origin/main..HEAD` (oturum açılışındaki HEAD), `git log -p` ara hâller dahil: `snapshots/`, `docs/`, `README.md`, `UNTRACKED-BY-DESIGN.md` | salt-okur | P0/P1 yok: sır, Luhn adayı, `dc27e5d0` dışında seri numarası, sunucu adresi | K0 |
+| `O3` | SEC-A2 | security-reviewer | Aynı aralık: `Planner-docs/` | salt-okur | Aynı | K0 |
+| `O3` | SEC-A3 | security-reviewer | Aynı aralık: `PROJECT_LOG.md`, `NEXT_PROMPT.md`, `ORCHESTRATION_PLAN.md` ve commit üstverisi | salt-okur | Aynı | K0 |
+| `O3` | REV-3 | reviewer | C1 diff'i, yalnız ledger, `README.md`, `UNTRACKED-BY-DESIGN.md` ve `docs/`: Ek A'ya karşı olgu doğruluğu, biçim, kapsam | salt-okur | P0/P1 yok; bulgular karar 4'e göre | K0 |
+| `O4` | I2a | orkestratör | W5 sahiplik kontrolü (`git diff --stat`, yalnız §1–§10); §2.6'yı güncel aşamaya göre yaz; depoları `gh api` ile yeniden ölç; `O3` bulgularının nereye yönlendirildiğini kaydet | `PROJECT_LOG.md` §2.6 ve §11, `ORCHESTRATION_PLAN.md` | W5 dışı değişiklik yok; o anda bilinmeyen sonuç yazılmaz | `O3` |
+| `O4` | GATE | orkestratör | §3 geçitleri: doğrulayıcı `--mode all` ve `--mode step4 --strict`, `--self-test`, bayt/NUL/boru | — | V1–V3 taban değerde | I2a |
+| `O5` | W6 | task `HandoffRewrite` | `NEXT_PROMPT.md`'yi Pencere 3 · `O0`+`O1` (koşu 21) için yaz: §0 döngüsü; K9 ve §7'deki açılış soruları başta; koşu 21 tuzakları; Pencere 2 sonucu; push'un C2'den hemen sonra onayla yapılacağı ve Pencere 3 açılışında `git ls-remote origin` ile doğrulanacağı | `NEXT_PROMPT.md` | Türkçe, LF; plan §0, §3 ve §7 ile tutarlı; kimlik değeri ve C2 hash'i yok; PROJECT_LOG'a yalnız bölümle atıf | `O4` |
+| `O5` | REV-1 | reviewer | `PROJECT_LOG.md`'nin son hâli: W5 değişiklikleri ve kalan bayatlık; Ek A, A.6 ve ledger'a karşı | salt-okur | P0/P1 yok | `O4` |
+| `O5` | REV-2 | reviewer | `NEXT_PROMPT.md` ve Pencere 2'de plana yapılan değişiklikler; plan, ClaudeQB ve doğrulayıcıya karşı | salt-okur | P0/P1 yok | W6 |
+| `O5` | SEC-B | security-reviewer | SEC-A tabanından (`O2` kapanış commit'i) sonraki commit'ler ve `git diff HEAD` | salt-okur | Bulgu yok | W6 |
+| `O5` | FIX | task (dosya sahibine göre) | P0/P1 düzeltmeleri; FIX olursa GATE yeniden | İlgili dosya | Bulgu kapandı | REV-1, REV-2, SEC-B |
+| `O5` | I2b | orkestratör | Geçit değerleri ve SEC/REV hükümleri: §11 girdisi, `NEXT_PROMPT.md`'deki Pencere 2 sonucu, §1 satırları; fark ayrıca bayt/boru ve kimlik taramasından geçer | `PROJECT_LOG.md` §2.6 ve §11, `NEXT_PROMPT.md` (yalnız sonuç cümleleri), `ORCHESTRATION_PLAN.md` | O ana kadarki bütün sonuçlar yazılı | FIX, GATE |
+| `O5` | C2 | orkestratör | Kapanış commit'i `Window 2: project log sweep and handoff for planning run 21` (döngü kuralıyla, onay sorulmadan) | git | Ağaç temiz | I2b |
+| `O5` | FF | **kullanıcı onayı** | `git fetch . integrate/impl-96:main` (yalnız ileri) | git | `main` = C2 | C2 |
+| `O5` | RID | orkestratör | Ek A.5 kimlik kontrolü: tüm ref'ler ve izlenen dosyalar, C2 dahil; yalnız sayılar ve konumlar | — | Geçti | FF |
+| `O5` | PUSH | **kullanıcı onayı** | `git push origin main integrate/impl-96` (`--all` ve `--mirror` asla) | git | — | RID |
+| `O5` | LSR | orkestratör | `git ls-remote origin` ile yerel hash karşılaştırması; sonuç sohbette; Pencere 3 açılışında yeniden doğrulanır ve kaydedilir | — | İki ref = C2 | PUSH |
+
+### 6.4 Sıra, kapanışlar ve girdiler
+
+- **`O2`:** K0 → kapanış `Window 2 O2: contract for the project log sweep and the run 21 handoff`.
+- **`O3`:** W5 ∥ SEC-A1 ∥ SEC-A2 ∥ SEC-A3 ∥ REV-3 (tek uygulama ajanı W5) → bulguların yönlendirilmesi (P0/P1: FIX ya da beklenmedik durum; ledger bulguları: §10) → kapanış `Window 2 O3: project log sweep and pre-push reviews`.
+- **`O4`:** I2a → GATE → kapanış `Window 2 O4: integration and gates`.
+- **`O5`:** W6 ∥ REV-1 → REV-2 ∥ SEC-B → FIX (gerekirse; ardından GATE) → I2b → C2 `Window 2: project log sweep and handoff for planning run 21` (Pencere 2'nin son kapanışı; Pencere 3 devrini taşır; onay sorulmadan) → FF (**onay**) → RID → PUSH (**onay**) → LSR. FF, RID, PUSH ve LSR C2'den sonra, aynı oturumda yapılır; sonuçlar sohbette raporlanır, Pencere 3 açılışında `git ls-remote origin` ile yeniden doğrulanıp kaydedilir.
+- **Silinecek depolar:** `gh api repos/ahmetxa/<ad>` ile I2a'da ve C2'den önce ölçülür (404 = silinmiş). Silinmişse PROJECT_LOG'a yazılır; ledger'daki `DEC-30` yürütme notu koşu 21'de.
+- **SEC ve REV girdileri** (`local://` oturumlar arasında taşınmaz; ilgili oturumda yeniden üretilir; `O0`'daki boyutlar sırasıyla 69 KB, 321 KB, 412 KB, 9 KB ve 136 KB):
+  - SEC-A1: `git log -p --reverse --no-color --format=fuller origin/main..HEAD -- snapshots docs README.md UNTRACKED-BY-DESIGN.md`
+  - SEC-A2: `git log -p --reverse --no-color --format=fuller origin/main..HEAD -- Planner-docs`
+  - SEC-A3: `git log -p --reverse --no-color --format=fuller origin/main..HEAD -- PROJECT_LOG.md NEXT_PROMPT.md ORCHESTRATION_PLAN.md` ve `git log --reverse --no-color --format=fuller --stat origin/main..HEAD`
+  - REV-3: `git diff --no-color c2abd46 <C1> -- Planner-docs/Planing-Ledger.md README.md UNTRACKED-BY-DESIGN.md docs/` (C1: `git log --grep 'IMPL-96: repository move'`)
+  - SEC-B: `git log -p --reverse --no-color <O2 kapanışı>..HEAD` (`git log --grep 'Window 2 O2'`) ve `git diff HEAD`
 
 ## 7. Pencere 3 — Planlama koşusu 21 (Step 1 + Step 2)
 
@@ -300,4 +481,62 @@ Single source of facts for every IMPL-96 writer (ledger drafters, README/UNTRACK
 ### A.5 Push rules
 
 - Only explicit refspecs: `git push origin main integrate/impl-96`; never `--all` or `--mirror`; then `git ls-remote origin` hash comparison.
-- Before any push, an identity check over everything reachable from any ref (`git log --all -p`): every line with the key `persist.sys.miui.sno`, `ro.ril.miui.imei0` or `ro.ril.miui.imei1` reads `<redacted>`, and no 15-digit number passing the Luhn check appears. Report counts only; the redacted values are never recovered, read or written. The security review (SEC) of `origin/main..integrate/impl-96`, including `7fa0a51`, and of the uncommitted W5/W6 diff (`git diff HEAD`) runs before C2; this identity check runs after C2 and the fast-forward, immediately before the push, so it covers C2.
+- Before any push, an identity check over everything reachable from any ref (`git log --all -p`) and over every tracked file: every value-bearing line with the key `persist.sys.miui.sno`, `ro.ril.miui.imei0` or `ro.ril.miui.imei1` (forms `[key]: [value]`, `key=value`, `key: value`) reads `<redacted>`, and no digit-bounded 15-digit number passing the Luhn check appears. Lines that only name a key in prose are counted and reported but do not fail the check (decision 5a, 2026-11-14: read literally, the check would fail on prose such as this line). Report counts and locations only; the redacted values are never recovered, read or written. Window 2 order (§6.4): SEC-A1–A3 in `O3`, SEC-B in `O5` before C2; this check (RID) runs in `O5` after C2 and the fast-forward, immediately before the push, so it covers C2. Every stage closing also runs it (§0 step 4). The script below is the reference implementation (run from the repository root, for example through `py -3 - <<'EOF'` in Git Bash); it never prints a value:
+
+```python
+import re, subprocess
+KEYS = r"persist\.sys\.miui\.sno|ro\.ril\.miui\.imei[01]"
+KEY = re.compile(KEYS)
+VAL = [re.compile(r"\[(?:%s)\]\s*:\s*\[([^\]]*)\]" % KEYS), re.compile(r"(?:%s)\s*[=:]\s*(\S+)" % KEYS)]
+D15 = re.compile(r"(?<!\d)\d{15}(?!\d)")
+def luhn(s):
+    t = 0
+    for i, ch in enumerate(reversed(s)):
+        d = int(ch)
+        if i % 2:
+            d = d * 2 - 9 if d > 4 else d * 2
+        t += d
+    return t % 10 == 0
+def scan(name, text, c):
+    for n, line in enumerate(text.splitlines(), 1):
+        if KEY.search(line):
+            vals = [m.group(1) for r in VAL for m in r.finditer(line)]
+            if vals:
+                c["value_lines"] += 1
+                if any("<redacted>" not in v for v in vals):
+                    c["NOT_REDACTED"] += 1
+                    print("not redacted:", name, n)
+            elif "<redacted>" not in line:
+                c["prose_mentions"] += 1
+        for m in D15.finditer(line):
+            if luhn(m.group()):
+                c["LUHN15"] += 1
+                print("luhn candidate:", name, n)
+c = dict(value_lines=0, NOT_REDACTED=0, prose_mentions=0, LUHN15=0)
+log = subprocess.run(["git", "log", "--all", "-p", "--no-color"], capture_output=True).stdout
+scan("git-log", log.decode("utf-8", "replace"), c)
+files = subprocess.run(["git", "ls-files", "-z"], capture_output=True).stdout.decode("utf-8", "replace").split("\0")
+for f in filter(None, files):
+    try:
+        scan(f, open(f, "rb").read().decode("utf-8", "replace"), c)
+    except OSError:
+        pass
+print(c, "PASS" if c["NOT_REDACTED"] == 0 and c["LUHN15"] == 0 else "FAIL")
+```
+
+### A.6 Window 2 facts (2026-11-14)
+
+Measured by the orchestrator in `Pencere 2 · O0` (2026-11-14), read-only; no device command was sent. Window 2 writers take facts from A.2 and this table only.
+
+| # | Fact | Value | Source / when measured |
+|---|---|---|---|
+| OPN2 | Window 2 opening | Branch `integrate/impl-96`, tree clean, 69 commits, tip = C1 (cited by title); `main` 63 commits at `7fa0a51` (`[origin/main: ahead 1]`); no tags; 350 tracked files (G12 unchanged: C1 added no file) | git, 2026-11-14 |
+| G4b | Remote state | `git ls-remote origin` lists only `HEAD` and `refs/heads/main`, both `587e3b5` (62 commits). Not pushed: `7fa0a51`, `70946ff`, `03b0898`, `775b321`, `b603516` (C0), `c2abd46` (C0 follow-up), C1 and every window 2 stage commit | git, 2026-11-14 |
+| G8b | Repositories to delete | `gh api` at 2026-11-14T07:23:21Z: `ahmetxa/ishtar` (private), `ahmetxa/android_local_manifests` (public) and `ahmetxa/android_device_xiaomi_ishtar` (public) all still 200; `ahmetxa/ishtar_cam_modes` private, default branch `main` | `gh api`, 2026-11-14 |
+| L653 | Ledger after window 1 | 653 lines, all CRLF, NUL 0; IMPL-96 row at :525 (`## 6.` at :526); `DEC-27`…`DEC-32` at :605-:610; no `DEC-33` anywhere. Window 2 does not edit it | script, 2026-11-14 |
+| LSH | Ledger line shift by C1 | C1 added 9 lines (IMPL-96 row :525; new §7 top entry and separator :550-:551; `DEC-27`…`DEC-32` :605-:610). A reference written against the 644-line ledger maps, checked by content, to N for N <= 524, N + 1 for 525-548, N + 3 for 549-601 and N + 9 for N >= 602 (examples: 527→528, 549→552, 551/553/555→554/556/558, 586→589, 599→602, 601→604, 632→641) | scouts and `git diff c2abd46` against C1, 2026-11-14 |
+| SH8 | `03b0898` shift | Inserted exactly 8 lines after line 2 of `docs/pre-rental-plan.md` and `docs/build-environment.md` (`@@ -2,0 +3,8 @@`): a reference to line N >= 3 written before it now points to N + 8; all 13 such references in `PROJECT_LOG.md` checked by content | `git diff 7fa0a51 03b0898`; scout, 2026-11-14 |
+| CDATE | Commit date groups | `PROJECT_LOG.md` §3.5 groups commits by author date in +0300 (`git log --date=short`): `7fa0a51`, `70946ff`, `03b0898`, `775b321`, `b603516` and `c2abd46` on 2026-11-13; C1 on 2026-11-14 (01:05 +0300 = 2026-11-13T22:05Z) | git, 2026-11-14 |
+| RID0 | Identity check baseline | The A.5 script over `git log --all -p` and the 350 tracked files: 6 value-bearing key lines (3 in history, 3 in the tree), all `<redacted>`; 0 Luhn-valid 15-digit numbers; 9 prose-only key mentions (5 history, 4 tree), which a literal reading of A.5 would fail (decision 5a). PASS | script, 2026-11-14 |
+| SEC0 | Push-range pre-scan | Every added line of the seven commit patches (`git log -p origin/main..integrate/impl-96`, 3,148 lines including intermediate states): no token, private key, credential assignment, rented-server host name, MAC address or Luhn-valid 15-digit number; the two IPv4-shaped matches are version strings (probe :321; `PROJECT_LOG.md` §11); the probe header records that the other phone's serial was not recorded, and the emulator appears only under its adb port name; author and committer e-mail identical to the already pushed `587e3b5` | script, 2026-11-14 |
+| SMK-O | `smoke.sh -o snapshots/NAME` | `scripts/smoke.sh:283` creates only `snapshots/` (`mkdir -p "$SNAPDIR"`); `:284` redirects into `snapshots/snapshots/NAME.txt`, whose directory does not exist, so no file is written; `:285` still prints `stored: snapshots/snapshots/NAME.txt`; the script sets only `set -u` (`:29`) | code reading, 2026-11-14 [INFERENCE: not run] |
