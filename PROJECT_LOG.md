@@ -225,19 +225,19 @@ Aşağıdaki her şey (2026-09-20 ölçümü, kanonik yapılandırma, son ölç�
 1. DEV §4 (2026-09-20): Kullanıcıya göre MIUI ve AOSPA'nın kerneli "has been upstreamed by third parties". K3 ile 2026-11-13'te düştü: telefon artık 5.15.215 kernelli HyperOS 4'te (§2.3).
 2. **Çelişki (giderildi):** DEV §7 "An Android 16 build ships a different binary, so the table does not carry over" diyordu; oysa IMPL-92 (L:102, L:521) pinlenmiş A16 HAL'inin md5'ini stok korumayla eşit ölçmüştü. Cümle yerinde bırakıldı; 2026-11-13'te DEV §10'a düzeltme notu eklendi (`03b0898`). Android 16 derlemesi bırakıldığı için konu kapandı.
 
-### 2.6 Bu oturumun durumu (Pencere 0, 2026-11-13)
+### 2.6 Bu oturumun durumu (Pencere 2 · O4, 2026-11-14)
 
-- **Genel durum:** Bu pencere `ORCHESTRATION_PLAN.md`'nin Pencere 0'ıdır (keşif, plan, sözleşme). O0 keşfi ve O1 planı tamamlandı; kullanıcı planı onayladı ("onay"). Kural: her yeni sohbet penceresi planın tek bir fazını yürütür (kullanıcı isteği). `O0`–`O5` adları orkestrasyon şablonundan gelir; ClaudeQB proje fazlarıyla karışmasın diye böyle yazılır (§10).
-- **Kararlar (2026-11-13):** K1 = (b) (`DEC-29`); K2: ROM derleme bırakıldı (`DEC-28`); K3 düştü; K4 uygulandı; K5 ve K6: üç ROM deposu silinecek, silmeyi kullanıcı yapar (`DEC-30`); K7 = (a) (`DEC-32`); K8 = A (`DEC-31`, yürütüldü); konusuz = altı karar (`DEC-07`, `DEC-08`, `DEC-22`, `DEC-24`, `DEC-25`, `DEC-26`). Açık: K9 (Pencere 3) ve push (Pencere 2). Ayrıntı §4.
-- **K8 yürütüldü:** `integrate/impl-96` `main` (`7fa0a51`) üzerine yeniden kuruldu; yeni hash'ler §2.1'de, eski→yeni eşleme §11'de. Redaksiyonsuz uç depo dışında (§2.1, §11). Eski hash'ler yalnız bundle'da ve yerel reflog'da.
-- **Bu pencerede yapılanlar:**
-  - O0 keşfi: dört scout (`LedgerMap`, `PlanDocsMap`, `ModuleMap`, `DocsFactCheck`) ve salt-okur ölçümler; üç ROM deposu hâlâ var; doğrulayıcı ve self-test taban ile aynı (§11).
-  - `ORCHESTRATION_PLAN.md` yazıldı; `NEXT_PROMPT.md` Pencere 1'i gösterecek şekilde güncellendi.
-  - K8 yürütüldü (yukarıda); bu belge ve §11 girdisi güncellendi.
-  - C0 (`ORCHESTRATION_PLAN.md`, bu günlük ve `NEXT_PROMPT.md`'yi taşıyan commit) işlendi; `git log --diff-filter=A -- ORCHESTRATION_PLAN.md` ile bulunur.
-- **Eski iş birimleri:** L, T2, T3, V ve RUN21 artık planda Pencere 1-4 olarak duruyor (`ORCHESTRATION_PLAN.md` §1, §5-§8). T1 (K1=(b)) ve T5 (K3) düştü.
-- **Sıcak noktalar:** `ORCHESTRATION_PLAN.md` §3'teki liste (yalnız ana oturum dokunur): ledger, `Main-Planing.md`, `Sub-Planing-Index.md`, `Sub-Planing-Audit.md`, `Project-Ontology.md`; `CHANGELOG.md`; sürüm yerleri `module.prop`, `customize.sh`; üretilen `docs/release-manifest.md`; `.gitignore`, `.gitattributes`; `snapshots/`; `ORCHESTRATION_PLAN.md`; tüm git işlemleri.
-- Yeni pencere `NEXT_PROMPT.md` ile devam eder; sıradaki faz Pencere 1 — IMPL-96 uygulaması (`ORCHESTRATION_PLAN.md` §5).
+- **Genel durum:** Bu oturum, `ORCHESTRATION_PLAN.md`'deki Pencere 2'nin (kapanış ve yayın; durum `in_progress`) `O4` aşamasıdır: entegrasyon ve geçitler (I2a → GATE). Her aşama ayrı bir oturumda yürür (plan §0); `2 · O0+O1`, `2 · O2` ve `2 · O3` bitti (§11). Kalan aşama `2 · O5`: W6 (`NEXT_PROMPT.md`'yi Pencere 3'e hazırlama), REV-1, REV-2, SEC-B, gerekirse FIX, I2b, C2, `main` fast-forward'ı (onay), RID, push (onay) ve LSR (plan §6.3–§6.4).
+- **`2 · O3` sonuçları:** W5 bu günlüğün §1–§10'unda envanterin 97 maddesini karşıladı; 96'sı uygulandı, §2.6 maddesi gereği gibi dokunulmadı. SEC-A1 ve SEC-A2'de bulgu yok; SEC-A3'te P0–P2 yok, tek P3 (belgelerdeki yerel yollar Windows kullanıcı adını içeriyor) kabul edildi, işlem yok. REV-3'te P0/P1 yok; P2 (`UNTRACKED-BY-DESIGN.md:36`: Faz 1.1'deki izlenen dosya sayısı 84 değil 86) düzeltici task ile düzeltildi. Ayrıntı §11.
+- **Bulguların yönü (plan §10):** ledger bulgusu (REV-3 P3: `DEC-29`…`DEC-32` satırlarının "Raised by" hücresi) koşu 21'e; plan Ek A.5 betiğinin bölünmüş 15 haneli sayıyı saymadığı gözlemi (SEC-A3) koşu 21'e ya da sonraki plan revizyonuna; W5'in envanter dışı 15 gözlemi `2 · O5`'te REV-1'in girdisi, oradan FIX'e ya da koşu 21'e.
+- **W5 sahiplik kontrolü (I2a, betik):** `2 · O2` ve `2 · O3` kapanış commit'leri arasında dört dosya değişti: bu günlük, `ORCHESTRATION_PLAN.md`, `NEXT_PROMPT.md` ve `UNTRACKED-BY-DESIGN.md` (yalnız satır 36, REV-3 düzeltmesi). Bu günlükte §11 dışındaki her değişiklik envanter satırlarında (plan §6.2, 97 madde; belge başındaki `:3` ve `:5` dahil); §11'e yalnız sona `2 · O3` girdisi eklendi; §2.6 değişmemişti. W5 dışı değişiklik yok.
+- **Dal ve uzak depo (`2 · O4` açılışı, salt-okur):** dal `integrate/impl-96`, uç `2 · O3` commit'i, ağaç temiz; dal 72, `main` 63 (`7fa0a51`), `origin/main` 62 (`587e3b5`) commit; push edilmemiş 10 commit; `git ls-remote origin` yalnız `HEAD` ve `refs/heads/main` = `587e3b5`; etiket yok; 350 izlenen dosya.
+- **Silinecek depolar (`DEC-30`):** `gh api` (2026-11-14T19:34:57Z): `ahmetxa/ishtar` (özel), `ahmetxa/android_local_manifests` ve `ahmetxa/android_device_xiaomi_ishtar` (açık) hâlâ 200, yani silinmedi. Silmeyi kullanıcı yapar; C2'den önce yeniden ölçülür (404 = silinmiş); ledger'daki yürütme notu koşu 21'de.
+- **Geçitler:** plan §3 geçitleri (doğrulayıcının iki kipi, `--self-test`, bayt ve boru kontrolü) bu aşamada bir kez çalıştırılır; değerler §11'deki `2 · O4` girdisinde.
+- **Kararlar:** Pencere 2'de yeni `DEC` açılmadı; plan kararları (1a–5a, aşama döngüsü, envantere eklenen 15 yer) plan §2 ve §6.1'de, `DEC` listesi §4'te. Açık kararlar: K9 (Pencere 3'ün başında sorulur) ve push (`2 · O5`'te, C2 ve fast-forward'dan sonra ayrı onayla).
+- **Bekleyen işler:** `2 · O5` (yukarıda); depo silme (kullanıcı); Pencere 3–5+ (planlama koşusu 21, 12. denetim, K7 = (a) dilimleri; plan §7–§9). Telefona Pencere 2'de komut gönderilmedi; cihaz olguları 2026-11-13 ölçümüdür (§2.3).
+- **Sıcak noktalar:** `ORCHESTRATION_PLAN.md` §3'teki liste (yalnız ana oturum dokunur): ledger, `Main-Planing.md`, `Sub-Planing-Index.md`, `Sub-Planing-Audit.md`, `Project-Ontology.md`; `CHANGELOG.md`; sürüm yerleri `module.prop`, `customize.sh`; üretilen `docs/release-manifest.md`; `.gitignore`, `.gitattributes`; `snapshots/`; `ORCHESTRATION_PLAN.md`; tüm git işlemleri. Pencere 2 ledger'a yazmaz.
+- Yeni pencere `NEXT_PROMPT.md` ile devam eder; sıradaki aşama Pencere 2 · O5 — Son inceleme ve kapanış (`ORCHESTRATION_PLAN.md` §6.3–§6.4).
 
 ## 3. Kronoloji
 
@@ -1085,3 +1085,24 @@ Ek not: `docs/pre-rental-plan.md`'deki "Step 1–4" o planın kendi sırasıdır
 - **Değişen dosyalar:** `PROJECT_LOG.md` (§1–§10, W5; bu girdi), `UNTRACKED-BY-DESIGN.md` (satır 36, REV-3 düzeltmesi), `ORCHESTRATION_PLAN.md` (§1, §6 durum satırı, §7'de push ve silme sonrası güncellenecek yerler, §10, Ek A.6'ya iki satır: bu aşamanın açılış ölçümü ve Faz 1.1 dosya sayısı), `NEXT_PROMPT.md` (`2 · O4` için). Ledger, `Planner-docs/`, `docs/` ve README dokunulmadı.
 - **Bekleyen:** Pencere 2 · `O4`–`O5` (plan §6.3); push kararı (`O5`); K9 ve öteki açılış soruları (Pencere 3); depo silme (kullanıcı; üçü de 2026-11-14'te duruyor).
 - **Kapanış:** `Window 2 O3: project log sweep and pre-push reviews` (yerel commit; döngü kuralıyla onay sorulmadan). Push yok; `main` ileri sarılmadı. Sonraki oturum: Pencere 2 · O4 — Entegrasyon ve geçitler (`ORCHESTRATION_PLAN.md` §6.3).
+
+**2026-11-14: Pencere 2 · O4 (omp, yedinci pencere).** Kapsam: `ORCHESTRATION_PLAN.md` Pencere 2'nin entegrasyon ve geçitler aşaması (I2a → GATE). Bu girdi bir IMPL satırı değildir; ledger'a yazılmadı (Pencere 2 ledger'a yazmaz).
+
+- **Açılış ölçümleri (salt-okur):**
+  - Git: dal `integrate/impl-96`, uç `2 · O3` commit'i, ağaç temiz; dal 72, `main` 63 (`7fa0a51`), `origin/main` 62 (`587e3b5`) commit; push edilmemiş 10 commit; `git ls-remote origin` yalnız `HEAD` ve `refs/heads/main` = `587e3b5`; etiket yok; 350 izlenen dosya.
+  - GitHub (`gh api`, 19:34:57Z): silinecek üç depo da hâlâ 200 (`ahmetxa/ishtar` özel, ikisi açık); `ishtar_cam_modes` özel.
+  - Değerler plan Ek A.6'ya yazıldı. Telefona komut gönderilmedi; cihaz olguları bu aşamada teyit edilmedi.
+- **I2a, sahiplik kontrolü (betik):** `2 · O2` ve `2 · O3` kapanış commit'leri arasında dört dosya değişti: bu günlük, plan, `NEXT_PROMPT.md` ve `UNTRACKED-BY-DESIGN.md` (yalnız satır 36, REV-3 düzeltmesi; plan §6.1 karar 4). Bu günlükte §11 dışındaki her değişiklik plan §6.2 envanterinin satırlarında (97 madde; belge başındaki `:3` ve `:5` dahil); §11'e yalnız sona `2 · O3` girdisi eklenmiş; §2.6 değişmemiş. W5 dışı değişiklik yok.
+- **I2a, §2.6:** başlık dahil bu aşamaya göre yeniden yazıldı: Pencere 2'nin durumu, `2 · O3` sonuçları, bulguların yönü (plan §10), sahiplik kontrolü, dal ve depo ölçümü, açık kararlar. Bölüm eskisi gibi 13 satır; sonraki satırların numarası değişmedi, plan §7 ve §10'daki `2 · O3` kapanışına göre numaralar geçerli.
+- **GATE (19:42Z, plan §3):**
+  - Doğrulayıcı `--mode all`: `error_count=0`, `warning_count=1` (`step4_has_nonblocking_warnings=P2:1,P3:9`), `p0_findings=0`, `p1_findings=0`, `subplan_count=42`, `secret_findings=0`; çıkış 0.
+  - `--mode step4 --strict`: yalnız bilinen `strict_warning=step4_has_nonblocking_warnings=P2:1,P3:9` hatası (taban değer, regresyon değil); `p0_findings=0`, `p1_findings=0`; çıkış 1.
+  - `py -3 scripts/build-release.py --self-test`: `SELF-TEST: PASS`; iki derlemenin sha256'sı da `407fb9be180d96ff0fc6d409d27ad35d4b3de10e0ea3dea8e53a1daee33cb2e0`; A1, A2, A3 PASS. Ağaçta yeni dosya kalmadı.
+  - Bayt ve boru: değişen dosyalar LF, CR 0, NUL 0; bütün tablolarda boru sayısı başlıkla aynı.
+  - Sonuç: üç geçit de taban değerde.
+- **Bulgular (plan §10):** `git log --grep 'Window 2 O2'` iki commit döndürüyor, çünkü `2 · O0+O1` commit'inin gövdesi O2 aşamasını adıyla anıyor; `2 · O5`'teki SEC-B girdisi için konu satırına bağlı arama kullanılır. Bu aşamanın devri sahiplik kontrolünde yalnız üç dosya bekliyordu; plan dördüncüsünü (REV-3 düzeltmesi) kaydetmişti: plan kazandı.
+- **Çelişkiler (dosya kazandı):** kullanıcının genel orkestrasyon şablonu (tek oturumda Faz 0–5, yeni branch, `isolated`, `outputSchema`, alt ajanlar) bu aşamada dosyalara göre uygulanmadı: aşama orkestratöründür, alt ajan yok (plan §6.3).
+- **Kimlik taraması** (plan Ek A.5; `git log --all -p` ve 350 dosya): `value_lines=6`, `NOT_REDACTED=0`, `LUHN15=0`, `prose_mentions=16` → geçti. Artış (15 → 16) `2 · O3` commit'inden: §4'teki `DEC-31` satırı artık geçmişte de sayılıyor (9 geçmişte, 7 ağaçta); karar 5a gereği hata değil.
+- **Değişen dosyalar:** `PROJECT_LOG.md` (§2.6, bu girdi), `ORCHESTRATION_PLAN.md` (§1, §6 durum satırı, §10, Ek A.6'ya bu aşamanın açılış ölçümü), `NEXT_PROMPT.md` (`2 · O5` için). Ledger, `Planner-docs/`, `docs/`, README, UNTRACKED ve bu günlüğün §2.6 dışındaki §1–§10'u dokunulmadı.
+- **Bekleyen:** Pencere 2 · `O5` (plan §6.3–§6.4); push kararı (`O5`); K9 ve öteki açılış soruları (Pencere 3); depo silme (kullanıcı; üçü de 2026-11-14'te duruyor).
+- **Kapanış:** `Window 2 O4: integration and gates` (yerel commit; döngü kuralıyla onay sorulmadan). Push yok; `main` ileri sarılmadı. Sonraki oturum: Pencere 2 · O5 — Son inceleme ve kapanış (`ORCHESTRATION_PLAN.md` §6.3–§6.4).
