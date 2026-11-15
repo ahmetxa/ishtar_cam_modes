@@ -57,13 +57,19 @@ Durum sözlüğü: `pending`, `in_progress`, `done`, `blocked`.
 | 2 · O3 | Paralel uygulama | W5 ∥ SEC-A1 ∥ SEC-A2 ∥ SEC-A3 ∥ REV-3 | 2 · O2 | done | `Window 2 O3: project log sweep and pre-push reviews` (`git log --grep 'Window 2 O3'`); W5 envanterin 97 maddesini karşıladı (96'sı uygulandı, §2.6 maddesi gereği gibi dokunulmadı); tek ajanlı ilk deneme bağlam taşmasıyla bozuk düzenleme yaptı ve geri alındı, iş parçalara bölündü (P1 `task` ajanı; P2–P5 salt-okur taslak ajanları ve orkestratörün `edit` entegrasyonu); SEC-A1 ve SEC-A2 bulgu yok; SEC-A3 bir P3 (yerel yollar, kabul); REV-3 P0/P1 yok, P2 `UNTRACKED-BY-DESIGN.md:36` düzeltici task ile düzeltildi, P3 ledger → §10; Ek A.6'ya `O3OPN` ve `G12b`; kimlik taraması geçti |
 | 2 · O4 | Entegrasyon ve geçitler | I2a → GATE | 2 · O3 | done | `Window 2 O4: integration and gates` (`git log --grep '^Window 2 O4:'`); açılış ölçümü Ek A.6 `O4OPN` (üç depo 19:34:57Z'de hâlâ 200); I2a: W5 sahiplik kontrolü geçti (`2 · O2` → `2 · O3` arasında dört dosya; PROJECT_LOG'da §11 dışındaki her değişiklik §6.2 envanterinin satırlarında, §2.6 değişmemiş; dördüncü dosya `UNTRACKED-BY-DESIGN.md:36`, REV-3 düzeltmesi); PROJECT_LOG §2.6 aynı satır sayısıyla yeniden yazıldı, sonraki satır numaraları kaymadı; GATE (19:42Z): V1–V3 taban değerde, bayt ve boru kontrolü geçti; kimlik taraması geçti (`prose_mentions=16`); §10'a iki madde; kullanıcı onayıyla takip commit'i `Window 2 O4 follow-up: anchor the O2 commit lookups` (`git log --grep '^Window 2 O4 follow-up:'`): §1 `:45` ve §6.4 `:341`'deki `2 · O2` aramaları konu satırına bağlandı, `NEXT_PROMPT.md`'nin dal durumu güncellendi |
 | 2 · O5 | Son inceleme ve kapanış | W6 ∥ REV-1 → REV-2 ∥ SEC-B → FIX (gerekirse, sonra GATE) → I2b → C2 → FF (onay) → RID → PUSH (onay) → LSR | 2 · O4 | done | `Window 2: project log sweep and handoff for planning run 21` (`git log --grep '^Window 2:'`); açılış ölçümü Ek A.6 `O5OPN` (üç depo 20:07:24Z'de ve C2'den önce 21:11:12Z'de hâlâ 200); W6: A parçası (`task`, başlık ve §0–§3) 100K bağlama ulaştı ve `partial` döndü, B parçası (§4–§11) geniş bağlamlı salt-okur ajanın taslağı, A'nın iki maddesinin düzeltmesiyle birlikte orkestratörce `edit` ile uygulandı ve betikle doğrulandı; REV-2'nin plan parçası ve SEC-B'nin `PROJECT_LOG.md` parçası W6'ya bağlı olmadığı için W6 ile paralel çalıştı; REV-1 (iki parça): P0/P1 yok, P2/P3 bulguları düzeltici task ile `PROJECT_LOG.md` §1–§10'da 30 satır içi düzeltmeyle giderildi (FIX); REV-2 plan parçası: P0/P1 yok, 1 P2 ve 7 P3 orkestratörce plana işlendi; REV-2 `NEXT_PROMPT.md` parçası: P0/P1 yok, 2 P2 ve 9 P3 düzeltici task ile 14 satırda giderildi (FIX), plana düşen üç uzantı §7'ye işlendi; SEC-B (iki parça): bulgu yok; GATE (FIX'ten sonra, 20:56Z): V1–V3 taban değerde; bayt ve boru kontrolü geçti; kimlik taraması geçti (`prose_mentions=16`); §10'a `O5` maddeleri; C2'den sonra, 2026-11-15: FF 08:14:45Z, RID geçti (`NOT_REDACTED=0`, `LUHN15=0`), PUSH 08:15:01Z, LSR: iki ref = C2 (PROJECT_LOG §11) |
-| 3 | Planlama koşusu 21 | Step 1 + Step 2: Faz 7/8 emekli; K7 = (a) için faz ve alt planlar; önce K9 ve kapsam soruları. Oturum düzeni ve bütçe §7 | Pencere 2 | pending | aşama satırları aşağıda; kalanını `3 · O1` ekler |
+| 3 | Planlama koşusu 21 | Step 1 + Step 2: Faz 7/8 emekli; K7 = (a) için faz ve alt planlar; önce K9 ve kapsam soruları. Oturum düzeni ve bütçe §7 | Pencere 2 | pending | aşama satırları aşağıda; plan ve onay §7.2 (`3 · O1`) |
 | 3 · O0 | Keşif | Açılış ölçümleri ve "Açılışta ayrıca"; sekiz açılış sorusu (yanıtlar §7'ye); üç scout; keşif envanteri (§7) | Pencere 2 | done | `Window 3 O0: discovery for planning run 21` (`git log --grep '^Window 3 O0:'`); açılış `W3OPN` (durum (b)); sekiz yanıt §7'de, K9 = hayır (§2; `DEC-33` koşu 21'de); dört salt-okur scout (§7'deki S3 ikiye bölündü); envanter §7.1 (≈ 13 KB); PROJECT_LOG push cümleleri güncel; `NEXT_PROMPT.md` kapanışa girmediği için kullanıcı onaylı takip commit'i `Window 3 O0 follow-up: hand-off for stage 3 O1` |
-| 3 · O1 | Plan | Aşama ve görev tablosu, oturum başına bağlam tahminiyle (§0 adım 9); kullanıcı onayı | 3 · O0 | pending | |
+| 3 · O1 | Plan | Aşama ve görev tablosu, oturum başına bağlam tahminiyle (§0 adım 9); kullanıcı onayı | 3 · O0 | done | `Window 3 O1: plan for planning run 21` (`git log --grep '^Window 3 O1:'`); plan §7.2, onay 2026-11-15 (form, dört soruda öneriler); `PRB` 13:01Z'de yürütüldü (§7.1 `W3P01`–`W3P04`; SukiSU-Ultra v4.3.0-r1 cihazda doğrulandı); S5–S7 scout'ları, olgular `W3F29`–`W3F32`; bağlam plan sunumunda 206k, onayda 235k |
+| 3 · O2a | Step 1 | `Main-Planing.md` (§7.2 Step 1 listesi; metni kullanıcı onaylar); `--mode step1 --strict`; tahmin ≈ 225k | 3 · O1 | pending | |
+| 3 · O2b | Step 2 kontratı | §7.3: alt plan sözleşmesi, ortak bağlam, `3 · O4` hedef tablosu; tahmin ≈ 225k | 3 · O2a | pending | |
+| 3 · O3a | Step 2 taslakları | `Faz10.1`–`Faz10.3` (`SP1`–`SP3`, `CPa`); tahmin ≈ 185k | 3 · O2b | pending | |
+| 3 · O3b | Step 2 taslakları | `Faz10.4`, `Faz10.5` (`SP4`, `SP5`, `CPb`); tahmin ≈ 155k | 3 · O3a | pending | |
+| 3 · O4 | Entegrasyon ve geçitler | Ledger, Index, Ontology, Hetzner satırları (`I3a`, `I3b`); `GATE3`; tahmin ≈ 233k | 3 · O3b | pending | |
+| 3 · O5 | Son inceleme ve kapanış | `REV-4` ∥ `SEC-C` → `FIX3` → `C3` → FF (onay) → push (onay) → `LSR`, `RID`; tahmin ≈ 215k | 3 · O4 | pending | |
 | 4 | 12. denetim | Step 3 (`run-step3.md`); oturum düzeni §8 | Pencere 3 | pending | |
 | 5+ | K7 = (a) Step 4 dilimleri | 12. denetimin kuyruğu; dilimler ve oturumlar bütçeyle (§9) | Pencere 4 | pending | |
 
-Her faz §0'daki aşamalarla yürür; bir fazın aşama satırları o fazın `O1` planında eklenir. Pencere 3'ün `O0` ve `O1` satırları 2026-11-15'te bütçe kuralıyla eklendi (§0 adım 9).
+Her faz §0'daki aşamalarla yürür; bir fazın aşama satırları o fazın `O1` planında eklenir. Pencere 3'ün `O0` ve `O1` satırları 2026-11-15'te bütçe kuralıyla, `O2a`–`O5` satırları aynı gün `3 · O1` planıyla (§7.2) eklendi (§0 adım 9).
 
 ## 2. Kararlar (2026-11-13)
 
@@ -90,6 +96,7 @@ Her faz §0'daki aşamalarla yürür; bir fazın aşama satırları o fazın `O1
 - **Alt ajanlar:** Görev metni kendi kendine yeter (hedef dosya yolları, değişiklik, kabul kriteri, yasak alanlar). Ajan yalnız sahip olduğu dosyaya yazar; başka bir dosyada sorun görürse düzeltmez, raporlar. Doğrulayıcı, test ya da format çalıştırmaz. Dönüşte şu blok zorunludur: `status`, `changed_files`, `acceptance` (kriter / karşılandı mı / kanıt), `contract_deviations`, `open_issues`. Sıcak noktalar için yalnız taslak üretir (`local://…`).
 - Aynı anda en fazla 4 uygulama ajanı çalışır. `task` aracında `isolated` ve `outputSchema` yok; yalıtım ayrık dosya sahipliğiyle sağlanır. `librarian` ve `designer` ajanları bu ortamda yok.
 - **Adlandırma:** Görev kimlikleri (`W1`–`W6`, `T3`, `I1`, `REV`, `SEC`; Pencere 2 için ayrıca `K0`, `SEC-A1`–`SEC-A3`, `SEC-B`, `REV-1`–`REV-3`, `I2a`, `I2b`, `GATE`, `FIX`, `FF`, `RID`, `PUSH`, `LSR`), aşama kimlikleri `O0`–`O5` ve Ek A olgu kimlikleri (`G`, `D`, `V`, `REL`, `T3`, `TRAP`, `M1`, `E`, `AUD11`, `OPN`; A.6'da `OPN2`, `G4b`, `G8b`, `L653`, `LSH`, `SH8`, `CDATE`, `RID0`, `SEC0`, `SMK-O`, `O2`'de eklenen `O2OPN`, `G8c`, `G1b`, `CLOG`, `LMAP`, `C1MAP`, `O3`'te eklenen `G12b`; sonraki aşamaların açılış ölçümleri `O3OPN` biçiminde) yalnız bu plana aittir. Main-Planing risk kimlikleri `R1`–`R12`, kararlar `K1`–`K9` ve `DEC-NN`, kontrol listesi `C-NN`, ClaudeQB `Faz n.m` / `Fn.m-NN` ile karışmasın diye böyle seçildi (önceki oturumun `R21` → `RUN21` düzeltmesiyle aynı gerekçe); `K0` bir görev kimliğidir, karar değildir. Ek A'daki `K3` ve `K4` satırları ise karar etiketlerini bilerek yeniden kullanır; plana özgü değildir. `C1` ve `C2` faz kapanış commit'leridir; Pencere 2'nin aşama commit'leri başlıklarıyla anılır (§6.4).
+- **Adlandırma, Pencere 3 (2026-11-15, §7.2):** görev kimlikleri `PRB`, `ST1-R`, `ST1-D`, `ST1-A`, `ST1-W`, `ST2-R`, `ST2-K`, `SP1`–`SP5`, `CPa`, `CPb`, `I3a`, `I3b`, `GATE3`, `REV-4`, `SEC-C`, `FIX3`; faz kapanış commit'i `C3`. Olgu kimlikleri `W3OPN`, `W3O1OPN`, `W3F01`–`W3F32`, `W3P01`–`W3P04`. `PRB` komutları `PRB1`–`PRB10` (`C1`–`C3` commit'leriyle karışmasın diye); `S1`–`S7` scout adlarıdır.
 
 **Geçitler** (fazın belirttiği aşamada bir kez, orkestratör; Pencere 2'de `O4`, düzeltme olursa `O5`'te yeniden):
 - `py -3 C:/Users/ahmet/.claude/plugins/cache/claudeqb/claudeqb/0.2.1/skills/claudeqb/scripts/validate_planner_docs.py --root . --mode all` → `error_count=0`, `warning_count=1` (`step4_has_nonblocking_warnings=P2:1,P3:9`), `p0_findings=0`, `p1_findings=0`, `subplan_count=42`, `secret_findings=0`. Koşu 21 alt plan sayısını, 12. denetim de bulgu sayılarını değiştirir; yeni baseline o fazda yazılır.
@@ -518,6 +525,140 @@ Bu cümlelerin `2 · O3` kapanışındaki yerleri: §2.1 `:49`, §3.5 giriş cü
 | W3F26 | Aday 6: AGC tuzakları | `docs/phase3-preconditions.md:71-119` yedeksiz; `:99` yönlendirmesi canlı dosyayı yazmadan önce boşaltır; sahip ve etiket AOSPA'ya sabit (:83-85). Yedek-önce, üç korumalı, sınanmış şablon `docs/agc-12mp-configuration.md:100-143`. Önerilen yeni yollar: `docs/hyperos4-adaptation-notes.md`, `scripts/agc-trap-clean.sh` | S4, 2026-11-15 |
 | W3F27 | Kapsam dışı kaymalar | `docs/recovery-runbook.md:113` `setmode.sh:253-255`'i anıyor, bugün `:254-256`; `docs/agc-12mp-configuration.md:381` smoke'un yalnız tuzak anahtarının varlığını raporladığını söylüyor (IMPL-80'den beri bayat). §10 adayı | S4, 2026-11-15 |
 | W3F28 | `3 · O1` için açık konular | (1) `Faz7.2`, `7.3`, `8.1`, `8.3` satırlarını kim superseded yapar: açık kullanıcı isteğiyle Step 1 ya da `3 · O4`'te orkestratör. (2) Soru 7 Step 1 sınırı dışında: kullanıcı onaylı sapma olarak ledger notu. (3) Faz 9'un emekli ROM derlemesine bağı denetlenmedi. (4) Aday 1 probe'unun zamanı. (5) `AUDIT-FIX-42`/`-57`'nin yeni ifadesi ve `AUDIT-FIX-22`'nin yazarı. (6) Step 1.5 atlama cümlesi | S1–S4, 2026-11-15 |
+| W3P01 | Yönetici ve WebUI (`PRB1`–`PRB3`) | `com.sukisu.ultra` versionCode 41140, versionName `v4.3.0-r1`: kullanıcı beyanı doğrulandı; `com.rifsxd.ksunext` ve başka kök yöneticisi yok. `ksu://webui` işleyicisi `com.sukisu.ultra/.ui.hdhrsdynpwdActivity` (rastgele etkinlik adı). `.ui.webui.WebUIActivity` için `resolve-activity --brief` "No activity found": dışa kapalı ya da adı farklı; kutucuğun kökle `am start` denemesi `Faz10.4`'te | PRB, 2026-11-15T13:01:41Z–13:01:43Z |
+| W3P02 | Kök, allowlist, mount (`PRB4`–`PRB6`) | `4.3.0-r1:KernelSU`, `41140`, `ksud 4.3.0-r1 (uapi: 6)`; adb kabuğunda `su` diyalogsuz çalıştı (`u:r:ksu:s0`). `/data/adb/ksu/.allowlist` var; `com.ishtar.cammodes` sayısı 0. `/data/adb/metamodule` yok, `metamodule=` taşıyan modül yok. init ad alanında `/adb/modules/` kökenli 6 bind mount (4 `data/app`, 1 `system/lib64`, 1 `system/priv-app`), KSU kaynaklı mount 0: başka bir modül uygulamayı kendi bind mount'uyla `priv-app`'e koyuyor | PRB, aynı |
+| W3P03 | Kamera servisleri ve etiketler (`PRB7`, `PRB8`) | Çalışan: `cameraserver`, `vendor.camera-provider` (`/odm/bin/hw/vendor.qti.camera.provider-service_64`), `vendor.camera-provider-2-7-ext-uvc`. `vendor.camera-provider-2-7-ext` (virtual camera) ve `virtual_camera` rc'de tanımlı, çalışmıyor: `setmode.sh`'in yeniden başlatması onu başlatır [ÇIKARIM]. HAL ve sensör dosyası `u:object_r:vendor_file:s0` (modüldeki `chcon` ile aynı); `/odm/lib64/hw` dizini `vendor_hal_file` | PRB, aynı |
+| W3P04 | AGC ve kutucuk (`PRB9`, `PRB10`) | AGC tercihleri `u0_a478`, `app_data_file:s0:c222,c257,c512,c768`; AOSPA'da `u0_a450`, `c194,c257` (`docs/phase3-preconditions.md:83-85` sabitleri tutmaz). Tuzak anahtarları `org.codeaurora.snapcam_preferences.xml`'de. HyperOS kutucuk kaydında `com.ishtar.cammodes` yok | PRB, aynı |
+
+### 7.2 Aşama ve görev planı (`3 · O1`, 2026-11-15)
+
+**Onay:** kullanıcı, 2026-11-15 (form: "onay"; dört soruda öneriler). `PRB` aynı gün yürütüldü; `3 · O2a` ve sonrası ayrı oturumlardır (§0, "Döngü").
+
+**`W3O1OPN` (açılış, 2026-11-15T12:36Z):** dal `integrate/impl-96`, ağaç temiz, 78 commit, uç `Window 3 O0 follow-up: hand-off for stage 3 O1`; `origin/main..HEAD` = 2; `main` = `origin/main` = `Window 2 follow-up: context budget and stage sizing`; etiket yok; 350 izlenen dosya. `ls-remote`: `HEAD`, `main`, `integrate/impl-96` = `main` (tam hash eşleşti). `gh api` (12:36:42Z–12:36:44Z): `ishtar`, `android_local_manifests`, `android_device_xiaomi_ishtar`, `ishtar_cam_modes` 200. Bağlamın ilk ölçümü 65k (Ek A.7).
+
+**Dört soru** (yanıtlar tarihle yazılır):
+1. **Dal:** `integrate/impl-96` sürer mi? Öneri: sürer (Pencere 2 kalıbı). Push kuralı (`git push origin main integrate/impl-96`; §3, Ek A.5, `NEXT_PROMPT.md` §6 madde 17) ve FF komutu değişmez; FF yalnız `3 · O5`'te. Yeni dal bu üç yeri ve devir metinlerini değiştirir, kazancı yalnız addır.
+   - **Yanıt (2026-11-15):** Sürer; FF yalnız `3 · O5`'te.
+2. **Salt-okur cihaz ölçümü (`PRB`):** Öneri: bu oturumda, onaydan sonra ve kapanıştan önce; yalnız aşağıdaki PRB1–PRB10 komutları. Sonuç §7.1'e `W3P` satırları olarak yazılır ve `Faz10.1`–`Faz10.4`'ün kanıtıdır (`W3F21`, `W3F31`). Ertelenirse aynı komutlar `3 · O2b` açılışında çalışır.
+   - **Yanıt (2026-11-15):** Bu oturumda; kullanıcı telefonun bağlı ve hazır olduğunu bildirdi. `PRB` 13:01:41Z–13:01:43Z'de `dc27e5d0`'da yürütüldü; çıktının kimlik taraması temiz (LUHN15 0, anahtar sözcük 0); `PRB3` paketi `com.sukisu.ultra` kaldı; sonuç §7.1 `W3P01`–`W3P04`.
+3. **Alt plan kimlikleri:** aşağıdaki tablo (`Faz10.1`–`Faz10.5`, klasör `Planner-docs/Faz-10-Plans`, "ClaudeQB Phase 10"). Dosya adlarının son eki `3 · O2b` kontratında kesinleşir.
+   - **Yanıt (2026-11-15):** Öneri kabul: `Faz10.1`–`Faz10.5` aşağıdaki tablodaki gibi.
+4. **Hetzner satırlarının aşaması (soru 7):** Öneri: `3 · O4`, orkestratör: Comprehension `CQ-13` ve `EV-20`, `docs/reverse-engineering-toolchain.md:220`, Ontology değişmez 11. `AUDIT-FIX-57` ailesi tek commit'te kapanır; 12. denetim doğrular, §10 yolu gerekmez.
+   - **Yanıt (2026-11-15):** `3 · O4`.
+
+**Alt planlar (ClaudeQB Phase 10):**
+
+| Kimlik | Aday | Konu | Oturum | Kanıt | Bağımlılık |
+|---|---|---|---|---|---|
+| `Faz10.1` | 1 | HyperOS 4 kamera yığınının salt-okur ölçümü ve kaydı: servis adları (değişmez 3), `chcon` etiketleri, allowlist, yönetici ve WebUI | `3 · O3a` | `W3F20`, `W3F21`, `PRB`; Ek A.2 `D1`–`D11`, `M1` | — |
+| `Faz10.2` | 2 | Sensör katmanı: v2.2 değişmeden HyperOS 4'te, smoke bracket ile (kurulum kullanıcıda); 50MP seçeneği HyperOS 4'te kapalı (K9 = hayır); `setmode.sh` servis adları | `3 · O3a` | `W3F22`, `M1`, `PRB`; PROJECT_LOG §2.3 | `Faz10.1` |
+| `Faz10.3` | 6 | AGC tuzak denetimi ve yedekli, korumalı temizleme (HyperOS 4) | `3 · O3a` | `W3F26`; Ek A.2 `TRAP`; `PRB` | `Faz10.1` |
+| `Faz10.4` | 4 | Kutucuk ve WebUI zinciri: SukiSU'ya uyarlama; aynı arayüzlü sistem uygulaması fikri değerlendirilir | `3 · O3b` | `W3F23`, `W3F24`, `PRB` | `Faz10.1` |
+| `Faz10.5` | 5 | v2.3 sürümü: `Kullanim.txt` (`DEC-29`), sürüm yerleri, CHANGELOG, manifest, modül yorumları, tile-app `versionName`; `ishtar-aon-fix`'in HyperOS 4'teki yeri | `3 · O3b` | `W3F25`; §10 (modül yorumları) | `Faz10.2`–`Faz10.4` |
+
+Aday 3 (50MP HAL) düştü (K9 = hayır, `DEC-33`). Numara sırası uygulama sırasıdır; `3 · O3a` yalnız 10.1–10.3'ü yazar, böylece klasörde numara boşluğu oluşmaz (V:1040-1043).
+
+**Oturumlar** (tahmin §0 adım 9: açılış ≈ 35k, 20 KB'lık devirle; tur başına ≈ 6k yürütme, ≈ 12k kontrat ve uzun metin):
+
+| Aşama | Kapsam | Görevler | Kapı ve geçit | Tahmin | Önkoşul |
+|---|---|---|---|---|---|
+| `3 · O1` | Plan ve onay; `PRB`; kapanış | `PRB` | plan onayı (`PRB` dahil); onayda bağlam ölçümü; kimlik taraması | 35k + 15 × 10k ≈ 185k; ölçülen 206k (plan sunumu, ≈ 24 tur) | `3 · O0` |
+| `3 · O2a` | Step 1: `Main-Planing.md` (aşağıdaki Step 1 listesi) | `ST1-R` → `ST1-D` → `ST1-A` → `ST1-W` | metin onayı (kullanıcı); `--mode step1 --strict` | 35k + 10k okuma + 15 × 12k ≈ 225k | `3 · O1` |
+| `3 · O2b` | Step 2 kontratı (§7.3): alt plan sözleşmesi, ortak bağlam, `3 · O4` hedef tablosu | `ST2-R` → `ST2-K` | bayt, boru, kimlik | 35k + 10k okuma + 15 × 12k ≈ 225k | `3 · O2a` |
+| `3 · O3a` | Step 2 taslakları `Faz10.1`–`Faz10.3` | `SP1` ∥ `SP2` ∥ `SP3` → `CPa` | taslak betiği; ara durum (aşağıda) | 35k + 25 × 6k ≈ 185k | `3 · O2b` |
+| `3 · O3b` | Step 2 taslakları `Faz10.4`, `Faz10.5` | `SP4` ∥ `SP5` → `CPb` | taslak betiği; ara durum | 35k + 20 × 6k ≈ 155k | `3 · O3a` |
+| `3 · O4` | Ledger, Index, Ontology, Hetzner satırları; geçitler | `I3a` ∥ `I3b` → `GATE3` | `step2` ve `step3-preflight` `--strict`; V1–V3 yeni taban; bayt, boru, kimlik | 35k + 33 × 6k ≈ 233k | `3 · O3b` |
+| `3 · O5` | İncelemeler, düzeltme, kapanış, FF, push | `REV-4` ∥ `SEC-C` → `FIX3` → `C3` → `FF` → `PUSH` → `LSR`, `RID` | FF ve push onayı | 35k + 30 × 6k ≈ 215k | `3 · O4` |
+
+Hiçbir aşama 240k'yı aşmıyor; birleşim yok (`3 · O3b` + `3 · O4` ≈ 388k). Kalibrasyon: `3 · O1` plan sunumunda ≈ 24 turda 206k'daydı (tahmin 185k); fark zorunlu okuma (≈ 50 KB ≈ 28k) ve uzun düşünme, bu yüzden `3 · O2a` ve `3 · O2b`'ye 10k okuma eklendi. Orkestratör uzun metni okumaz ve yazmaz: taslak `local://`'da, uygulama `py -3` betiğiyle (edit yankısı yok). `3 · O4` sınıra en yakın; 300k'da §0 adım 7.
+
+**Görevler** (alt ajanlar doğrulayıcı, test ve format çalıştırmaz; dönüş bloğu §3; sıcak noktalara yalnız taslak). Uzun taslaklar (`ST1-D`, `SP1`–`SP5`, `I3a`) geniş bağlamlı salt-okur scout'a verilir, `local://`'a yazar: 100K bağlamlı `task` ajanı ≈ 67 KB girdide taştı (§10, `O5` W6 maddesi). `task` yalnız küçük düzeltmelerde (`FIX3`):
+
+| Kimlik | Aşama | Ajan | İş | Yazar | Yasak | Kabul | Doğrulama | Bağımlı |
+|---|---|---|---|---|---|---|---|---|
+| `PRB` | `3 · O1` | orkestratör (adb) | `W3F21` olgularının salt-okur ölçümü | plan §7.1 (`W3P` satırları) | cihaz durumu, AGC tercihleri, cihaza yazma | her komutun sonucu kayıtlı; kimlik değeri yok | yalnız `PRB` tablosu; kimlik taraması | plan onayı |
+| `ST1-R` | `3 · O2a` | scout ×2 | `Main-Planing.md` tam okuma ve çapalar; First-Planner kuralları | `local://` | depo | ≤ 4 KB; yerler içerikle doğrulanmış | — | `3 · O1` |
+| `ST1-D` | `3 · O2a` | scout (taslak, geniş bağlam) | Step 1 değişikliklerinin satır satır taslağı | `local://` | depo | Step 1 listesinin her maddesi; 11 başlık sırayla | taslak betiği | `ST1-R` |
+| `ST1-A` | `3 · O2a` | kullanıcı | Step 1 metninin onayı | — | — | "onay" | — | `ST1-D` |
+| `ST1-W` | `3 · O2a` | orkestratör | taslağı `py -3` betiğiyle uygular | `Planner-docs/Main-Planing.md` | öteki dosyalar | CRLF korunur, NUL 0 | bayt sayımı; `--mode step1 --strict` | `ST1-A` |
+| `ST2-R` | `3 · O2b` | scout ×3 | Step 2'nin tam okuması (fazlar, destek belgeleri, 42 alt plan); ledger, Index, Ontology çapaları | `local://` | depo | ≤ 4 KB | — | `3 · O2a` |
+| `ST2-K` | `3 · O2b` | orkestratör | §7.3: alt plan başına kapsam, kanıt, §9 yolları ve tek sahip; ortak bağlam; `3 · O4` hedef tablosu | plan §7.3 | `Planner-docs/` | her alt plan ve hedef satır tanımlı | bayt, boru, kimlik | `ST2-R` |
+| `SP1`–`SP3` | `3 · O3a` | scout ×3 (taslak, geniş bağlam) | `Faz10.1`–`Faz10.3` taslakları | `local://` | depo | `W3F07` biçimi, §7.3 kapsamı, tekrar kuralı | taslak betiği | `ST2-K` |
+| `CPa` | `3 · O3a` | orkestratör | taslakları `cp` ile yerine koyar; Index'e yalnız yazılan dosyaların Phase 10 girdileri | `Planner-docs/Faz-10-Plans/`, `Sub-Planing-Index.md` | öteki dosyalar | betik geçti; ara durum tablosu | `--mode step2 --strict`, `--mode all` | `SP1`–`SP3` |
+| `SP4`, `SP5`, `CPb` | `3 · O3b` | scout ×2 (taslak); orkestratör | `Faz10.4`, `Faz10.5` | `3 · O3a` gibi | `3 · O3a` gibi | `3 · O3a` gibi | `3 · O3a` gibi | `CPa` |
+| `I3a` | `3 · O4` | scout (taslak); orkestratör | ledger: §2 koşu 21; §3 snapshot; §4 dört superseded, `Faz6.1`/`Faz6.2` notları, beş yeni `planned`; §8 `DEC-33`, `DEC-32` atfı, silme ölçülürse `DEC-30` notu | ledger (orkestratör) | — | yalnız ekleme; kontrattaki hücre değişiklikleri | difflib, bayt | `CPb` |
+| `I3b` | `3 · O4` | orkestratör | Index'te emekli girdiler (Faz 7/8, `Faz6.1`; `:258`, `:279`); Ontology değişmez 10 ve 11; Comprehension `CQ-13`, `EV-20`; toolchain `:220` | bu dört dosya | — | NUL ve satır sonları korunur | bayt | `CPb` |
+| `GATE3` | `3 · O4` | orkestratör | geçitler | — | — | aşağıdaki son durum | V1–V3; `step2`, `step3-preflight` `--strict`; kimlik taraması | `I3a`, `I3b` |
+| `REV-4` | `3 · O5` | reviewer (parçalı) | Pencere 3 diff'i: doğruluk, kontrat, doğrulayıcı tuzakları, eksik kanıt | `local://` | depo | P0/P1 yok ya da düzeltildi | — | `GATE3` |
+| `SEC-C` | `3 · O5` | security-reviewer | push öncesi sır ve kimlik incelemesi (`W3P` satırları dahil) | `local://` | depo | P0/P1 yok | — | `GATE3` |
+| `FIX3` | `3 · O5` | task | sıcak nokta dışı düzeltmeler (sıcak noktalar orkestratörde) | bulgunun dosyası | sıcak noktalar | bulgu kapandı | `GATE3` yeniden | `REV-4`, `SEC-C` |
+| `C3`, `FF`, `PUSH`, `LSR`, `RID` | `3 · O5` | orkestratör | kapanış commit'i; FF (onay); push (onay); `ls-remote` karşılaştırması; silinecek depoların ölçümü | git | — | onaylar alındı; hash'ler eşleşti | `ls-remote` | `FIX3` |
+
+**Step 1 listesi** (`3 · O2a`, yalnız `Main-Planing.md`; Step 1 ledger'a yazmaz; metni kullanıcı onaylar):
+1. Faz 7 ve 8: yol haritası satırları ve bölümleri yerinde, ilk hücre `7`/`8` kalır, tarihli emeklilik notu (`DEC-28`); yeni satır tam `| 10 |` ile başlar, `### Phase 10` bölümü "ClaudeQB Phase 10" adıyla beş alt plan temasını sırasıyla anar (V:163, V:539-541).
+2. §4 hedef son durumu (`:79`) K7 = (a)'ya göre; `W3F11`'in 25 satırı; Faz 6 bölümü (`:195`–`:205`, `:61`, `:276`; `Faz6.1` aşağıda); Faz 9 yalnız `:288` ve `:300`.
+3. `AUDIT-FIX-57` (`:75`, `:211`, `:265`), `AUDIT-FIX-41` (`:277`), `AUDIT-FIX-42` (`:22`, `:61`, `:288`) için yeni ifade; R8 gerçekleşti, R9 konusuz.
+4. §9 Step 2 devri yeniden yazılır: sınırlı Step 2, yalnız Phase 10 alt planları; tarihli not biçimi (`:300` emsali).
+5. §10'a Step 1.5 atlama cümlesi: `Autopsy.md` bayat kalır; Comprehension ve Ontology'nin öteki bayat satırları (`W3F13`, `W3F14`) 12. denetime kalır.
+
+**`W3F28` açık konuları ve kararlar:**
+- (1) `Faz7.2`, `7.3`, `8.1`, `8.3` → `superseded`, `3 · O4`'te orkestratör. Superseded By = koşu 21'in MAIN snapshot kimliği (emsal `Faz4.1`, `Faz4.7`), gerekçe `DEC-28`; doğrulayıcı boş olmayan her değeri kabul eder (V:848, V:284). `Faz6.1` (`implemented`; ledger `:97` "planning run 21 decides the row") aynı biçimde `superseded`: yapı yok, Audit `:314` "`Faz7.3` adım 3'ten önce verified deme" der. `Faz6.2` `verified` kalır, tarihli `DEC-28` notu alır (soru 6).
+- (2) Soru 7'nin Hetzner düzeltmeleri Step 1 ve Step 2 sınırı dışındadır: koşu 21 ledger satırında kullanıcı onaylı sapma notu (`3 · O4`).
+- (3) Faz 9 ROM derlemesine bağlı değil (`Faz9.1`–`9.3` `verified`; S5). `Main-Planing.md` `:288`, `:300` Step 1'de; Index `:258`, `:279` `3 · O4`'te; `Faz9.2`:54'teki Android 16 cümlesi sınırlı Step 2 dışında: §10, 12. denetim.
+- (4) `PRB` zamanı: soru 2.
+- (5) `AUDIT-FIX-41`, `-42`, `-57`'nin yeni ifadesi Step 1 metninde (kullanıcı onaylar). Yazarını kaybeden `AUDIT-FIX-22` (`F8.1-10`), `-37` (`F7.3-08`) ve `-50` (`F8.3-08`) 12. denetimin yeni kuyruğunda atanır; koşu 21 satırı bunu anar.
+- (6) Step 1.5 atlama cümlesi `Main-Planing.md` §10'da (`3 · O2a`) ve koşu 21 ledger satırında (`3 · O4`).
+
+**Ara durumlar ve geçitler** (S5 ve S7 okumasıyla öngörü; aşama açılışında ölçülür):
+
+| Aşamadan sonra | Kip | Beklenen | Çıkış |
+|---|---|---|---|
+| `3 · O2a`, `3 · O2b` | `step1 --strict` | bulgu yok | 0 |
+| `3 · O2a`, `3 · O2b` | `all` | `missing_phase_folder=…Faz-10-Plans` (V:1010) ve denetim uyarısı; beklenen ara durum | 1 |
+| `3 · O3a`, `3 · O3b` | `step2 --strict` | bulgu yok (`CPa`/`CPb` Index girdileriyle; girdisiz dosya `unindexed_subplan`, dosyasız girdi `missing_index_target`) | 0 |
+| `3 · O3a`, `3 · O3b` | `all` | yalnız denetim uyarısı; `subplan_count` 45, sonra 47 | 0 |
+| `3 · O4` | `step2`, `step3-preflight` `--strict` | bulgu yok | 0 |
+| `3 · O4` | V1 `all` | yeni taban: `subplan_count=47`, `warning_count=1` | 0 |
+| `3 · O4` | V2 `step4 --strict` | taban (`strict_warning` yalnız) | 1 |
+
+Kırmızıya dönüş yolları: alt planda TODO/TBD/FIXME (V:947); ≥ 160 karakterlik aynı §3 ya da §7 gövdesi üç dosyada (V:1049); §3, §6, §8, §11'de ≥ 80 karakterlik aynı cümle 5 kez (V:624, V:1055); ledger §4'te ters tırnaklı yol (V:828) ya da tablodan boş satırla ayrılmış satır (V:420). Ledger §2 ve §3 satırlarını V okumaz (V:93-103); Audit'in hazırlık satırları 12. denetimde düzelir.
+
+**Sıcak noktalar** (yalnız orkestratör): `Main-Planing.md` (`3 · O2a`); `Sub-Planing-Index.md` (`3 · O3a`, `3 · O3b`, `3 · O4`); ledger, Ontology, Comprehension, toolchain belgesi (`3 · O4`); `Faz-10-Plans/` (`3 · O3a`, `3 · O3b`); bu dosya, PROJECT_LOG §2.6/§11 ve `NEXT_PROMPT.md` (her kapanış); git. `Sub-Planing-Audit.md` Pencere 3'te yazılmaz.
+
+**`PRB` komutları** (salt-okur; S6 tasarımı). `%TEMP%`'teki `py -3` betiği sabit PRB1–PRB10 listesini `subprocess.run(["platform-tools/adb.exe", "-s", "dc27e5d0", "shell", yük])` ile çalıştırır (kabuk tırnağı ve MSYS dönüşümü yok); çıktı geçici dosyaya yazılır, okunmadan önce kimlik taraması yapılır. PRB3'teki `com.sukisu.ultra`, PRB1/PRB2 başka bir yönetici paketi bulursa o paketle değişir. Başka komut çalışmaz; `am start` yok (arayüz açar):
+
+```text
+PRB1  pm list packages --show-versioncode | grep -iE 'sukisu|ksu|kernelsu|rifsxd|weishu|apatch|magisk|ishtar'
+PRB2  cmd package query-activities --brief -a android.intent.action.VIEW -d ksu://webui
+PRB3  dumpsys package com.sukisu.ultra | grep -m3 -E 'versionName=|versionCode=|lastUpdateTime='; cmd package resolve-activity --brief -n com.sukisu.ultra/.ui.webui.WebUIActivity
+PRB4  su -v; su -V; timeout 20 su -c '/data/adb/ksud -V; id -Z'
+PRB5  timeout 20 su -c 'ls -la /data/adb/ksu; ls -ld /data/adb/metamodule; grep -il metamodule= /data/adb/modules/*/module.prop; grep -ac com.ishtar.cammodes /data/adb/ksu/.allowlist'
+PRB6  su -c 'cat /proc/1/mountinfo' | grep -E '^[0-9]+ [0-9]+ [0-9]+:[0-9]+ /adb/modules/' | cut -d' ' -f5 | cut -d/ -f2-3 | sort | uniq -c; su -c 'cat /proc/1/mountinfo' | grep -cE ' - [^ ]+ KSU '
+PRB7  getprop | grep -E '^\[init\.svc\.[^]]*camera'; grep -rhoE '^service [^ ]*camera[^ ]* [^ ]+' /system/etc/init /vendor/etc/init /odm/etc/init 2>/dev/null | sort -u; ps -A -o LABEL,NAME | grep -i camera
+PRB8  ls -lZ /odm/lib64/hw/camera.qcom.so /odm/lib64/camera/com.qti.sensormodule.ishtar_semco_imx989_wide.bin; ls -ldZ /odm/lib64/hw /odm/lib64/camera
+PRB9  timeout 20 su -c 'ls -ldZ /data/data/org.codeaurora.snapcam/shared_prefs; ls -lZ /data/data/org.codeaurora.snapcam/shared_prefs/org.codeaurora.snapcam_preferences.xml; grep -l -e pref_raw_key -e pref_fix_resolution_key /data/data/org.codeaurora.snapcam/shared_prefs/*.xml'
+PRB10 settings get secure sysui_qs_tiles
+```
+
+| Kimlik | Ölçülen | Kök | Alt plan |
+|---|---|---|---|
+| PRB1, PRB2, PRB3 | Yönetici paketi ve sürümü; `ksu://webui` işleyicisi; WebUI etkinliğinin varlığı | hayır | 10.1, 10.4 |
+| PRB4, PRB5 | `su` ve `ksud` sürümü, `su` alanı; allowlist (yalnız sayım); metamodül | evet | 10.1, 10.2, 10.4 |
+| PRB6 | init ad alanındaki modül bind mount'ları (iki yol bileşeni) ve KSU kaynaklı mount sayısı | evet | 10.2 |
+| PRB7, PRB8 | Kamera servis adları, rc tanımları, HAL alanları; HAL ve sensör dosyalarının SELinux etiketleri | hayır | 10.1, 10.2 |
+| PRB9 | AGC tercih dizininin ve dosyasının sahibi ve etiketi; tuzak anahtarlı dosyanın adı (değer basılmaz) | evet | 10.3 |
+| PRB10 | HyperOS kutucuk kaydı | hayır | 10.4 |
+
+Hiçbir komut yazmaz, mount etmez, özellik ayarlamaz, servis başlatıp durdurmaz, kurulum yapmaz; SukiSU `su` kullanımını günlüğüne yazabilir [ÇIKARIM]. Geniş `getprop` dökümü yok; allowlist yalnız sayılır. Çıktı §7.1'e `W3P` satırları olarak, kimlik değeri olmadan yazılır. Onayda bağlam ölçülür: `PRB` ve kapanış 280k'yı aşacaksa, telefon bağlı değilse ya da bir izin diyaloğu çıkarsa `PRB` aynı komutlarla `3 · O2b` açılışına kayar (diyalog fiziksel eylemdir, kullanıcıya sorulur).
+
+**Yeni olgular (`3 · O1`, 2026-11-15; salt-okur scout'lar, cihaza komut yok):**
+
+| Kimlik | Konu | Olgu | Kaynak |
+|---|---|---|---|
+| W3F29 | Faz 6 ve 9 | Faz 6 "AON fix upstreaming" (`Main-Planing.md:124`, `:195`–`:205`); `Faz6.1` `implemented` (IMPL-03), `Faz6.2` `verified` (IMPL-75), ikisinde de `DEC-28` notu yok. Faz 9: `Faz9.1`–`9.3` `verified` (ledger `:105`–`:107`); ROM'a bağ yalnız `Faz9.2`:54, Index `:258`, `:279`. Audit `:345` `AUDIT-FIX-50`'nin, `:377` `-22`'nin, `:382` `-37`'nin yazarı emekli alt planlarda. Alt plan boyları 15–20 KB; H1 kalıbı `# Faz 9.1 — Reproducible Release Build` | S5 |
+| W3F30 | Doğrulayıcı kipleri | `step1` yalnız `Main-Planing.md`'yi denetler (V:1328, :627-638); denetim kapıları yalnız `step3`, `all`, `step4`'te (V:1218-1254). Index'te her `Faz-N-Plans/FazN.M-…md` yolu toplanır (V:158, :901-907): girdisiz dosya `unindexed_subplan` (V:1017), dosyasız girdi `missing_index_target` (V:1019). Dosyasız ledger satırı `missing_ledger_subplan` (V:830); satırsız dosya bulgu vermez; ledger yolu tırnaksız (V:484, :828). Emekli dosyalar H1'i ve 13 başlığı korur (V:924-944) | S7 |
+| W3F31 | SukiSU ve WebUI | SukiSU-Ultra v4.3.0-r1 sürüm kodu 41140 (probe `:358` ile aynı); yönetici paketi varsayılan `com.sukisu.ultra`; WebUI etkinliği `.ui.webui.WebUIActivity`, `exported="false"`: kökle başlatılır. r1 modül kimliğini yalnız URI sorgusundan okur: kutucuğun `--es id` çağrısı etkinliği kapatır; çalışan biçim `-d 'ksu://webui?id=<modül>'`. `index.html:337` `enableEdgeToEdge`'i argümansız çağırır | S6, cihazda ölçülmedi; github.com/SukiSU-Ultra/SukiSU-Ultra (v4.3.0-r1) |
+| W3F32 | Mount, allowlist, 2026-11-13 kökü | KernelSU v3 ve sonrası modülün `system/` ağacını yalnız metamodülle bağlar (kernelsu.org/guide/metamodule.html); probe'da `/data/adb/metamodule` yok; bizim modül `system/` taşımaz, kendi bind mount'unu yapar (`post-fs-data.sh:72`, `:127`): sistem uygulaması fikri metamodül ister. Allowlist yolu `/data/adb/ksu/.allowlist` (`action.sh:56` ile aynı; `main` dalında doğrulandı). 2026-11-13'te `su -c id` adb kabuğundan çalıştı (`u:r:ksu:s0`, probe `:272-274`) | S6 |
 
 ## 8. Pencere 4 — 12. denetim (Step 3)
 
@@ -576,6 +717,9 @@ Bu cümlelerin `2 · O3` kapanışındaki yerleri: §2.1 `:49`, §3.5 giriş cü
   - **REV-2, `NEXT_PROMPT.md` parçası → bu aşamada düzeltildi:** P0/P1 yok; 2 P2 (`--mode autopsy` geçidi Step 1.5'e bağlı değildi; §10'da yanlış bölüm atfı) ve 9 P3; hepsi düzeltici task ile 14 satırda düzeltildi. Plana düşen üç uzantı orkestratörce §7'ye işlendi (`autopsy` kipinin Comprehension'ı da denetlemesi; Step 1.5 yönergesi `Autopsy-Planner.md`; alt plan dosya adının `FazN.M-` öneki). Koşu 21'e not: `git log --grep '^…'` kalıbı gövde satırlarını da eşler; aramanın yalnız konu satırını bulması gövdede o başlıkla başlayan satır olmamasına dayanır (bu bölümün `O4` maddesindeki "konu satırına bağladı" ifadesi bu anlamdadır).
   - **SEC-B notu (bulgu değil):** push edilmiş `587e3b5`'in commit mesajında `Co-Authored-By` satırının yanında bir oturum adresi var; push aralığının dışında, kimlik bilgisi taşımıyor.
   - **W6 süreci:** `task` ajanının 100K bağlamı yine yetmedi (A parçası ≈ 67 KB girdiyle taştı ve `partial` döndü); B parçası geniş bağlamlı salt-okur bir ajana taslak olarak yazdırıldı ve orkestratör `edit` ile uyguladı (`2 · O3`'teki P2–P5 yöntemi).
+- **`3 · O1`'de eklenen (2026-11-15):**
+  - **`W3F27` (S4):** `docs/recovery-runbook.md:113` `setmode.sh:253-255`'i anıyor, bugün `:254-256`; `docs/agc-12mp-configuration.md:381` smoke'un yalnız tuzak anahtarının varlığını raporladığını söylüyor (IMPL-80'den beri bayat). → 12. denetim ya da `Faz10.5`.
+  - **Sınırlı Step 2'nin dışında kalanlar (`W3F13`, `W3F14`, `W3F29`):** `Faz9.2`:54'teki Android 16 cümlesi; Comprehension'ın Hetzner dışındaki bayat satırları (TRACE-14 ve ARC-06 dahil); Ontology'nin değişmez 10 ve 11 dışındaki yerleri. Step 1.5 atlandığı için koşu 21 bunları düzeltmez → 12. denetim.
 
 ## Ek A — IMPL-96 contract (English)
 
