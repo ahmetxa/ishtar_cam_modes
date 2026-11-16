@@ -224,6 +224,10 @@ document unblocks a build, and the presence of a working Python interpreter here
 does **not** narrow the Phase 7 gap — that gap is a Linux build server, not an
 interpreter. (Corrected 2026-09-11 by `IMPL-91`; the retired sentence said
 provisioning WSL2 "is Phase 7's entire purpose".)
+**Updated 2026-11-16 (planning run 21, `AUDIT-FIX-57`):** no Hetzner server was
+ever rented. `DEC-26` moved the rental after Hetzner's new-account limit blocked
+the CCX53, and `DEC-28` (2026-11-13) abandoned the ROM build, so no build server
+is used or planned.
 
 Keep the two separate when reporting status. "The toolchain works" is true of
 this document and false of Phase 7.
