@@ -31,20 +31,20 @@ Plan, PROJECT_LOG, ledger, Index, Ontology ve Comprehension bütün okunmaz; bö
 1. Plan §0, §1 ve §3 (geçitler, Gizlilik, Git).
 2. Plan §7.2 dar aralıkla: "Oturumlar" `3 · O5` satırı (`:571`), "Görevler" `REV-4`…`RID` (`:592`–`:595`), "Ara durumlar ve geçitler" (`:612`–`:626`), "Sıcak noktalar".
 3. Plan §6.3–§6.4 (`:326`–`:363`): `2 · O5` emsali (SEC/REV girdileri, FF, `RID`, PUSH, `LSR`).
-4. Plan §7.1 `W3P` satırları (`grep '^| W3P'`); §7 "Açılışta ayrıca" (`:439`–`:441`; silme yerleri); §10 `:812`–`:815`; §8 (devir için).
+4. Plan §7.1 `W3P` satırları (`grep '^| W3P'`); §7 "Açılışta ayrıca" (`:439`–`:441`; silme yerleri); §10 `:812`–`:817`; §8 (devir için).
 5. Ek A.5 (push kuralları, betik), A.7; PROJECT_LOG §2.6, §5.5 ve §11'in `3 · O4` girdisi.
 
 ## 3. Mevcut durum
 
 **Beklenen durum (3 · O4 kapanışından sonra):**
-- **Git:** dal `integrate/impl-96`, ağaç temiz, 85 commit. Uç: `Window 3 O4: integration and gates for planning run 21` (`git log --grep '^Window 3 O4:'`). Etiket yok, 355 izlenen dosya.
-- **`main` = `origin/main`** = `6632a18`. `origin/main..HEAD` = 9 (`3 · O0` kapanışı ve takip commit'i, `3 · O1`, `3 · O2a`, `3 · O2b`, `3 · O3a` ve takip commit'i, `3 · O3b`, `3 · O4`); push edilmedi.
+- **Git:** dal `integrate/impl-96`, ağaç temiz, 86 commit. Uç: `Window 3 O4 follow-up: record line shifts and FIX3 items` (onaylı takip); kapanış `Window 3 O4: integration and gates for planning run 21` (`git log --grep '^Window 3 O4:'`). Etiket yok, 355 izlenen dosya.
+- **`main` = `origin/main`** = `6632a18`. `origin/main..HEAD` = 10 (`3 · O0` kapanışı ve takip commit'i, `3 · O1`, `3 · O2a`, `3 · O2b`, `3 · O3a` ve takip commit'i, `3 · O3b`, `3 · O4` ve takip commit'i); push edilmedi.
 - **`git ls-remote origin`:** `HEAD`, `main`, `integrate/impl-96` = `6632a18`.
 - **GitHub:** `origin` özel `ahmetxa/ishtar_cam_modes` (silinmez); silinecek üç depo (`DEC-30`): `ahmetxa/ishtar`, `ahmetxa/android_local_manifests`, `ahmetxa/android_device_xiaomi_ishtar`. 2026-11-16T10:17:27Z–10:17:31Z'de dördü de 200 (404 = silinmiş).
 - **`Main-Planing.md`** (değişmedi): sha256 `6790b6aed65fe6ae69eb6920e9187b4cc8484a0408838207c6c058f2117b7cc2`, 406 satır, 77.019 bayt, CRLF, NUL 0, 10 faz. Alt plan 47.
 - **Ledger:** 653 → 662 satır, CRLF, NUL 0. §2 koşu 21; §3 `SNAP-2026-11-15-MAIN`, `SNAP-2026-11-16-SUBPLANS`; §4 47 satır: 34 `verified`, 1 `implemented` (`Faz4.6`), 5 `planned` (`Faz10.1`–`Faz10.5`), 7 `superseded`; `Faz6.2` notu; §7 notu; §8 `DEC-33`, `DEC-32` notu.
 - **Öteki dosyalar:** Index 443 satır, LF; Ontology 453, LF, NUL 2 (`:313`, `:316`; değişmez 10, 11); Comprehension 176, LF (`CQ-13`, `EV-20`); toolchain 246, LF (Hetzner notu); PROJECT_LOG §5.5 (kimlik değeri kuralı; `Faz10.2`–`Faz10.4` için tek cihaz penceresi).
-- **Plan:** §1'de `3 · O4` `done`; §3 `:102` yeni taban; §10 `:812`–`:815` (`3 · O4`'ün üç kapsam dışı bulgusu, 12. denetim). Boru tabanı `:174`, `:848`.
+- **Plan:** §1'de `3 · O4` `done`; §3 `:102` yeni taban; §10 `:812`–`:815` (`3 · O4`'ün üç kapsam dışı bulgusu, 12. denetim), `:816` kayma haritası, `:817` `FIX3` maddeleri. Boru tabanı `:174`, `:850`.
 - **Sürüm:** v2.2 / versionCode 13; `dist/ishtar-cam-modes-v2.2.zip` md5 `e95789572311cc95266d3ab4045cdcba`; `Kullanim.txt` v1.9 içeriğinde (`DEC-29`).
 - **Telefon** (plan §7.1, PROJECT_LOG §2.3): HyperOS 4 (`OS4.0.0.44.WMACNXM`), SukiSU-Ultra v4.3.0-r1, metamodül yok; HAL AOSPA'dan farklı, sensör = `EXPECT_MD5`; proje modülleri ve kutucuk yok; AGC yamasız V9.6, 10 tuzak.
 - **Araçlar:** `3 · O4`'ün `o4.py`/`fix.py` betikleri ve `local://` taslakları taşınmaz; `%TEMP%/idscan.py` duruyor.
@@ -53,7 +53,7 @@ Plan, PROJECT_LOG, ledger, Index, Ontology ve Comprehension bütün okunmaz; bö
 
 İncelemeler salt-okurdur. Yazılanlar: `FIX3` düzeltmeleri; kapanışta plan §1 (gerekirse §10), PROJECT_LOG §2.6 ve §11 ve bu dosya; sonra git.
 
-**(a) Açılış kontrolleri** (alt ajanlardan önce): `git status` (temiz); `git log --oneline -8`; `git branch -vv`; `git log -1 --format=%s` = `Window 3 O4: integration and gates for planning run 21`; `git rev-list --count HEAD` = 85; `git rev-list --count origin/main..HEAD` = 9; `main` ve `origin/main` = `6632a18`; `git tag` boş; `git ls-files` = 355; `git ls-remote origin` (§3). Plan §1'de ilk `pending` = `3 · O5`.
+**(a) Açılış kontrolleri** (alt ajanlardan önce): `git status` (temiz); `git log --oneline -8`; `git branch -vv`; `git log -1 --format=%s` = `Window 3 O4 follow-up: record line shifts and FIX3 items`; `git rev-list --count HEAD` = 86; `git rev-list --count origin/main..HEAD` = 10; `main` ve `origin/main` = `6632a18`; `git tag` boş; `git ls-files` = 355; `git ls-remote origin` (§3). Plan §1'de ilk `pending` = `3 · O5`.
 Snapshot: `Main-Planing.md` §3'teki gibi; ledger 662 satır, CRLF, NUL 0; Index 443, Ontology 453 (NUL 2), Comprehension 176, toolchain 246, hepsi LF. Kapsam: `git diff --stat 6632a18..HEAD` ve `git log -p 6632a18..HEAD` baytı (parçalama için). Tutmayan her şey beklenmedik durumdur.
 
 **(b) GitHub ölçümü:** dört depo için `gh api -i repos/ahmetxa/<ad>` (UTC; ilk satır HTTP durumu); açılışta, `C3`'ten önce (emsal §6.4) ve `RID` olarak push'tan sonra. `ahmetxa/ishtar_cam_modes` 200 değilse beklenmedik durum.
@@ -70,6 +70,7 @@ Snapshot: `Main-Planing.md` §3'teki gibi; ledger 662 satır, CRLF, NUL 0; Index
 4. **Yönlendirme:** P0/P1 beklenmedik durumdur (§0 adım 6). P2/P3'te kapsamı kullanıcı formla seçer (emsal `3 · O3a`/`O3b`: "hepsi"). Kapsam dışı bulgu plan §10'a (12. denetim).
 
 **(f) `FIX3`:** `task` yalnız sıcak nokta dışındaki dosyalarda (örneğin `docs/`, `README.md`), dosya başına bir ajan. Sıcak noktalar (değişmez 20 ve `Faz-10-Plans/`) orkestratörde: taslak gerekirse salt-okur scout'ta; ledger ve Ontology `py -3` betiğiyle (§8), öteki `edit` ile. Bir şey değiştiyse geçitler yeniden: `GATE3` değerleri, bayt, boru, kimlik taraması.
+Bilinen `FIX3` maddeleri (plan §10 `:817`; kullanıcı kararı "takip", 2026-11-16): `Faz10.5` `:33` ve `:65`'teki atıf `PROJECT_LOG.md:857-871` olur; PROJECT_LOG §4 başlığı `DEC-01 … DEC-33`; `DEC-33`'ü sonraki boş numara sayan ve K9'u açık gösteren satırlara tarihli not (yerler plan §10'da).
 
 **(g) `C3`** (beklenmedik durum yoksa sorulmadan):
 - Başlık `Window 3:` ile başlar, fazı adlandırır; plan başlık tanımlamaz, emsal C2 `Window 2: project log sweep and handoff for planning run 21`. Öneri: `Window 3: planning run 21 and handoff for the twelfth audit`.
@@ -108,9 +109,10 @@ Kaynak: plan §2, §7, §7.2, §7.3 ve ledger §8.
 | `3 · O3b` incelemesi | P1 3, P2 4, P3 9; düzeltmeler "hepsi" (2026-11-16, form) | plan §7.3 `:719`–`:720`, §10 |
 | `3 · O4` planı | Onaylandı (2026-11-16, form "onay"); iki PROJECT_LOG kuralı "yeni §5.5" | plan §1, PROJECT_LOG §5.5 |
 | `3 · O4` incelemesi | Teyit incelemesi "ekle" (2026-11-16, form); P0 0, P1 0, P2 2, P3 5 aşamada düzeltildi | plan §10 `:812`–`:815` |
+| `3 · O4` takibi | Kaydet (2026-11-16, form "takip"): kayma haritası ve `FIX3` maddeleri; içerik `3 · O5`'te | plan §10 `:816`–`:817` |
 | Snapshot | Step 2 durmaz; etkin plan bugünkü `Main-Planing.md`; satırlar yazıldı (`I3a`-2) | plan §7.3, ledger §3 |
 | Atıf | Phase 10 ve emeklilikler koşu 21'in seçimi; `DEC-28` Faz 7/8'i, `DEC-32` uyarlamayı anar | ledger §8 |
-| Yayın | Dal `integrate/impl-96` sürer; C2 ve takip commit'i push edildi; Pencere 3'ün dokuz commit'i yerel; FF ve push bu aşamada, ayrı onaylarla | plan §1, §7.2 |
+| Yayın | Dal `integrate/impl-96` sürer; C2 ve takip commit'i push edildi; Pencere 3'ün on commit'i yerel; FF ve push bu aşamada, ayrı onaylarla | plan §1, §7.2 |
 
 ## 6. Değişmezler — asla yapma
 
@@ -157,8 +159,8 @@ py -3 scripts/build-release.py --self-test
 | V1 `--mode all` | Yalnız `warning=step4_has_nonblocking_warnings=P2:1,P3:9`; `subplan_count=47`, `index_reference_count=47`, `phase_folder_count=10`; çıkış 0 |
 | V2 `--mode step4 --strict` | Yalnız bilinen `strict_warning`; çıkış 1 (taban) |
 | V3 `--self-test` | `SELF-TEST: PASS`; sha256 `407fb9be180d96ff0fc6d409d27ad35d4b3de10e0ea3dea8e53a1daee33cb2e0` |
-| Kimlik taraması (Ek A.5) | `value_lines=6`, `NOT_REDACTED=0`, `LUHN15=0`, `prose_mentions=22` → PASS; `prose_mentions` artabilir |
-| Boru ve bayt | Plan'da boru dışı yalnız `:174`, `:848`; ledger ve `Main-Planing.md` CRLF, öteki LF; NUL yalnız Ontology'de (2) |
+| Kimlik taraması (Ek A.5) | `value_lines=6`, `NOT_REDACTED=0`, `LUHN15=0`, `prose_mentions=24` → PASS; `prose_mentions` artabilir |
+| Boru ve bayt | Plan'da boru dışı yalnız `:174`, `:850`; ledger ve `Main-Planing.md` CRLF, öteki LF; NUL yalnız Ontology'de (2) |
 
 - Kimlik taraması: `%TEMP%/idscan.py`, depo kökünde `py -3`; değer basmaz. Bayraksız `build-release.py` `dist/`'i yeniden yazar: çalıştırma.
 
@@ -168,7 +170,7 @@ py -3 scripts/build-release.py --self-test
 - **omp:** Ek A.7 betiği JS'tir (`eval`). `bash` politikası `cat`, `head`, `tail`, `grep` ve `find`'ı engeller: `awk`, `read`/`grep`/`glob` araçları ya da `py -3`; `<(…)` çalışmaz.
 - **Ledger ve Ontology** yalnız `py -3` betiğiyle, bayt olarak yazılır (`edit` satır sonunu ve NUL'u bozabilir); `difflib` ile yalnız ekleme kanıtlanır; değişiklik sondan başa uygulanır.
 - **600 bayt sınırı** orkestratörün kendi satırlarını bağlar; eski metni koruyan Index satırları onu aşabilir.
-- **Çapa numaraları** çoğu yerde `3 · O4`'ten öncedir (ledger 653, Index 426); her atıf içerikle doğrulanır.
+- **Çapa numaraları** çoğu yerde `3 · O4`'ten öncedir (ledger 653, Index 426, PROJECT_LOG 1228, toolchain 242; kayma haritası plan §10 `:816`); her atıf içerikle doğrulanır.
 - **Ledger §4 doğrulayıcısı:** ters tırnaklı yol (V:828), boş satırla ayrılmış satır (V:420), dosyasız alt plan (V:830) kırmızıdır. §2, §3 satırlarını V okumaz (V:93-103).
 - **Ontology**'de 2 NUL (`:313`, `:316`): `grep` boş dönebilir (`AUDIT-FIX-22`).
 - **Alt ajanlar:** scout'un kabuğu yok, `local://`'a yazar (ilk yazımın baytına bak; `local://` taşınmaz); `task` 100K bağlamlı: plan ya da PROJECT_LOG bütün verilmez. 429 ya da 402 ile duran ajan canlanmaz: görevi ortak bağlamla taze gönder.
