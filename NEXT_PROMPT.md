@@ -39,8 +39,8 @@ Plan (≈ 200 KB), PROJECT_LOG, ledger ve Index bütün okunmaz; bölüm başlar
 ## 3. Mevcut durum
 
 **Beklenen durum (3 · O3a kapanışından sonra):**
-- **Git:** dal `integrate/impl-96`, ağaç temiz, 82 commit. Uç: `Window 3 O3a: Step 2 drafts 10.1-10.3 for planning run 21` (`git log --grep '^Window 3 O3a:'`). Etiket yok, 353 izlenen dosya.
-- **`main` = `origin/main`** = `6632a18`. `origin/main..HEAD` = 6 (`3 · O0` kapanışı, takip commit'i, `3 · O1`–`3 · O3a`); hiçbiri push edilmedi; FF ve push `3 · O5`'te, ayrı onaylarla.
+- **Git:** dal `integrate/impl-96`, ağaç temiz, 83 commit. Uç: `Window 3 O3a follow-up: scope the hand-off line-length gate`, altında kapanış (`git log --grep '^Window 3 O3a:'`). Etiket yok, 353 izlenen dosya.
+- **`main` = `origin/main`** = `6632a18`. `origin/main..HEAD` = 7 (`3 · O0`–`3 · O3a` kapanışları ve iki takip commit'i); hiçbiri push edilmedi; FF ve push `3 · O5`'te, ayrı onaylarla.
 - **`git ls-remote origin`:** `HEAD`, `main`, `integrate/impl-96` = `6632a18`.
 - **GitHub:** `origin` özel `ahmetxa/ishtar_cam_modes` (silinmez); silinecek üç depo (`DEC-30`): `ahmetxa/ishtar`, `ahmetxa/android_local_manifests`, `ahmetxa/android_device_xiaomi_ishtar`. 2026-11-15T19:42:48Z–19:42:51Z'de dördü de 200; ajan yalnız ölçer (404 = silinmiş).
 - **`Main-Planing.md`** (`3 · O2a`'dan beri değişmedi): 406 satır, 77.019 bayt, CRLF, NUL 0, 10 faz.
@@ -55,7 +55,7 @@ Plan (≈ 200 KB), PROJECT_LOG, ledger ve Index bütün okunmaz; bölüm başlar
 
 Yalnız `Planner-docs/Faz-10-Plans/`'e iki yeni dosya ve Index'in 10.4–10.5 girdileri yazılır (kapanış dosyaları (e)'de). Ledger, `Main-Planing.md`, `Faz10.1`–`Faz10.3`, Audit, Ontology, Comprehension ve `docs/` yazılmaz.
 
-**(a) Açılış kontrolleri** (alt ajanlardan önce): `git status` (temiz); `git log --oneline -8`; `git branch -vv`; `git log -1 --format=%s` = `Window 3 O3a: Step 2 drafts 10.1-10.3 for planning run 21`; `git rev-list --count HEAD` = 82; `git rev-list --count origin/main..HEAD` = 6; `main` ve `origin/main` = `6632a18`; `git tag` boş; `git ls-files` = 353; `git ls-remote origin` (§3). Plan §1'de ilk `pending` = `3 · O3b`.
+**(a) Açılış kontrolleri** (alt ajanlardan önce): `git status` (temiz); `git log --oneline -8`; `git branch -vv`; `git log -1 --format=%s` = `Window 3 O3a follow-up: scope the hand-off line-length gate`; `git rev-list --count HEAD` = 83; `git rev-list --count origin/main..HEAD` = 7; `main` ve `origin/main` = `6632a18`; `git tag` boş; `git ls-files` = 353; `git ls-remote origin` (§3). Plan §1'de ilk `pending` = `3 · O3b`.
 Snapshot (plan §7.3): `Planner-docs/Main-Planing.md` sha256 `6790b6aed65fe6ae69eb6920e9187b4cc8484a0408838207c6c058f2117b7cc2`, 77.019 bayt, 406 satır, CRLF, NUL 0. Tutmayan her şey beklenmedik durumdur.
 
 **(b) GitHub ölçümü:** dört depo için `gh api -i repos/ahmetxa/<ad>` (UTC; ilk satır HTTP durumu). 404 varsa PROJECT_LOG'un silme cümleleri güncellenir (yerler plan §7 "Açılışta ayrıca").
@@ -64,7 +64,7 @@ Snapshot (plan §7.3): `Planner-docs/Main-Planing.md` sha256 `6790b6aed65fe6ae69
 
 **(d) Step 2 taslakları:**
 1. **Taban:** `step2 --strict` ve `step1 --strict` çıkış 0; `all` yalnız denetim uyarısı, `subplan_count=45`, çıkış 0 (§7). Başka her bulgu beklenmedik durumdur.
-2. **Betik uzantısı** (küçük `task`): `%TEMP%/ishtar-st3/draftcheck.py` sözlüğüne 10.4/10.5 adları ve H1'leri (§7.3 `:682`–`:683`); C11 (10.4 → `Faz10.1`; 10.5 → `Faz10.2`–`Faz10.4`); C6 istisnası: `Faz10.5`'in 10.2–10.4 dosyalarındaki sürüm eki satırları (yalnız sürüm dizesi ve bayat yorum, eklediğini adlandırır; `:693`, `:702`).
+2. **Betik uzantısı** (küçük `task`): `draftcheck.py` sözlüğüne 10.4/10.5 adları ve H1'leri (§7.3 `:682`–`:683`); C11 (10.4 → `Faz10.1`; 10.5 → `Faz10.2`–`Faz10.4`); C6 istisnası: `Faz10.5`'in 10.2–10.4 dosyalarındaki sürüm eki satırları (yalnız sürüm dizesi ve bayat yorum, eklediğini adlandırır; `:693`, `:702`).
 3. **`SP4` ∥ `SP5`:** iki geniş bağlamlı salt-okur scout aynı turda; `SP4` → `Faz10.4`, `SP5` → `Faz10.5` taslağını `local://`'a yazar, ≤ 4 KB döner (yol, bayt, bölüm başına bir satır, `open_issues`). Görev metni:
    - §7.3: o alt planın sözleşme ve kapsam satırları, tek sahip kuralı ve haritası (`:693`–`:707`), "Ortak bağlam" ve `:718` notu; `Main-Planing.md:276-312`; §2 madde 4'teki kanıt. Biçim örneği `Faz9.1` ve `Faz10.1`–`Faz10.3`: yalnız biçim, cümle değil.
    - Yeni kimlikler `VAL-10M-AD`, kullanıcı eylemi `VAL-104-MANUAL`/`VAL-105-MANUAL` (yalın `VAL-MANUAL` değil). Snapshot satırı dosya adıyla: `snapshots/YYYYMMDD-HHMM__Faz10.M__<ad>.txt` (`smoke.sh -o AD` → `snapshots/AD.txt`; `smoke.sh:9`, `:284`).
@@ -73,7 +73,7 @@ Snapshot (plan §7.3): `Planner-docs/Main-Planing.md` sha256 `6790b6aed65fe6ae69
    - `SP5`: sürüm eki istisnası; bayat yorumların hepsi `Faz10.5`'te. `W3F27` yolları ve `.gitignore` haritada yok: eklenmez, `open_issues`'a yazılır.
 4. **Taslak betiği:** `py -3 "$TEMP"/ishtar-st3/draftcheck.py --root . <taslak>...`; son satır `DRAFTCHECK: PASS files=2`, çıkış 0 (1 bulgu, 2 kullanım); C1 (ad) – C12 (tekrar). Bulguyu taslağın scout'u düzeltir; orkestratör taslağı yeniden yazmaz.
 5. **`CPb`:** iki taslak `cp` ile `Planner-docs/Faz-10-Plans/`'e (adlar §7.3). Index `edit` ile, sondan başa, satırlar önce içerikle doğrulanarak: `:301` Phase 10 = 5, toplam 47 (`find` ile sayılır); `:188` öncelik maddesi 16 10.4–10.5'i de anar; `:167`'den sonra 10.4 ve 10.5 maddeleri (V:158). `:163` değişmez.
-6. **Geçit:** `step2 --strict` çıkış 0; `all` çıkış 0, `subplan_count=47`; bayt (LF, CR 0, NUL 0; satırlar ≤ 600 bayt), boru (plan tabanı `:174`, `:838`), kimlik (§7).
+6. **Geçit:** `step2 --strict` çıkış 0; `all` çıkış 0, `subplan_count=47`; bayt (LF, CR 0, NUL 0; orkestratörün satırları ≤ 600 bayt), boru (plan tabanı `:174`, `:838`), kimlik (§7).
 7. **İnceleme (öneri):** plan `3 · O3b`'de inceleme öngörmez; `3 · O3a`'da eklenen salt-okur REV ∥ SEC 5 P1 buldu. Açılış formunda eklenmesini öner; P0/P1 → plan §0 adım 6.
 
 **(e) Kapanış** (beklenmedik durum yoksa sorulmadan):
@@ -103,7 +103,7 @@ Kaynak: plan §2, §7, §7.2, §7.3, plan başlığındaki onaylar ve ledger §8
 | Atıf | Phase 10 ve emeklilikler koşu 21'in seçimi; `DEC-28` Faz 7/8'i, `DEC-32` uyarlamayı anar | ledger `:606`, `:610` |
 | Dal | `integrate/impl-96` sürer; FF yalnız `3 · O5` | plan §7.2 |
 | Alt planlar | `10.1` ölçüm, `10.2` sensör, `10.3` AGC tuzakları, `10.4` kutucuk ve WebUI, `10.5` v2.3 | plan §7.3 |
-| Yayın | C2 ve takip commit'i push edildi; sonraki altı commit yerel, push `3 · O5`'te | plan §1 |
+| Yayın | C2 ve takip commit'i push edildi; sonraki yedi commit yerel, push `3 · O5`'te | plan §1 |
 
 ## 6. Değişmezler — asla yapma
 
