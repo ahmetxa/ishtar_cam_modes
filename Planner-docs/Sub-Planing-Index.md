@@ -21,7 +21,7 @@ The index does not replace `Main-Planing.md`, and no sub-plan changes the phase 
 
 Source: `Planner-docs/Main-Planing.md`.
 
-Detected phase count: 9. The count comes from the roadmap table under section 6 of the main plan, whose rows are numbered 1 through 9, and it is confirmed by the nine `### Phase <n>` headings in the same section.
+Detected phase count: 10. The count comes from the roadmap table under section 6 of the main plan, whose rows are numbered 1 through 10, and it is confirmed by the ten `### Phase <n>` headings in the same section. **Updated 2026-11-16 (planning run 21, Step 2):** the count was 9 until that run's Step 1 added Phase 10.
 
 Detected phase names, in the master plan's order:
 
@@ -36,6 +36,7 @@ Detected phase names, in the master plan's order:
 | 7 | Android 16 build environment | M3 | medium |
 | 8 | Camera work on Android 16 + kernel LTS | M5 | high |
 | 9 | Release engineering | M6 | low |
+| 10 | HyperOS 4 camera module adaptation | M5 | medium |
 
 **Phase 3's row was updated by planning run 8.** Its name changed with `DEC-14`, and its token/context band moves from **high** to **low** — the high banding described a write-site search in a 27 MB stripped binary, and the replacement objective contains no search at all. `Main-Planing.md` section 9 makes the same point: "C was the project's critical path and its highest-uncertainty work; **after `DEC-14` it is neither**."
 
@@ -159,6 +160,12 @@ First useful slice: `F4.2-01`, which now settles both the format set and the row
 - `Faz-9-Plans/Faz9.2-release-verification-checklist.md`
 - `Faz-9-Plans/Faz9.3-documentation-consolidation.md`
 
+**Phase 10 — HyperOS 4 camera module adaptation.** Bring the camera module and its AGC configuration to HyperOS 4, measuring first. Folder: `Faz-10-Plans`. Added by planning run 21 for the adaptation recorded as `DEC-32`; its Step 2 writes `Faz10.1` to `Faz10.3` first and `Faz10.4`, `Faz10.5` after them. Execution order: the read-only survey first; then the sensor layer, the AGC trap cleanup and the tile and WebUI chain, in any order; the v2.3 release last. First useful slice: the survey's read-only pass. Fresh-session token risk: medium. Subagents: not recommended.
+
+- `Faz-10-Plans/Faz10.1-hyperos4-camera-stack-survey.md` — read-only survey and dated record of the HyperOS 4 camera stack: running services and the restart order, SELinux labels, allowlist count, SukiSU-Ultra manager and WebUI entry, module mounts; written before the other four.
+- `Faz-10-Plans/Faz10.2-hyperos4-sensor-layer.md` — the unchanged v2.2 module in a smoke bracket (sensor guard passes, HAL guard fails closed), then `setmode.sh` retargeted to the HyperOS 4 services in invariant 3's order; `50mp` refused under `DEC-33`.
+- `Faz-10-Plans/Faz10.3-agc-trap-audit-and-guarded-cleanup.md` — AGC trap audit and a backup-first cleanup script that reads the HyperOS 4 owner and label; no picture-size write, no `sed -i`, no `.agc` import; each write user-approved and bracketed.
+
 ## 4. Priority Detailing Order
 
 The master plan's phase order is preserved in the folder structure. The execution order below reflects Main-Planing's own prioritized next steps and Autopsy's scheduling feedback, both of which move certain work out of numbered order.
@@ -178,6 +185,7 @@ The master plan's phase order is preserved in the folder structure. The executio
 13. **`Faz-9-Plans/Faz9.1-reproducible-release-build.md`**, **`Faz-9-Plans/Faz9.3-documentation-consolidation.md`**, then **`Faz-9-Plans/Faz9.2-release-verification-checklist.md`** — release engineering, once the contents stop moving.
 14. **`Faz-7-Plans/Faz7.1-github-input-staging.md`**, **`Faz-7-Plans/Faz7.2-first-aospa-build.md`** and **`Faz-7-Plans/Faz7.3-flash-boot-and-aon-verification.md`** — the second front, in strict order. **Re-planned by planning run 18; see amendment 4d.**
 15. **`Faz-8-Plans/Faz8.1-android16-camera-blob-comparison.md`**, **`Faz-8-Plans/Faz8.2-kernel-lts-merge-scoping.md`** and **`Faz-8-Plans/Faz8.3-camera-modes-on-android16-build.md`** — the camera work on Android 16 and the kernel scoping, with both commit decisions (`DEC-07`, `DEC-08`) routed to the user. **Re-planned by planning run 18; see amendment 4d.**
+16. **`Faz-10-Plans/Faz10.1-hyperos4-camera-stack-survey.md`** first, then **`Faz-10-Plans/Faz10.2-hyperos4-sensor-layer.md`** and **`Faz-10-Plans/Faz10.3-agc-trap-audit-and-guarded-cleanup.md`** — the HyperOS 4 adaptation planned by planning run 21. The survey's record comes before any change; `Faz10.4` (tile and WebUI) also follows it, and `Faz10.5` (v2.3 release) closes the phase. **Added 2026-11-16.**
 
 ### 4a. Priority amendment, 2026-08-31 — Phase 5 raised, `DEC-03` answered
 
@@ -289,8 +297,9 @@ The revised Phase 4 order is:
 
 ## 6. Coverage Check
 
-- [x] Every main phase from `Planner-docs/Main-Planing.md` has a folder. Nine phases detected; nine folders present: `Faz-1-Plans` through `Faz-9-Plans`.
-- [x] Every main phase has at least one sub-plan. Counts per phase: Phase 1 has 6, Phase 2 has 4, Phase 3 has 11, Phase 4 has 7, Phase 5 has 3, Phase 6 has 2, Phase 7 has **3**, Phase 8 has **3**, Phase 9 has 3. Total: **42**. Counted from `find Planner-docs -type f -name 'Faz*.md'` on 2026-09-10 during planning run 18, not incremented from memory. **Phases 7 and 8 each went 2 -> 3 in that run.** Each lost one file (the former WSL2 provisioning and second-device sizing sub-plans, removed) and gained two (`Faz7.1-github-input-staging.md` and `Faz7.3`; `Faz8.1-android16-camera-blob-comparison.md` and `Faz8.3`). Earlier growth: Phase 3 went 6 -> 11 on 2026-09-03 (planning run 8); Phase 4 went 4 -> 5 and 5 -> 6 on 2026-09-01, and 6 -> 7 on 2026-09-03.
+- [x] Every main phase from `Planner-docs/Main-Planing.md` has a folder. Ten phases detected; ten folders present: `Faz-1-Plans` through `Faz-10-Plans` (`Faz-10-Plans` added 2026-11-16 by planning run 21).
+- [x] Every main phase has at least one sub-plan. Counts per phase: Phase 1 has 6, Phase 2 has 4, Phase 3 has 11, Phase 4 has 7, Phase 5 has 3, Phase 6 has 2, Phase 7 has 3, Phase 8 has 3, Phase 9 has 3, Phase 10 has **3**. Total: **45**. Counted from `find Planner-docs -type f -name 'Faz*.md'` on 2026-11-16 during planning run 21's Step 2, not incremented from memory. **Phase 10 is new in that run;** it reaches 5 sub-plans, and the total 47, once `Faz10.4` and `Faz10.5` are written.
+  - Earlier counts: **42** on 2026-09-10 (planning run 18). **Phases 7 and 8 each went 2 -> 3 in that run.** Each lost one file (the former WSL2 provisioning and second-device sizing sub-plans, removed) and gained two (`Faz7.1-github-input-staging.md` and `Faz7.3`; `Faz8.1-android16-camera-blob-comparison.md` and `Faz8.3`). Earlier growth: Phase 3 went 6 -> 11 on 2026-09-03 (planning run 8); Phase 4 went 4 -> 5 and 5 -> 6 on 2026-09-01, and 6 -> 7 on 2026-09-03.
 - [x] Two Phase 4 sub-plans (`Faz4.1`, `Faz4.7`) are `superseded` and two more (`Faz4.5`, `Faz4.6`) are complete or partly complete. A superseded sub-plan is still counted and still present — nothing is deleted — and each is marked in section 3 so a reader does not schedule it.
 - [x] Sub-plan numbering is contiguous within each phase, starting at 1 with no gaps.
 - [x] Sub-plan filenames follow the `Faz<phase>.<sub>-<ascii-lowercase-kebab-slug>.md` convention, with no spaces and no non-ASCII characters.
