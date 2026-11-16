@@ -162,8 +162,8 @@ Aşağıdaki her şey (2026-09-20 ölçümü, kanonik yapılandırma, son ölç�
   - P2 açık: `AUDIT-FIX-22`
   - P3 açık: `-37`, `-41`, `-42`, `-50`, `-55`, `-56`, `-57`
   - P3 kabul edilmiş: `-25`, `-33`
-- **Sıradaki numaralar:** `IMPL-97`, planlama koşusu 21, 12. denetim. `DEC-27`…`DEC-32` ledger'da (`:605`–`:610`); sonraki boş numara `DEC-33`.
-- **Açık kararlar:** K1–K8 yanıtlı (K7 = (a) → `DEC-32`; K8 = A → `DEC-31`, yürütüldü). K9 (50MP HAL yeniden türetmesi) ve push açık. Konusuz altı karar (`DEC-07`, `DEC-08`, `DEC-22`, `DEC-24`, `DEC-25`, `DEC-26`) `DEC-28` ile kapanır (ROM derleme bırakıldı; konusuz notları ledger'da `:582`, `:583`, `:599`, `:601`, `:603`, `:604`). `DEC-09` koşullu; ancak tetiklenirse gündeme gelir. Diğer tüm DEC'ler yanıtlandı.
+- **Sıradaki numaralar:** `IMPL-97`, planlama koşusu 21, 12. denetim. `DEC-27`…`DEC-32` ledger'da (`:605`–`:610`); sonraki boş numara `DEC-33`. *(2026-11-16 notu: `DEC-33` (K9) planlama koşusu 21 ile ledger `:619`'a yazıldı (`3 · O4`); sonraki boş numara `DEC-34`.)*
+- **Açık kararlar:** K1–K8 yanıtlı (K7 = (a) → `DEC-32`; K8 = A → `DEC-31`, yürütüldü). K9 (50MP HAL yeniden türetmesi) ve push açık. Konusuz altı karar (`DEC-07`, `DEC-08`, `DEC-22`, `DEC-24`, `DEC-25`, `DEC-26`) `DEC-28` ile kapanır (ROM derleme bırakıldı; konusuz notları ledger'da `:582`, `:583`, `:599`, `:601`, `:603`, `:604`). `DEC-09` koşullu; ancak tetiklenirse gündeme gelir. Diğer tüm DEC'ler yanıtlandı. *(2026-11-16 notu: K9 yanıtlandı 2026-11-15, `3 · O0`: hayır, şimdilik (`DEC-33`); HAL katmanı HyperOS 4'te kapalı, sensör katmanı sürer.)*
 - **Doğrulayıcı (Ö13):** depoda değil, ClaudeQB eklentisinin içinde duruyor. `py -3` (CPython 3.14.10) ile çalıştırılır.
   - Komut: `py -3 C:/Users/ahmet/.claude/plugins/cache/claudeqb/claudeqb/0.2.1/skills/claudeqb/scripts/validate_planner_docs.py --root . --mode all`
   - Sonuç: `error_count=0`, `warning_count=1` (`step4_has_nonblocking_warnings=P2:1,P3:9`), `p0_findings=0`, `p1_findings=0`, `subplan_count=42`, `secret_findings=0`. HEAD ağacında da aynı.
@@ -225,19 +225,19 @@ Aşağıdaki her şey (2026-09-20 ölçümü, kanonik yapılandırma, son ölç�
 1. DEV §4 (2026-09-20): Kullanıcıya göre MIUI ve AOSPA'nın kerneli "has been upstreamed by third parties". K3 ile 2026-11-13'te düştü: telefon artık 5.15.215 kernelli HyperOS 4'te (§2.3).
 2. **Çelişki (giderildi):** DEV §7 "An Android 16 build ships a different binary, so the table does not carry over" diyordu; oysa IMPL-92 (L:102, L:521) pinlenmiş A16 HAL'inin md5'ini stok korumayla eşit ölçmüştü. Cümle yerinde bırakıldı; 2026-11-13'te DEV §10'a düzeltme notu eklendi (`03b0898`). Android 16 derlemesi bırakıldığı için konu kapandı.
 
-### 2.6 Bu oturumun durumu (Pencere 3 · O4, 2026-11-16)
+### 2.6 Bu oturumun durumu (Pencere 3 · O5, 2026-11-16)
 
-- **Genel durum:** Pencere 3 · O4 (koşu 21'in entegrasyonu ve geçitleri: `I3a`, `I3b`, `GATE3`) bitti; kapanış `Window 3 O4: integration and gates for planning run 21` (§11). Ledger, Index, Ontology, Comprehension, toolchain belgesi ve bu dosyanın §5.5'i yazıldı; `Main-Planing.md`, alt planlar ve Audit dokunulmadı, telefona komut gönderilmedi. Sıradaki aşama `3 · O5`: `REV-4` ∥ `SEC-C`, `FIX3`, `C3`, FF ve push.
-- **Açılış (2026-11-16T10:17Z):** kontrollerin hepsi tuttu: ağaç temiz, dal `integrate/impl-96` 84 commit, uç `Window 3 O3b: …`; `origin/main..HEAD` = 8; `main`, `origin/main` ve `ls-remote` üç ref `6632a18`; etiket yok; 355 dosya; `Main-Planing.md` sha256 `6790b6ae…` aynı. Taban: `step2`, `step1` ve ilk kez ölçülen `step3-preflight` `--strict` 0; `all` 0, `subplan_count=47`.
-- **Yayın:** bu oturumda FF ve push yapılmadı. `origin/main..HEAD` = 10 (`3 · O0` kapanışı ve takip commit'i, `3 · O1`, `3 · O2a`, `3 · O2b`, `3 · O3a` ve takip commit'i, `3 · O3b`, `3 · O4` ve takip commit'i); FF ve push `3 · O5`'te, ayrı onaylarla.
-- **Plan ve onay:** genel şablon plana göre uyarlandı (dal sürer; ayrı kontrat commit'i, `isolated`, `outputSchema`, `designer`, `librarian` yok; sıcak noktalara yalnız orkestratör yazar); form "onay", teyit incelemesi "ekle", iki kural "yeni §5.5".
-- **Taslaklar ve uygulama:** üç salt-okur scout (`I3a-A` §2, §3, §7; `I3a-B` §4, §8; `I3b-D` Index, Ontology, Comprehension, toolchain) işlem listelerini JSON olarak `local://`'a yazdı; `%TEMP%/o4/o4.py` çapaları tekil doğrulayıp sondan başa, bayt düzeyinde uyguladı. Ledger 653 → 662 satır; §4 47 satır: 34 `verified`, 1 `implemented`, 5 `planned`, 7 `superseded`; `DEC-33` yazıldı, `DEC-30` notu yok.
-- **Kontrol:** HEAD'e karşı difflib, satır ve karakter düzeyinde: silme yok, eski metin yalnız eklemeyle korunur (ledger'da yalnız beş satırın Status, Superseded By, Updated At hücreleri değişti); Index 426 → 443, toolchain 242 → 246, Comprehension iki satır, Ontology iki satır ve NUL 2 yerinde; satır sonları korundu.
-- **İnceleme:** salt-okur teyit: P0 0, P1 0, P2 2 (`AUDIT-FIX-37`'nin yanlış tanımı; 4e ve §7'deki "in any order" `Faz10.4`'ün sırasıyla çelişiyordu), P3 5. Scout'lar düzeltme işlemleri yazdı (yalnız bu aşamanın satırlarında); §5.5 plan `:715`'e uyduruldu; toolchain başlık notu kapsam dışı diye geri alındı; üç madde plan §10 `:812`–`:815`'e.
-- **Geçit (`GATE3`, 20:30Z):** `step2`, `step3-preflight`, `step1` `--strict` 0; `all` 0, yalnız denetim uyarısı, `subplan_count=47`, `index_reference_count=47`; V2 taban (çıkış 1); V3 `SELF-TEST: PASS`, sha256 aynı; bayt ve boru geçti (plan yalnız `:174`, `:848`; takipten sonra `:850`); kimlik taraması PASS (`prose_mentions=22`).
-- **Silinecek depolar (`DEC-30`):** `gh api -i` (2026-11-16T10:17:27Z–10:17:31Z): `ahmetxa/ishtar`, `ahmetxa/android_local_manifests`, `ahmetxa/android_device_xiaomi_ishtar` ve `ahmetxa/ishtar_cam_modes` 200; silme cümleleri değişmedi; `3 · O5` açılışında yeniden ölçülür (404 = silinmiş).
-- **Bekleyen işler:** `3 · O5` (plan §1): `REV-4` ∥ `SEC-C` → `FIX3` → `C3` → FF (onay) → push (onay) → `LSR`, `RID`; `FIX3`'e plan §10 `:816`–`:817` (kayma haritası; `Faz10.5` atfı, `DEC-33` ve K9 notları). Ardından Pencere 4 (12. denetim; plan §8): §10'daki öteki `3 · O4` maddeleri ve `AUDIT-FIX-22`, `-37`, `-50`. Depo silme kullanıcıda.
-- **Sıcak noktalar ve devam:** plan §3 ve §7.2 "Sıcak noktalar" (yalnız ana oturum); yeni pencere `NEXT_PROMPT.md` ile `3 · O5`'e devam eder.
+- **Genel durum:** Pencere 3 · O5 (son inceleme ve kapanış) bitti; Pencere 3 `done`. Kapanış `Window 3: planning run 21 and handoff for the twelfth audit` (§11). Cihaza komut gönderilmedi; `Main-Planing.md`, Ontology, Comprehension ve toolchain belgesi dokunulmadı. Sıradaki aşama Pencere 4 · `O0` (12. denetim keşfi; plan §8).
+- **Açılış (2026-11-16T20:55Z–21:01Z):** kontrollerin hepsi tuttu: ağaç temiz, 86 commit, `origin/main..HEAD` = 10, `main` = `origin/main` = ls-remote'taki üç ref = `6632a18`, etiket yok, 355 dosya; snapshot değerleri aynı; taban `GATE3` değerlerinde; kimlik taraması PASS (`prose_mentions=24`).
+- **Plan ve onay:** şablon plana göre uyarlandı (dal sürer; yeni dal ve kontrat commit'i yok; `isolated`, `outputSchema`, `designer`, `librarian` yok; sıcak noktalara yalnız orkestratör yazar). Formlar: plan "onay", teyit "ekle", düzeltme kapsamı "hepsi".
+- **İncelemeler:** `REV-4` dört parça (Main-Planing ve 10.1–10.2; 10.3–10.5; ledger, Index, Ontology, Comprehension, toolchain; plan, bu dosya, NEXT_PROMPT), `SEC-C` üç parça (`git log -p` ara hâllerle, 263–378 KB): P0 0, P1 0, P2 9, P3 24. Sır, yabancı seri numarası, sunucu adresi ya da kimlik değeri yok.
+- **`FIX3`:** üç salt-okur scout JSON işlem listesi yazdı (32 + 30 + 24 = 86 işlem); `%TEMP%/o5/apply.py` her işlemi satırında tekil eşleşmeyle, bayt düzeyinde uyguladı; satır sayıları, satır sonları ve NUL değişmedi. Bilinen maddeler (`Faz10.5` atfı `:857-871`, §4 başlığı, `DEC-33` ve K9 notları) ve `RID`/`DEL3` ayrımı dahil.
+- **İstisnalar:** onaylı `Main-Planing.md` maddeleri (sha256 sabit), kapsam dışı kod ve belge bulguları plan §10'a (12. denetim); `W3P01`'deki etkinlik adı kabul edildi.
+- **Teyit:** reviewer P2 3, P3 5; security-reviewer 0; hepsi bu aşamada düzeltildi (`fix-t`).
+- **Geçit (2026-11-16T21:27Z ve C3'ten önce):** `step2`, `step1`, `step3-preflight` `--strict` 0; `all` 0, yalnız denetim uyarısı, `subplan_count=47`, `index_reference_count=47`; V2 taban (çıkış 1); V3 `SELF-TEST: PASS`, sha256 aynı; boru: plan yalnız `:174`, `:854`; kimlik taraması PASS (`prose_mentions=24`).
+- **Yayın:** C3'ten sonra FF ve push bu oturumda ayrı onaylarla sorulur; sonuç sohbette verilir. Pencere 4 · `O0` açılışı `git ls-remote origin` ile doğrular ve kaydeder.
+- **Silinecek depolar (`DEC-30`; `DEL3` push'tan sonra, sonuç sohbette):** `gh api -i` açılışta (20:55:59Z–20:56:05Z) dört depo 200; C3'ten önce 21:31:10Z–21:31:13Z'de de dört depo 200. Silme cümleleri değişmedi; silme kullanıcıda.
+- **Bekleyen işler ve devam:** Pencere 4 (12. denetim; plan §8): §10'daki `3 · O4` ve `3 · O5` maddeleri, `AUDIT-FIX-22`, `-37`, `-50`. Sıcak noktalar plan §3 ve §7.2; yeni pencere `NEXT_PROMPT.md` ile Pencere 4 · `O0`'a başlar.
 
 ## 3. Kronoloji
 
@@ -594,11 +594,11 @@ Liste `integrate/impl-96` dalının commit'leridir, eskiden yeniye; `2 · O3` a�
 - 2 · O0+O1: Window 2 O0-O1: approved plan, discovery facts, stage-per-session loop
 - 2 · O2: Window 2 O2: contract for the project log sweep and the run 21 handoff
 
-## 4. Kararlar (DEC-01 … DEC-32)
+## 4. Kararlar (DEC-01 … DEC-33)
 
 Kanonik kaynak `Planner-docs/Planing-Ledger.md` §8'dir (başlık :572, satırlar :576–:610; satır sırası numara sırasında değil: DEC-10, DEC-05'ten sonra; DEC-01, DEC-24'ten sonra geliyor). Bu tablo bir özettir. `Kaynak` sütunundaki `ledger:N`, `Planner-docs/Planing-Ledger.md:N` demektir.
 
-**Açık kararlar (2026-11-14):** `DEC-09` (koşullu; yalnızca tetiklenirse gündeme gelir) ve K9 (kullanıcının; 50MP HAL yeniden türetmesi; henüz DEC numarası yok). `DEC-07` ve `DEC-08` 2026-11-13'ten beri konusuz (`DEC-28`); `DEC-08`'i etkileyebilecek doğrulanmamış kernel-upstream iddiası da 2026-11-13'te düştü (K3; bkz. §9). Kalan 31 kararın hepsi yanıtlandı, kapandı ya da konusuz kaldı (ledger:576–:610).
+**Açık kararlar (2026-11-14):** `DEC-09` (koşullu; yalnızca tetiklenirse gündeme gelir) ve K9 (kullanıcının; 50MP HAL yeniden türetmesi; henüz DEC numarası yok). `DEC-07` ve `DEC-08` 2026-11-13'ten beri konusuz (`DEC-28`); `DEC-08`'i etkileyebilecek doğrulanmamış kernel-upstream iddiası da 2026-11-13'te düştü (K3; bkz. §9). Kalan 31 kararın hepsi yanıtlandı, kapandı ya da konusuz kaldı (ledger:576–:610). *(2026-11-16 notu: K9 yanıtlandı 2026-11-15, `3 · O0`: hayır, şimdilik (`DEC-33`); HAL katmanı HyperOS 4'te kapalı, sensör katmanı sürer.)*
 
 | id | tarih (açıldı → yanıt) | soru | hüküm | durum | kaynak |
 |---|---|---|---|---|---|
@@ -635,7 +635,7 @@ Kanonik kaynak `Planner-docs/Planing-Ledger.md` §8'dir (başlık :572, satırla
 | DEC-31 | 2026-11-13 → 2026-11-13 | Commit edilmiş ama push edilmemiş probe anlık görüntüsündeki cihaz tanımlayıcıları redakte edilsin ve geçmiş yeniden kurulsun mu? | K8 = A: tanımlayıcılar (iki IMEI anahtarı ve `persist.sys.miui.sno` değerleri) yerinde redakte edildi; push edilmemiş üç commit, herhangi bir push'tan önce yeniden kuruldu. Geçmişi yeniden yazmama kuralının kayıtlı tek istisnası (ledger satırları commit hash'lerini anar); eski hash'leri anan ledger satırı yoktu. Redaksiyonsuz özgün kopya depo dışında, doğrulanmış bir bundle'da | yanıtlandı ve yürütüldü | ledger:609 |
 | DEC-32 | 2026-11-13 → 2026-11-13 | Modül HyperOS 4'te hangi yolu izleyecek? | K7 = (a): modül HyperOS 4'e uyarlanır. Kapsamı (50MP HAL yeniden türetmesi = K9, kutucuk/WebUI zinciri, AGC tuzakları, v2.3) planlama koşusu 21 belirler | yanıtlandı | ledger:610 |
 
-**Oturum kararları (2026-11-13).** Bu numaralar atandı; ledger'a IMPL-96 ile (Pencere 1) yazıldı (`:605`–`:610`). Atanan numaralar: `DEC-27` depo taşıma, `DEC-28` ROM derlemenin bırakılması ve HyperOS 4, `DEC-29` K1, `DEC-30` K5+K6, `DEC-31` K8, `DEC-32` K7. Sonraki boş numara `DEC-33`.
+**Oturum kararları (2026-11-13).** Bu numaralar atandı; ledger'a IMPL-96 ile (Pencere 1) yazıldı (`:605`–`:610`). Atanan numaralar: `DEC-27` depo taşıma, `DEC-28` ROM derlemenin bırakılması ve HyperOS 4, `DEC-29` K1, `DEC-30` K5+K6, `DEC-31` K8, `DEC-32` K7. Sonraki boş numara `DEC-33`. *(2026-11-16 notu: `DEC-33` (K9) planlama koşusu 21 ile ledger `:619`'a yazıldı (`3 · O4`); sonraki boş numara `DEC-34`. Bu tabloda `DEC-33` satırı bilerek yok (satır eklemek çapaları kaydırırdı); karar aşağıdaki K9 satırında (`:651`).)*
 
 | id | soru | yanıt / durum (öneri kalın) |
 |---|---|---|
@@ -648,7 +648,7 @@ Kanonik kaynak `Planner-docs/Planing-Ledger.md` §8'dir (başlık :572, satırla
 | K7 | HyperOS 4'te projenin yönü | **Yanıtlandı: (a)** modülü HyperOS 4'e uyarla (`DEC-32`, ledger'a Pencere 1'de yazıldı, `:610`). Seçenekler: (a) modülleri HyperOS 4'e uyarla: sensör katmanı aynı blob üzerinde; 50MP katmanı yeni HAL'de baştan tersine mühendislik ister; kutucuk/WebUI zinciri KernelSU Next'e bağlı. (b) Yalnız AGC'yi sürdür: şu an yamasız V9.6, tuzaklar kurulu (10), 12,58 MP türetiliyor. (c) AOSPA dönemini kapat. Kaynak: `ORCHESTRATION_PLAN.md` §2 |
 | K8 | Probe snapshot'ındaki cihaz kimlikleri (push öncesi) | **Yanıtlandı: A** (redaksiyon, `DEC-31`); dal yeniden kuruldu (`70946ff`, `03b0898`, `775b321`; eşleme §11); **yürütüldü**. Redaksiyonsuz uç yalnız depo dışı bundle'da (§11) |
 | Konusuz | ROM derlemeye bağlı altı karar | `DEC-07`, `DEC-08`, `DEC-22`, `DEC-24`, `DEC-25`, `DEC-26`: `DEC-28` ile konusu kalmadı; ledger'a Pencere 1'de işlendi (IMPL-96; konusuz notları `:582`, `:583`, `:599`, `:601`, `:603`, `:604`) |
-| K9 | 50MP HAL katmanının HyperOS 4 HAL'inde (`2a955e68…`) yeniden türetilmesi | **Yanıtlandı (2026-11-15, `3 · O0`): hayır, şimdilik.** HAL katmanı HyperOS 4'te kapalı kalır, sensör katmanı sürer; ileride yeniden açılabilir. Karar `DEC-33`; ledger'a koşu 21 yazar |
+| K9 | 50MP HAL katmanının HyperOS 4 HAL'inde (`2a955e68…`) yeniden türetilmesi | **Yanıtlandı (2026-11-15, `3 · O0`): hayır, şimdilik.** HAL katmanı HyperOS 4'te kapalı kalır, sensör katmanı sürer; ileride yeniden açılabilir. Karar `DEC-33`; ledger'a koşu 21 yazar *(2026-11-16 notu: yazıldı, ledger `:619` (`3 · O4`).)* |
 | O2 | Depo hijyeni ve IMPL-96 kurulumu | **Onaylandı (2026-11-13):** `7fa0a51`, `integrate/impl-96`, `70946ff`, `03b0898`, `775b321`; ledger satırı Pencere 1'de yazıldı (`:525`) |
 | Push | `7fa0a51` ve `integrate/impl-96` dalı | **Yapıldı (2026-11-15):** C2'den sonra ayrı onaylarla FF ve push (08:14:45Z, 08:15:01Z); takip commit'i de aynı gün (reflog: 08:58:01Z, 08:58:04Z). `origin`'de `main` ve `integrate/impl-96` = takip commit'i (§2.1); yalnız açık refspec |
 
@@ -707,7 +707,7 @@ Kanonik kaynak `Planner-docs/Planing-Ledger.md` §8'dir (başlık :572, satırla
   - Blob'lar `.gitignore`'da olduğu için temiz bir checkout arşivi byte-özdeş üretemiyor (FIND-9.1-02).
   - Kurtarma runbook'u bozuk cihazda gösterilmedi; F9.2-04 yalnızca eski-mod tespitini test etti.
   - AGC'nin açtığı HAL id'si ölçülmedi (OQ-17); OQ-12 kısmi; DNG probu erişilemez (OQ-02/H-03); LN birleşimi denenmedi (H-04).
-  - HAL yama tablosu HyperOS 4'te hiç denenmedi (Android 16 derlemesi bırakıldı; Faz8.1'in uzlaşma yarısı yapılmayacak). HyperOS 4'teki HAL (`camera.qcom.so` md5 `2a955e68…`, 2026-11-13'te ölçüldü) tablonun kilitli olduğu AOSPA A15 stok HAL'inden (`HAL_STOCK_MD5` `c3fa63a8…`) farklı; modülün HAL koruması (`ishtar-cam-modes/post-fs-data.sh:101-107`) bu yüzden kapalı başarısız olur (fail-closed) ve HAL katmanını atlar [ÇIKARIM]. Yeniden türetme K9'a bağlı (açık).
+  - HAL yama tablosu HyperOS 4'te hiç denenmedi (Android 16 derlemesi bırakıldı; Faz8.1'in uzlaşma yarısı yapılmayacak). HyperOS 4'teki HAL (`camera.qcom.so` md5 `2a955e68…`, 2026-11-13'te ölçüldü) tablonun kilitli olduğu AOSPA A15 stok HAL'inden (`HAL_STOCK_MD5` `c3fa63a8…`) farklı; modülün HAL koruması (`ishtar-cam-modes/post-fs-data.sh:101-107`) bu yüzden kapalı başarısız olur (fail-closed) ve HAL katmanını atlar [ÇIKARIM]. Yeniden türetme K9'a bağlı (açık). *(2026-11-16 notu: K9 = hayır, şimdilik (2026-11-15, `DEC-33`); HAL kapalı, sensör sürer.)*
 
 ### 5.5 Çalışma kuralları (koşu 21, 2026-11-16)
 
@@ -886,9 +886,9 @@ Birleşik ve tekilleştirilmiş liste. Kanıtlar extract'lardan alındı; satır
 | R5 otomatik doğrulama yok | yüksek | smoke + checklist + self-test var; yalnızca cihazda; tasarım gereği CI yok | MP:257 |
 | R6 release hiç flash edilmedi | orta | Çözüldü; v2.2 kurulu (VAL-INSTALL) *(2026-11-14 notu: v2.2 AOSPA A15'te kuruluydu; HyperOS 4'te kurulu değil (2026-11-13 ölçümü).)* | MP:259 |
 | R7 bilgi tek belgede | orta | Ontoloji ve comprehension var ama kusurlu: NUL baytlar (`-22`), IMPL-52…54 eksik (`-37`), Hetzner metni (`-57`) | MP:261; Audit:377–382 |
-| R8 tek vendor bloba bağımlılık | orta | **Gerçekleşti:** telefonun HyperOS 4 portuna geçtiği 2026-11-13'te gözlendi. Aynı günkü ölçüm (`70946ff`): HAL farklı (`2a955e68…`), sensör blobu aynı (`EXPECT_MD5`). 16 noktalı tablo AOSPA HAL'ine (`c3fa63a8…`) kilitli: modül kurulursa HAL guard'ı fail-closed davranıp HAL katmanını atlar, sensör katmanı mount olur [ÇIKARIM]. HAL katmanının yeniden türetilmesine K9 karar verir (`ORCHESTRATION_PLAN.md` §2, §7) | MP:263 |
+| R8 tek vendor bloba bağımlılık | orta | **Gerçekleşti:** telefonun HyperOS 4 portuna geçtiği 2026-11-13'te gözlendi. Aynı günkü ölçüm (`70946ff`): HAL farklı (`2a955e68…`), sensör blobu aynı (`EXPECT_MD5`). 16 noktalı tablo AOSPA HAL'ine (`c3fa63a8…`) kilitli: modül kurulursa HAL guard'ı fail-closed davranıp HAL katmanını atlar, sensör katmanı mount olur [ÇIKARIM]. HAL katmanının yeniden türetilmesine K9 karar verir (`ORCHESTRATION_PLAN.md` §2, §7) | MP:263 *(2026-11-16 notu: K9 = hayır, şimdilik (2026-11-15, `DEC-33`); HAL kapalı, sensör sürer.)* |
 | R9 Windows derleyemiyor | orta | Konusuz: ROM derleme bırakıldı (K2, 2026-11-13); önce kiralık sunucu planlanmıştı (DEC-24→26) | MP:265 |
-| R10 RE'de token kullanımı | orta | Faz 3 yalnızca yapılandırma oldu; HyperOS 4'e uyarlama seçildi (K7 = (a), `DEC-32`): 50MP katmanı için yeniden tersine mühendislik K9'a bağlı | MP:267 |
+| R10 RE'de token kullanımı | orta | Faz 3 yalnızca yapılandırma oldu; HyperOS 4'e uyarlama seçildi (K7 = (a), `DEC-32`): 50MP katmanı için yeniden tersine mühendislik K9'a bağlı | MP:267 *(2026-11-16 notu: K9 yanıtlandı 2026-11-15, `3 · O0`: hayır, şimdilik (`DEC-33`); HAL katmanı HyperOS 4'te kapalı, sensör katmanı sürer.)* |
 | R11 karışık dil | düşük | Kabul edildi: kullanıcıya dönük TR/EN, planlama belgeleri EN | MP:269 |
 | R12 AGC'nin sessizce 50 MP'ye dönmesi | orta | Dedektörler var (IMPL-55/56, 60/61). Her AGC güncellemesi veya `.agc` import'u sonrası yeniden doğrulanmalı; FIND-3.10-02 rotası bilinmiyor | MP:255 |
 
@@ -909,7 +909,7 @@ Birleşik ve tekilleştirilmiş liste. Kanıtlar extract'lardan alındı; satır
 | `IMPL-NN` | Uygulama koşusu (Step 4); her koşu bir satır | ledger §5; sıradaki **IMPL-97** |
 | planlama koşusu N | Step 1/2 (ve eski denetim) koşuları | ledger §2; sıradaki **21** |
 | N. denetim | Step 3 denetimi; yalnızca `Sub-Planing-Audit.md`'ye yazar, kendi koşu satırı yok | sıradaki **12.** |
-| `DEC-NN` | Kullanıcı kararı | ledger §8; sıradaki **DEC-33**; `DEC-27`…`DEC-32` 2026-11-13'te ayrıldı, ledger'a yazıldı (`:605`–`:610`) |
+| `DEC-NN` | Kullanıcı kararı | ledger §8; sıradaki **DEC-33**; `DEC-27`…`DEC-32` 2026-11-13'te ayrıldı, ledger'a yazıldı (`:605`–`:610`) *(2026-11-16 notu: `DEC-33` (K9) planlama koşusu 21 ile ledger `:619`'a yazıldı (`3 · O4`); sıradaki `DEC-34`.)* |
 | `FIND-x.y-NN` | Faz x.y'nin bulgusu; atamadan önce kullanılmadığı kontrol edilir | ledger, belgeler |
 | `AUDIT-FIX-NN` | Denetim kaydı maddesi, P0–P3 (şu ana dek 57) | Audit §13 |
 | `AUTOPSY-Pn-NN` | Otopsi öncelik bulguları | `Planner-docs/Autopsy.md` §13 |
@@ -1227,7 +1227,7 @@ Ek not: `docs/pre-rental-plan.md`'deki "Step 1–4" o planın kendi sırasıdır
 - **Plan:** şablon `3 · O3a`'daki gibi uyarlandı; ayrı keşif scout'u yok (bağımlılık haritası §7.3); form "onay", inceleme "ekle".
 - **Betik ve taslaklar:** `task` ajanı (D2) `draftcheck.py`'yi genişletti, orkestratör C11 ve `CPb` için iki küçük değişiklik yaptı; `SP4` ∥ `SP5` taslakları yazdı, ilk birlikte koşu `DRAFTCHECK: PASS files=2`.
 - **`CPb`:** açık konular orkestratörce karara bağlandı (plan §7.3 `:719`–`:720`, §10 `:808`–`:811`); scout'lar taslakları güncelledi; iki dosya `cp` ile yerine, Index'te dört satır (`:168`–`:169`, `:190`, `:303`).
-- **İnceleme:** REV ∥ SEC: P0 0, P1 3, P2 4, P3 9 (§2.6); kullanıcı "hepsi" dedi (form). Düzeltmeden sonra betik C5 buldu (10.4'te başka alt planın iş kalemi kimliği), scout düzeltti. Teyit turu: eskilerin hepsi kapandı; yeni P2 1 ve P3 1 düzeltildi, bir P3 değişiklik gerektirmedi, biri `3 · O4` notu.
+- **İnceleme:** REV ∥ SEC: P0 0, P1 3, P2 4, P3 9 (§2.6); kullanıcı "hepsi" dedi (form). Düzeltmeden sonra betik C5 buldu (10.4'te başka alt planın iş kalemi kimliği), scout düzeltti. Teyit turu: eskilerin hepsi kapandı; yeni P2 1 ve P3 1 düzeltildi, bir P3 değişiklik gerektirmedi, biri `3 · O4` notu. *(2026-11-16 notu: buradaki §2.6, `git log --grep '^Window 3 O3b:'` kapanış commit'indeki §2.6'dır; §2.6 her kapanışta yeniden yazılır.)*
 - **Kontroller:** son dosyalarla `DRAFTCHECK: PASS files=2`; `step2 --strict` 0; `all` 0, yalnız denetim uyarısı, `subplan_count=47`; `step1 --strict` 0; V2 taban; V3 `SELF-TEST: PASS`; LF, CR 0, NUL 0; plan boruları yalnız taban (`:174`, `:844`); kimlik taraması PASS.
 - **Bağlam:** açılışta 64k; plan formunda 98k; taslaklarda 151k; incelemede 189k; düzeltme turunda 207k; teyitten sonra 236k (tahmin 155k); fark iki düzeltme turu, teyit ve `CPb` kararları.
 - **Kapanış:** `Window 3 O3b: Step 2 drafts 10.4-10.5 for planning run 21` (`git log --grep '^Window 3 O3b:'`; yerel commit; push edilmedi): 84 commit, `origin/main..HEAD` = 8. `NEXT_PROMPT.md` `3 · O4` için yeniden yazıldı (taslak salt-okur scout'ta).
@@ -1235,11 +1235,22 @@ Ek not: `docs/pre-rental-plan.md`'deki "Step 1–4" o planın kendi sırasıdır
 **2026-11-16: Pencere 3 · O4 (omp, on beşinci pencere).** Kapsam: `ORCHESTRATION_PLAN.md` §7.3 hedef tablosu, planlama koşusu 21'in entegrasyonu ve geçitleri (`I3a`, `I3b`, `GATE3`); bu girdi bir IMPL satırı değildir; `Main-Planing.md`, alt planlar ve Audit dokunulmadı, cihaza komut gönderilmedi.
 
 - **Açılış (2026-11-16T10:17Z):** `NEXT_PROMPT.md` §4 (a) kontrollerinin hepsi tuttu (84 commit, `origin/main..HEAD` = 8, `main` = `origin/main` = `6632a18`, etiket yok, 355 dosya); snapshot değerleri aynı (ledger 653 CRLF, Index 426 LF, Ontology NUL 2); dört depo 200 (10:17:27Z–10:17:31Z); taban `step2`, `step1`, `step3-preflight` `--strict` 0, `all` 0 (`subplan_count=47`); kimlik taraması PASS.
-- **Plan:** şablon plana göre uyarlandı (§2.6); form "onay", teyit "ekle", iki kural "yeni §5.5".
+- **Plan:** şablon plana göre uyarlandı (§2.6); form "onay", teyit "ekle", iki kural "yeni §5.5". *(2026-11-16 notu: buradaki §2.6, `git log --grep '^Window 3 O4:'` kapanış commit'indeki §2.6'dır; §2.6 her kapanışta yeniden yazılır.)*
 - **Taslaklar ve uygulama:** üç salt-okur scout aynı turda (`I3a-A`, `I3a-B`, `I3b-D`) JSON işlem listeleri yazdı; `%TEMP%/o4/o4.py` uyguladı (çapalar tekil, sondan başa, bayt düzeyinde). Index, Comprehension ve toolchain de `edit` yerine betikle yazıldı: taslak metni yeniden yazılmadı.
 - **Kontroller:** HEAD'e karşı satır ve karakter düzeyinde difflib (yalnız ekleme; ledger'da izinli üç hücre); yeni satırların boruları ledger §2 6, §3 7, §4 10, §8 7; ledger §4 34/1/5/7.
-- **İnceleme:** teyit (reviewer) P0 0, P1 0, P2 2, P3 5 (§2.6). Düzeltme işlemlerini taslağın scout'ları yazdı, `fix.py` yalnız bu aşamanın değiştirdiği satırlarda uyguladı; R6'da toolchain başlık notu geri alındı, R7 (§5.5) orkestratörce; Step 2'nin Index `:165`, `:192` ifadesi plan §10'a.
-- **Geçit:** `GATE3` iki kez geçti (20:18Z; düzeltmelerden sonra 20:30Z); değerler §2.6. `NEXT_PROMPT.md` taslağı betikle denetlendi (19.323 B, LF, en uzun satır 427 B, tablolar tutarlı).
+- **İnceleme:** teyit (reviewer) P0 0, P1 0, P2 2, P3 5 (§2.6). Düzeltme işlemlerini taslağın scout'ları yazdı, `fix.py` yalnız bu aşamanın değiştirdiği satırlarda uyguladı; R6'da toolchain başlık notu geri alındı, R7 (§5.5) orkestratörce; Step 2'nin Index `:165`, `:192` ifadesi plan §10'a. *(2026-11-16 notu: buradaki §2.6, `git log --grep '^Window 3 O4:'` kapanış commit'indeki §2.6'dır; §2.6 her kapanışta yeniden yazılır.)*
+- **Geçit:** `GATE3` iki kez geçti (20:18Z; düzeltmelerden sonra 20:30Z); değerler §2.6. `NEXT_PROMPT.md` taslağı betikle denetlendi (19.323 B, LF, en uzun satır 427 B, tablolar tutarlı). *(2026-11-16 notu: buradaki §2.6, `git log --grep '^Window 3 O4:'` kapanış commit'indeki §2.6'dır; §2.6 her kapanışta yeniden yazılır.)*
 - **Bağlam:** açılışta 59k; plan formunda 117k; taslaklarda ≈ 175k; incelemeden sonra ≈ 206k; kapanışta ≈ 250k (tahmin 233k); fark teyit incelemesi ve düzeltme turu.
 - **Kapanış:** `Window 3 O4: integration and gates for planning run 21` (`git log --grep '^Window 3 O4:'`; yerel commit; push edilmedi): 85 commit, `origin/main..HEAD` = 9. `NEXT_PROMPT.md` `3 · O5` için yeniden yazıldı (taslak salt-okur scout'ta).
 - **Takip commit'i (kullanıcı onayı, form "takip"):** `Window 3 O4 follow-up: record line shifts and FIX3 items`. Kapanıştan sonra gelen inceleme notu: §5.5'in +5 kayması `Faz10.5` `:33`, `:65`'teki `PROJECT_LOG.md:852-866` atfını kaydırdı (doğrusu `:857-871`); bu dosyada `DEC-33` eksik, K9 beş yerde "açık". Betik taraması ve kayma haritası plan §10 `:816`, `FIX3` maddeleri `:817`; içerik `3 · O5`'te düzeltilir. Beklenen durum 86 commit, `origin/main..HEAD` = 10; plan boru tabanı `:174`, `:850`.
+
+**2026-11-16: Pencere 3 · O5 (omp, on altıncı pencere).** Kapsam: `REV-4` ∥ `SEC-C` → `FIX3` → `C3` → FF (onay) → `RID` → push (onay) → `LSR`, `DEL3` (plan §7.2); bu girdi bir IMPL satırı değildir; cihaza komut gönderilmedi.
+
+- **Açılış (2026-11-16T20:55Z):** `NEXT_PROMPT.md` §4 (a) kontrollerinin hepsi tuttu (86 commit, `origin/main..HEAD` = 10, `main` = `origin/main` = `6632a18`, etiket yok, 355 dosya); snapshot aynı (ledger 662 CRLF, Index 443, Ontology NUL 2); dört depo 200; `GATE3` tabanı tuttu; kimlik taraması PASS (`prose_mentions=24`).
+- **Plan:** şablon plana göre uyarlandı; form "onay" ve teyit "ekle"; inceleme girdileri `local://` dosyalarına yazıldı (REV 130–166 KB, SEC 263–378 KB), aynı anda en çok dört ajan.
+- **İncelemeler:** `REV-4a` P2 4, P3 6; `REV-4b` P2 4, P3 9; `REV-4c` P3 4; `REV-4d` P2 1, P3 3; `SEC-C1` P3 1; `SEC-C2` 0; `SEC-C3` P3 1. P0/P1 yok. Kapsam formu "hepsi".
+- **`FIX3`:** üç scout (`fix-a` 10.1–10.2, `fix-b` 10.3–10.5, `fix-c` ledger, Index, bu dosya, plan) 86 işlem yazdı; `apply.py` kuru denemeden sonra yazdı; satır sayıları sabit, `:857` hâlâ "13 bayat ifade". `RID` Ek A.5 kimlik kontrolü olarak kaldı, depo ölçümü `DEL3` oldu (plan `:99`, `:571`, `:595`).
+- **Teyit:** reviewer P2 3, P3 5; security-reviewer 0; hepsi bu aşamada düzeltildi (`fix-t`).
+- **Geçit (21:27Z):** `step2`, `step1`, `step3-preflight` `--strict` 0; `all` 0 (`subplan_count=47`, `index_reference_count=47`, `phase_folder_count=10`, yalnız denetim uyarısı); V2 çıkış 1 (taban); V3 PASS, sha256 aynı; boru plan `:174`, `:850` (§10 eklemesinden sonra `:854`); kimlik PASS (`prose_mentions=24`).
+- **Bağlam:** açılışta 78k; plan formunda 119k; incelemelerden sonra ≈ 194k; `FIX3`'ten sonra ≈ 225k; teyit düzeltmelerinden sonra, C3'ten önce 267k (tahmin 215k).
+- **Kapanış:** C3'ten önce dört depo 200 (21:31:10Z–21:31:13Z); `Window 3: planning run 21 and handoff for the twelfth audit` (`git log --grep '^Window 3:'`; yerel commit): 87 commit. `NEXT_PROMPT.md` Pencere 4 · `O0` için yeniden yazıldı (taslak salt-okur scout'ta, yer tutucular betikle). FF, push, `LSR` ve `DEL3` sonuçları sohbette; Pencere 4 açılışı doğrular ve kaydeder.

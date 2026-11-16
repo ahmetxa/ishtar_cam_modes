@@ -30,7 +30,7 @@ Facts, inferences and AOSPA history stay in separate sentences. A fact carries t
 
 ## 4. Scope
 
-- A host probe whose command table is the fixed PRB1-PRB10 texts, invoked only as `platform-tools/adb.exe -s dc27e5d0`.
+- A host probe whose command table is the fixed PRB1-PRB10 texts of `ORCHESTRATION_PLAN.md` §7.2 (`PRB` commands, copied verbatim), invoked only as `platform-tools/adb.exe -s dc27e5d0`.
 - A fresh read of init-defined camera services, running camera services and process labels.
 - SELinux labels of the HAL file, the IMX989 sensor file and their two parent directories.
 - The allowlist hit count for `com.ishtar.cammodes`, with the allowlist file itself not printed.
@@ -62,7 +62,7 @@ Four `chcon u:object_r:vendor_file:s0` sites were read in this Step 2 run: `isht
 
 Main-Planing section 6, Phase 10 entry evidence, was read in this Step 2 run. The 2026-11-13 probe records HyperOS `OS4.0.0.44.WMACNXM`, Android 17, kernel 5.15.215, SELinux enforcing, and no project module installed. The HAL md5 prefix `2a955e68` is not the AOSPA stock prefix `c3fa63a8`. The sensor md5 prefix `9e4d0fe1` matches the module `EXPECT_MD5`. The same section's 2026-11-15 read records SukiSU-Ultra v4.3.0-r1, manager `com.sukisu.ultra`, versionCode 41140, no metamodule, no KernelSU-Next package, running services `cameraserver`, `vendor.camera-provider` and `vendor.camera-provider-2-7-ext-uvc`, and both target files labelled `vendor_file`.
 
-The 2026-11-15 `PRB` inventory, read in this Step 2 run, timestamps that pass at 13:01Z. `ksu://webui` resolved to `com.sukisu.ultra/.ui.hdhrsdynpwdActivity`. Resolving `.ui.webui.WebUIActivity` found no activity. The allowlist path existed and the `com.ishtar.cammodes` count was 0. The init namespace had six `/adb/modules/` bind mounts and zero KSU-sourced mounts. `/odm/lib64/hw` was labelled `vendor_hal_file` while the HAL and sensor files were `u:object_r:vendor_file:s0`. The provider binary path recorded then was `/odm/bin/hw/vendor.qti.camera.provider-service_64`. The further claim that a `setmode.sh` restart would start the idle `vendor.camera-provider-2-7-ext` is an inference. This plan does not test it.
+The 2026-11-15 `PRB` inventory (`ORCHESTRATION_PLAN.md` §7.1, `W3P01`–`W3P03`), read in this Step 2 run, timestamps that pass at 13:01Z. `ksu://webui` resolved to `com.sukisu.ultra/.ui.hdhrsdynpwdActivity`. Resolving `.ui.webui.WebUIActivity` found no activity. The allowlist path existed and the `com.ishtar.cammodes` count was 0. The init namespace had six `/adb/modules/` bind mounts and zero KSU-sourced mounts. `/odm/lib64/hw` was labelled `vendor_hal_file` while the HAL and sensor files were `u:object_r:vendor_file:s0`. The provider binary path recorded then was `/odm/bin/hw/vendor.qti.camera.provider-service_64`. The further claim that a `setmode.sh` restart would start the idle `vendor.camera-provider-2-7-ext` is an inference. This plan does not test it.
 
 A source reading of SukiSU-Ultra v4.3.0-r1, explicitly not measured on the phone, says that build takes the module id only from the URI query and that an `--es id` extra closes the activity. This survey must not promote that reading to a device fact. Opening the activity is `Faz10.4`.
 
@@ -73,7 +73,7 @@ A source reading of SukiSU-Ultra v4.3.0-r1, explicitly not measured on the phone
 ## 7. Planned Work Breakdown
 
 - F10.1-01 — Freeze the ten-command probe
-  - Description: `scripts/hyperos4-probe.py` stores the PRB1-PRB10 texts as data and runs a selected subset with `subprocess.run` of `platform-tools/adb.exe`, arguments `-s` and `dc27e5d0`, and `ANDROID_SERIAL=dc27e5d0` in the environment. Combined output goes to a file that `tempfile` creates in the host's `%TEMP%`, outside the repository. The temp file's life has a fixed order: scan it, copy a passing transcript into the new snapshot, then delete it; on an aborting hit it is deleted with nothing copied. There is no shell quotation step and no `am start`. PRB3 names `com.sukisu.ultra`. If PRB1 or PRB2 reports any other root manager package, the probe stops before PRB3 and asks the user. It does not substitute the package on its own, and it does not keep running the frozen string against the wrong manager.
+  - Description: `scripts/hyperos4-probe.py` stores the PRB1-PRB10 texts of `ORCHESTRATION_PLAN.md` §7.2 verbatim as data and runs a selected subset with `subprocess.run` of `platform-tools/adb.exe`, arguments `-s` and `dc27e5d0`, and `ANDROID_SERIAL=dc27e5d0` in the environment. Combined output goes to a file that `tempfile` creates in the host's `%TEMP%`, outside the repository. The temp file's life has a fixed order: scan it, keep a passing transcript until `F10.1-08` appends it to the one new snapshot, then delete it; on an aborting hit it is deleted with nothing copied. There is no shell quotation step and no `am start`. PRB3 names `com.sukisu.ultra`. If PRB1 or PRB2 reports any other root manager package, the probe stops before PRB3 and asks the user. It does not substitute the package on its own, and it does not keep running the frozen string against the wrong manager.
   - Output: `scripts/hyperos4-probe.py`.
 
 - F10.1-02 — Prove refusal without the phone
@@ -82,11 +82,11 @@ A source reading of SukiSU-Ultra v4.3.0-r1, explicitly not measured on the phone
 
 - F10.1-03 — Re-measure services and labels
   - Description: After `VAL-101-MANUAL`, run PRB7 and PRB8 on `dc27e5d0`. Record running names, rc-defined names, process labels, and the labels of the HAL file, the sensor file and both parent directories. Do not stop or start a service. Compare the labels to the four `chcon` sites without changing them.
-  - Output: scanned temp transcripts for PRB7 and PRB8.
+  - Output: scanned temp transcripts for PRB7 and PRB8, kept in `%TEMP%` until `F10.1-08`.
 
 - F10.1-04 — Re-measure manager, count and mounts
   - Description: Run PRB1 through PRB6. Record the manager package and versionCode, the `ksu://webui` handler, whether `.ui.webui.WebUIActivity` resolves, the `su` context, the allowlist hit count, metamodule presence, the two-component mount summary and the KSU-sourced mount count. If a root dialog appears, stop. Do not accept it from the host.
-  - Output: scanned temp transcripts for PRB1 through PRB6.
+  - Output: scanned temp transcripts for PRB1 through PRB6, kept in `%TEMP%` until `F10.1-08`.
 
 - F10.1-05 — Write the dated notes first
   - Description: `docs/hyperos4-adaptation-notes.md` gives every fact its measurement date, copies no preference value, and labels both the idle-service wake-up and the upstream URI reading as inference. It states the order later plans must keep, using the names just measured: stop the client before the HAL, and start the HAL before the client.
@@ -101,12 +101,12 @@ A source reading of SukiSU-Ultra v4.3.0-r1, explicitly not measured on the phone
   - Output: new rows in `Planner-docs/Project-Comprehension.md`.
 
 - F10.1-08 — Store one new snapshot and stop
-  - Description: After the identity scan passes, copy the scanned transcript to a new file named with the UTC minute and `__Faz10.1__probe`, and only then delete the `%TEMP%` file. On an aborting hit, delete the `%TEMP%` file without copying anything. Do not modify the two IMPL96 HyperOS snapshot files. Do not run PRB9 or PRB10 for this record; those answers belong to `Faz10.3` and `Faz10.4`, and the strings stay in the frozen table so the list cannot drift.
+  - Description: After the identity scan passes, append the passing transcripts in PRB order, PRB1 through PRB6 from `F10.1-04` and then PRB7 and PRB8 from `F10.1-03`, to one new file named with the UTC minute and `__Faz10.1__probe`, and only then delete the `%TEMP%` files. On an aborting hit, delete every `%TEMP%` file of this run without copying anything. Do not modify the two IMPL96 HyperOS snapshot files. Do not run PRB9 or PRB10 for this record; those answers belong to `Faz10.3` and `Faz10.4`, and the strings stay in the frozen table so the list cannot drift.
   - Output: one new snapshot file, and no other device action.
 
 ## 8. Acceptance Criteria
 
-- The probe command table equals the ten PRB strings, and every device process starts with `platform-tools/adb.exe` and `-s dc27e5d0`.
+- The probe command table equals the ten PRB strings of `ORCHESTRATION_PLAN.md` §7.2, and every device process starts with `platform-tools/adb.exe` and `-s dc27e5d0`.
 - An eleventh command is refused on the host before adb starts.
 - Identity-shaped output is rejected before a person reads it, and the allowlist appears only as a count.
 - The notes name every running camera service and every rc-defined camera service from the new run, each with a date.

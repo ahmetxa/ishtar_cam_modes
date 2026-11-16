@@ -33,8 +33,8 @@ Detected phase names, in the master plan's order:
 | 4 | Minimal correct HAL patch | M5 | medium |
 | 5 | Mode-0 12-bit composition | M5 | medium |
 | 6 | AON fix upstreaming | M4 | low |
-| 7 | Android 16 build environment (retired by planning run 21, `DEC-28`) | M3 | medium |
-| 8 | Camera work on Android 16 + kernel LTS (retired by planning run 21, `DEC-28`) | M5 | high |
+| 7 | Android 16 build environment (retired 2026-11-15 by planning run 21, `DEC-28`) | M3 | medium |
+| 8 | Camera work on Android 16 + kernel LTS (retired 2026-11-15 by planning run 21, `DEC-28`) | M5 | high |
 | 9 | Release engineering | M6 | low |
 | 10 | HyperOS 4 camera module adaptation | M5 | medium |
 
@@ -440,4 +440,4 @@ The revised Phase 4 order is:
   - **Snapshots:** `SNAP-2026-11-15-MAIN` (10 phases) and `SNAP-2026-11-16-SUBPLANS` (10 phases, 47 sub-plans). **Retired:** `Faz6.1`, `Faz7.2`, `Faz7.3`, `Faz8.1` and `Faz8.3` are `superseded` (Superseded By `SNAP-2026-11-15-MAIN`); `Faz7.1` and `Faz8.2` stay `verified`. **Phase 10 order:** `Faz10.1` first, `Faz10.2` to `Faz10.4` in any order; `Faz10.4`'s phone half starts only after `Faz10.2` records unchanged v2.2 booting, and only one device window is open at a time; `Faz10.5` last (amendment 4e).
   - **Step 1.5 (Autopsy) was skipped** by the user's answer to question 8 (2026-11-15); `Autopsy.md` stays stale. **User-approved deviation (question 7, 2026-11-15):** outside the Step 1 and Step 2 limits, the orchestrator corrected the Hetzner statements in `Project-Comprehension.md` (`CQ-13`, `EV-20`), `docs/reverse-engineering-toolchain.md` section 7 and Project-Ontology invariant 11 (`AUDIT-FIX-57`), and marked invariant 10 realised; the twelfth Step 3 audit verifies them.
   - **Not verified, left open:** the twelfth Step 3 audit must read the five new sub-plans, and it assigns `AUDIT-FIX-22`, `-37` and `-50`, which lost their owners. GitHub, 2026-11-16T10:17Z: the three repositories marked for deletion under `DEC-30` still answer 200.
-  - **Validator status** at this stage's opening (2026-11-16): `--mode step2 --strict`, `--mode step1 --strict` and `--mode step3-preflight --strict` reported `error_count=0` and `warning_count=0`; `--mode all` exited 0 with `subplan_count=47`, `index_reference_count=47`, `phase_folder_count=10` and `main_phase_count=10`, its only warning `step4_has_nonblocking_warnings=P2:1,P3:9`.
+  - **Validator status** at this stage's opening (2026-11-16): `--mode step2 --strict`, `--mode step1 --strict` and `--mode step3-preflight --strict` reported `error_count=0` and `warning_count=0`; `--mode all` exited 0 with `subplan_count=47`, `index_reference_count=47`, `phase_folder_count=10` and `main_phase_count=10`, its only warning `step4_has_nonblocking_warnings=P2:1,P3:9`. After the writes (`GATE3`, 2026-11-16T20:30Z), `--mode step2 --strict`, `--mode step3-preflight --strict` and `--mode step1 --strict` exited 0; `--mode all` exited 0 with only the audit warning, `subplan_count=47` and `index_reference_count=47`.
