@@ -227,3 +227,279 @@ Mapping (one row per temp ID):
 | sec-a-05 (r2) | AUDIT-FIX-81 | same topic as sec-a-02 (r1) |
 | sec-a-06 (r2) | AUDIT-FIX-89 |  |
 | sec-a-07 (r2) | AUDIT-FIX-82 | same topic as sec-a-03 (r1) |
+
+## Session 4 · O3b
+
+Reviews run on 2026-11-17 on branch `integrate/impl-96`, at the commit `Window 4 O3a: Phase 10 reviews for the twelfth audit`. The inputs are unchanged since `Window 4 O1`: `git diff --stat 2f39b73..HEAD` over them is empty, and plan §8.3 and Ek A.8 are unchanged since `Window 4 O2`. Each run's task text was `ORCHESTRATION_PLAN.md` Ek A.8.1 with the A.8.2 abbreviation paragraph as the shared context (5,297 B) and the run's A.8.2 block as the task (cov-b 398 B, cov-c 1,709 B, cov-d 773 B), sliced from the plan in `eval` and sent unchanged. The three `reviewer` runs ran as one parallel group, with `PAT4` beside them. Temp IDs map to `AUDIT-FIX-90`–`-109` in the order cov-b, cov-c, cov-d, `PAT4` (§8.3 item 3): 21 temp IDs, 20 permanent IDs, one same-topic merge, no rejection; P0 0, P1 0, P2 0, P3 20. A preference value that a reviewer copied into its detail file is withheld here.
+
+### Findings
+
+| Finding ID | Temp ID | Severity | Status | Affected Files | Issue | Required Action |
+|---|---|---|---|---|---|---|
+| AUDIT-FIX-90 | cov-b-01 | P3 | open | Planner-docs/Sub-Planing-Audit.md, Planner-docs/Faz-3-Plans/Faz3.8-agc-state-in-smoke-script.md, Planner-docs/Sub-Planing-Index.md | The carried `AUDIT-FIX-33` text gets the delivered field count wrong, and it lists only some of the residue lines. The audit says `Faz3.8` "is verified at four" fields (Audit :385), and its §12 reason says "Built at four fields" (Audit :332). The ledger says five were delivered, because the front key was added. The residue runs through more lines than :120 and :163. Criterion :95 lists three fields and leaves out `pref_camera_resolution`, although §4 and `F3.8-03` (:31-41, :72-74) require it. :120 and :155 also call `pref_48m_key` a "50 MP availability" flag, which :62 of the same file contradicts. Section 7 plans four fields (`F3.8-02`…`-04`), and Index :107 names three. Evidence: Planing-Ledger.md:86 "**Delivered five fields, not four: the front key is included**"; Sub-Planing-Audit.md:385 "the sub-plan is `verified` at four (`IMPL-55`, `IMPL-56`)"; Faz3.8:95 "reports AGC's photo-size preference, `pref_48m_key`, and a derived megapixel figure" | Restate `AUDIT-FIX-33` in the twelfth audit as follows. The plan text names three fields at Faz3.8 :95, :120, :155 and :163 and at Index :107. Section 7 plans four. Five were delivered, the front key included (`IMPL-55`, `IMPL-56`, ledger :86). Correct the Audit §12 `Faz3.8` reason to match. Keep the status `accepted`; the plan file needs no repair. |
+| AUDIT-FIX-91 | cov-b-02 | P3 | open | Planner-docs/Faz-3-Plans/Faz3.7-agc-photo-size-pin.md | This is S3-02. `Faz3.7` says the snapshot names use a `<UTC>` stamp (:71, and the `VAL-SMOKE` command at :131). Repository history shows the stamps are local time (UTC+3). Commit `3a307d2` is dated `2026-09-07 00:00:58 +0300`, which is 21:00:58 UTC on 2026-09-06. It adds `snapshots/20260906-2356__Faz3.9__FIND-3-9-02-instrument-proof.txt`. If the stamp were UTC, that file would have been created after the commit that added it. A reader who sets snapshot names against the `Z` stamps the planning docs use (for example `GATE3, 2026-11-16T20:30Z`) would be 3 h off. Evidence: Faz3.7:71 "The naming convention is `<UTC>__<subplan>__<label>`; this sub-plan follows it."; `git show --stat 3a307d2`: "3a307d2 2026-09-07 00:00:58 +0300" … "snapshots/20260906-2356__Faz3.9__FIND-3-9-02-instrument-proof.txt" | At the next bounded touch of `Faz3.7`, replace `<UTC>` at :71 and :131 with a local-time stamp (`<YYYYMMDD-HHMM local, UTC+3>`). Otherwise keep this finding visible as accepted history. No Step 4 impact, since `Faz3.7` is COMPLETE. |
+| AUDIT-FIX-92 | cov-b-03 | P3 | open | Planner-docs/Sub-Planing-Index.md | The Index still presents `Faz3.8`…`Faz3.11` as active and queued, although the ledger and the audit queue mark all of them verified/COMPLETE. :91 calls `Faz3.7`…`Faz3.11` "the active sub-plans". :107-110 carry no status. Amendment 4c :252 says "The queue's first Phase 3 row is now `Faz3.8`", and its positions 2–5 (:253-256) are not marked discharged. Contrast `Faz3.7` (:106) and 4c position 1 (:252), which were annotated. RS3's resume step 5 forbids marking verified work READY again, and the Index wording invites exactly that. Evidence: Sub-Planing-Index.md:252 "**The queue's first Phase 3 row is now `Faz3.8`**, and it may be entered only after a Step 3 re-audit"; Planing-Ledger.md:86-89 status `verified` (all four) | Mark 4c positions 2–5 as discharged, citing `IMPL-55/56`, `-57/58/83/85`, `-60/61` and `-62/63/89`. Add `verified` to the :107-110 entries. Reword :91 so it describes a closed generation (`DEC-21`). |
+| AUDIT-FIX-93 | cov-b-04 | P3 | open | Planner-docs/Sub-Planing-Index.md | The Index Phase 3 entry lacks the `DEC-28` AOSPA-only scope note that Main now carries for Phase 3 (:143, :178, :184). Planning run 21 added such notes to the Index entries for Phases 6, 7 and 8 (:141, :146, :153). :91 still reads "Coexistence, verified and made durable", without saying this holds only on AOSPA Android 15. None of the 11 Phase 3 files carries a HyperOS/`DEC-28` note (grep: 0 matches). A Step 4 reader of the Index could therefore carry Phase 3 evidence over to HyperOS 4, contrary to the settled reading. Evidence: Sub-Planing-Index.md:91 "**Phase 3 — AGC stable at 12.6 MP under 50 MP.** Coexistence, verified and made durable."; Main-Planing.md:178 "AOSPA evidence only. On HyperOS 4 nothing of it is verified or carried over" | Add one dated line to the Index Phase 3 entry: closed on AOSPA Android 15 only (`DEC-21`); not verified or carried over on HyperOS 4 (`DEC-28`); the 50 MP HAL layer stays off (`DEC-33`); `Faz10.2`/`Faz10.3` measure the AGC state first. Add the same scope to the audit §3 Phase 3 note. |
+| AUDIT-FIX-94 | cov-b-05 | P3 | accepted | Planner-docs/Faz-3-Plans/Faz3.1-preference-trap-clearance.md | `Faz3.1` contradicts itself on the trap-key count. Section 6 lists twelve keys (:53), and the ledger records 0/12. Yet `F3.1-01`, the acceptance criteria and the transition criteria all say "ten" (:68, :91, :92, :156). `Faz3.1` is COMPLETE and was verified against all twelve, so the slip has no execution impact. Evidence: Faz3.1:91 "The preference audit reports each of the ten trap keys as set or unset by name."; Planing-Ledger.md:79 "**0/12 trap keys set** in all three" | No repair required; carry it as accepted history. If `Faz3.1` is ever touched, change "ten" to "twelve" at :68, :91, :92 and :156. |
+| AUDIT-FIX-95 | cov-b-06 | P3 | accepted | Planner-docs/Faz-3-Plans/Faz3.10-pin-stickiness-matrix.md | The §9 security sentence in `Faz3.10` still describes the old negative-control stimulus, "clears an application preference", at :140. Section 4 (:51) and §8 (:119) make the stimulus `pref_48m_key`=`[value withheld]` and rule that clearing the derived key does not satisfy the criterion. This is the same class of residue as `AUDIT-FIX-31`. `Faz3.10` is COMPLETE (ledger :88). Evidence: Faz3.10:140 "the negative control clears an application preference and restores it"; Faz3.10:119 "The negative control's stimulus is `pref_48m_key`=`[value withheld]`." | No repair required; carry it as accepted history. If the file is ever touched, reword :140 to "sets `pref_48m_key` to `[value withheld]` and restores it to `0`". |
+| AUDIT-FIX-96 | cov-c-01 | P3 | open | Planner-docs/Planing-Ledger.md | **S3-01, verified in part.** Two of the three cited lines moved, and the ledger has no note about it. `:52` held `SNAP-2026-09-10-MAIN` at `9ee505f` (`IMPL-96`) and at `7fa0a51` (eleventh audit). It now holds `SNAP-2026-09-04-MAIN`, which was at `:51`. `:651` held a `Faz3.11` paragraph at `9ee505f` and now holds the `FIND-2.3-03` row. **`:19` did not move**: it is the run-3 row at `7fa0a51`, at `9ee505f` and at HEAD. `IMPL-96` did not cause the shift. Planning run 21 did: `3e7805e` changed the ledger by +20/−11, and `081790f` changed it by +3/−3. The shifts are recorded only outside `Planner-docs/` (`76c091b`: `NEXT_PROMPT.md`, `ORCHESTRATION_PLAN.md`, `PROJECT_LOG.md`). The row content has not changed since `78373d5` (2026-09-06) and `097d687` (2026-09-13). **Format view, measured.** `:366`, `:367`, `:524` and `:525` have 7 pipes, the same as the §5 header (`:119`–`:120`, 7 pipes). `:501` and `:507` have 6 pipes and `:506` has 8; none contains an escaped pipe, and the content was not read. `:503`, `:511` and `:512` are empty (0 bytes) and split the §5 row run. Every one of these lines was last changed in `78373d5` (2026-09-06) or `130185d` (2026-09-10), so they are older than both `IMPL-96` and run 21. Evidence: Planner-docs/Planing-Ledger.md:52 "/ SNAP-2026-09-04-MAIN / `Planner-docs/Main-Planing.md` / 2026-09-04 / 9 / not applicable / **SUPERSEDED 2026-09-10 by `SNAP-2026-09-10-MAIN`" | In the twelfth audit, cite ledger lines by HEAD `def2685` numbering and state that run 21 shifted `:52` (+1) and `:651`; do not attribute the shift to `IMPL-96`. Do not open a format repair under S3-01, because the 6- and 8-pipe rows and the blank lines are older than both runs. A cell-count check on `:501`, `:506` and `:507` can go with the next ledger edit if wanted. |
+| AUDIT-FIX-97 | cov-c-02 | P3 | open | Planner-docs/Planing-Ledger.md | **S3-14, confirmed.** The `Faz6.2` row contradicts itself. Its Validation Evidence (2026-11-16, `DEC-28`) says that "the `VAL-BUILD` this row deferred to Phase 7 will not run". Its Next Action still says that Phase 7 runs `VAL-BUILD` and asks for a `stock`-mode capture that needs the user's approval. Updated At still reads `2026-09-06`, although the cell was edited on 2026-11-16. Evidence: Planner-docs/Planing-Ledger.md:101 "Phase 7 runs `VAL-BUILD` against the exact strings in `docs/aon-verification.md` §8.2 rather than against a positive baseline" | Replace the Next Action with a statement that there is no next action: `VAL-BUILD` will not run (`DEC-28`), and on HyperOS 4 the place of `ishtar-aon-fix` is `Faz10.5`'s. Set Updated At to the date of that edit. Leave the status as `verified`. |
+| AUDIT-FIX-98 | cov-c-03 | P3 | open | Planner-docs/Project-Comprehension.md | **S3-06, confirmed for 8 of the 11 lines.** None of these lines has a `DEC-28` note; `DEC-28` appears in the file only at `:25` and `:51`, run 21's `AUDIT-FIX-57` edits. Stale lines: `:9` (the change goal is still "make a 50 MP capture complete inside the AGC port"); `:42` EV-11 ("unverified until Phase 7, registered by `Faz6.2`"); `:101` TRACE-14 ("verification is registered against Phase 7"); `:120` ARC-06 ("unverifiable until a build exists (Phase 7)", "`VAL-BUILD` to Phase 7"); `:141` ("*50 MP* … The active frontier", which `DEC-33` contradicts); `:53` EV-22 and `:167` H-05 (AOSPA Launcher3, "false on this ROM", although the ROM is now HyperOS 4); `:45` EV-14 ("the device now reports `version=v2.1`"). **Not confirmed:** `:145` is `DEC-14`-era wording about scoping Phase 3 and is harmless; `:149` QAS-01 still holds, because `disable` plus a reboot does not depend on the ROM. `:95` ("five ROM reference trees, three kernel checkouts") may be stale after the `IMPL-96` repository move, but checking it needs a root listing, which is outside the allowed reads. Evidence: Planner-docs/Project-Comprehension.md:120 "**The edit is complete; its effect is unverified and unverifiable until a build exists (Phase 7).**" Orchestrator (cov-c open issue): `:95` (`TRACE-14`) is stale in the same way. Its paths still exist at the root, so the repository move did not break them, but the row still waits for a build that `DEC-28` cancelled and names the retired Phase 7 for verification. | Do this in the same edit that discharges `AUDIT-FIX-37` (decision 6). Add one dated `DEC-28`/`DEC-33` note to each of `:9`, `:42`, `:45`, `:53`, `:101`, `:120`, `:141` and `:167`. Each note marks the claim as AOSPA Android 15 history and gives the current owner (`Faz10.2`, `Faz10.4` or `Faz10.5`) or says that none exists. Do not rewrite the history text. Check `:95` against the root listing in the same edit. |
+| AUDIT-FIX-99 | cov-c-04 | P3 | open | Planner-docs/Project-Ontology.md | **S3-07, confirmed for 6 of the 16 lines.** `:8` says the device is "running AOSPA Android 15". `:19` says "`ishtar` is built on it in Phase 7". `:117` lists the reference trees as "AOSPA/LOS build inputs" for a build that is now retired. `:391` heads a section "Kernel trees the Android 16 build consumes" in the present tense, with no note. `:447` OQ-11 rests on "AOSPA Launcher3 keeps the drawer entry". `:448` OQ-12 gives a camera-id map measured on AOSPA. The other ten lines (`:7`, `:9`, `:18`, `:20`, `:116`, `:118`, `:119`, `:390`, `:392` and `:446`) are blank, neutral or dated history. The control bytes are unchanged (cf. `AUDIT-FIX-22`): run 21's two-line Ontology edit in `3e7805e` kept the bytes byte-for-byte. Evidence: Planner-docs/Project-Ontology.md:8 "modifies the camera stack of a Xiaomi 13 Ultra (`ishtar`) running AOSPA Android 15" | Do this in the same byte-preserving Ontology edit that discharges `AUDIT-FIX-22` (decision 6). Add dated `DEC-28`/`DEC-33` notes to `:8`, `:19`, `:117`, `:391`, `:447` and `:448`. Each note marks the line as AOSPA Android 15 or Phase 7 history and says that HyperOS 4 facts belong to `Faz10.1`'s record. Diff the bytes before and after the edit. |
+| AUDIT-FIX-100 | cov-c-05 | P3 | open | docs/reverse-engineering-toolchain.md | **S3-08, confirmed, with one more stale site.** The `:213` heading ("Boundary against the Phase 7 build toolchain") and `:232`–`:233` ("true of this document and false of Phase 7") still treat Phase 7 as live work. Only `:227`–`:230` carry a dated note, and that note covers only the server. **Additional:** the step at `:140`–`:142` that reads the HAL tells the reader to compare the live HAL against the AOSPA stock md5 (`c3fa63a8…`). On HyperOS 4 the HAL md5 is `2a955e68…` (Index `:294`), so the check fails on the current phone, and nothing says that the §4 offsets and md5 are AOSPA Android 15 values. `DEC-33` keeps the HAL layer off, so this is documentation drift, not a dangerous procedure. Evidence: docs/reverse-engineering-toolchain.md:213 "## 7. Boundary against the Phase 7 build toolchain (F1.4-07)" | Add a dated `DEC-28` note to §7 (`:213`/`:232`): no build toolchain exists or is planned. Add a dated note to §4 (`:128`–`:142`): the address book, the offsets and `HAL_STOCK_MD5` describe the AOSPA Android 15 HAL; the HyperOS 4 HAL differs, and its layer stays off under `DEC-33`. |
+| AUDIT-FIX-101 | cov-c-06 | P3 | open | Planner-docs/Sub-Planing-Index.md | **Phase 6 block missing its retirement note.** Run 21 added dated `DEC-28` notes to the Phase 7 and Phase 8 blocks (`:146` and `:153`), to `Faz6.1`'s entry (`:142`) and to §4 item 12 (`:188`). The Phase 6 block was left out. `:140` still says that the phase removes the workaround "by fixing the device-tree defect", that the first slice is the entry "mirrored to the Android 16 tree", and that the phase should be scheduled "early". `:143` (`Faz6.2`) has no status note. `Main-Planing.md` `:222`–`:228` carries the matching Phase 6 notes, so the Index and the master plan now disagree. Evidence: Planner-docs/Sub-Planing-Index.md:140 "Remove the need for the runtime workaround by fixing the device-tree defect." | Add one dated `DEC-28` note after `:140`, in the style of `:146`: the ROM target is retired, `Faz6.1` is `superseded`, `Faz6.2` stays `verified`, and the place of `ishtar-aon-fix` on HyperOS 4 is `Faz10.5`'s. |
+| AUDIT-FIX-102 | cov-c-07 | P3 | open | Planner-docs/Sub-Planing-Index.md | **The `EV-20` assumption bullet is stale.** It says that `F7.1-12` "rewrites it, together with `CQ-13` and Project-Ontology invariant 11", and that until then those records must not be used to plan. `F7.1-12` ran (`IMPL-91`), and run 21 corrected all three records again under `AUDIT-FIX-57` (Ledger `:42`). The bullet has no `DEC-28` note. Evidence: Planner-docs/Sub-Planing-Index.md:66 "`Faz-7-Plans/Faz7.1-github-input-staging.md` `F7.1-12` rewrites it, together with `CQ-13` and Project-Ontology invariant 11. Until then" | Add a dated note to the bullet: `F7.1-12` ran (`IMPL-91`), and run 21 rewrote `CQ-13`, `EV-20` and invariant 11 under `DEC-28`/`AUDIT-FIX-57`. Leave the history text. |
+| AUDIT-FIX-103 | cov-c-08 | P3 | open | Planner-docs/Planing-Ledger.md | **`FIND-2.3-03` is routed to a closed sub-plan.** The Phase 3 closure table (2026-09-06) says the finding is "RE-ROUTED to `Faz5.3`, which is `planned` and not closing". `Faz5.3` was already `verified` on 2026-08-31 (`IMPL-17`), and its row says "Phase 5 is closed" (`:99`). So the finding (AGC's video section is black in `stock`) has no live owner. The text is older than `IMPL-96`, but no later run has corrected it, and Phase 10 now owns the AGC work. Evidence: Planner-docs/Planing-Ledger.md:651 "**RE-ROUTED to `Faz5.3`**, which is `planned` and not closing." | Re-route `FIND-2.3-03` in a dated note. Either give it to the Phase 10 AGC work (`Faz10.3`) to re-measure on HyperOS 4, or close it as AOSPA Android 15 history. Do not edit `Faz5.3`. |
+| AUDIT-FIX-104 | cov-d-01 | P3 | open | Planner-docs/Faz-4-Plans/Faz4.1-fullres-dimension-guard.md, Planner-docs/Faz-4-Plans/Faz4.7-ultra-high-resolution-sensor-mode.md, Planner-docs/Faz-7-Plans/Faz7.2-first-aospa-build.md, Planner-docs/Faz-7-Plans/Faz7.3-flash-boot-and-aon-verification.md, Planner-docs/Faz-8-Plans/Faz8.1-android16-camera-blob-comparison.md, Planner-docs/Faz-8-Plans/Faz8.3-camera-modes-on-android16-build.md, Planner-docs/Faz-4-Plans/Faz4.6-raw-payload-geometry-diagnosis.md | **Confirmed: none of the seven retired files carries a supersession note.** `grep -c -i -E 'supersed/DEC-28/DEC-14'` returns 0 for all seven, and also for the DEFERRED `Faz4.6`. Their status lives only in ledger §4, Index §3/§4e and the audit queue. A Step 4 session that opens one of these files alone sees an executable plan: rent a server, flash a ROM, or narrow the HAL table, which `IMPL-49` showed stops AGC from launching. `Faz4.6` §13 also still hands off to the superseded `Faz4.1` as its successor. This fails safe while RS3's resume protocol (reconcile the ledger first) is followed, so P3. Evidence: Planner-docs/Faz-4-Plans/Faz4.6-raw-payload-geometry-diagnosis.md:242 "`Faz-4-Plans/Faz4.1-fullres-dimension-guard.md` may begin: it is unblocked by `Faz4.5`"; the light-read count is 0 in all eight files; Planner-docs/Planing-Ledger.md:103 "**Superseded 2026-11-16 by `DEC-28`" Orchestrator: cov-c's light read of `Faz6.1` also counts 0, so all seven retired files lack the note (`W4F08` confirmed). | At the next bounded Step 2 amendment, add one dated banner line under each H1, changing nothing else: status, the deciding `DEC` (`DEC-14` for 4.1/4.7, `DEC-28` for 7.2/7.3/8.1/8.3; `DEC-19`/DEFERRED for 4.6), and Superseded By (`SNAP-2026-09-03-MAIN` or `SNAP-2026-11-15-MAIN`). Until then, the audit's queue states that the ledger and the index are authoritative for these seven files and `Faz4.6`. |
+| AUDIT-FIX-105 | cov-d-02, PAT4-R4-01 | P3 | open | Planner-docs/Faz-9-Plans/Faz9.2-release-verification-checklist.md | S3-05 is confirmed. The Out of Scope sentence says Android 16 verification "has its own registered check in Faz 7.2". `Faz7.2` is SUPERSEDED (`DEC-28`), so the check will never run, and no Android 16 build will exist to verify. The index explicitly leaves this to the twelfth audit. `Faz9.2` is COMPLETE, and nothing queued reads the sentence. Evidence: Planner-docs/Faz-9-Plans/Faz9.2-release-verification-checklist.md:54 "Verification of the Android 16 build, which has its own registered check in Faz 7.2."; Planner-docs/Sub-Planing-Index.md:290 "`Faz9.2`'s Android 16 sentence lies outside the bounded Step 2 and is left to that audit." `PAT4` R4 hits the same line (`PAT4-R4-01`, same topic). | No repair before Step 4. At the next bounded Step 2 touch of `Faz9.2`, append "Moot 2026-11-16 (`DEC-28`): no Android 16 build; `Faz7.2` superseded; the next release is `Faz10.5`'s v2.3 on HyperOS 4" to line 54. Do not delete the sentence. |
+| AUDIT-FIX-106 | cov-d-03 | P3 | open | Planner-docs/Sub-Planing-Index.md | Index §3 Phase 4 still presents `Faz4.2` → `Faz4.3` → `Faz4.4` as the pending order, with `Faz4.2` marked "runs first". It gives these three no status, but the ledger has all three `verified` (`IMPL-64`; `IMPL-65`/`-66`; `IMPL-67`/`-68`/`-70`). The same block does mark `Faz4.5` complete and `Faz4.1`/`Faz4.7` superseded. This is an inaccurate status claim in the navigation surface. Evidence: Planner-docs/Sub-Planing-Index.md:126 "`Faz-4-Plans/Faz4.2-duration-rows.md` — **runs first.**"; Planner-docs/Sub-Planing-Index.md:118 "**The remaining order is `Faz4.2` → `Faz4.3` → `Faz4.4`, and it runs after Phase 3.**"; Planner-docs/Planing-Ledger.md:91 " / Planner-docs/Faz-4-Plans/Faz4.2-duration-rows.md / verified /" | At the next index edit, mark the three entries `verified` with their IMPL ids, and mark the line-118 order paragraph "discharged 2026-09-06". |
+| AUDIT-FIX-107 | cov-d-04 | P3 | open | Planner-docs/Main-Planing.md | The Phase 4 first vibecoding slice still says to "add justified rows". The desired end state in the same section says the rows need no work and that `d000c` is "out of scope rather than pending". The ledger closed `Faz4.2` with "settled row set is empty on evidence". The section therefore contradicts itself. Phase 4 is closed, and no queued row reads the slice. Evidence: Planner-docs/Main-Planing.md:202 "Locate the two default-mode duration tables (`d000b` / `d000c`) and add justified rows for the entries already emitted"; Planner-docs/Main-Planing.md:198 "**The duration rows need no work and this goal no longer claims they do" | At the next deliberate Step 1 amendment, together with `AUDIT-FIX-41`/`-42`, mark the slice done: "Done 2026-09-05 (`IMPL-64`): the row set was empty on evidence; six RAW stall rows are a measured, unpatchable gap." |
+| AUDIT-FIX-108 | cov-d-05 | P3 | open | Planner-docs/Faz-4-Plans/Faz4.3-patch-table-consolidation.md, Planner-docs/Faz-4-Plans/Faz4.4-patch-compatibility-validation.md | Both files present quotations as "Quoted from the **amended** Phase 4", but the Main-Planing text they quote is gone. Commit `60f0aee` (run 16, 2026-09-07) removed "plus matching duration rows" from Main's desired end state, and Main's acceptance signal now states that RAW10 (37) "is not among them" at 8192x6144. `git log -S` shows the `Faz4.3` string was added in `65610de` and removed from Main in `60f0aee`; neither sub-plan has changed since `65610de`. Both are COMPLETE history, so the stale quotations mislead only a re-reader. Evidence: Planner-docs/Faz-4-Plans/Faz4.3-patch-table-consolidation.md:5 "carrying the broad emission plus matching duration rows"; Planner-docs/Faz-4-Plans/Faz4.4-patch-compatibility-validation.md:17 "shows RAW10 at 8192x6144 with correct duration rows"; Planner-docs/Main-Planing.md:200 "**RAW10 (37) is not among them" | No repair before Step 4. At the next bounded Step 2 touch of either file, add one note under each quotation: "Main-Planing reworded 2026-09-07 (run 16, `FIND-4.4-01`); this quotation is the text of its time." Otherwise accept as history. |
+| AUDIT-FIX-109 | cov-d-06 | P3 | open | Planner-docs/Planing-Ledger.md | Two COMPLETE rows in ledger §4 still give pre-`DEC-28` next actions. `Faz7.1` points to a rental-day transition into the superseded `Faz7.2`. `Faz8.2` routes a future commit through `DEC-08`, which `DEC-28` makes moot. Planning run 21 annotated the four superseded rows but not these two. Evidence: Planner-docs/Planing-Ledger.md:102 "Transition to `Faz7.2`: re-run `docs/build-environment.md` section 5 on the rental day."; Planner-docs/Planing-Ledger.md:106 "None in the current roadmap; a commit under `DEC-08` is a section 7 replanning input."; Planner-docs/Main-Planing.md:240 "`DEC-28` moots `DEC-07` and `DEC-08`." | At the next ledger edit, append "Moot 2026-11-16 (`DEC-28`; `DEC-08` moot): history only" to both Next Action cells. Leave the status `verified`. |
+
+### Dispositions
+
+| Run | Item | Disposition | Evidence |
+|---|---|---|---|
+| cov-b | `AUDIT-FIX-33` (accepted P3; `Faz3.8`, Index) | AUDIT-FIX-90 (cov-b-01). The residue is confirmed and still present (Faz3.8 :120, :163; Index :107), so status `accepted` stands. The register text needs correcting: the delivered count is five, not four (ledger :86), and :95 and :155 carry the same residue. | Faz3.8:163 "The three new fields appear in the comparable region of a real snapshot."; Sub-Planing-Index.md:107 "AGC's photo size, `pref_48m_key` and derived megapixels"; Planing-Ledger.md:86 |
+| cov-b | S3-02 (`Faz3.7-agc-photo-size-pin.md:71`, the `<UTC>` file-name claim) | AUDIT-FIX-91 (cov-b-02). Confirmed false: the stamps are local time, UTC+3. | Faz3.7:71, :131; commit `3a307d2` (`+0300`, 00:00:58) adds `snapshots/20260906-2356__…` |
+| cov-c | AUDIT-FIX-22 (P2) | unchanged | **Open; new owner is the Ontology edit with S3-07 (decision 6), shared with AUDIT-FIX-99 (cov-c-04).** Measured by script: 7 control bytes below 0x20 (2 NUL), at offsets 42806, 42869, 42932, 42989, 42990, 42991 and 43113 (lines 313–318). The NULs are at `:313` and `:316`. These are the same offsets the tenth audit recorded. `Project-Ontology.md` is 453 lines and 87114 bytes. Run 21's edit (`3e7805e`, 2 lines) preserved the bytes. The old owner `F8.1-10` is `superseded` (Index `:155`). |
+| cov-c | AUDIT-FIX-37 (P3) | unchanged | **Open; new owner is the Comprehension edit with S3-06, shared with AUDIT-FIX-98 (cov-c-03).** A search of `Project-Comprehension.md` for `IMPL-52`, `IMPL-53` and `IMPL-54` finds 0 hits. The old owner `F7.3-08` is `superseded`. |
+| cov-c | AUDIT-FIX-25 (P3) | unchanged | Accepted, and no repair is needed. `Faz1.3:9` still says "Faz 4.1 narrows the RAW emission". `Faz4.1` has been `superseded` since `DEC-14`, and `Faz1.3` is COMPLETE (Ledger `:71`). The file is unchanged since `ff6934e`. |
+| cov-c | S3-27 (authorless -22) | unchanged | Same item as `AUDIT-FIX-22` above, re-owned by decision 6 (Ledger `:42`: "`AUDIT-FIX-22` (`F8.1-10`) … lost their author sub-plans"). |
+| cov-c | S3-28 (authorless -37) | unchanged | Same item as `AUDIT-FIX-37` above (Ledger `:42`). |
+| cov-c | S3-01 | AUDIT-FIX-96 (cov-c-01) | The shift is confirmed for `:52` and `:651` and refuted for `:19`; it was caused by run 21, not by `IMPL-96`. The format inference is resolved: every line in the format view is older than both runs (see AUDIT-FIX-96 (cov-c-01)). |
+| cov-c | S3-14 | AUDIT-FIX-97 (cov-c-02) | Ledger `:101`: Next Action against Validation Evidence, and Updated At still `2026-09-06`. |
+| cov-c | S3-06 | AUDIT-FIX-98 (cov-c-03) | 8 of the 11 lines confirmed. `:145` and `:149` are not confirmed. `:95` could not be checked within the allowed reads. |
+| cov-c | S3-07 | AUDIT-FIX-99 (cov-c-04) | 6 of the 16 lines confirmed (`:8`, `:19`, `:117`, `:391`, `:447`, `:448`). |
+| cov-c | S3-08 | AUDIT-FIX-100 (cov-c-05) | Confirmed (`:213`, `:232`–`:233`), plus the AOSPA HAL md5 step at `:140`–`:142`. |
+| cov-d | AUDIT-FIX-55 (P3 open, `Faz7.2`) | not_applicable | `Faz7.2` is `superseded` (Planner-docs/Planing-Ledger.md:103; Planner-docs/Main-Planing.md:230). The rental-day verification and the later past-tense rewording have no subject, and the runbook is marked historical (docs/build-environment.md:3 "**Historical as of 2026-11-13.**"). |
+| cov-d | AUDIT-FIX-56 (P3 open, `Faz7.2` + ledger) | not_applicable | Both halves are moot. No paid session will grade `VAL-SYNC`. `DEC-25` item (3), whose annotation was owed, is mooted by `DEC-28` (Planner-docs/Main-Planing.md:232 "`DEC-28` moots `DEC-22`, `DEC-24`, `DEC-25` and `DEC-26`"). |
+| cov-d | AUDIT-FIX-52 (P3 resolved) | resolved (confirmed) | The exception text is unchanged, now at docs/build-environment.md:143-146 "**Exception (`AUDIT-FIX-52`):**". Commit `03b0898` added an 8-line historical note at the top, so the audit's "lines 135–138" is now +8. |
+| cov-d | AUDIT-FIX-53 (P3 resolved) | resolved (confirmed) | docs/build-environment.md:195-198 "AOSPA/manifest beryl moved past the pin ($base): stop, do not rent (AUDIT-FIX-53)". The audit cited 186–190, now +8. |
+| cov-d | AUDIT-FIX-54 (P3 resolved) | resolved (confirmed) | docs/build-environment.md:481-487 (`manifest-resolved.err`, "continuing"), :531 (operator rule), :562-564 (`retrieval.txt`, "recorded, not fatal"). The audit cited 473–480, 523–526 and 556–572, now +8. |
+| cov-d | S3-05 (`Faz9.2:54`) | AUDIT-FIX-105 (cov-d-02) | Confirmed: the sentence depends on the superseded `Faz7.2`. |
+| cov-d | Seven retired files carry no supersession note | AUDIT-FIX-104 (cov-d-01) | Confirmed. The light-read count of `supersed/DEC-28/DEC-14` is 0 in `Faz4.1`, `Faz4.7`, `Faz7.2`, `Faz7.3`, `Faz8.1` and `Faz8.3`, and also in the DEFERRED `Faz4.6`. (The six files plus `Faz6.1` make seven; `Faz6.1` is outside this run's inputs, so its count was not taken here.) |
+| orchestrator | S3-31 (old status, queue and readiness lines) | Assigned to `AUD-W` (`4 · O4`): the template rewrite replaces those lines (§8.3 items 1 and 5). | `ORCHESTRATION_PLAN.md` §8.3 Distribution table |
+| orchestrator | S3-32 (new gate baseline) | Assigned to `GATE4` (`4 · O4`): the new counts go to plan §3 Gates (§8.3 item 6). | `ORCHESTRATION_PLAN.md` §8.3 item 6 |
+| orchestrator | `[ÇIKARIM]` `W4F07` | Not used: the verified plans were read whole; only the SUPERSEDED files and `Faz4.6` had the light read (§8.3 item 1). | cov-b, cov-c and cov-d inputs (e) |
+| orchestrator | `W4F26` (estimate) | An estimate, not a finding; nothing to verify. | `ORCHESTRATION_PLAN.md` §8.3 Distribution table |
+| orchestrator | `[ÇIKARIM]` `W4F17` (cov-c item: Ledger §5 format lines) | Verified by cov-c's format view, no longer an inference: `:366`, `:367`, `:524`, `:525` have 7 pipes like the §5 header (`:119-120`); `:501` and `:507` have 6 and `:506` has 8; `:503`, `:511`, `:512` are empty. All were last changed in September 2026 (`78373d5`, `130185d`), before `IMPL-96` and run 21, so no format repair is opened. The `:52` and `:651` shifts are AUDIT-FIX-96. | cov-c S3-01 row |
+| orchestrator | `AUDIT-FIX-57` remainder: `CQ-13`, Ontology invariant 11, `docs/reverse-engineering-toolchain.md:220` | Resolved for `CQ-13` (its only line, Comprehension `:25`, carries the `DEC-28` retirement note) and for invariant 11 (Ontology `:429` carries `DEC-28`); run 21 corrected both under `AUDIT-FIX-57` (Ledger `:42`). Toolchain `:220` (the rented server) falls under the dated server note at `:227-230`; the rest of §7 still treats Phase 7 as live: AUDIT-FIX-100. | Orchestrator `awk` check (line flags only); cov-c-05 and cov-c-07 evidence |
+| orchestrator | `W4F08` (cov-d item): `Faz6.1` | cov-c's light read of `Faz6.1` counts 0 for `supersed`, `DEC-28` and `DEC-14`, which completes the seven-file claim: AUDIT-FIX-104. | cov-c inputs (e); cov-d `W4F08` row |
+| orchestrator | Comprehension `:95` (cov-c open issue) | Checked: `device_ishtar/proprietary-files.txt` and `refs/a16_ishtar/` exist at the root; the row still waits for a build and names Phase 7 for verification: added to AUDIT-FIX-98. | `Planner-docs/Project-Comprehension.md:95`; root listing |
+| orchestrator | Old §12 owners of `AUDIT-FIX-22` and `-50` (cov-d open issue: `F8.1-10` and `F8.3-08` are gone) | For `AUD-W` (`4 · O4`): the `Faz4.3` and `Faz9.2` rows follow decision 6: `-22` goes with the Ontology edit for S3-07 (AUDIT-FIX-99); `-50`'s document half is `Faz10.5`'s (AUDIT-FIX-77). | cov-d open issue; `ORCHESTRATION_PLAN.md` §8.2 decision 6 |
+| orchestrator | `AUDIT-FIX-52`–`-54` line numbers (cov-d open issue) | The old Audit cites lines that moved 8 down when `03b0898` added a historical note to `docs/build-environment.md`; the cov-d rows above give the current lines, which `AUD-W` cites. | cov-d `AUDIT-FIX-52`–`-54` rows |
+
+### Section notes
+
+#### cov-b
+
+**§3 Main Phase Coverage, Phase 3 row.** Main phase 3, "AGC stable at 12.6 MP under 50 MP" (Main :143); folder `Planner-docs/Faz-3-Plans/` exists; 11 sub-plans (counted by `ls`); coverage OK. Ledger :79-89 marks all eleven `verified`, and `DEC-21` marked the phase successful. Main's roadmap goal (:143) and the Phase 3 Goal (:178) now say the phase is closed on AOSPA Android 15 only. Its acceptance signals (:184) "are not HyperOS 4 acceptance signals". The §3 note should say "AOSPA A15 only (`DEC-21`); not carried to HyperOS 4 (`DEC-28`/`DEC-33`)" (AUDIT-FIX-93). Main's `DEC-14` objective change is reflected in the two generations: `Faz3.1`…`3.6` hold the retired objective as history, and `Faz3.7`…`3.11` cover the replacement. This matches Index :91-110.
+
+**§4 Sub-Plan File Inventory, `Faz-3-Plans` (11).** H1 titles and phase numbers match for all 11 (checked by reading each H1). Section structure is OK for all 11. Content quality: `Faz3.1`–`3.6` are strong, measurable history. `Faz3.7`–`3.11` are strong and carry dated amendment banners (runs 12–15) that kept §8 and §13 aligned with the measurements. Carried residues: AUDIT-FIX-90 (`AUDIT-FIX-33` restated), AUDIT-FIX-91 (`Faz3.7` `<UTC>`), AUDIT-FIX-94 (`Faz3.1` ten/twelve) and AUDIT-FIX-95 (`Faz3.10`:140). Two dated-history sentences are stale but harmless, and are notes rather than findings: `Faz3.11`:19 ("`Faz3.10` remains `NEEDS_REPAIR`", a run-14 banner) and :45 ("`Faz9.3` … is still `planned`"). `Faz3.5` §8 :110 ("twice more") and §13 :177 ("at least three times") differ by one capture. The ledger records three JPEGs (:83). Also history.
+
+**§5 Naming and Sequencing (Phase 3).** All 11 filenames match `Faz3.<n>-<ascii-kebab>.md`, numbered 1–11 with no gap and no duplicate. Folder, filename and H1 agree. Execution order runs as numbered in both generations (Index :93, :252-256). No naming issues.
+
+**§6 Index Consistency (Phase 3).** All 11 files are referenced: Index :99-104 (3.1–3.6) and :106-110 (3.7–3.11). No broken, missing or unindexed reference. The phase count of 11 matches Index :312. Issues: AUDIT-FIX-92 (the 3.8–3.11 entries and amendment 4c still read as an active queue, :91, :107-110, :252-256), AUDIT-FIX-93 (no `DEC-28` scope note in the Phase 3 entry), and the carried `AUDIT-FIX-33` three-field description at :107 (AUDIT-FIX-90).
+
+**§7 Required Section Structure (Phase 3).** Checked on all 11 with `awk '/^#/'`. Each file has one H1 and the 13 required `##` headings, numbered 1–13 in order, with none missing, duplicated or empty. Every file's §9 carries an Implementation Contract table with Path/State/Purpose/Validation Command IDs columns and repo-relative paths (read for all 11).
+
+**§9 Scope Drift (Phase 3).** No drift from Main. `DEC-14` (Main :176) is applied consistently. `Faz3.7`–`3.11` contain no write-site search, no HAL patch and no APK change (Index :112; `Faz3.7` §5). `DEC-15`, `-17` and `-18` are carried into each later file's banner. `DEC-21` closure is consistent across ledger :89 and Audit :335. Settled decisions: none is contradicted. No Phase 3 file asserts anything about HyperOS 4, and all Phase 3 evidence is AOSPA A15. The only drift risk is the Index reader path (AUDIT-FIX-93). Ledger continuity is good: rows :79-89 agree with Audit §12 rows :325-335, all COMPLETE/satisfied. The single exception is the `Faz3.8` reason text (AUDIT-FIX-90). `Faz3.9`'s ledger Run ID cell lists `IMPL-57, -58, -83`, while Audit :333 also cites `IMPL-85`. That matches the row's evidence text (:87), so there is no defect. On S3-02, history-continuity: snapshot names are local time, not UTC (AUDIT-FIX-91).
+
+#### cov-c
+
+**§3 Main phase coverage (Phases 1, 2, 5, 6).** Phase 1 has 6 files, Phase 2 has 4, Phase 5 has 3 and Phase 6 has 2, counted per file with `wc`. All four folders exist and are rated OK. Phase 6 now reads as follows: `Faz6.1` is `superseded` (Ledger `:100`, `DEC-28`; Superseded By `SNAP-2026-11-15-MAIN`), and `Faz6.2` stays `verified` (Ledger `:101`). Main `:144` and `:222`–`:228` retire Phase 6's ROM target. The eleventh audit's text at `:112` ("`Faz6.1` `implemented`, effect verification owned by `Faz7.3` `F7.3-08`") is stale: `Faz7.3` is `superseded`. The new row should read "`Faz6.1` `superseded` (`DEC-28`); `Faz6.2` `verified`".
+
+**§4 Inventory (15 files).** All 15 have 13 numbered `##` headings, one Implementation Contract header row, LF line endings and 0 NUL. None of the four folders has changed since `ff6934e` (2026-08-24); `git log 7fa0a51..HEAD` shows no commit in them. In content, all of them are completed history; their AOSPA-era wording is history and needs no repair. Carried residue: `Faz1.3` (`AUDIT-FIX-25`, accepted). `Faz6.2`'s §9 `VAL-BUILD (deferred, Phase 7)` and its §13 "pending Phase 7's verification" can no longer be carried out under `DEC-28`. The ledger records that, but the `Faz6.2` row contradicts itself (AUDIT-FIX-97).
+
+**§5 Naming and sequencing.** No naming or order issues were found. Numbering is contiguous: 1.1–1.6, 2.1–2.4, 5.1–5.3 and 6.1–6.2. Folder, filename and H1 agree; `Faz6.1`'s H1 is at `:1`.
+
+**§6 Index consistency.** All 15 files are referenced (`:77`–`:82`, `:86`–`:89`, `:136`–`:138`, `:142`–`:143`), and no reference is broken. `Faz6.1` is marked `superseded` at `:142` and `:180`. §4 item 12 (`:188`) carries the `Faz6.2` note. §5 `:301` (version-control remote, answered by `DEC-01`) is consistent. Gaps: the Phase 6 block has no `DEC-28` note (AUDIT-FIX-101), and the `EV-20` bullet is stale (AUDIT-FIX-102). §6 coverage counts (`:312`): Phase 1 has 6, Phase 2 has 4, Phase 5 has 3 and Phase 6 has 2, which matches the measurement.
+
+**§7 Section structure.** The 13 headings are present and in order in all 15 files. A light read of `Faz6.1` gives the headings at `:1`, `:3`, `:15`, `:19`, `:31`, `:42`, `:52`, `:68`, `:95`, `:107`, `:126`, `:146`, `:156` and `:164`. A count of `supersed`, `DEC-28` and `DEC-14` in that file returns 0, which is expected: the retirement lives in the ledger and the Index, not in the plan text.
+
+**§9 Scope drift.**
+- No Phase 1, 2, 5 or 6 sub-plan contradicts `DEC-28`, `DEC-32` or `DEC-33`, and no file was edited after the decisions.
+- Drift sits in the support artifacts:
+  - Comprehension: 8 stale lines (AUDIT-FIX-98).
+  - Ontology: 6 stale lines (AUDIT-FIX-99).
+  - Toolchain doc: §7 and the AOSPA HAL md5 step (AUDIT-FIX-100).
+- Ledger continuity:
+  - Run 21 shifted the ledger lines without a note in the ledger (AUDIT-FIX-96).
+  - The `Faz6.2` row contradicts itself (AUDIT-FIX-97).
+  - `FIND-2.3-03` is routed to a sub-plan that is already closed (AUDIT-FIX-103).
+- The format rows in ledger §5 (`:501`, `:506`, `:507` and the blank lines `:503`, `:511`, `:512`) are older than both `IMPL-96` and run 21.
+
+**§12 rows (Phases 1, 2, 5, 6).**
+- `Faz1.1`–`1.6`, `Faz2.1`–`2.4`, `Faz5.1`–`5.3` and `Faz6.2` are COMPLETE: their ledger status is `verified` (`:69`–`:78`, `:97`–`:99`, `:101`).
+- `Faz6.1` is SUPERSEDED (`:100`). The eleventh audit's `:314` row (COMPLETE, owned by `Faz7.3`) must be replaced.
+- `Faz6.2`'s Finding IDs cell gains AUDIT-FIX-97, but the status stays COMPLETE.
+
+#### cov-d
+
+**§3 Main Phase Coverage (Phases 4, 7, 8, 9).**
+- Phase 4: folder present, 7 files, OK. `Faz4.2`–`4.5` are COMPLETE, `Faz4.1` and `Faz4.7` SUPERSEDED (`DEC-14`), and `Faz4.6` DEFERRED (host half `implemented`; `F4.6-07` gated on the superseded `Faz4.1`).
+- Phase 7: 3 files, OK (retired). Main retired the phase on 2026-11-15 under `DEC-28` (Main:230). `Faz7.1` is COMPLETE as history; `Faz7.2` and `Faz7.3` are SUPERSEDED. No new sub-plan is owed, because the goal moved to Phase 10 (`DEC-32`).
+- Phase 8: 3 files, OK (retired, Main:240). `Faz8.2` is COMPLETE; `Faz8.1` and `Faz8.3` are SUPERSEDED. The eleventh audit's notes ("Faz8.1 implemented", "Faz8.3 queued", and "Faz7.2 queued" for Phase 7) are stale and must be rewritten.
+- Phase 9: 3 files, all COMPLETE, OK. The Index (4d update, 4e) states that Phase 9 does not depend on the abandoned ROM build.
+- Counts for the four phases are 7/3/3/3. The Index §6 total of 47 includes the superseded files.
+- Main Phase 4's internal slice/end-state contradiction is AUDIT-FIX-107.
+
+**§4 Inventory (Phases 4, 7, 8, 9).**
+- H1, filename and phase number agree for all 16 files. All carry `## 1.`–`## 13.` in order: the light reads show the headings for the seven light-read files, and the whole reads showed them for the nine read in full.
+- Content of the whole-read files: Phase 4 history is strong. `Faz4.2`–`4.4` carry dated `DEC-14` and run-10 amendments, and the stale run-16 quotations are AUDIT-FIX-108.
+- `Faz7.1` §1 quotes the Hetzner wording of its time; it is history (`AUDIT-FIX-57`, not live).
+- `Faz8.2` §6 "`Faz8.3` exercises them on Android 16" is history.
+- `Faz9.1` and `Faz9.3` are unchanged since `65610de`/initial commit and consistent with their verified rows. `Faz9.2` is AUDIT-FIX-105.
+- Retired files: AUDIT-FIX-104.
+
+**§5 Naming and Sequencing.** No naming issue in Phases 4, 7, 8 or 9: `Faz-<n>-Plans/` folders, contiguous numbering, ASCII kebab slugs. The order inconsistency is the Index's live-looking Phase 4 order (AUDIT-FIX-106). Amendments 4c, 4d and 4e otherwise sequence the phases correctly.
+
+**§6 Index Consistency.**
+- References for the 16 files resolve.
+- Index §3 marks `Faz7.2`, `Faz7.3`, `Faz8.1` and `Faz8.3` superseded with "Do not revive". Phase 7 and 8 headers carry the 2026-11-16 retirement update, and 4d is marked RETIRED with 4e current.
+- Inaccurate claim: the Phase 4 order and the missing statuses (AUDIT-FIX-106).
+- Index §3 Phase 9 entries carry no status; this is harmless, since §4e and 4d state all three are verified.
+- Index line 290 routes the `Faz9.2` sentence to this audit (AUDIT-FIX-105). The same line routes `AUDIT-FIX-22`, `-37` and `-50` for reassignment. The eleventh audit's `Faz9.2` row still names `Faz8.3` `F8.3-08` as the `-50` owner; that owner is gone.
+
+**§7 Section Structure.** No missing, duplicated or out-of-order section in the 16 files. The heading lists of the 7 light-read files are complete: 13 sections each, `## 1.` to `## 13.`. The 9 whole-read files carry Implementation Contract tables with repo-relative paths. `Faz4.5` §9 says "seven items" and then lists eight; the eighth is `AUDIT-FIX-08`, recorded inline. This is an old, intentional detail, not a defect.
+
+**§9 Scope Drift.**
+- No drift from `DEC-28`, `DEC-32` or `DEC-33` in these phases. No file in Phases 4, 7, 8 or 9 revives the ROM build or treats AOSPA Android 15/16 evidence as HyperOS 4 fact.
+- Stale ledger evidence: the two COMPLETE rows' next actions (AUDIT-FIX-109).
+- History gaps that could confuse replanning: the retired files lack in-file notes (AUDIT-FIX-104), and `Faz4.3`/`4.4` quote superseded Main text (AUDIT-FIX-108).
+- The `docs/build-environment.md` line citations behind `AUDIT-FIX-52`–`-54` drifted by +8 when `03b0898` added the historical note. This is documentary; the runbook is historical.
+
+**Proposed §12 rows (Phases 4, 7, 8, 9).**
+- COMPLETE, satisfied: `Faz4.2`, `Faz4.3`, `Faz4.4`, `Faz4.5`, `Faz7.1`, `Faz8.2`, `Faz9.1`, `Faz9.2` (AUDIT-FIX-105 P3, history), `Faz9.3`.
+- SUPERSEDED, independent: `Faz4.1`, `Faz4.7`, `Faz7.2`, `Faz7.3`, `Faz8.1`, `Faz8.3` (AUDIT-FIX-104).
+- DEFERRED, blocked: `Faz4.6`.
+- The `Faz4.3` row's `AUDIT-FIX-22` and the `Faz9.2` row's `-50` repair text must follow the orchestrator's owner reassignment.
+
+#### orchestrator
+
+- Parallel Index defects: AUDIT-FIX-92 (Phase 3) and AUDIT-FIX-106 (Phase 4) are the same kind of stale queue wording, and AUDIT-FIX-93 (Phase 3) and AUDIT-FIX-101 (Phase 6) the same missing `DEC-28` note. They stay separate because they sit in different Index sections; one Index edit can fix all four.
+- `PAT4` adds no new topic: its one finding group is the line of AUDIT-FIX-105 (see `### PAT4`).
+
+### Runs
+
+| Run | Agent | Status | Input bytes | Extra reads | Notes |
+|---|---|---|---|---|---|
+| cov-b | reviewer | complete | 385,848 | ≈ 0.8 KB: read-only `git log` and `git show --stat` output (commit times for S3-02); no repository file outside the inputs | Contract deviations: none. Open issues: Audit `:305`, `:306` are long lines outside the Phase 3 rows and were not read; no Phase 3 queue row changes (all 11 COMPLETE, satisfied). cov-b proposed `accepted` for AUDIT-FIX-94 (cov-b-05) and AUDIT-FIX-95 (cov-b-06) and left the choice to the orchestrator, which keeps it: P3 wording slips inside COMPLETE plans that Step 4 does not re-run. The detail file quoted one AGC preference value; it is withheld here. |
+| cov-c | reviewer | complete | 363,276 | ≈ 3.6 KB: Ledger `:42` (raw, 3,403 B; cited for S3-27 and S3-28) and an `awk` citation scan of Ledger `:533`; read-only `git log -L` | Deviations: `git log -L` (a read-only `git log` form); `bash` refused `grep`, so counts came from `awk` and the grep tool. Open issue: Comprehension `:95` needed a root listing; the orchestrator checked it (Dispositions). `Faz6.1` light read: keyword count 0. |
+| cov-d | reviewer | complete | 372,294 | ≈ 2.1 KB, including `docs/build-environment.md:1-10` outside the cited ±3 windows (to explain the 8-line shift) | Deviations: one `ls -R` of `Planner-docs` (not on the allowed list); the search tool in place of `grep -n`; `git log -S`. Open issues: the `Faz6.1` count (answered by cov-c), the old §12 owners of `-22` and `-50`, and the old line numbers of `-52`–`-54` (Dispositions). |
+| PAT4 | orchestrator | complete | 42 files | none | Counts equal the `W4O2P01` calibration (164); S5 and S6 have no hit. One finding group (merged into AUDIT-FIX-105), 49 not_applicable groups; see `### PAT4`. |
+
+Mapping (one row per temp ID):
+
+| Temp ID | Finding ID | Note |
+|---|---|---|
+| cov-b-01 | AUDIT-FIX-90 |  |
+| cov-b-02 | AUDIT-FIX-91 |  |
+| cov-b-03 | AUDIT-FIX-92 |  |
+| cov-b-04 | AUDIT-FIX-93 |  |
+| cov-b-05 | AUDIT-FIX-94 | status `accepted`, as proposed by cov-b |
+| cov-b-06 | AUDIT-FIX-95 | status `accepted`, as proposed by cov-b |
+| cov-c-01 | AUDIT-FIX-96 |  |
+| cov-c-02 | AUDIT-FIX-97 |  |
+| cov-c-03 | AUDIT-FIX-98 |  |
+| cov-c-04 | AUDIT-FIX-99 |  |
+| cov-c-05 | AUDIT-FIX-100 |  |
+| cov-c-06 | AUDIT-FIX-101 |  |
+| cov-c-07 | AUDIT-FIX-102 |  |
+| cov-c-08 | AUDIT-FIX-103 |  |
+| cov-d-01 | AUDIT-FIX-104 |  |
+| cov-d-02 | AUDIT-FIX-105 |  |
+| cov-d-03 | AUDIT-FIX-106 |  |
+| cov-d-04 | AUDIT-FIX-107 |  |
+| cov-d-05 | AUDIT-FIX-108 |  |
+| cov-d-06 | AUDIT-FIX-109 |  |
+| PAT4-R4-01 | AUDIT-FIX-105 | same topic as cov-d-02 |
+
+### PAT4
+
+Run 2026-11-17T13:04:48Z from the root with `py -3`: the script of `ORCHESTRATION_PLAN.md` Ek A.8.3, taken from the plan unchanged; counts first, then `--locations`; no line text was printed or stored. Scope: the 42 sub-plans of Phases 1–9 (`files=42`). Every count equals the `W4O2P01` calibration, and S5 and S6 have no hit. The orchestrator judged each (pattern, file) group from a ±60-character window around each hit in the active files, with preference values, long digit runs and addresses masked; SUPERSEDED files were not opened. Result: 50 groups, one finding group (`PAT4-R4-01`, 1 hit, merged into AUDIT-FIX-105) and 49 not_applicable groups (163 hits).
+
+| Pattern | Calibration (`W4O2P01`) | Hits | Files | Per folder |
+|---|---|---|---|---|
+| PAT4-S1 | 17 | 17 | 11 | Faz-1: 1, Faz-2: 4, Faz-3: 4, Faz-5: 1, Faz-7: 5, Faz-8: 2 |
+| PAT4-S2 | 3 | 3 | 2 | Faz-7: 3 |
+| PAT4-S3 | 12 | 12 | 4 | Faz-3: 12 |
+| PAT4-S4 | 0 | 0 | 0 | — |
+| PAT4-S5 | 0 | 0 | 0 | — |
+| PAT4-S6 | 0 | 0 | 0 | — |
+| PAT4-S7 | 1 | 1 | 1 | Faz-3: 1 |
+| PAT4-S8 | 0 | 0 | 0 | — |
+| PAT4-R1 | 6 | 6 | 6 | Faz-3: 3, Faz-4: 2, Faz-9: 1 |
+| PAT4-R2 | 0 | 0 | 0 | — |
+| PAT4-R3 | 20 | 20 | 3 | Faz-7: 17, Faz-8: 3 |
+| PAT4-R4 | 81 | 81 | 10 | Faz-1: 1, Faz-6: 7, Faz-7: 17, Faz-8: 55, Faz-9: 1 |
+| PAT4-R5 | 24 | 24 | 13 | Faz-2: 6, Faz-3: 5, Faz-6: 8, Faz-7: 2, Faz-8: 2, Faz-9: 1 |
+| PAT4-R6 | 0 | 0 | 0 | — |
+| Total | 164 | 164 | — | — |
+
+Groups (pattern, file) and verdicts:
+
+| Pattern | File | Lines | Hits | Verdict |
+|---|---|---|---|---|
+| PAT4-R1 | `Faz3.10-pin-stickiness-matrix.md` | 134 | 1 | not_applicable (NEG) |
+| PAT4-R1 | `Faz3.3-single-word-patch-and-metadata-proof.md` | 103 | 1 | not_applicable (PROP) |
+| PAT4-R1 | `Faz3.8-agc-state-in-smoke-script.md` | 146 | 1 | not_applicable (PROP) |
+| PAT4-R1 | `Faz4.3-patch-table-consolidation.md` | 123 | 1 | not_applicable (PROP) |
+| PAT4-R1 | `Faz4.7-ultra-high-resolution-sensor-mode.md` | 17 | 1 | not_applicable (SUP) |
+| PAT4-R1 | `Faz9.1-reproducible-release-build.md` | 15 | 1 | not_applicable (PROP) |
+| PAT4-R3 | `Faz7.1-github-input-staging.md` | 5, 19, 45, 99, 130, 139 | 6 | not_applicable (HIST); the plan's stale ledger next action is AUDIT-FIX-109 |
+| PAT4-R3 | `Faz7.2-first-aospa-build.md` | 1, 5, 7, 9, 11, 18, 59, 94, 244, 307, 322 | 11 | not_applicable (SUP) |
+| PAT4-R3 | `Faz8.2-kernel-lts-merge-scoping.md` | 9, 26, 154 | 3 | not_applicable (HIST); the plan's stale ledger next action is AUDIT-FIX-109 |
+| PAT4-R4 | `Faz1.6-workspace-readme-and-refs-index.md` | 7 | 1 | not_applicable (HIST) |
+| PAT4-R4 | `Faz6.1-symlink-entry-in-device-trees.md` | 39, 64, 77, 82, 122, 149 | 6 | not_applicable (SUP) |
+| PAT4-R4 | `Faz6.2-aon-module-disposition.md` | 67 | 1 | not_applicable (HIST) |
+| PAT4-R4 | `Faz7.1-github-input-staging.md` | 5, 11, 62 | 3 | not_applicable (HIST); the plan's stale ledger next action is AUDIT-FIX-109 |
+| PAT4-R4 | `Faz7.2-first-aospa-build.md` | 36, 40, 48, 326 | 4 | not_applicable (SUP) |
+| PAT4-R4 | `Faz7.3-flash-boot-and-aon-verification.md` | 9, 11, 37, 56, 64, 66, 86, 147, 152, 186 | 10 | not_applicable (SUP) |
+| PAT4-R4 | `Faz8.1-android16-camera-blob-comparison.md` | 1, 5, 7, 27, 31, 54, 55, 63, 65, 105, 156, 199 | 12 | not_applicable (SUP) |
+| PAT4-R4 | `Faz8.2-kernel-lts-merge-scoping.md` | 5, 10, 18, 61, 65, 150, 161 | 7 | not_applicable (HIST); the plan's stale ledger next action is AUDIT-FIX-109 |
+| PAT4-R4 | `Faz8.3-camera-modes-on-android16-build.md` | 1, 5, 7, 11, 17, 23, 27, 29, 33, 40, 41, 44, 51, 55, 56, 73, 92, 94, 95, 107, 120, 121, 137, 149, 150, 152, 153, 161, 163, 177, 180, 183, 184, 188, 197, 199 | 36 | not_applicable (SUP) |
+| PAT4-R4 | `Faz9.2-release-verification-checklist.md` | 54 | 1 | finding `PAT4-R4-01` → AUDIT-FIX-105 (same topic as cov-d-02, S3-05) |
+| PAT4-R5 | `Faz2.1-device-smoke-script.md` | 128 | 1 | not_applicable (HIST) |
+| PAT4-R5 | `Faz2.2-flash-v21-and-baseline-snapshot.md` | 31, 71, 134, 146 | 4 | not_applicable (HIST) |
+| PAT4-R5 | `Faz2.3-ten-mode-regression-pass.md` | 138 | 1 | not_applicable (HIST) |
+| PAT4-R5 | `Faz3.1-preference-trap-clearance.md` | 128 | 1 | not_applicable (HIST) |
+| PAT4-R5 | `Faz3.10-pin-stickiness-matrix.md` | 160 | 1 | not_applicable (HIST) |
+| PAT4-R5 | `Faz3.7-agc-photo-size-pin.md` | 159 | 1 | not_applicable (HIST) |
+| PAT4-R5 | `Faz3.8-agc-state-in-smoke-script.md` | 135 | 1 | not_applicable (HIST) |
+| PAT4-R5 | `Faz3.9-coexistence-bracket.md` | 145 | 1 | not_applicable (HIST) |
+| PAT4-R5 | `Faz6.1-symlink-entry-in-device-trees.md` | 58 | 1 | not_applicable (SUP) |
+| PAT4-R5 | `Faz6.2-aon-module-disposition.md` | 13, 29, 36, 57, 61, 75, 150 | 7 | not_applicable (KSU) |
+| PAT4-R5 | `Faz7.3-flash-boot-and-aon-verification.md` | 41, 52 | 2 | not_applicable (SUP) |
+| PAT4-R5 | `Faz8.3-camera-modes-on-android16-build.md` | 11, 27 | 2 | not_applicable (SUP) |
+| PAT4-R5 | `Faz9.2-release-verification-checklist.md` | 33 | 1 | not_applicable (HIST) |
+| PAT4-S1 | `Faz1.4-toolchain-procedure-record.md` | 58 | 1 | not_applicable (PROSE) |
+| PAT4-S1 | `Faz2.1-device-smoke-script.md` | 65, 128 | 2 | not_applicable (PROSE) |
+| PAT4-S1 | `Faz2.2-flash-v21-and-baseline-snapshot.md` | 134 | 1 | not_applicable (PROSE) |
+| PAT4-S1 | `Faz2.3-ten-mode-regression-pass.md` | 138 | 1 | not_applicable (PROSE) |
+| PAT4-S1 | `Faz3.10-pin-stickiness-matrix.md` | 160 | 1 | not_applicable (PROSE) |
+| PAT4-S1 | `Faz3.8-agc-state-in-smoke-script.md` | 135 | 1 | not_applicable (PROSE) |
+| PAT4-S1 | `Faz3.9-coexistence-bracket.md` | 120, 145 | 2 | not_applicable (PROSE) |
+| PAT4-S1 | `Faz5.2-temporary-mount-composition-test.md` | 59 | 1 | not_applicable (PROSE) |
+| PAT4-S1 | `Faz7.2-first-aospa-build.md` | 183 | 1 | not_applicable (SUP) |
+| PAT4-S1 | `Faz7.3-flash-boot-and-aon-verification.md` | 78, 141, 142, 173 | 4 | not_applicable (SUP) |
+| PAT4-S1 | `Faz8.3-camera-modes-on-android16-build.md` | 134, 169 | 2 | not_applicable (SUP) |
+| PAT4-S2 | `Faz7.2-first-aospa-build.md` | 95, 182 | 2 | not_applicable (SUP) |
+| PAT4-S2 | `Faz7.3-flash-boot-and-aon-verification.md` | 77 | 1 | not_applicable (SUP) |
+| PAT4-S3 | `Faz3.10-pin-stickiness-matrix.md` | 106, 127, 198 | 3 | not_applicable (NEG) |
+| PAT4-S3 | `Faz3.11-phase-closure-and-configuration-record.md` | 11, 43, 51, 54, 102, 125, 149 | 7 | not_applicable (NEG) |
+| PAT4-S3 | `Faz3.7-agc-photo-size-pin.md` | 11 | 1 | not_applicable (NEG) |
+| PAT4-S3 | `Faz3.8-agc-state-in-smoke-script.md` | 21 | 1 | not_applicable (NEG) |
+| PAT4-S7 | `Faz3.5-agc-capture-and-image-evidence.md` | 31 | 1 | not_applicable (LABEL) |
+
+Verdict codes:
+
+- `SUP`: the file is SUPERSEDED (ledger §4; plan §8.2 decision 2): it leaves the Step 4 queue and only its headings and counts are read (plan §8.3 item 1, light read); the missing supersession note is AUDIT-FIX-104.
+- `PROSE`: the hit names the tool or the `/data/adb` path in prose (an infrastructure list or a description); the line is not an `adb` command.
+- `NEG`: the line negates, warns against or replaces the pattern (no `.agc` import happened; `sed -i` is recorded as unsafe and replaced by the inode-preserving route); it prescribes nothing.
+- `PROP`: the word describes a file format's checksum property, a design property or a goal, not a claim that the module works.
+- `HIST`: a COMPLETE (verified) plan that records the AOSPA-era state (root through KernelSU, the `DEC-24` rented host, the Android 16 target); Step 4 does not re-run it, and the HyperOS 4 path is Phase 10's (`DEC-28`, `DEC-32`).
+- `KSU`: names the plan's KernelSU-independence design property of `ishtar-aon-fix`, not a root-manager assumption.
+- `LABEL`: the procedure ends by setting the parent directory's SELinux context; it does not loosen SELinux or permissions.
