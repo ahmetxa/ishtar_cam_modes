@@ -225,19 +225,19 @@ Aşağıdaki her şey (2026-09-20 ölçümü, kanonik yapılandırma, son ölç�
 1. DEV §4 (2026-09-20): Kullanıcıya göre MIUI ve AOSPA'nın kerneli "has been upstreamed by third parties". K3 ile 2026-11-13'te düştü: telefon artık 5.15.215 kernelli HyperOS 4'te (§2.3).
 2. **Çelişki (giderildi):** DEV §7 "An Android 16 build ships a different binary, so the table does not carry over" diyordu; oysa IMPL-92 (L:102, L:521) pinlenmiş A16 HAL'inin md5'ini stok korumayla eşit ölçmüştü. Cümle yerinde bırakıldı; 2026-11-13'te DEV §10'a düzeltme notu eklendi (`03b0898`). Android 16 derlemesi bırakıldığı için konu kapandı.
 
-### 2.6 Bu oturumun durumu (Pencere 4 · O0, 2026-11-16/17)
+### 2.6 Bu oturumun durumu (Pencere 4 · O1, 2026-11-17)
 
-- **Genel durum:** Pencere 4 · O0 (12. denetimin keşfi; plan §8) bitti. Kapanış `Window 4 O0: discovery for the twelfth audit` (§11). Keşif salt-okurdu: ledger, `Planner-docs/`, `docs/` ve Audit dokunulmadı; cihaza komut gönderilmedi. Sıradaki aşama Pencere 4 · `O1+O2` (plan ve denetim kontratı, birleşik; açılışta onayla).
-- **Açılış (2026-11-16T22:09Z–22:10Z):** kontrollerin hepsi tuttu: ağaç temiz, 87 commit, uç C3; `main` = `origin/main` = ls-remote'taki üç ref = `081790f`, `origin/main..HEAD` = 0; etiket yok, 355 dosya; snapshot aynı (plan §8.1 `W4OPN`, `W4F01`).
-- **Yayın:** C3, `3 · O5`'te ayrı onaylarla FF (22:05:00Z) ve push (22:05:35Z) edildi (reflog); soru gerekmedi. Push cümleleri güncellendi: §2.1, §3.5, §4 Push, §8 (iki satır), §9 N3.
-- **Taban (22:11Z–22:12Z):** `step2`, `step1`, `step3-preflight` `--strict` 0; `all` 0 (yalnız denetim uyarısı, `subplan_count=47`); V2 çıkış 1 (taban); V3 PASS; kimlik taraması PASS (`prose_mentions=26`). `--mode step3` keşif ölçümü: çıkış 0, `--strict` 1 (`W4F03`).
-- **Keşif:** üç salt-okur scout (S1 boyut ve dilim, S2 Audit ve doğrulayıcı, S3 12. denetime yönlendirilenler); ilk gönderim 429 ile durdu, 2026-11-17T05:12Z'de taze gönderildi. Envanter plan §8.1 (`W4OPN`, `W4F01`–`W4F27`, 13,8 KB).
-- **Başlıca olgular:** S1: 7 reviewer çalışması, 3 oturum, hepsi ≤ 400 KB; §8'in ≈ 9 çalışması tam okumayla sığmaz. S2: 16 başlık (H1 + 15); `PASS_WITH_WARNINGS` ile `step3 --strict` hep çıkış 1, §8 `:751` geçit lafzı düzeltilmeli. S3: 32 madde, hepsi açık; `AUDIT-FIX-22`, `-37` konusuz değil, `-50` kısmen.
-- **`4 · O1+O2` kararları (plan §8.1 `W4F27`):** geçit lafzı; 7 SUPERSEDED ve `Faz4.6` DEFERRED; readiness ve security kapsamı; bulgu dosyasının yeri; kuyrukta `Faz10.x`; yazarsız bulguların sahipleri; REV-3 P3; `[ÇIKARIM]` satırları.
-- **Silinecek depolar (`DEC-30`):** `gh api -i` 22:10:02Z–22:10:05Z'de dört depo 200; silme cümleleri değişmedi; silme kullanıcıda.
-- **Bağlam:** ilk ölçüm 98,6k; scout'lar gönderilince 154k; S2'den sonra 182k; envanterden sonra 247k; kapanış §11'de.
-- **Değişen dosyalar:** `ORCHESTRATION_PLAN.md` (§1 iki satır, §3 Adlandırma, §8.1), `PROJECT_LOG.md` (push cümleleri, §2.6, §11), `NEXT_PROMPT.md` (`4 · O1+O2` için).
-- **Bekleyen işler ve devam:** Pencere 4 · `O1+O2` (yeni oturum, `NEXT_PROMPT.md`); ardından `4 · O3a`–`O3c` incelemeleri, `4 · O4` birleştirme ve geçitler, `4 · O5` kapanış (plan §8).
+- **Genel durum:** Pencere 4 · O1 (12. denetimin planı; plan §8.2) bitti. Birleşim (`O1+O2`) açılışta onaylandı; `O1` onayında bağlam 200k'yı geçtiği için (form gönderilirken 200.951 token) `O2` ayrı oturum oldu. Kapanış `Window 4 O1: plan for the twelfth audit` (§11). Ledger, `Planner-docs/`, `docs/` ve Audit dokunulmadı; cihaza komut gönderilmedi. Sıradaki aşama Pencere 4 · `O2` (denetim kontratı, plan §8.3).
+- **Açılış (2026-11-17T09:52Z–09:59Z):** kontrollerin hepsi tuttu: ağaç temiz, 88 commit, uç `Window 4 O0:`; `main` = `origin/main` = ls-remote'taki üç ref = `081790f`, `origin/main..HEAD` = 1; etiket yok, 355 dosya; snapshot aynı (plan §8.2 `W4O1OPN`).
+- **Yayın:** değişmedi; `4 · O0` ve `4 · O1` commit'leri yerel. FF ve push yalnız `4 · O5`'te, `C4`'ten sonra, ayrı onaylarla (plan §8.2).
+- **Taban (09:55Z):** `step2`, `step1`, `step3-preflight` `--strict` 0; `all` 0 (yalnız denetim uyarısı, `subplan_count=47`); V2 çıkış 1 (taban); V3 PASS; `step3` 0, `--strict` 1; kimlik taraması PASS (`prose_mentions=26`).
+- **Kapasite yoklaması (`W4O1P01`, danışman notu):** iki `reviewer` yoklaması 192 ve 369 KB'ı tam okudu (pencere 1M); `security-reviewer` 308 KB'ı sınıra takılmadan okudu ama `partial` döndü (yöntem sapması: `:raw` yok, sayılar tahmini). Okuyucu uzun satırları keser, büyük dosyada blok atlar: reviewer `:raw` ile yeniden okur.
+- **Plan (§8.2, "onay"):** seçenek C: 6 reviewer çalışması, 2 inceleme oturumu (`4 · O3a` Faz10; `4 · O3b` Faz 1–9 ve `PAT4` desen taraması); ardından `4 · O4` birleştirme ve geçitler, `4 · O5` son inceleme ve kapanış. Sekiz karar öneriyle (geçit lafzı, 7 SUPERSEDED, bulgu dosyası `AUDIT12_FINDINGS.md`, 47 satırlık kuyruk, sahipsiz bulgular).
+- **Ledger dilim baytları (`W4O1P02`):** §4 47 satır, 76.612 B; `cov-d`'nin alt planları ham 441.673 B (kontrat hafif okumayı tanımlar ya da dilimi böler).
+- **Silinecek depolar (`DEC-30`):** `gh api -i` 09:52:59Z–09:53:02Z'de dört depo 200; silme cümleleri değişmedi; silme kullanıcıda.
+- **Bağlam:** ilk ölçüm 69k; birleşim sorusunda 108k; plan taslağından sonra 169k; form gönderilirken 201k; kapanış §11'de.
+- **Değişen dosyalar:** `ORCHESTRATION_PLAN.md` (§1 altı satır, §3 Adlandırma, §8, yeni §8.2), `PROJECT_LOG.md` (§2.6, §11), `NEXT_PROMPT.md` (`4 · O2` için).
+- **Bekleyen işler ve devam:** Pencere 4 · `O2` (yeni oturum, `NEXT_PROMPT.md`; plan §8.3 kontratı); ardından `4 · O3a`, `4 · O3b` incelemeleri, `4 · O4` birleştirme ve geçitler, `4 · O5` kapanış (plan §8.2).
 
 ## 3. Kronoloji
 
@@ -1267,3 +1267,16 @@ Ek not: `docs/pre-rental-plan.md`'deki "Step 1–4" o planın kendi sırasıdır
 - **Doğrulama:** kapanıştan önce üç dosyada bayt ve boru kontrolü (LF, CR 0, NUL 0, tablo boruları tutarlı, değişen satırlar ≤ 600 bayt) ve kimlik taraması (Ek A.5) geçti; `git diff --stat` yalnız bu üç dosya. Doğrulayıcı yeniden çalıştırılmadı (`Planner-docs/` dokunulmadı).
 - **Bağlam (Ek A.7):** ilk ölçüm 98,6k; scout'lar gönderilince 154k; S2'den sonra 182k; envanterden sonra 247k; kapanışta ≈ 270k (tahmin 185k; 429 yeniden gönderimi dahil).
 - **Kapanış:** `Window 4 O0: discovery for the twelfth audit` (yerel commit; push edilmedi). Sonraki oturum: Pencere 4 · O1+O2 (`NEXT_PROMPT.md`; plan §8, §8.1).
+
+**2026-11-17: Pencere 4 · O1 (omp, on sekizinci pencere).** Kapsam: `ORCHESTRATION_PLAN.md` §8.2, 12. denetimin aşama ve görev planı. Birleşim `O1+O2` açılışta onaylandı; `O1` onayında bağlam 200k'yı geçtiği için `O2` ayrı oturum oldu. Bu girdi bir IMPL satırı değildir; ledger'a yazılmadı. Ledger'a, `Planner-docs/`'a, `docs/`'a ve cihaza dokunulmadı.
+
+- **Açılış (2026-11-17T09:52:59Z–09:59Z, salt-okur):** ağaç temiz; dal 88 commit, uç `Window 4 O0:` (tek eşleşme); `main` = `origin/main` = `081790f`, `origin/main..HEAD` 1; etiket yok; 355 dosya; `ls-remote` üç ref = `081790f`; dört depo 200; snapshot aynı. Plan §8.2 `W4O1OPN`.
+- **Taban (09:55:11Z–09:55:26Z):** `NEXT_PROMPT.md` §7 tabanı tuttu; kimlik taraması `prose_mentions=26`.
+- **Birleşim:** form "evet" (`O1` onayında bağlam 200k'yı geçerse `O2` ayrı oturum). Kullanıcının orkestrasyon şablonuyla plan arasındaki farklar formda söylendi: yeni dal açılmaz (dal sürer, plan §7.2); şablonun Faz 3–5'i sonraki oturumlardır; `isolated`, `outputSchema`, `librarian` ve `designer` bu ortamda yok. Formdaki "advisor yok" ifadesi yanlıştı (danışman notları geldi, aşağıda); kapanış raporunda düzeltildi.
+- **Danışman notları (dördü de uygulandı):** (1) reviewer penceresi bilinmiyordu: üç yoklama ajanı (`W4O1P01`), seçenek gerekçesi düzeltildi, öneri A'dan C'ye döndü; (2) form gönderilirken bağlam 200.951 tokendı: `O2` başlamadı, `O1` kapandı; (3) yoklama satırları (`security-reviewer` `partial`) ve `CT4` kabul atfı düzeltildi; (4) NEXT_PROMPT taslağı `cp`'den önce betikle denetlendi (100K `task` sınırı, `cov-d` 441.673 B, okuma yöntemi, §4 (d)).
+- **Plan:** §8.2 (oturumlar, dilim seçenekleri, görevler, sekiz karar) "onay" ile; §1'e `4 · O1` (done) ve `4 · O2`, `4 · O3a`, `4 · O3b`, `4 · O4`, `4 · O5` (pending); §3'e Pencere 4 görev kimlikleri ve `C4`; §8'de oturum düzeni, dağılım, başlık, SUPERSEDED ve geçit satırları düzeltildi. Boru dışı satırlar artık `:183`, `:958`.
+- **Ölçüm:** `W4O1P02` ledger §4 dilim baytları; `W4F05`'in [ÇIKARIM]'ı kapandı.
+- **NEXT_PROMPT:** `4 · O2` için yeniden yazıldı; taslağı salt-okur bir scout yazdı, orkestratör betikle denetleyip `cp` ile yerine koydu.
+- **Doğrulama:** kapanıştan önce üç dosyada bayt ve boru kontrolü ve kimlik taraması (Ek A.5) geçti; `git diff --stat` yalnız bu üç dosya. Doğrulayıcı yeniden çalıştırılmadı (`Planner-docs/` dokunulmadı).
+- **Bağlam (Ek A.7):** ilk ölçüm 69k; birleşim sorusunda 108k; plan taslağından sonra 169k; form gönderilirken 201k; NEXT_PROMPT taslağı gönderildikten sonra 258k (`O1` tahmini ≈ 170k; fark zorunlu okuma ve edit yankıları).
+- **Kapanış:** `Window 4 O1: plan for the twelfth audit` (yerel commit; push edilmedi). Sonraki oturum: Pencere 4 · O2 (`NEXT_PROMPT.md`; plan §8.2, §8.3).

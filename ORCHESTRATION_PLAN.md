@@ -68,7 +68,12 @@ Durum sözlüğü: `pending`, `in_progress`, `done`, `blocked`.
 | 3 · O5 | Son inceleme ve kapanış | `REV-4` ∥ `SEC-C` → `FIX3` → `C3` → FF (onay) → `RID` → push (onay) → `LSR`, `DEL3`; tahmin ≈ 215k | 3 · O4 | done | `Window 3: planning run 21 and handoff for the twelfth audit` (`git log --grep '^Window 3:'`); açılış tuttu, dört depo 200; `REV-4` dört, `SEC-C` üç parça: P0 0, P1 0, P2 9, P3 24; kapsam "hepsi" (form): üç taslak scout'u, 86 işlem betikle, satır sayıları sabit; istisnalar §10; teyit: reviewer P2 3, P3 5, security-reviewer 0, hepsi bu aşamada düzeltildi (`fix-t`); `GATE3` tabanda; bağlam PROJECT_LOG §11 |
 | 4 | 12. denetim | Step 3 (`run-step3.md`); oturum düzeni §8 | Pencere 3 | pending | |
 | 4 · O0 | Keşif | Açılış ve yayın doğrulaması; taban ve `--mode step3` ölçümü; S1–S3 scout'ları; keşif envanteri (§8.1) | Pencere 3 | done | `Window 4 O0: discovery for the twelfth audit` (`git log --grep '^Window 4 O0:'`); açılış `W4OPN` (C3 push edilmiş); dört depo 200; taban tuttu; S1–S3 ilk gönderimde 429 ile durdu, taze gönderildi; envanter §8.1 (`W4F01`–`W4F27`); PROJECT_LOG push cümleleri güncel; bağlam PROJECT_LOG §11 |
-| 4 · O1+O2 | Plan ve denetim kontratı | Aşama ve görev tablosu, kullanıcı onayı; denetim kontratı: reviewer dilimleri, bulgu dosyası, kimlik ve geçit kuralları (§8.1 `W4F27`); birleşim açılışta onaylanır; tahmin ≈ 190k (formül; kalibrasyonla 240–265k, `W4F26`) | 4 · O0 | pending | |
+| 4 · O1 | Plan | Aşama ve görev tablosu, kullanıcı onayı (§8.2); birleşim `O1+O2` açılışta onaylandı, `O1` onayında bağlam 200k'yı geçince `O2` ayrıldı | 4 · O0 | done | `Window 4 O1: plan for the twelfth audit` (`git log --grep '^Window 4 O1:'`); açılış `W4O1OPN`, dört depo 200; taban tuttu; `W4O1P01` kapasite yoklaması (reviewer 1M), `W4O1P02` ledger dilim baytları; plan "onay" (C: 6 çalışma, 2 oturum; sekiz karar öneriyle); bağlam PROJECT_LOG §11 |
+| 4 · O2 | Denetim kontratı | §8.3: reviewer girdisi ve dosya listeleri (≤ 400 KB), İngilizce görev metni, dönüş biçimi, kimlik, bulgu dosyası, `4 · O4` birleştirmesi, geçitler, sahiplik, `PAT4` desen listesi (`CT4`); tahmin ≈ 220k | 4 · O1 | pending | |
+| 4 · O3a | İnceleme: Faz10 | `cov-a` ∥ `rdy-a` ∥ `sec-a` → `FND-a`; bulgu dosyası `AUDIT12_FINDINGS.md` doğar; tahmin ≈ 185k | 4 · O2 | pending | |
+| 4 · O3b | İnceleme: Faz 1–9 | `cov-b` ∥ `cov-c` ∥ `cov-d` ∥ `PAT4` → `FND-b`; tahmin ≈ 195k | 4 · O3a | pending | |
+| 4 · O4 | Birleştirme ve geçitler | `AUD-D1`–`AUD-D3` → `AUD-W` → `GATE4`: Audit şablonla yeniden yazılır; tahmin ≈ 235k (taslaklardan sonra 200k'yı geçerse `GATE4` `4 · O4b`'ye) | 4 · O3b | pending | |
+| 4 · O5 | Son inceleme ve kapanış | `REV-5` ∥ `SEC-D` → `FIX4` → `GATE4` → `C4` → FF (onay) → `RID` → push (onay) → `LSR`, `DEL4`; tahmin ≈ 220k | 4 · O4 | pending | |
 | 5+ | K7 = (a) Step 4 dilimleri | 12. denetimin kuyruğu; dilimler ve oturumlar bütçeyle (§9) | Pencere 4 | pending | |
 
 Her faz §0'daki aşamalarla yürür; bir fazın aşama satırları o fazın `O1` planında eklenir. Pencere 3'ün `O0` ve `O1` satırları 2026-11-15'te bütçe kuralıyla, `O2a`–`O5` satırları aynı gün `3 · O1` planıyla (§7.2) eklendi (§0 adım 9).
@@ -100,6 +105,7 @@ Her faz §0'daki aşamalarla yürür; bir fazın aşama satırları o fazın `O1
 - **Adlandırma:** Görev kimlikleri (`W1`–`W6`, `T3`, `I1`, `REV`, `SEC`; Pencere 2 için ayrıca `K0`, `SEC-A1`–`SEC-A3`, `SEC-B`, `REV-1`–`REV-3`, `I2a`, `I2b`, `GATE`, `FIX`, `FF`, `RID`, `PUSH`, `LSR`), aşama kimlikleri `O0`–`O5` ve Ek A olgu kimlikleri (`G`, `D`, `V`, `REL`, `T3`, `TRAP`, `M1`, `E`, `AUD11`, `OPN`; A.6'da `OPN2`, `G4b`, `G8b`, `L653`, `LSH`, `SH8`, `CDATE`, `RID0`, `SEC0`, `SMK-O`, `O2`'de eklenen `O2OPN`, `G8c`, `G1b`, `CLOG`, `LMAP`, `C1MAP`, `O3`'te eklenen `G12b`; sonraki aşamaların açılış ölçümleri `O3OPN` biçiminde) yalnız bu plana aittir. Main-Planing risk kimlikleri `R1`–`R12`, kararlar `K1`–`K9` ve `DEC-NN`, kontrol listesi `C-NN`, ClaudeQB `Faz n.m` / `Fn.m-NN` ile karışmasın diye böyle seçildi (önceki oturumun `R21` → `RUN21` düzeltmesiyle aynı gerekçe); `K0` bir görev kimliğidir, karar değildir. Ek A'daki `K3` ve `K4` satırları ise karar etiketlerini bilerek yeniden kullanır; plana özgü değildir. `C1` ve `C2` faz kapanış commit'leridir; Pencere 2'nin aşama commit'leri başlıklarıyla anılır (§6.4).
 - **Adlandırma, Pencere 3 (2026-11-15, §7.2):** görev kimlikleri `PRB`, `ST1-R`, `ST1-D`, `ST1-A`, `ST1-W`, `ST2-R`, `ST2-K`, `SP1`–`SP5`, `CPa`, `CPb`, `I3a`, `I3b`, `GATE3`, `REV-4`, `SEC-C`, `FIX3`, `DEL3` (silinecek depoların ölçümü; `RID` Ek A.5 anlamında kalır); faz kapanış commit'i `C3`. Olgu kimlikleri `W3OPN`, `W3O1OPN`, `W3F01`–`W3F32`, `W3P01`–`W3P04`. `PRB` komutları `PRB1`–`PRB10` (`C1`–`C3` commit'leriyle karışmasın diye); `S1`–`S7` scout adlarıdır.
 - **Adlandırma, Pencere 4 (2026-11-16, §8.1):** olgu kimlikleri `W4OPN`, `W4F01`–`W4F27`; `S1`–`S3` scout adları, `S3-01`–`S3-32` S3'ün madde numaralarıdır; S1'in dilim etiketleri (`cov-a`–`cov-d`, `rdy-a`, `rdy-b`, `sec-a`) öneridir. Görev kimliklerini ve faz kapanış commit'inin adını `4 · O1+O2` seçer.
+- **Adlandırma, Pencere 4 görevleri (2026-11-17, §8.2):** `CT4` (kontrat), `cov-a`–`cov-d`, `rdy-a` (`Faz10.1`–`10.5`), `sec-a` (reviewer çalışmaları; S1 etiketleri), `PAT4` (desen taraması), `FND-a`, `FND-b`, `AUD-D1`–`AUD-D3`, `AUD-W`, `GATE4`, `REV-5`, `SEC-D`, `FIX4`, `DEL4` (`FF`, `RID`, `PUSH`, `LSR` Ek A.5 anlamında); faz kapanış commit'i `C4`. Olgu kimlikleri `W4O1OPN`, `W4O1P01`, `W4O1P02`. Reviewer'ın geçici bulgu kimliği `<çalışma>-NN` (ör. `cov-a-01`); kalıcısı `AUDIT-FIX-58`'den (`4 · O2`).
 
 **Geçitler** (fazın belirttiği aşamada bir kez, orkestratör; Pencere 2'de `O4`, düzeltme olursa `O5`'te yeniden):
 - `py -3 C:/Users/ahmet/.claude/plugins/cache/claudeqb/claudeqb/0.2.1/skills/claudeqb/scripts/validate_planner_docs.py --root . --mode all` → `error_count=0`, `warning_count=1` (`step4_has_nonblocking_warnings=P2:1,P3:9`), `p0_findings=0`, `p1_findings=0`, `subplan_count=47`, `index_reference_count=47`, `phase_folder_count=10`, `secret_findings=0` (koşu 21 tabanı, `3 · O4` `GATE3`, 2026-11-16; önce `subplan_count=42`). `step2`, `step1`, `step3-preflight` `--strict`: bulgu yok, çıkış 0. 12. denetim bulgu sayılarını değiştirir; yeni baseline o fazda yazılır.
@@ -747,11 +753,11 @@ Dokunulmayanlar: ledger §5 `:525`, §7 `:567`, §8 `:606` tarihseldir; koşu 21
 ## 8. Pencere 4 — 12. denetim (Step 3)
 
 - `run-step3.md`: yalnız `Planner-docs/Sub-Planing-Audit.md` yazılır (orkestratör). En fazla 3 salt-okur reviewer (kapsam, hazırlık, güvenlik; roller `run-step3.md:17`, sayı sınırı bu planın seçimi) paralel çalışır.
-- **Oturum düzeni (2026-11-15, §0 adım 9):** Denetim 42 alt planın tamamını (≈ 0,93 MB, ortanca 19 KB) ve koşu 21'in yenilerini okur; denetim dosyası bugün ≈ 57 KB. Reviewer başına girdi ≤ 400 KB tutulur: roller klasör dilimleriyle bölünür (≈ 9 reviewer çalışması), oturum başına en çok üç reviewer.
-- **Varsayılan dağılım:** `4 · O0` keşif; `4 · O1+O2` plan ve denetim kontratı (birleşik, onayla); üç inceleme oturumu (`4 · O3a`–`4 · O3c`); `4 · O4` denetim dosyasının birleştirilmesi ve geçitler; `4 · O5` kapanış. Bulgular oturumlar arasında depodaki bir dosyada taşınır (§0 adım 8); dosya `Planner-docs/` dışındadır, yerini `4 · O1+O2` seçer.
-- Tuzaklar: Doğrulayıcı denetim durumunu dosyadaki ilk `status:` eşleşmesinden okur; başlıkta eski denetimin durumu alıntılanmaz; değer ayıraçtan hemen sonra gelmeli (§7, doğrulayıcı tuzakları). 15 başlık tekil olmalı, her biri en az 20 karakter. Bulgu kimlikleri `AUDIT-FIX-58`'den devam eder.
-- Beklenen: `Faz7.2`, `7.3`, `8.1`, `8.3` SUPERSEDED; `Faz4.6` DEFERRED; yeni alt planlar READY, READY_WITH_WARNINGS ya da gerekçeli NEEDS_REPAIR.
-- Geçit: `--mode step3 --strict` ve `--mode all`. Step 4 önkoşulu `p0_findings=0`, `p1_findings=0`.
+- **Oturum düzeni (2026-11-15, §0 adım 9):** Denetim 42 alt planın tamamını (≈ 0,93 MB, ortanca 19 KB) ve koşu 21'in yenilerini okur; denetim dosyası bugün ≈ 57 KB. Reviewer başına girdi ≤ 400 KB tutulur: roller klasör dilimleriyle bölünür (≈ 9 reviewer çalışması), oturum başına en çok üç reviewer. *(2026-11-17: 47 alt plan, 1.141.813 B (`W4F04`); 6 çalışma, 2 inceleme oturumu (§8.2 karar 3).)*
+- **Varsayılan dağılım:** `4 · O0` keşif; `4 · O1+O2` plan ve denetim kontratı (birleşik, onayla); üç inceleme oturumu (`4 · O3a`–`4 · O3c`); `4 · O4` denetim dosyasının birleştirilmesi ve geçitler; `4 · O5` kapanış. Bulgular oturumlar arasında depodaki bir dosyada taşınır (§0 adım 8); dosya `Planner-docs/` dışındadır, yerini `4 · O1+O2` seçer. *(2026-11-17: `O1` ve `O2` ayrı oturum; inceleme `4 · O3a`, `4 · O3b`; dosya kökte `AUDIT12_FINDINGS.md`; §8.2.)*
+- Tuzaklar: Doğrulayıcı denetim durumunu dosyadaki ilk `status:` eşleşmesinden okur; başlıkta eski denetimin durumu alıntılanmaz; değer ayıraçtan hemen sonra gelmeli (§7, doğrulayıcı tuzakları). H1 ve 15 `##` başlık birebir, tekil ve sıralı; her `##` gövdesi en az 20 karakter (`W4F10`, `W4F13`). Bulgu kimlikleri `AUDIT-FIX-58`'den devam eder.
+- Beklenen (§8.2 karar 2): 7 SUPERSEDED (`Faz7.2`, `7.3`, `8.1`, `8.3`, `Faz4.1`, `Faz4.7`, `Faz6.1`); `Faz4.6` DEFERRED; yeni alt planlar READY, READY_WITH_WARNINGS ya da gerekçeli NEEDS_REPAIR.
+- Geçit (§8.2 karar 1): `--mode all` çıkış 0; `--mode step3 --strict` yalnız `strict_warning=step4_has_nonblocking_warnings` (denetim `PASS_WITH_WARNINGS` kaldıkça çıkış 1; `W4F11`, `W4F13`). Step 4 önkoşulu `p0_findings=0`, `p1_findings=0`.
 
 ### 8.1 Keşif envanteri (`4 · O0`, 2026-11-16/17, ağaç `081790f`)
 
@@ -787,6 +793,66 @@ Dokunulmayanlar: ledger §5 `:525`, §7 `:567`, §8 `:606` tarihseldir; koşu 21
 | W4F25 | Bulgu dosyası | Bulgular oturumlar arasında depodaki bir dosyada taşınır (§0 adım 8, §8 `:748`); dosya `Planner-docs/` dışında olur, V oraya bakmaz (W4F11). Seçenekler: (a) kökte yeni İngilizce dosya (ör. `AUDIT12_FINDINGS.md`, LF; Pencere 4 boyunca yalnız orkestratör yazar); (b) bu planda alt bölüm (plan büyür, dil Türkçe); (c) `docs/` altında (proje belgeleriyle karışır). Öneri (a); seçim `4 · O1+O2`'nin | orkestratör; 2026-11-17 |
 | W4F26 | Aşama tahminleri | Kalibrasyon (gerçekleşen/tahmin): `3 · O0` 233k/185k, `3 · O5` 267k/215k; `4 · O0` PROJECT_LOG §11'de. `4 · O1+O2`: formülle 35k + 6 × 10k (plan) + 8 × 12k (kontrat) ≈ 190k, kalibrasyonla ≈ 240–265k; kontrat taslakları task ajanında yazılırsa birleşim sığar, sığmazsa O1 onayından sonra bölünür (§0 adım 7). O3a–O3c her biri ≈ 35k + 20 × 6k ≈ 155k; O4 (denetimin yeniden yazımı) ≈ 235k, bölünebilir; O5 ≈ 215k [ÇIKARIM] | Ek A.7, PROJECT_LOG §11 |
 | W4F27 | `4 · O1+O2` için açık konular | S3: 32 madde, hepsi açık (coverage 17, readiness 13, security 2). Kararlar: (1) §8 `:751` geçit lafzı (W4F13); (2) 7 SUPERSEDED ve `Faz4.6` DEFERRED (W4F08); (3) readiness ve security yalnız Faz10 mu (W4F06); (4) bulgu dosyası (W4F25); (5) kuyrukta `Faz10.1`–`10.5` ve emekli satırlar (W4F11); (6) `AUDIT-FIX-22`, `-37`, `-50` sahipleri (W4F23); (7) yalnız koşu 21'e yönlendirilip düzelmeyen REV-3 P3 (ledger `:615`–`:618` "Raised by"; S3); (8) `[ÇIKARIM]` satırları | S1–S3 |
+
+### 8.2 Aşama ve görev planı (`4 · O1`, 2026-11-17)
+
+**Onay:** kullanıcı, 2026-11-17 (form "onay"; sekiz kararda öneriler, aşağıda). Birleşim açılışta onaylandı ("evet"; `O1` onayında bağlam 200k'yı geçerse `O2` başlamaz). Form gönderilirken bağlam 200.951 tokendı (10:25:47Z): `O2` başlamadı, `O1` kapanır; kontrat `4 · O2` oturumudur (§1; §0 adım 7, 9).
+
+**`W4O1OPN` (açılış, 2026-11-17T09:52Z–09:59Z):** dal `integrate/impl-96`, ağaç temiz, 88 commit, uç `Window 4 O0: discovery for the twelfth audit` (`--grep '^Window 4 O0:'` tek commit); etiket yok; 355 izlenen dosya; §1'de ilk `pending` aşama `4 · O1+O2`. Snapshot ve dosyalar `W4F01` gibi; plan 1043 satır.
+- **Yayın:** `main` = `origin/main` = `081790f` (C3), `origin/main..HEAD` = 1 (`4 · O0` commit'i); `ls-remote`: `HEAD`, `main`, `integrate/impl-96` = `081790f` (tam hash). `gh api -i` (09:52:59Z–09:53:02Z): `ishtar_cam_modes`, `ishtar`, `android_local_manifests`, `android_device_xiaomi_ishtar` 200; silme yok.
+- **Taban (09:55:11Z–09:55:26Z):** `NEXT_PROMPT.md` §7 tabanı tuttu: `step2`, `step1`, `step3-preflight` `--strict` 0; `all` 0 (yalnız denetim uyarısı); V2 1; V3 PASS, sha256 aynı; `step3` 0, `--strict` 1 (`strict_warning`); kimlik taraması PASS (`prose_mentions=26`); boru dışı yalnız plan `:177`, `:892` ve ledger'in bilinen satırları.
+- **Bağlam (Ek A.7):** ilk ölçüm 69k; birleşim sorusunda 108k; plan taslağından sonra 169k.
+- **`W4O1P01` kapasite yoklaması (≈ 10:23Z; danışman notu: reviewer penceresi bilinmiyordu):** iki `reviewer` yoklaması tam döndü: 369.082 B (Faz10'un beş alt planı, `Main-Planing.md`, Index) 56 s'de, 192.830 B 27,5 s'de; araç durumu `ctx 135K/1M` (369 KB'lık okumanın ortasında). `security-reviewer` 307.696 B'yi bağlam sınırına takılmadan okudu, ama `partial` döndü: uzun satırları `:raw` ile yeniden okumadı, satır sayıları tahmindi (yöntem sapması); penceresi görülmedi. Model üçünde `anthropic/claude-opus-5-5`.
+- **Okuma yöntemi (`W4O1P01`):** okuyucu 768 karakterden uzun satırları keser, büyük dosyada blok atlar. Tam dönen reviewer 760 karakter üstü satırları `awk` ile buldu, onları ve atlanan blokları `:raw` ile yeniden okudu, satırları `wc -l` ile saydı; `4 · O2` bu yöntemi §8.3'te zorunlu kılar.
+- **`W4O1P02` ledger §4 dilim baytları (10:33Z; `W4F05`'in [ÇIKARIM]'ı kapanır):** 47 satır (`:69`–`:115`) 76.612 B, satır 338–8.842 B. F10 5 satır 5.184 B (`:111`–`:115`); F3 11 satır 19.796 B (`:79`–`:89`); F1, F2, F5, F6 15 satır 12.381 B; F4, F7, F8, F9 16 satır 39.251 B (`:90`–`:110`). `cov-d`'nin alt planları ham 441.673 B: `W4F06`'nın 341,6 KB'ı sekiz emekli ya da ertelenmiş dosyanın hafif okunmasına dayanır; `4 · O2` bunu tanımlar ya da dilimi böler.
+
+**Oturumlar** (tahmin §0 adım 9, ölçülen açılışla: ≈ 100k (`4 · O0` 98,6k, bu oturum 108k; zorunlu okuma ve taban dahil); tur başına ≈ 6k yürütme, ≈ 12k uzun yazım; oturum başına ≤ 240k ve en çok üç reviewer):
+
+| Aşama | Kapsam | Görevler | Kapı ve geçit | Tahmin | Önkoşul |
+|---|---|---|---|---|---|
+| `4 · O2` | Denetim kontratı (§8.3): reviewer girdisi ve dosya listeleri, dönüş biçimi, kimlik, bulgu dosyası, `4 · O4` birleştirmesi, geçitler, sahiplik | `CT4` | açılışta taban; bayt, boru, kimlik | 100k + 10 × 12k ≈ 220k | `4 · O1` |
+| `4 · O3a` | Faz10: kapsam; hazırlık `Faz10.1`–`10.5`; güvenlik | `cov-a` ∥ `rdy-a` ∥ `sec-a` → `FND-a` | açılışta taban; bulgu dosyası doğar; bayt, boru, kimlik | 100k + 14 × 6k ≈ 185k | `4 · O2` |
+| `4 · O3b` | Faz 1–9 kapsamı; Faz1–9 hazırlık ve güvenlik desen taraması | `cov-b` ∥ `cov-c` ∥ `cov-d` ∥ `PAT4` → `FND-b` | açılışta taban; bayt, boru, kimlik | 100k + 16 × 6k ≈ 195k | `4 · O3a` |
+| `4 · O4` | Audit'in şablonla yeniden yazımı (§8.3); geçitler | `AUD-D1` ∥ `AUD-D2` ∥ `AUD-D3` → `AUD-W` → `GATE4` | §8.3 geçitleri; yeni taban | ≈ 235k; taslaklardan sonra 200k'yı geçerse `GATE4` ayrı oturum (`4 · O4b`, §0 adım 7) | `4 · O3b` |
+| `4 · O5` | Son inceleme, kapanış, yayın | `REV-5` ∥ `SEC-D` → `FIX4` → `GATE4` → `C4` → FF (onay) → `RID` → push (onay) → `LSR`, `DEL4` | `GATE4` yeniden; kimlik taraması; `ls-remote` | 100k + 20 × 6k ≈ 220k | `4 · O4` |
+
+`O3` oturumlarının girdileri birbirinden bağımsızdır (ortak girdi değişmez); sıra yalnız bulgu dosyasının bölüm sırası ve kimlik sürekliliği içindir. Reviewer taşarsa (dönüş `partial` ya da bağlam hatası) dilim ikiye bölünür, yarılar taze gönderilir; üç reviewer sınırını aşan yarı sonraki `O3` oturumuna kalır. FF ve push yalnız `4 · O5`'te, `C4`'ten sonra, ayrı onaylarla (§3 Git, Ek A.5); ara kapanış commit'leri o zamana kadar yereldir.
+
+**Dilim seçenekleri** (`W4F06`, `W4F07`; KB, dosya listesiyle; kesin listeler ve baytlar §8.3):
+
+| Seçenek | Çalışmalar | Oturum | Not |
+|---|---|---|---|
+| A | 8: B'deki `cov-b` ikiye bölünür (`Faz3.1`–`3.6` ve `Faz3.7`–`3.11`; alt plan 111,7 ve 157,3 + paket) | 3 | `W4O1P01`'den sonra bağlam gerekçesi kalmadı; Faz3 daha dar okunur |
+| B | 7 (`W4F06`): `cov-a` Faz10 334,5; `cov-b` Faz3 360,2; `cov-c` F1, F2, F5, F6 322,9; `cov-d` F4, F7, F8, F9 341,6; `rdy-a` 10.1–10.3 283,5; `rdy-b` 10.4–10.5 288,3; `sec-a` Faz10 296,8 | 3 | hepsi `W4O1P01`'in okuduğu 369 KB'ın altında |
+| C (öneri) | 6: B'deki `rdy-a` ve `rdy-b` tek `rdy-a` olur (`Faz10.1`–`10.5`, 386,4) | 2 | bir oturum az; hazırlık Faz10'un bağımlılık zincirini (10.2–10.4 → 10.5) tek okumada görür; 1M pencerede pay geniş |
+| D | 12: bütün roller bütün fazlarda tam okuma | 4 | en kapsamlı; iki oturum fazla, `PAT4` gerekmez (A–C'de readiness ve security yalnız Faz10'u okur, Faz1–9'u `PAT4` tarar) |
+
+**Görevler** (reviewer'lar salt-okur; dönüş bloğu §3 ve §8.3; Audit ve bulgu dosyası yalnız orkestratörün; cihaz yok):
+
+| Kimlik | Aşama | Ajan | İş | Çıktı | Kabul | Bağımlı |
+|---|---|---|---|---|---|---|
+| `CT4` | `O2` | orkestratör | Denetim kontratı (§8.3): çalışma başına dosya listesi ve baytları (≤ 400 KB), İngilizce reviewer görev metni, dönüş biçimi, kimlik, bulgu dosyası, `4 · O4` birleştirmesi, geçitler, sahiplik, `PAT4` desen listesi | plan §8.3 | §1 `4 · O2` satırının (`:72`) maddeleri §8.3'te tam; çalışma başına baytlar ölçülü | `4 · O1` |
+| `cov-a`, `cov-b`, `cov-c`, `cov-d` | `O3a`; `O3b` | `reviewer` | Kapsam (Audit §3–§7, §9): faz ve klasör kapsaması, adlandırma ve sıra, Index tutarlılığı, 13 bölüm yapısı, kapsam kayması; dilimin destek belgesi maddeleri (S3) ve eski `AUDIT-FIX`'lerin durumu | dönüş bloğu ≤ 4 KB, ayrıntı `local://` | §8.3 girdi ve çıktı kuralları; her bulgu alıntılı `yol:satır` | `4 · O2` |
+| `rdy-a` | `O3a` | `reviewer` | Hazırlık (Audit §8, §10, §12), `Faz10.1`–`10.5`: belgelenen ve uygulanan, yerel ve canlı, smoke ve üretim, operasyon boşlukları; `Faz10.x` kuyruk satırları | aynı | aynı; kuyruk satırları §12 sütunlarıyla | `4 · O2` |
+| `sec-a` | `O3a` | `security-reviewer` | Güvenlik (Audit §11), Faz10: sırlar, komut yürütme, onay kapıları, güvensiz varsayılanlar, bağımlılıklar, dışa dönük değişiklik | aynı | aynı; kimlik değeri basılmaz | `4 · O2` |
+| `PAT4` | `O3b` | orkestratör | Faz1–9 için hazırlık ve güvenlik desen taraması (§8.3 desen listesi; yalnız sayı ve konum) | bulgu dosyası | desen başına sayı; her isabet bulguya ya da gerekçeli `not_applicable`'a döner | `4 · O2` |
+| `FND-a`, `FND-b` | `O3a`; `O3b` | orkestratör | Dönüşleri bulgu dosyasına yazar, kalıcı kimlik verir (`AUDIT-FIX-58`'den) | bulgu dosyası (karar 4) | §8.3 biçimi; geçici → kalıcı eşleme tam | o oturumun reviewer'ları |
+| `AUD-D1`–`AUD-D3` | `O4` | `scout` (taslak) | Audit taslağı: D1 §1–§11, D2 §12 kuyruğu (47 satır), D3 §13–§15 | `local://` | §8.3 birleştirme kuralları | `4 · O3b` |
+| `AUD-W`, `GATE4` | `O4` (`GATE4` `O5`'te yeniden) | orkestratör | Taslakları birleştirip yerine koyar, betikle doğrular; §8.3 geçitleri | `Planner-docs/Sub-Planing-Audit.md` | 16 başlık, durum satırı, 47 kuyruk satırı, P0/P1 yolu yazılı | `AUD-D1`–`AUD-D3` |
+| `REV-5`, `SEC-D` | `O5` | `reviewer`, `security-reviewer` | Pencere 4 diff'i (`081790f..`): doğruluk, kontrata uyum, eksikler; sır ve kimlik değeri | dönüş bloğu | P0–P3 listesi | `GATE4` |
+| `FIX4`, `C4`, `FF`, `RID`, `PUSH`, `LSR`, `DEL4` | `O5` | orkestratör (düzeltme gerekirse `task`) | Bulguları onaylı kapsamla düzeltir; faz kapanış commit'i `C4`; FF ve push ayrı onayla; silinecek üç deponun ölçümü | git | §3 Git, Ek A.5 | `REV-5`, `SEC-D` |
+
+**Kararlar** (`W4F27`; form 2026-11-17, "onay"; sekizi de öneriyle):
+1. **Geçit lafzı:** `--mode all` çıkış 0; `step3 --strict`'te yalnız `strict_warning=step4_has_nonblocking_warnings` kabul; Step 4 önkoşulu `p0_findings=0`, `p1_findings=0`. §8'deki geçit ve başlık lafzı düzeltildi.
+2. **Durumlar:** 7 SUPERSEDED (`Faz7.2`, `7.3`, `8.1`, `8.3`, `Faz4.1`, `Faz4.7`, `Faz6.1`); `Faz4.6` DEFERRED (`W4F08`).
+3. **Dilim:** C: 6 çalışma, 2 inceleme oturumu; readiness ve security yalnız Faz10'u okur, Faz1–9'u `PAT4` tarar (`W4F06`, `W4O1P01`).
+4. **Bulgu dosyası:** kökte `AUDIT12_FINDINGS.md`, İngilizce, LF; Pencere 4 boyunca yalnız orkestratör yazar; her `O3` kapanış commit'ine girer; `4 · O4`'te Audit'e birleştirildikten sonra kanıt olarak kalır (`W4F25`).
+5. **Kuyruk:** §12 47 satır, Index sırasıyla, `Faz10.1`–`10.5` dahil; durumlar ledger §4 ile tutarlı (`W4F11`).
+6. **Yazarsız bulgular:** `AUDIT-FIX-22` → Ontology düzenlemesi (NUL `:313`, `:316`; S3-07 ile); `-37` → Comprehension düzenlemesi (S3-06 ile); `-50` kısmen konusuz (`beryl` koşulu), belge yarısı `Faz10.5` (`W4F23`).
+7. **REV-3 P3 (ledger `:615`–`:618`):** ilgili coverage çalışmasının girdisi; denetim bulguya çevirir ya da gerekçeyle kapatır.
+8. **`[ÇIKARIM]` satırları:** dilimin reviewer'ı doğrular; `W4F05`'inki `W4O1P02` ile kapandı; `W4F26` tahmindir.
+
+Görev kimlikleri §3'te (Adlandırma, Pencere 4 görevleri); faz kapanış commit'i `C4`; FF ve push yalnız `4 · O5`'te, ayrı onaylarla.
 
 ## 9. Pencere 5+ — K7 = (a) Step 4 koşuları
 
