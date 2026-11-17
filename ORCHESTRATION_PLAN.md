@@ -69,7 +69,7 @@ Durum sözlüğü: `pending`, `in_progress`, `done`, `blocked`.
 | 4 | 12. denetim | Step 3 (`run-step3.md`); oturum düzeni §8 | Pencere 3 | pending | |
 | 4 · O0 | Keşif | Açılış ve yayın doğrulaması; taban ve `--mode step3` ölçümü; S1–S3 scout'ları; keşif envanteri (§8.1) | Pencere 3 | done | `Window 4 O0: discovery for the twelfth audit` (`git log --grep '^Window 4 O0:'`); açılış `W4OPN` (C3 push edilmiş); dört depo 200; taban tuttu; S1–S3 ilk gönderimde 429 ile durdu, taze gönderildi; envanter §8.1 (`W4F01`–`W4F27`); PROJECT_LOG push cümleleri güncel; bağlam PROJECT_LOG §11 |
 | 4 · O1 | Plan | Aşama ve görev tablosu, kullanıcı onayı (§8.2); birleşim `O1+O2` açılışta onaylandı, `O1` onayında bağlam 200k'yı geçince `O2` ayrıldı | 4 · O0 | done | `Window 4 O1: plan for the twelfth audit` (`git log --grep '^Window 4 O1:'`); açılış `W4O1OPN`, dört depo 200; taban tuttu; `W4O1P01` kapasite yoklaması (reviewer 1M), `W4O1P02` ledger dilim baytları; plan "onay" (C: 6 çalışma, 2 oturum; sekiz karar öneriyle); bağlam PROJECT_LOG §11 |
-| 4 · O2 | Denetim kontratı | §8.3: reviewer girdisi ve dosya listeleri (≤ 400 KB), İngilizce görev metni, dönüş biçimi, kimlik, bulgu dosyası, `4 · O4` birleştirmesi, geçitler, sahiplik, `PAT4` desen listesi (`CT4`); tahmin ≈ 220k | 4 · O1 | pending | |
+| 4 · O2 | Denetim kontratı | §8.3: reviewer girdisi ve dosya listeleri (≤ 400 KB), İngilizce görev metni, dönüş biçimi, kimlik, bulgu dosyası, `4 · O4` birleştirmesi, geçitler, sahiplik, `PAT4` desen listesi (`CT4`); tahmin ≈ 220k | 4 · O1 | done | `Window 4 O2: audit contract for the twelfth audit` (`git log --grep '^Window 4 O2:'`); açılış `W4O2OPN`, dört depo 200; taban tuttu; §8.3 sekiz maddeyle; Ek A.8 (görev metni, altı çalışma bloğu, `PAT4` betiği); `W4O2P02`: altı çalışma 349.931–389.140 B, cov-d hafif okumayla bölünmedi; `W4O2P01`: `PAT4` 164 isabet; bağlam PROJECT_LOG §11 |
 | 4 · O3a | İnceleme: Faz10 | `cov-a` ∥ `rdy-a` ∥ `sec-a` → `FND-a`; bulgu dosyası `AUDIT12_FINDINGS.md` doğar; tahmin ≈ 185k | 4 · O2 | pending | |
 | 4 · O3b | İnceleme: Faz 1–9 | `cov-b` ∥ `cov-c` ∥ `cov-d` ∥ `PAT4` → `FND-b`; tahmin ≈ 195k | 4 · O3a | pending | |
 | 4 · O4 | Birleştirme ve geçitler | `AUD-D1`–`AUD-D3` → `AUD-W` → `GATE4`: Audit şablonla yeniden yazılır; tahmin ≈ 235k (taslaklardan sonra 200k'yı geçerse `GATE4` `4 · O4b`'ye) | 4 · O3b | pending | |
@@ -105,7 +105,7 @@ Her faz §0'daki aşamalarla yürür; bir fazın aşama satırları o fazın `O1
 - **Adlandırma:** Görev kimlikleri (`W1`–`W6`, `T3`, `I1`, `REV`, `SEC`; Pencere 2 için ayrıca `K0`, `SEC-A1`–`SEC-A3`, `SEC-B`, `REV-1`–`REV-3`, `I2a`, `I2b`, `GATE`, `FIX`, `FF`, `RID`, `PUSH`, `LSR`), aşama kimlikleri `O0`–`O5` ve Ek A olgu kimlikleri (`G`, `D`, `V`, `REL`, `T3`, `TRAP`, `M1`, `E`, `AUD11`, `OPN`; A.6'da `OPN2`, `G4b`, `G8b`, `L653`, `LSH`, `SH8`, `CDATE`, `RID0`, `SEC0`, `SMK-O`, `O2`'de eklenen `O2OPN`, `G8c`, `G1b`, `CLOG`, `LMAP`, `C1MAP`, `O3`'te eklenen `G12b`; sonraki aşamaların açılış ölçümleri `O3OPN` biçiminde) yalnız bu plana aittir. Main-Planing risk kimlikleri `R1`–`R12`, kararlar `K1`–`K9` ve `DEC-NN`, kontrol listesi `C-NN`, ClaudeQB `Faz n.m` / `Fn.m-NN` ile karışmasın diye böyle seçildi (önceki oturumun `R21` → `RUN21` düzeltmesiyle aynı gerekçe); `K0` bir görev kimliğidir, karar değildir. Ek A'daki `K3` ve `K4` satırları ise karar etiketlerini bilerek yeniden kullanır; plana özgü değildir. `C1` ve `C2` faz kapanış commit'leridir; Pencere 2'nin aşama commit'leri başlıklarıyla anılır (§6.4).
 - **Adlandırma, Pencere 3 (2026-11-15, §7.2):** görev kimlikleri `PRB`, `ST1-R`, `ST1-D`, `ST1-A`, `ST1-W`, `ST2-R`, `ST2-K`, `SP1`–`SP5`, `CPa`, `CPb`, `I3a`, `I3b`, `GATE3`, `REV-4`, `SEC-C`, `FIX3`, `DEL3` (silinecek depoların ölçümü; `RID` Ek A.5 anlamında kalır); faz kapanış commit'i `C3`. Olgu kimlikleri `W3OPN`, `W3O1OPN`, `W3F01`–`W3F32`, `W3P01`–`W3P04`. `PRB` komutları `PRB1`–`PRB10` (`C1`–`C3` commit'leriyle karışmasın diye); `S1`–`S7` scout adlarıdır.
 - **Adlandırma, Pencere 4 (2026-11-16, §8.1):** olgu kimlikleri `W4OPN`, `W4F01`–`W4F27`; `S1`–`S3` scout adları, `S3-01`–`S3-32` S3'ün madde numaralarıdır; S1'in dilim etiketleri (`cov-a`–`cov-d`, `rdy-a`, `rdy-b`, `sec-a`) öneridir. Görev kimliklerini ve faz kapanış commit'inin adını `4 · O1+O2` seçer.
-- **Adlandırma, Pencere 4 görevleri (2026-11-17, §8.2):** `CT4` (kontrat), `cov-a`–`cov-d`, `rdy-a` (`Faz10.1`–`10.5`), `sec-a` (reviewer çalışmaları; S1 etiketleri), `PAT4` (desen taraması), `FND-a`, `FND-b`, `AUD-D1`–`AUD-D3`, `AUD-W`, `GATE4`, `REV-5`, `SEC-D`, `FIX4`, `DEL4` (`FF`, `RID`, `PUSH`, `LSR` Ek A.5 anlamında); faz kapanış commit'i `C4`. Olgu kimlikleri `W4O1OPN`, `W4O1P01`, `W4O1P02`. Reviewer'ın geçici bulgu kimliği `<çalışma>-NN` (ör. `cov-a-01`); kalıcısı `AUDIT-FIX-58`'den (`4 · O2`).
+- **Adlandırma, Pencere 4 görevleri (2026-11-17, §8.2):** `CT4` (kontrat), `cov-a`–`cov-d`, `rdy-a` (`Faz10.1`–`10.5`), `sec-a` (reviewer çalışmaları; S1 etiketleri), `PAT4` (desen taraması), `FND-a`, `FND-b`, `AUD-D1`–`AUD-D3`, `AUD-W`, `GATE4`, `REV-5`, `SEC-D`, `FIX4`, `DEL4` (`FF`, `RID`, `PUSH`, `LSR` Ek A.5 anlamında); faz kapanış commit'i `C4`. Olgu kimlikleri `W4O1OPN`, `W4O1P01`, `W4O1P02`. Reviewer'ın geçici bulgu kimliği `<çalışma>-NN` (ör. `cov-a-01`); kalıcısı `AUDIT-FIX-58`'den (`4 · O2`). `4 · O2` (§8.3, Ek A.8) ekledi: olgu kimlikleri `W4O2OPN`, `W4O2P01` (`PAT4` kalibrasyonu), `W4O2P02` (çalışma baytları); desen kimlikleri `PAT4-S1`–`S8`, `PAT4-R1`–`R6`; `PAT4`'ün geçici kimliği `PAT4-<desen>-NN`.
 
 **Geçitler** (fazın belirttiği aşamada bir kez, orkestratör; Pencere 2'de `O4`, düzeltme olursa `O5`'te yeniden):
 - `py -3 C:/Users/ahmet/.claude/plugins/cache/claudeqb/claudeqb/0.2.1/skills/claudeqb/scripts/validate_planner_docs.py --root . --mode all` → `error_count=0`, `warning_count=1` (`step4_has_nonblocking_warnings=P2:1,P3:9`), `p0_findings=0`, `p1_findings=0`, `subplan_count=47`, `index_reference_count=47`, `phase_folder_count=10`, `secret_findings=0` (koşu 21 tabanı, `3 · O4` `GATE3`, 2026-11-16; önce `subplan_count=42`). `step2`, `step1`, `step3-preflight` `--strict`: bulgu yok, çıkış 0. 12. denetim bulgu sayılarını değiştirir; yeni baseline o fazda yazılır.
@@ -854,6 +854,67 @@ Dokunulmayanlar: ledger §5 `:525`, §7 `:567`, §8 `:606` tarihseldir; koşu 21
 
 Görev kimlikleri §3'te (Adlandırma, Pencere 4 görevleri); faz kapanış commit'i `C4`; FF ve push yalnız `4 · O5`'te, ayrı onaylarla.
 
+### 8.3 Denetim kontratı (`4 · O2`, 2026-11-17)
+
+**Kaynak.** `CT4`; kontrat onay kapısı değildir (§0 adım 5). Her madde §8.2'nin bir kararına bağlanır; okurlar `4 · O3a`, `4 · O3b`, `4 · O4`, `4 · O5`. İngilizce görev metni ve `PAT4` betiği Ek A.8'dedir. Numaralar `Window 4 O1` kapanışındaki ağaca aittir; `Planner-docs/`, `docs/`, modül kodu ve PROJECT_LOG `:712`–`:716` `4 · O4`'e kadar değişmez.
+
+**`W4O2OPN` (açılış, 2026-11-17T11:50:59Z–11:54:00Z):** dal `integrate/impl-96`, ağaç temiz, 89 commit, uç `Window 4 O1: plan for the twelfth audit` (`--grep '^Window 4 O1:'` tek commit); etiket yok; 355 izlenen dosya; §1'de ilk `pending` `4 · O2`. Snapshot ve dosyalar `W4F01` gibi; Audit 437 satır, `:18` durum; plan 1109 satır.
+- **Yayın:** `main` = `origin/main` = `081790f`, `origin/main..HEAD` = 2; `ls-remote`: `HEAD`, `main`, `integrate/impl-96` = `081790f`. `gh api -i` (11:50:59Z–11:51:01Z): dört depo 200 (`ishtar_cam_modes` ve `ishtar` özel, öteki ikisi açık); silme yok.
+- **Taban (11:53:50Z–11:54:00Z):** `NEXT_PROMPT.md` §7 tabanı tuttu: `step2`, `step1`, `step3-preflight` `--strict` 0; `all` 0 (yalnız `step4_has_nonblocking_warnings=P2:1,P3:9`); V2 1; V3 PASS, sha256 aynı; `step3` 0, `--strict` 1 (`strict_warning`); kimlik taraması PASS (`prose_mentions=26`).
+
+**1. Reviewer girdisi (karar 3, 7, 8).**
+- **Görev metni:** `O3` orkestratörü her çalışmanın `task` çağrısına Ek A.8.1'i ve çalışmanın A.8.2 bloğunu (kısaltma paragrafıyla) aynen koyar. A.8.1: rol, şablon `Third-Planner.md:295`, izinli değerler (`W4F14`), salt-okur, kimlik değeri basılmaz, karar 2'nin durumları, dönüş biçimi. Plan ve PROJECT_LOG hiçbir reviewer'a bütün verilmez; plan satırı hiç verilmez, PROJECT_LOG yalnız `:712`–`:716`.
+- **Okuma yordamı (`W4O1P01`):** A.8.1'de zorunlu: `wc -l -c`; `awk` ile 760 karakteri aşan satırlar yalnız `:raw` ile okunur; atlanan blok `:raw` ile yeniden okunur; satır sayısı tahmin edilmez. Yordamı atlayan ya da bir girdiyi bitiremeyen çalışma `partial` döner.
+- **Ek okuma:** girdinin ya da atanan maddenin `yol:satır` atfı ±3 satır; çalışma başına ≤ 10 KB, baytı dönüşte bildirilir. Aşağıdaki toplamlar buna 10 KB eklendiğinde de ≤ 400 KB'tır (400 KB = 400.000 B, `W4F04` ile aynı birim).
+- **Hafif okuma (cov-d sorusu):** SUPERSEDED ve DEFERRED satırları Step 4 kuyruğuna girmez (`Third-Planner.md:489`); içerik kalitesi denetlenmez, yapı başlıklardan, durum ledger §4'ten okunur. Hafif okuma: `wc`, başlık satırları ve `supersed|DEC-28|DEC-14` sayımı. `Faz4.6` (DEFERRED) için ayrıca `## 1.` ve `## 13.` bölümleri. Altı SUPERSEDED cov-d'de 2.306 B, `Faz4.6` 3.727 B, `Faz6.1` (cov-c) 373 B. cov-d'nin alt planları 441.673 B yerine 224.903 B: bölme gerekmez, `4 · O3b` üç reviewer'da kalır.
+
+**`W4O2P02` çalışma baytları** (2026-11-17, orkestratörün `py -3` betiği; aralık baytı satır sonları dahil; A.8 = A.8.1 4.726 B + çalışma bloğu ve kısaltma paragrafı):
+
+| Çalışma | Ajan | Oturum | Denetim bölümleri | Bileşenler (B) | Toplam (B) | `W4F06` ön değeri |
+|---|---|---|---|---|---|---|
+| `cov-a` | `reviewer` | `4 · O3a` | §3–§7, §9: Faz10 ve koşu 21'in Step 1'i | alt plan 192.830; Main 77.019; Index 64.839; ledger 11.345; Comprehension 2.394; Audit 13.377; TP+RS3 5.453; A.8 6.888 | 374.145 | 334,5 KB |
+| `rdy-a` | `reviewer` | `4 · O3a` | §8, §10, §12: `Faz10.1`–`10.5` | alt plan 192.830; modül kodu 87.075; `smoke.sh`+`build-release.py` 32.888; docs aralıkları 7.695; `ishtar-aon-fix` 2.467; CHANGELOG 5.411; Main 20.250; Index 12.155; ledger 5.349; PROJECT_LOG 821; Audit 8.565; TP+RS3+PB 5.917; A.8 7.717 | 389.140 | 386,4 KB |
+| `sec-a` | `security-reviewer` | `4 · O3a` | §11: Faz10 | alt plan 192.830; depo kuralları ve kod 117.585; Main 15.582; Index 3.904; ledger 6.253; PROJECT_LOG 821; Audit 2.051; TP+RS3+PB 4.177; A.8 6.728 | 349.931 | 296,8 KB |
+| `cov-b` | `reviewer` | `4 · O3b` | §3–§7, §9: Faz3 | alt plan 268.994; Main 7.973; Index 64.839; ledger 19.961; Audit 12.906; TP+RS3 5.453; A.8 5.722 | 385.848 | 360,2 KB |
+| `cov-c` | `reviewer` | `4 · O3b` | §3–§7, §9: Faz 1, 2, 5, 6 ve destek belgeleri | alt plan 223.031 + hafif 373; Main 7.114; Index 64.839; ledger 15.140 (biçim görünümü 300 dahil); Comprehension 8.039; Ontology 4.835; toolchain 12.654; Audit 14.765; TP+RS3 5.453; A.8 7.033 | 363.276 | 322,9 KB |
+| `cov-d` | `reviewer` | `4 · O3b` | §3–§7, §9: Faz 4, 7, 8, 9 | alt plan 218.870 + hafif 6.033; Main 10.359; Index 64.839; ledger 39.416; Audit 21.227; TP+RS3 5.453; A.8 6.097 | 372.294 | 341,6 KB |
+
+Ön değerden farklar: coverage çalışmaları Index `:1`–`:325`'i (§7 hariç) ve eski Audit'in §3–§7, §9 ve §13 başını okur; cov-a Main'in tamamını; sec-a ve rdy-a Faz10'un değiştirdiği kodu bütün okur. Kısaltmalar (Main, Index, TP, RS3, PB) A.8.2'nin başındadır.
+
+**Dağıtım** (S3 maddeleri `W4F15`–`W4F24`, eski `AUDIT-FIX`'ler, karar 6–8; her madde tek sahipli; reviewer her birine A.8.1'in (b) satırını yazar):
+
+| Sahip | Eski `AUDIT-FIX` | S3 maddeleri | Öteki |
+|---|---|---|---|
+| `cov-a` | `-41`, `-42`, `-57` | S3-09, S3-12, S3-13, S3-15, S3-18, S3-19, S3-20, S3-30 | REV-3 P3 (ledger `:615`–`:618`; §10'daki "REV-3 P3 → koşu 21" kaydı A.8.2'de İngilizce); `[ÇIKARIM]` `W4F15` (`:316` R1 eşlemesi) |
+| `cov-b` | `-33` | S3-02 | — |
+| `cov-c` | `-22`, `-25`, `-37` | S3-01, S3-06, S3-07, S3-08, S3-14, S3-27, S3-28 | `[ÇIKARIM]` `W4F17` (ledger §5 biçim satırları; içeriksiz `awk` görünümüyle) |
+| `cov-d` | `-52`, `-53`, `-54`, `-55`, `-56` | S3-05 | `W4F08`: emekli dosyalarda supersession notu yok (hafif okuma sayımı) |
+| `rdy-a` | `-50` | S3-03, S3-04, S3-11, S3-16, S3-17, S3-22, S3-23, S3-24, S3-25, S3-26, S3-29 | `[ÇIKARIM]` `W4F20` (S3-24'ün sahipsizliği) |
+| `sec-a` | — | S3-10, S3-21 | — |
+| orkestratör | — | S3-31 → `AUD-W` (eski durum, kuyruk ve hazırlık satırları yeniden yazımla gider); S3-32 → `GATE4` (yeni taban §3 Geçitler'e) | `W4F07`'nin `[ÇIKARIM]`'ı kullanılmaz (verified planlar tam okunur); `W4F26` tahmindir |
+
+Kapsam: 32 S3 maddesinin hepsi; eski §13 tablosunun 13 kimliği (açık P2 1, açık P3 7, kabul P3 2, resolved 3). S3-27–S3-29 `-22`, `-37`, `-50`'nin sahipsizliğidir (ledger `:42`); karar 6 sahiplerini verir: `-22` Ontology düzenlemesi (S3-07 ile), `-37` Comprehension düzenlemesi (S3-06 ile), `-50`'nin belge yarısı `Faz10.5`, `beryl` koşulu konusuz.
+
+**2. Çıktı biçimi (§3 dönüş bloğu, §0 adım 8).** Dönüş ≤ 4 KB: `status`, `changed_files`, `acceptance`, `contract_deviations`, `open_issues`, bulgu sayıları, `local://` yolu. Ayrıntı `local://<çalışma>.md`: (a) bulgular §13 sütunları artı `Temp ID` ve `Evidence` (alıntılı `yol:satır`, ≤ 160 karakter, kimlik değeri yok); (b) atanan maddelerin sonuçları; (c) rol bölümleri için notlar; (d) yalnız rdy-a: beş `Faz10.x` kuyruk satırı §12 sütunlarıyla; (e) okunan girdiler, `wc` sayıları, `extra_reads`. Değerler `W4F14`. `local://` aynı oturumda `FND-a`/`FND-b` ile bulgu dosyasına geçer. `partial` dönüş ya da bağlam hatasında dilim ikiye bölünür ve taze gönderilir (§8.2); üç reviewer'ı aşan yarı sonraki `O3`'e kalırsa oturum sayısı değişir: beklenmedik durum (§0 adım 6).
+
+**3. Kimlik.** Reviewer geçici `<çalışma>-NN`, `PAT4` geçici `PAT4-<desen>-NN` verir. Kalıcı kimlik `AUDIT-FIX-58`'den sürer: `FND-a` sırası `cov-a`, `rdy-a`, `sec-a`; `FND-b` `cov-b`, `cov-c`, `cov-d`, `PAT4`; çalışma içinde geçici sırayla. Aynı konudaki iki geçici bulgu tek kimliğe gider; reddedilen geçici bulgu kimlik almaz, gerekçesiyle `rejected` yazılır. Eşleme tablosu bulgu dosyasındadır ve tamdır (her geçici kimlik bir satır).
+
+**4. Bulgu dosyası (karar 4).** `AUDIT12_FINDINGS.md`, kök, İngilizce, LF; yalnız orkestratör yazar; `4 · O3a`'da doğar. Yapı: H1 `# Twelfth Audit Findings`; bir giriş paragrafı (kaynak bu bölüm); oturum başına bir `##` bölüm (`## Session 4 · O3a`, `## Session 4 · O3b`), altında `### Findings` (`| Finding ID | Temp ID | Severity | Status | Affected Files | Issue | Required Action |`), `### Dispositions`, `### Queue rows` (rdy-a, §12 sütunları), `### Section notes`, `### Runs` (çalışma, durum, bayt, `partial` notu, eşleme); `4 · O3b`'de ayrıca `### PAT4`. Her `O3` kapanış commit'ine girer. `.gitattributes` `* -text` (bayt korunur), `*.md` için `eol=lf` yok: LF baytla doğrulanır. `4 · O4`'ten sonra silinmez: başına tarihli birleştirme notu (`4 · O4` commit başlığıyla) yazılır, kanıt olarak kalır.
+
+**5. `4 · O4` birleştirmesi (karar 2, 5, 6).**
+- Audit `Third-Planner.md:295`–`:552` şablonundan yeniden yazılır: H1 `# Sub-Planing Audit` ve 15 `##` başlık birebir, tekil, sıralı (V:137-154, :371-388); her `##` gövdesi ≥ 20 karakter (V:1146-1152). Dosyadaki ilk `status:` eşleşmesi yeni durumdur (V:1071-1084): §1'in başında `status: <DEĞER>` satırı; ondan önce eski denetimin durumu alıntılanmaz (`W4F09`).
+- §12: 47 satır, Index §3 haritasının sırasıyla, `Faz10.1`–`10.5` dahil; durumlar ledger §4 ile: 34 verified → COMPLETE, 7 SUPERSEDED, `Faz4.6` DEFERRED, `Faz10.x` rdy-a'nın satırlarından. Yol depoya göreli; aynı alt plana iki satır yok; kuyruk durumu (READY, NO_ACTION_REQUIRED, BLOCKED) yazılır.
+- §13: başlık birebir; eski tablonun 13 kimliği yeni durumlarıyla (karar 6 dahil) ve yeniler; öteki 44 kimlik eski kuraldaki gibi tek cümleyle (onuncu denetimden önce kapandı, yeniden listelenmez). P sayıları yalnız `open` ve `accepted` satırlardan çıkar (V:1095-1134).
+- Taslaklar `AUD-D1` (§1–§11), `AUD-D2` (§12), `AUD-D3` (§13–§15) salt-okur scout'larda, girdi bulgu dosyası, eski Audit, Index §3, ledger §4 durum sütunu ve bu bölüm; §14 Step 4 istemini yalnız P0 ve P1 0 ise basar (`Third-Planner.md:534`–`:537`). `AUD-W` taslakları birleştirir, `cp` ile yerine koyar, betikle doğrular (16 başlık, durum satırı, 47 satır, boru, LF).
+
+**6. Geçitler (karar 1).** `--mode all` çıkış 0; `--mode step3 --strict`'te yalnız `strict_warning=step4_has_nonblocking_warnings` (denetim `PASS_WITH_WARNINGS` kaldıkça çıkış 1); Step 4 önkoşulu `p0_findings=0`, `p1_findings=0`; `step2`, `step1`, `step3-preflight` `--strict` 0; V3 değişmez. Yeni sayılar `4 · O4`'te §3 Geçitler'e yazılır (S3-32). **P0/P1 yolu:** `O3`'te P0 ya da P1 denetim bulgusu beklenmedik durumdur (§0 adım 6): kapanış yok, kullanıcıya sade soru. Seçenekler: (a) önerilen: bulgu kaydedilir, denetim `BLOCKED` ya da Step 4 önkoşulu kapalı yazılır, onarım ayrı bir Step 3.1 onarım koşusudur (`Third-Planner.md:535`; Audit dışı dosyaya bu fazda yazılmaz); (b) kanıt bulguyu düşürürse gerekçe bulgu dosyasına yazılır, akış sürer.
+
+**7. Sahiplik.** Audit'i ve bulgu dosyasını yalnız orkestratör yazar. Reviewer'lar salt-okurdur: doğrulayıcı, test ya da cihaz komutu çalıştırmaz, yalnız `local://<çalışma>.md` yazar. `AUD-D` scout'ları yalnız `local://`'a yazar. `4 · O3a`–`4 · O4` boyunca Audit dışında `Planner-docs/` değişmez (`run-step3.md:12`); her kapanışta `git diff --stat` ile doğrulanır.
+
+**8. `PAT4` desen listesi (Ek A.8.3).** Kapsam Faz 1–9'un 42 alt planı. Güvenlik: S1 seri numarasız `adb`; S2 yıkıcı komut (`rm -r`, `dd`, blok aygıtı, `fastboot`, silme); S3 AGC tercih yazımı ya da `.agc` içe aktarma; S4 geçmişi yeniden yazma ya da geniş push; S5 sır ataması; S6 değerli kimlik anahtarı; S7 SELinux ya da izin gevşetme; S8 indirip kabuğa verme. Hazırlık: R1 aşırı iddia; R2 yer tutucu; R3 emekli ROM ya da kiralık sunucu hedefi; R4 Android 16; R5 KernelSU ya da Magisk adı; R6 50 MP'yi yeniden açma.
+- **`W4O2P01` kalibrasyonu (2026-11-17):** S1 17, S2 3, S3 12, S7 1, R1 6, R3 20, R4 81, R5 24; S4, S5, S6, S8, R2, R6 0; toplam 164. Faz 1–9 `4 · O4`'e kadar değişmediği için `4 · O3b`'deki sayım bunu verir; sapma beklenmedik durumdur.
+- **Kural:** yalnız sayı ve `yol:satır` basılır, satır metni basılmaz. İsabetler (desen, dosya) gruplarıyla incelenir; her grup bir bulguya (`PAT4-<desen>-NN`) ya da gerekçeli `not_applicable`'a döner (ör. SUPERSEDED dosyadaki isabet, yasaklayan cümle). S5 ya da S6 isabeti satır okunmadan P0 adayıdır: beklenmedik durum.
+
 ## 9. Pencere 5+ — K7 = (a) Step 4 koşuları
 
 - `run-step4.md`: 12. denetimin kuyruğu, dizin sırasıyla. Her dilim bir fazdır; aşamaları oturumlara §0 adım 9 ile dağılır.
@@ -1106,4 +1167,119 @@ for (const l of require("fs").readFileSync(s.file, "utf8").trimEnd().split("\n")
   if (u && (t = (u.input || 0) + (u.cacheRead || 0) + (u.cacheWrite || 0))) break;
 }
 print(s.id.slice(0, 13), t);
+```
+
+### A.8 Window 4 reviewer task text (2026-11-17, `4 · O2`)
+
+The orchestrator of `4 · O3a` and `4 · O3b` pastes A.8.1 and one A.8.2 block into the `task` call of each run (§8.3). Reviewers read no other part of this plan; §8.3 holds the rules, the assignments and the measured bytes. A.8.3 is the orchestrator's `PAT4` script.
+
+#### A.8.1 Common text
+
+You are a read-only reviewer for the twelfth ClaudeQB Step 3 audit (sub-plan audit) of the `ishtar` repository: root `C:/Users/ahmet/Documents/Projeler/ishtar`, branch `integrate/impl-96`. `ishtar` is a root-based camera customization for one Xiaomi 13 Ultra. Your run ID, role, inputs and assigned items are in the block that follows this text.
+
+**Rules.**
+- Read-only. Do not create, edit, move or delete any repository file; write only your detail file `local://<run>.md`. Do not run the validator, tests, builds, formatters, git write commands, network commands or any device command (`adb`, `fastboot`). Allowed commands: `wc`, `awk`, `grep -c`, `grep -n`, `git log` and `git show --stat` (read-only).
+- Read only your inputs. A file or line that an input or an assigned item cites as `path:line` may be read (the cited lines ±3); list it under `extra_reads` with its bytes; stop at 10 KB of extra reads and report the rest under `open_issues`.
+- Never print, quote or copy an identity value (IMEI, a serial number other than the project device `dc27e5d0`, `persist.sys.miui.sno`, AGC preference values) or a secret (token, key, password, server address). Report counts and `path:line` only.
+- Template: `references/Third-Planner.md` from `:295` (the audit's 15 sections) in the ClaudeQB skill `C:/Users/ahmet/.claude/plugins/cache/claudeqb/claudeqb/0.2.1/skills/claudeqb/`; your block names your sections. You do not write the audit; the orchestrator merges your output.
+- Settled decisions (do not reopen; report contrary evidence as a finding): the ROM build is abandoned and the phone runs HyperOS 4 (`DEC-28`); the module is adapted to HyperOS 4 as ClaudeQB Phase 10 (`DEC-32`); the 50 MP HAL layer stays closed on HyperOS 4 (`DEC-33`); AOSPA Android 15 evidence is not assumed on HyperOS 4. Queue statuses follow ledger §4: `verified` → COMPLETE; `superseded` → SUPERSEDED (seven: `Faz4.1`, `Faz4.7`, `Faz6.1`, `Faz7.2`, `Faz7.3`, `Faz8.1`, `Faz8.3`); `Faz4.6` (`implemented`, host-side half complete) → DEFERRED; `Faz10.1`–`10.5` (`planned`) are assessed by `rdy-a`.
+
+**Reading procedure (mandatory; a run that skips it is `partial`).**
+1. Per input file: `wc -l -c <file>`. Line counts come from this output, never from an estimate.
+2. `awk 'length($0) > 760 {print FNR}' <file>` (for a range add `FNR>=a && FNR<=b`). Read those lines only with the reader's raw selector (`<file>:raw:N-N`): the reader cuts lines longer than 768 characters. Do not read them twice.
+3. Read the rest by ranges. When the reader skips a block (`…` in its output), read that block again with `:raw`.
+4. Light read (only where your block says so): `wc -l -c`, the heading lines (`awk '/^#/{print FNR": "$0}'`) and `grep -c -i -E 'supersed|DEC-28|DEC-14'`; no other content.
+5. If an input cannot be read completely, finish the rest and return `status: partial` with the file and lines.
+
+**Values** (Third-Planner §12 and §13; `validate_planner_docs.py`).
+- Queue status: READY, READY_WITH_WARNINGS, NEEDS_REPAIR, BLOCKED, COMPLETE, SUPERSEDED, DEFERRED. Dependency state: satisfied, independent, blocked, unknown. READY needs `satisfied` or `independent`; READY_WITH_WARNINGS may cite only open or accepted P2/P3.
+- Severity: P0 blocks Step 4 or could cause dangerous implementation; P1 serious, fix before implementation; P2 quality, fix soon; P3 minor wording or maintainability. Finding status: open, accepted, resolved, not_applicable.
+
+**Output.**
+- Detail file `local://<run>.md` (English):
+  - (a) Findings: `| Temp ID | Severity | Status | Affected Files | Issue | Required Action | Evidence |`. Temp IDs `<run>-01`, `<run>-02`, …; Evidence is `path:line` plus a quote of at most 160 characters (never an identity value). Affected Files are repo-relative paths.
+  - (b) Dispositions: one row per assigned item: `| Item | Disposition | Evidence |`; the disposition is a temp ID, or `resolved`, `not_applicable` or `unchanged`, with the reason.
+  - (c) Notes per audit section of your role (≤ 1.5 KB each), ready to merge.
+  - (d) `rdy-a` only: one queue row per `Faz10.x`: `| Sub-Plan Path | Status | Finding IDs | Dependency State | Reason | Required Repair |`, with temp IDs.
+  - (e) Inputs read: path, `wc` lines and bytes, raw-read line numbers; `extra_reads`.
+- Return block (≤ 4 KB): `status` (complete or partial), `changed_files` (none), `acceptance` (criterion / met / evidence) for: every input read by the procedure; every assigned item dispositioned; every finding has `path:line` evidence; then `contract_deviations`, `open_issues`, finding counts by severity and the `local://` path.
+- Temp IDs are final only after the orchestrator maps them to `AUDIT-FIX-58` onward.
+
+#### A.8.2 Run blocks (inputs measured 2026-11-17, `W4O2P02`)
+
+Common abbreviations: *Main* = `Planner-docs/Main-Planing.md` (CRLF), *Index* = `Planner-docs/Sub-Planing-Index.md`, *Ledger* = `Planner-docs/Planing-Ledger.md` (CRLF, rows up to 9 KB), *Audit* = `Planner-docs/Sub-Planing-Audit.md` (the eleventh audit), *TP* = the skill's `references/Third-Planner.md`, *RS3* = `references/handoffs/run-step3.md`, *PB* = `references/subagent-playbook.md`. Coverage sections are audit §3–§7 and §9 (TP `:321-391`, `:407-423`, `:493-522`); every coverage run also reads Audit `:103-168`, `:204-241`, `:361-376`, TP `:321-391`, `:407-423`, `:493-522` and RS3.
+
+**`cov-a`** (`reviewer`, `4 · O3a`). Coverage of Phase 10 and of run 21's Step 1: main-phase coverage, naming and order, Index consistency, 13-section structure, scope drift.
+- Inputs: `Planner-docs/Faz-10-Plans/` (5 files, whole); Main (whole); Index `:1-325`; Ledger `:67-68`, `:111-115`, `:42`, `:582-583`, `:615-618`; `Planner-docs/Project-Comprehension.md:49-53`; Audit `:380`, `:383`, `:384`.
+- `AUDIT-FIX-41`, `-42`, `-57`. `-41` looks resolved (Main `:348`, `:349` hold the measured configuration). `-42` (Main `:26`, `:71`, `:363`, `:365`) was met by retirement, not by rewording: decide. `-57`: dated notes at Main `:87`, `:234`, `:335`, `:406`; residue Main `:238` ("rented Hetzner VDS") and `Project-Comprehension.md:51` (EV-20 Confidence still `confirmed`; S3-15).
+- S3-09: Main `:21`, `:25`, `:63`, `:81`, `:87`, `:398` stale wording outside Step 1's edits; `:316` (R1) — the mapping is an inference: verify. S3-18: Main `:282` ties SukiSU-Ultra to 2026-11-13. S3-19: Main `:367` calls itself the only record of the 2026-11-15 checks. S3-20: Main `:15` says "functionally proven" in the present tense.
+- S3-12: Index `:43`, the `SNAP-2026-09-10-MAIN` sentence is stale. S3-13: Index `:66`, the EV-20 retired-server paragraph.
+- REV-3 P3 (window 2, routed to run 21, not fixed): Ledger `:615`–`:618` (`DEC-29`–`DEC-32`) "Raised by" cells read "The user, 2026-11-13"; the ledger's convention for questions a session puts to the user is "put to the user <date> by `IMPL-NN`" (`DEC-23`, `DEC-25`). Turn it into a finding or close it with a reason.
+
+**`rdy-a`** (`reviewer`, `4 · O3a`). Readiness of `Faz10.1`–`10.5`, audit §8, §10, §12 (TP `:392-406`, `:425-435`, `:455-491`, `:493-522`; RS3; PB `:19-25`): documented vs implemented, local vs live, smoke vs production, operational gaps; the chain 10.1 → 10.2–10.4 → 10.5; the five queue rows.
+- Inputs: `Planner-docs/Faz-10-Plans/` (5 files); `ishtar-cam-modes/` `setmode.sh`, `action.sh`, `service.sh`, `post-fs-data.sh`, `halpatch.sh`, `customize.sh`, `module.prop`, `Kullanim.txt`, `webroot/index.html`, `tile-app/AndroidManifest.xml`, `tile-app/build.sh`, `tile-app/res/values/strings.xml`, `tile-app/res/drawable/ic_camera.xml`, and `BaseTile.java`, `WebUiActivity.java`, `FullResTile.java`, `Sh.java` under `tile-app/java/com/ishtar/cammodes/`; `scripts/smoke.sh`; `scripts/build-release.py`; `ishtar-aon-fix/` `customize.sh`, `module.prop`, `post-fs-data.sh`; `CHANGELOG.md`.
+- Ranges: `docs/agc-12mp-configuration.md:97-146,149-157,199-205,378-384`; `docs/phase3-preconditions.md:68-122`; `docs/recovery-runbook.md:110-116`; `docs/release-checklist.md:162-168,488-500`; `docs/rom-build-device-notes.md:213-220`; Main `:90-92`, `:176-180`, `:276-356`; Index `:1-11`, `:165-193`, `:285-291`; Ledger `:67-68`, `:111-115`; `PROJECT_LOG.md:712-716`; Audit `:169-203`, `:242-258`, `:275-304`, `:347-360`, `:381`.
+- `AUDIT-FIX-50`: the `beryl` condition is moot; the document half belongs to `Faz10.5` (decision 6): confirm or report.
+- S3-03: `docs/recovery-runbook.md:113` cites `setmode.sh:253-255`; today `:254-256`. S3-04: `docs/agc-12mp-configuration.md:381` presence-only sentence stale since `IMPL-80`. S3-25: `Faz10.3:91` corrects that sentence, `Faz10.5:54` calls it unmapped. S3-26: `Faz10.1:76` stops before `PRB3` and speaks of a package change.
+- S3-16: Index `:165`, `:192` order conflicts with the single-device-window rule (`PROJECT_LOG.md:715`). S3-17: Main `:178`, `:349` also give the AGC measurement to `Faz10.2`. S3-11: `tile-app/res/drawable/ic_camera.xml:4` is orphaned when `FullResTile` is deleted; `Faz10.4` excludes it.
+- S3-22: `setmode.sh:218`, `:226` recommend stock for video, against Main `:91`. S3-23: `scripts/smoke.sh:281`, `:284` two `emit` lines and two `date -u` calls. S3-24: `action.sh:8`, `:70`, `:148`, `tile-app/AndroidManifest.xml:7`, `:48`, `webroot/index.html:196` name KernelSU; that no sub-plan owns them is an inference: verify.
+
+**`sec-a`** (`security-reviewer`, `4 · O3a`). Security of `Faz10.1`–`10.5`, audit §11 (TP `:437-453`, `:493-522`; RS3; PB `:19-25`): secret safety, command execution, approval gates, insecure defaults, dependencies, external mutation, the identity rule.
+- Inputs: `Planner-docs/Faz-10-Plans/` (5 files); `.gitignore`; `.gitattributes`; `UNTRACKED-BY-DESIGN.md`; `scripts/build-release.py`; `scripts/smoke.sh`; `ishtar-cam-modes/` `setmode.sh`, `action.sh`, `service.sh`, `post-fs-data.sh`, `halpatch.sh`, `customize.sh`, `webroot/index.html`, `tile-app/AndroidManifest.xml`, `tile-app/build.sh`, and `BaseTile.java`, `WebUiActivity.java`, `Sh.java` under `tile-app/java/com/ishtar/cammodes/`.
+- Ranges: Main `:276-356`; Index `:165-172`, `:285-291`; Ledger `:67-68`, `:111-115`, `:582-583`, `:617`; `PROJECT_LOG.md:712-716`; Audit `:259-274`.
+- Project rules to check the plans against: `adb` only as `-s dc27e5d0`; device actions are the user's, approved and smoke-bracketed; no `camera.qcom.so`, `*.keystore`, `*.jks`, `*.apk`, `*.zip`, `blobs/*.bin` or `candidates/*.bin` in the repository; push only with an explicit refspec; identity values are never written.
+- S3-10: `.gitignore` has no `camera.qcom.so` or `*.so` rule; the rule against committing it holds only by discipline. S3-21: `PROJECT_LOG.md:714` ("preference values are not written") against the setting values at Main `:293`, `:348`.
+
+**`cov-b`** (`reviewer`, `4 · O3b`). Coverage of Phase 3.
+- Inputs: `Planner-docs/Faz-3-Plans/` (11 files, whole); Main `:1-5`, `:133-149`, `:174-191`; Index `:1-325`; Ledger `:67-68`, `:79-89`; Audit `:385` and the §12 rows naming `Faz-3-Plans` (in `:305-346`).
+- `AUDIT-FIX-33` (accepted P3; `Faz3.8`, Index). S3-02: `Faz3.7-agc-photo-size-pin.md:71`, the `<UTC>` file-name claim is unreliable.
+
+**`cov-c`** (`reviewer`, `4 · O3b`). Coverage of Phases 1, 2, 5, 6 and of the support artifacts.
+- Inputs: `Planner-docs/Faz-1-Plans/` (6), `Faz-2-Plans/` (4), `Faz-5-Plans/` (3) and `Faz6.2-aon-module-disposition.md`, whole; `Faz6.1-symlink-entry-in-device-trees.md` light; Main `:1-5`, `:133-173`, `:204-229`; Index `:1-325`; Ledger `:15-16`, `:48-49`, `:67-78`, `:97-101`, `:19`, `:52`, `:640`, `:651`; `docs/reverse-engineering-toolchain.md` (whole); Audit `:377`, `:382`, `:386` and the §12 rows naming `Faz-1-`, `Faz-2-`, `Faz-5-`, `Faz-6-Plans`.
+- Ledger format view, no content: `awk -F'|' 'FNR==366||FNR==367||(FNR>=500&&FNR<=513)||FNR==524||FNR==525{print FNR, NF-1, length($0)}' Planner-docs/Planing-Ledger.md`.
+- Exact lines: `Project-Comprehension.md:9,42,45,53,95,101,120,141,145,149,167`; `Project-Ontology.md:7-9,18-20,116-119,390-395,446-448` (two NUL bytes at `:313`, `:316`, measured by script; `grep` may skip the file).
+- `AUDIT-FIX-22` (P2; the NUL bytes; owner: the Ontology edit with S3-07, decision 6), `-37` (Comprehension never names `IMPL-52`; owner: the Comprehension edit with S3-06), `-25` (accepted P3, `Faz1.3`). S3-27 and S3-28 are the authorless `-22` and `-37` (Ledger `:42`).
+- S3-01: Ledger `:19`, `:52`, `:651` shifted outside `IMPL-96` without a note; the §5 format lines `:366-367`, `:501`, `:503`, `:511-512`, `:524-525` are an inference: verify with the format view. S3-14: Ledger `:101` Next Action names Phase 7's `VAL-BUILD`.
+- S3-06: the Comprehension lines above are stale without a `DEC-28` note. S3-07: the Ontology lines above assume Phase 7 or AOSPA. S3-08: `docs/reverse-engineering-toolchain.md:213` (§7) assumes Phase 7; only `:227-230` carry a note.
+
+**`cov-d`** (`reviewer`, `4 · O3b`). Coverage of Phases 4, 7, 8, 9.
+- Inputs, whole: `Faz4.2`–`Faz4.5`, `Faz7.1`, `Faz8.2`, `Faz9.1`–`Faz9.3`. Light: `Faz4.1`, `Faz4.7`, `Faz7.2`, `Faz7.3`, `Faz8.1`, `Faz8.3`; `Faz4.6` light plus its `## 1.` and `## 13.` sections. Main `:1-5`, `:133-149`, `:192-203`, `:230-275`; Index `:1-325`; Ledger `:67-68`, `:90-96`, `:102-110`; Audit `:378`, `:379`, `:387-389` and the §12 rows naming `Faz-4-`, `Faz-7-`, `Faz-8-`, `Faz-9-Plans`.
+- `AUDIT-FIX-55`, `-56` (open P3 on `Faz7.2`, now SUPERSEDED); `-52`–`-54` (resolved; confirm). S3-05: `Faz9.2-release-verification-checklist.md:54`, the Android 16 sentence depends on `Faz7.2`. Confirm or refute: none of the seven retired files carries a supersession note (light-read counts).
+
+#### A.8.3 `PAT4` script (orchestrator, `4 · O3b`)
+
+Run from the root with `py -3`. It prints counts, and with `--locations` also `path:line ID`; never line text. Calibration 2026-11-17 (`W4O2P01`): see §8.3.
+
+```python
+import re, sys, glob
+from collections import Counter, defaultdict
+P = [
+ ("PAT4-S1", r"\badb(?:\.exe)?\b", lambda l: "dc27e5d0" not in l and "ANDROID_SERIAL" not in l),
+ ("PAT4-S2", r"\brm\s+-[a-zA-Z]*[rR]|\bdd\s+if=|of=/dev/block|\bfastboot\b|\bformat\s+data\b|\bwipe\s+data\b", None),
+ ("PAT4-S3", r"\bsed\s+-i\b|pref_camera_picturesize_back_key\s*[=:]\s*\S|\bimport\w*\b[^.\n]{0,40}\.agc\b|\.agc\b[^.\n]{0,40}\bimport", None),
+ ("PAT4-S4", r"\bpush\s+(?:--force|-f\b|--all\b|--mirror\b)|\bcommit\s+--amend\b|\bfilter-(?:branch|repo)\b|\brebase\s+-i\b|\breset\s+--hard\b", None),
+ ("PAT4-S5", r"(?i)\b(?:password|passwd|token|api[_-]?key|secret|storepass|keypass)\b\s*[=:]\s*\S{6,}|BEGIN [A-Z ]*PRIVATE KEY", None),
+ ("PAT4-S6", r"(?:persist\.sys\.miui\.sno|ro\.ril\.miui\.imei[01])\s*\]?\s*[=:]\s*\[?\s*(?!<redacted>)\S", None),
+ ("PAT4-S7", r"\bsetenforce\s+0\b|\bchmod\s+(?:-R\s+)?777\b|\bmount\s+-o\s+rw,remount\b|\bmagiskpolicy\b|\bsupolicy\b|\bchcon\b|\brestorecon\b", None),
+ ("PAT4-S8", r"\b(?:curl|wget)\b[^\n|]*\|\s*(?:sh|bash|su)\b", None),
+ ("PAT4-R1", r"(?i)\bproduction[- ]ready\b|\bfully\s+(?:working|proven|tested)\b|\bguaranteed?\b|\bbullet-?proof\b|\balways\s+works\b", None),
+ ("PAT4-R2", r"\b(?:TODO|TBD|FIXME|XXX)\b|<placeholder>", None),
+ ("PAT4-R3", r"(?i)\bhetzner\b|\brented\b[^.\n]{0,20}\b(?:server|vds|machine)\b|\brepo\s+sync\b|\bbrunch\b|\blunch\s+\w|\bm\s+-j\d", None),
+ ("PAT4-R4", r"Android\s?16|\bA16\b", None),
+ ("PAT4-R5", r"\bKernelSU\b|\bMagisk\b", None),
+ ("PAT4-R6", r"(?i)\b(?:re-?enable|re-?open|turn\s+on|enable)\b[^.\n]{0,30}\b50\s?MP\b", None),
+]
+files = sorted(f.replace("\\", "/") for f in glob.glob("Planner-docs/Faz-[1-9]-Plans/*.md"))
+loc = "--locations" in sys.argv
+tot, per, hit = Counter(), defaultdict(Counter), defaultdict(set)
+for f in files:
+    for n, line in enumerate(open(f, encoding="utf-8").read().split("\n"), 1):
+        for pid, rx, cond in P:
+            if re.search(rx, line) and (cond is None or cond(line)):
+                tot[pid] += 1; per[pid][f.split("/")[1]] += 1; hit[pid].add(f)
+                if loc: print(f"{f}:{n} {pid}")
+print(f"files={len(files)}")
+for pid, _, _ in P:
+    print(pid, f"hits={tot[pid]}", f"files={len(hit[pid])}", " ".join(f"{k}:{v}" for k, v in sorted(per[pid].items())))
+print("total", sum(tot.values()))
 ```
