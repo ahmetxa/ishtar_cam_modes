@@ -28,7 +28,7 @@ Three more P2 findings sit on the same device window:
 - define the video-failure outcome per mode (`AUDIT-FIX-69`);
 - gate `F10.2-07` to a diff of `setmode.sh` alone (`AUDIT-FIX-70`);
 - forbid tile taps and the root grant while v2.2 is installed (`AUDIT-FIX-78`);
-- add the push, the tile-list backup and restore, and the cleanup to the `Faz10.4` approvals (`AUDIT-FIX-80`).
+- add the device push (`adb push`), the tile-list backup and restore, and the cleanup to the `Faz10.4` approvals (`AUDIT-FIX-80`).
 
 In `Faz10.1`, add a host-only file mode for `VAL-101-IDENTITY` in `F10.1-01` and `F10.1-02` (`AUDIT-FIX-86`). The rest of the survey is read-only and can start as written.
 
@@ -42,7 +42,7 @@ In `Faz10.1`, add a host-only file mode for `VAL-101-IDENTITY` in `F10.1-01` and
 
 ## 2. Reviewed Sources
 
-**Review runs.** All runs took place on 2026-11-17 on branch `integrate/impl-96`. The inputs were unchanged since `Window 4 O1` (`git diff --stat 2f39b73..HEAD` over them is empty). Each run's task text was `ORCHESTRATION_PLAN.md` Ek A.8.1 plus that run's A.8.2 block. Status, bytes and extra reads come from the `### Runs` tables (`AUDIT12_FINDINGS.md:179` and `:385`). The inputs come from the `W4O2P02` table in `ORCHESTRATION_PLAN.md` §8.3.
+**Review runs.** All runs took place on 2026-11-17 on branch `integrate/impl-96`. The inputs were unchanged since `Window 4 O1` (`git diff --stat 2f39b73..HEAD` over them is empty). Each run's task text was `ORCHESTRATION_PLAN.md` Ek A.8.1 plus that run's A.8.2 block. Status, bytes and extra reads come from the `### Runs` tables (`AUDIT12_FINDINGS.md:183` and `:389`). The inputs come from the `W4O2P02` table in `ORCHESTRATION_PLAN.md` §8.3.
 
 | Run | Session | Agent | Status | Input bytes | Extra reads | Inputs read (bytes) |
 |---|---|---|---|---|---|---|
@@ -223,7 +223,7 @@ All 47 sub-plans were checked, not sampled.
 
 ## 8. Content Quality and Implementability Analysis
 
-**Phase 10, the Step 4 queue (rdy-a, `AUDIT12_FINDINGS.md:149`).**
+**Phase 10, the Step 4 queue (rdy-a, `AUDIT12_FINDINGS.md:153`).**
 - **Specific and verified against the tree.** Each plan names concrete lines, and rdy-a confirmed the ones it checked: `setmode.sh` restart, mode write and chcon; `post-fs-data.sh`; `customize.sh`; `action.sh`; `BaseTile.java`; the manifest; `index.html`; and the `build-release.py` options.
 - **Small verified slices.** Each plan sets out local-first slices with a fastest signal: the probe refusal (10.1), the unchanged v2.2 boot (10.2), the host fixture (10.3), the `-d` launch (10.4) and the host grep (10.5).
 - **Dependencies.** They are explicit: `Faz10.1` is independent, and the others are satisfied by earlier queue rows.
@@ -311,7 +311,7 @@ None of them changes a queue row.
 
 ## 10. Readiness Realism
 
-**No overclaim in the Phase 10 plans (rdy-a, `AUDIT12_FINDINGS.md:151`).**
+**No overclaim in the Phase 10 plans (rdy-a, `AUDIT12_FINDINGS.md:155`).**
 - **Docs versus implementation.** All five ledger rows are `planned`, and nothing is implemented. The probe, both notes files and the cleanup script are `proposed`.
 - **Local versus live.** Each §9 separates the two. For example, the 10.3 fixture is local, while the backup, write and restore are live.
 - **Inferences are labelled.** These include the idle-provider wake-up, KernelSU staging, `--es id` and the metamodule `system/` overlay.
@@ -338,7 +338,7 @@ These are history and scope labels, not readiness claims on queued work.
 
 ## 11. Security and Governance Findings
 
-**Sources.** sec-a run 1 (`AUDIT12_FINDINGS.md:155`, partial) and run 2 (`:165`, complete), both on the five Phase 10 plans. PAT4 covers the 42 sub-plans of Phases 1 to 9 (`:420-505`). No finding is P0 or P1.
+**Sources.** sec-a run 1 (`AUDIT12_FINDINGS.md:159`, partial) and run 2 (`:169`, complete), both on the five Phase 10 plans. PAT4 covers the 42 sub-plans of Phases 1 to 9 (`:424-509`). No finding is P0 or P1.
 
 - **Secret safety: clean, with one wording error.**
   - No token, password, server address or identity value appears in the five plans.
@@ -418,7 +418,7 @@ Rows appear in the order of `Planner-docs/Sub-Planing-Index.md` section 3 (lines
 
 **Counts, measured from the ledger matrix (`Planner-docs/Planing-Ledger.md` section 4, rows :69-:115).** 47 rows: 34 `verified`, 7 `superseded`, 1 `implemented` (`Faz4.6`, :95) and 5 `planned` (`Faz10.1`-`10.5`, :111-:115). That gives 34 COMPLETE, 7 SUPERSEDED, 1 DEFERRED and 5 READY_WITH_WARNINGS rows, with 0 READY, 0 NEEDS_REPAIR and 0 BLOCKED.
 
-**What changed since the eleventh audit.** Planning run 21 (`DEC-28`) retired the ROM track: `Faz6.1`, `Faz7.2`, `Faz7.3`, `Faz8.1` and `Faz8.3` are now SUPERSEDED, so the eleventh audit's four queued rows leave the queue. The five Phase 10 rows (`DEC-32`) are new and form the whole queue. Under decision 6, the `Faz4.3` row no longer carries `AUDIT-FIX-22` and the `Faz9.2` row no longer carries `AUDIT-FIX-50` (`AUDIT12_FINDINGS.md` :291); `-50`'s document half moves to the `Faz10.5` row (`AUDIT-FIX-77`).
+**What changed since the eleventh audit.** Planning run 21 (`DEC-28`) retired the ROM track: `Faz6.1`, `Faz7.2`, `Faz7.3`, `Faz8.1` and `Faz8.3` are now SUPERSEDED, so the eleventh audit's four queued rows leave the queue. The five Phase 10 rows (`DEC-32`) are new and form the whole queue. Under decision 6, the `Faz4.3` row no longer carries `AUDIT-FIX-22` and the `Faz9.2` row no longer carries `AUDIT-FIX-50` (`AUDIT12_FINDINGS.md` :295); `-50`'s document half moves to the `Faz10.5` row (`AUDIT-FIX-77`).
 
 **The `Faz3.8` reason is corrected (`AUDIT-FIX-90`).** The plan text names three fields, its section 7 plans four, and five were delivered with the front key; the row stays COMPLETE.
 
@@ -484,7 +484,7 @@ Rows appear in the order of `Planner-docs/Sub-Planing-Index.md` section 3 (lines
 - `Faz10.2`: the user installs and reboots, and approves each mode switch; no tile tap or root grant while v2.2 is installed (`AUDIT-FIX-78`).
 - `Faz10.3`: each preference write and the restore are user-approved and bracketed; no value is written into any document.
 - `Faz10.4`: its section 10 approval list, which must also name the four host-sent writes of `AUDIT-FIX-80` before they run.
-- `Faz10.5`: the user's install bracket, the push and the `lang` restore.
+- `Faz10.5`: the user's install bracket, the device push (`adb push`) and the `lang` restore.
 
 **Not queued.** The SUPERSEDED and DEFERRED rows, like the COMPLETE rows, do not enter the Step 4 queue (`Third-Planner.md` :489).
 
@@ -586,7 +586,7 @@ The four `accepted` findings (`-25`, `-33`, `-94`, `-95`) are risk knowingly car
 
 The queue then runs `Faz10.2`, `Faz10.3` and `Faz10.4` (each `satisfied` once `Faz10.1` is done; one device window at a time) and ends with `Faz10.5`. The six P2 and 49 P3 warnings stay visible throughout. Four of the P2s (`-69`, `-70`, `-78`, `-80`) sit in `Faz10.2` and `Faz10.4`, and the prompt makes the session settle them with the user before that plan's device work.
 
-**Before starting it, the user decides** whether to commit this audit locally, so the session starts from a clean tree.
+**Before starting it:** this audit is committed locally (`Window 4 O4: merged audit and gates for the twelfth audit`), so the Step 4 session starts from a clean tree.
 
 **Supporting actions, not preconditions:** a bounded Step 2 touch-up for the Phase 10 wording findings (`-66`, `-67`, `-68`, `-71`, `-73` to `-76`, `-79`, `-83` to `-85`, `-87` to `-89`); the next Step 1 amendment for the Main findings (`-58` to `-61`, `-72`, `-81`, `-107`); and one Index edit for `-63`, `-64`, `-92`, `-93`, `-101`, `-102` and `-106`.
 
