@@ -1,5 +1,9 @@
 # Twelfth Audit Findings
 
+**Merge note (2026-11-19, `4 · O4`, commit `Window 4 O4: merged audit and gates for the twelfth audit`).** The findings below were merged into `Planner-docs/Sub-Planing-Audit.md` (twelfth audit, `PASS_WITH_WARNINGS`: P0 0, P1 0, P2 6, P3 49; section 13 has 65 rows). This file stays as evidence; the sections below are unchanged.
+
+Merge decisions: `AUDIT-FIX-90` and `-96` are `resolved` because the audit text does what they ask; `-57` is `resolved` (its residue is carried as `-62` and `-100`); `-50` stays `open`, narrowed to its document half and owned by `Faz10.5` (decision 6).
+
 This file holds the reviewer findings of the twelfth ClaudeQB Step 3 audit (`Planner-docs/Sub-Planing-Audit.md`), as set by `ORCHESTRATION_PLAN.md` §8.3, items 3 and 4. Only the orchestrator writes it, one `##` section per review session. Reviewer temp IDs (`<run>-NN`) map to permanent IDs from `AUDIT-FIX-58` in run order (`4 · O3a`: cov-a, rdy-a, sec-a; `4 · O3b`: cov-b, cov-c, cov-d, PAT4) and in temp order within a run. Two temp findings on one topic share one ID; a rejected temp finding gets none and is listed with its reason. Evidence is given as `path:line`. Identity values, secrets and AGC preference values are never written here. `4 · O4` merges these findings into the audit; this file then stays as evidence.
 
 ## Session 4 · O3a
